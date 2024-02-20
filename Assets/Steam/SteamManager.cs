@@ -100,6 +100,7 @@ namespace Steam
 
         public void Disconnect()
         {
+            Debug.Log($"Disconnect");
             CurrentLobby?.Leave();
 
             if (NetworkManager.Singleton == null)

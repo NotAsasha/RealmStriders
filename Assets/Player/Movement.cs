@@ -46,7 +46,7 @@ namespace Player
         {
             // Pauses the player -- In future should be moved to the separated class
             if (Input.GetKeyDown(EscapeKey)) isPaused = !isPaused;
-            if (Input.GetMouseButton(0)) isPaused = false;
+            //if (Input.GetMouseButton(0)) isPaused = false;
             if (isPaused) return;
 
             isGrounded = Physics.Raycast(playerTransform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);

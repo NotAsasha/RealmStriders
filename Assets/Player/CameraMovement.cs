@@ -38,7 +38,7 @@ namespace Player
 
             // Pauses the camera -- In future should be moved to the separated class
             if (Input.GetKeyDown(EscapeKey)) PauseCamera(!isPaused);
-            if (Input.GetMouseButton(0)) PauseCamera(false);
+            //if (Input.GetMouseButton(0)) PauseCamera(false);
             if (isPaused) return;
 
             float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
