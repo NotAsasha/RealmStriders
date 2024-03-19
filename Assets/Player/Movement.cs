@@ -1,7 +1,9 @@
 using Steamworks;
 using System.Collections;
 using Unity.Netcode;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Player
 {
@@ -25,13 +27,15 @@ namespace Player
         [Header("Other Settings")]
         public bool isNetwork = true;
 
+        public static Controls _controls;
+        public static bool isPaused = false;
+
         private bool isGrounded;
         private Vector3 velocity = new();
         private float currentSpeed;
         private Transform playerTransform;
 
         private const KeyCode EscapeKey = KeyCode.Escape;
-        public bool isPaused = false;
         void Start()
         {
             // Checks of you are owner of this Network Object and if Network is turned on
@@ -40,20 +44,56 @@ namespace Player
             Application.targetFrameRate = 240;
             player = GetComponent<CharacterController>();
             playerTransform = transform;
-        }
 
+            _controls = new();
+            LoadBindingsFromPlayerPrefs();
+            _controls.System.Enable();
+            _controls.Gameplay.Enable();
+            _controls.Gameplay.Jump.performed += OnJump;
+            _controls.System.Pause.performed += OnPause;
+        }
+        private void LoadBindingsFromPlayerPrefs()
+        {
+            string rebinds = PlayerPrefs.GetString("rebinds", string.Empty);
+            if (!string.IsNullOrEmpty(rebinds))
+            {
+                _controls.LoadBindingOverridesFromJson(rebinds);
+                Debug.Log("Bindings loaded!");
+            }
+        }
+        private void OnJump(InputAction.CallbackContext obj)
+        {
+            // Handle jumping
+            if (isGrounded)
+            {
+                velocity.y = Mathf.Sqrt(2f * jumpHeight * Mathf.Abs(gravity));
+            }
+        }
+        private void OnPause(InputAction.CallbackContext obj)
+        {
+            isPaused = !isPaused;
+            if (isPaused)
+            {
+                _controls.Gameplay.Disable();
+                _controls.UI.Enable();
+            }
+            else
+            {
+                _controls.Gameplay.Enable();
+                _controls.UI.Disable();
+            }
+
+        }
         void FixedUpdate()
         {
-            // Pauses the player -- In future should be moved to the separated class
-            if (Input.GetKeyDown(EscapeKey)) isPaused = !isPaused;
-            //if (Input.GetMouseButton(0)) isPaused = false;
             if (isPaused) return;
 
             isGrounded = Physics.Raycast(playerTransform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
             if (isGrounded && velocity.y < 0) velocity.y = 0f;
 
+            var MovementControls = _controls.Gameplay.Movement;
             // Calculate movement direction and speed
-            Vector3 move = playerTransform.right * Input.GetAxis("Horizontal") + playerTransform.forward * Input.GetAxis("Vertical");
+            Vector3 move = playerTransform.right * MovementControls.ReadValue<Vector3>().x + playerTransform.forward * MovementControls.ReadValue<Vector3>().z;
             if (move.magnitude > 1) move.Normalize();
 
             // Set the current speed based on whether the run key is pressed
@@ -64,12 +104,6 @@ namespace Player
 
             // Apply the final position to the character controller
             player.Move(finalPosition * Time.deltaTime);
-
-            // Handle jumping
-            if (Input.GetKey(jumpKey) && isGrounded)
-            {
-                velocity.y = Mathf.Sqrt(2f * jumpHeight * Mathf.Abs(gravity));
-            }
 
             // Apply gravity to the velocity
             velocity.y += gravity * Time.deltaTime;

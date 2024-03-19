@@ -2,7 +2,9 @@ using Steamworks;
 using System.Collections.Generic;
 using System.IO;
 using Unity.Netcode;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Player.Voice
 {
@@ -12,7 +14,6 @@ namespace Player.Voice
         private AudioSource source;
 
         [Header("Keybinds")]
-        public KeyCode voiceKey = KeyCode.V;
 
         private MemoryStream output;
         private MemoryStream stream;
@@ -40,20 +41,24 @@ namespace Player.Voice
             source.clip = AudioClip.Create("VoiceData", clipBufferSize, 1, optimalRate, true, OnAudioRead, null);
             source.loop = true;
             source.Play();
-        }
 
+            Movement._controls.Gameplay.Voice.performed += ChangeVoiceRecordState;
+        }
+        private void ChangeVoiceRecordState(InputAction.CallbackContext obj)
+        {
+            SteamUser.VoiceRecord = !SteamUser.VoiceRecord;
+        }
         private void Update()
         {
             ListenForVoice();
         }
-
         private void ListenForVoice()
         {
             if (!Application.isFocused) return;
-            SteamUser.VoiceRecord = Input.GetKey(voiceKey);
 
             if (SteamUser.HasVoiceData)
             {
+                Debug.LogError("HasVoiceData");
                 int compressedWritten = SteamUser.ReadVoiceData(stream);
                 stream.Position = 0;
                 VoiceCommand voice = new()
