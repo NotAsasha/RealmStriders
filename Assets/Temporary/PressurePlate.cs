@@ -19,14 +19,7 @@ public class PressurePlate : NetworkBehaviour
     private void Start()
     {
         _fileHandler = GameFileHandler.Instance;
-        foreach (var file in _fileHandler.availableFiles)
-        {
-            if (file.FileName == _saveFileName)
-            {
-                testGameFile = (TestGameFile)file;
-                break;
-            }
-        };
+        testGameFile = (TestGameFile)_fileHandler.SearchForFileByName(_saveFileName);
         _pressesCounter.text = "Button press count: " + testGameFile.buttonPresses;
     }
     [ClientRpc]
@@ -40,10 +33,5 @@ public class PressurePlate : NetworkBehaviour
         testGameFile.AddButtonClick();
         testGameFile.Save(false);
         UiUpdateClientRPC(testGameFile.buttonPresses);
-    }
-    public void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Q)) { testGameFile.Save(true); }
-        if (Input.GetKeyDown(KeyCode.E)) { testGameFile.Load(true); }
     }
 }

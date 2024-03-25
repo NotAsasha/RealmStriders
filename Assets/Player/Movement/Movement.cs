@@ -1,7 +1,7 @@
+using FileSystem;
 using Steamworks;
 using System.Collections;
 using Unity.Netcode;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -34,6 +34,8 @@ namespace Player
         private Vector3 velocity = new();
         private float currentSpeed;
         private Transform playerTransform;
+        private SettingsFile settingsFile;
+        private GameFileHandler _fileHandler;
 
         private const KeyCode EscapeKey = KeyCode.Escape;
         void Start()
@@ -46,19 +48,22 @@ namespace Player
             playerTransform = transform;
 
             _controls = new();
-            LoadBindingsFromPlayerPrefs();
+            _fileHandler = GameFileHandler.Instance;
+            settingsFile = (SettingsFile)_fileHandler.SearchForFileByName("Settings");
+            LoadBindings();
             _controls.System.Enable();
             _controls.Gameplay.Enable();
             _controls.Gameplay.Jump.performed += OnJump;
             _controls.System.Pause.performed += OnPause;
         }
-        private void LoadBindingsFromPlayerPrefs()
+        private void LoadBindings()
         {
-            string rebinds = PlayerPrefs.GetString("rebinds", string.Empty);
+            string rebinds = settingsFile.save.rebinds;
             if (!string.IsNullOrEmpty(rebinds))
             {
-                _controls.LoadBindingOverridesFromJson(rebinds);
-                Debug.Log("Bindings loaded!");
+                try { _controls.LoadBindingOverridesFromJson(rebinds); }
+                catch { Debug.LogWarning("Unable to rewrite bindings"); }
+                Debug.Log("Bindings loaded!"); 
             }
         }
         private void OnJump(InputAction.CallbackContext obj)

@@ -1,3 +1,4 @@
+using FileSystem;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -24,7 +25,8 @@ namespace Player
             // Locks your cursor to the game
             Movement._controls.System.Pause.performed += UpdateCursorState;
             Cursor.lockState = CursorLockMode.Locked;
-            mouseSensitivity = PlayerPrefs.GetFloat("MouseSensativity");
+            SettingsFile file = (SettingsFile)GameFileHandler.Instance.SearchForFileByName("Settings");
+            mouseSensitivity = file.save._sensValue;
         }
         private void UpdateCursorState(InputAction.CallbackContext obj)
         {

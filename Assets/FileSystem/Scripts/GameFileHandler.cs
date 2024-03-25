@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 namespace FileSystem
@@ -19,7 +18,14 @@ namespace FileSystem
             Instance = this;
             LoadAll(availableFiles);
         }
-
+        public GameFile SearchForFileByName(string name)
+        {
+            foreach (var file in availableFiles)
+            {
+                if (file.FileName == name) return file;
+            };
+            return null;
+        }
         public void DeleteAvaible() => DeleteAll(availableFiles);
         public void LoadAll(List<GameFile> filesToLoad)
         {

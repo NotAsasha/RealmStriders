@@ -2,31 +2,17 @@ using Steam;
 using Steamworks;
 using UnityEngine;
 using UnityEngine.UI;
-public class LobbyUiManager : MonoBehaviour
+namespace Menu
 {
-    [Header("Steam")]
-    [SerializeField] private SteamManager _steamManager;
-    [SerializeField] private Toggle _friendsOnly;
-    [SerializeField] private Slider _sensSlider;
+    public class LobbyUiManager : MonoBehaviour
+    {
+        [Header("Steam")]
+        [SerializeField] private SteamManager _steamManager;
+        [SerializeField] private Toggle _friendsOnly;
 
-    private float _sensValue;
-    private void Start()
-    {
-        // SteamMatchmaking.OnLobbyDataChanged += UpdateLobbyMembers;
-        _sensValue = PlayerPrefs.GetFloat("MouseSensativity");
-        if (_sensValue == 0)
+        public void CreateLobbyButton()
         {
-            UpdateMouseSensativity();
+            _steamManager.StartHost(6, _friendsOnly.isOn);
         }
-        _sensSlider.value = _sensValue;
-    }
-    public void CreateLobbyButton()
-    {
-        _steamManager.StartHost(6, _friendsOnly.isOn);
-    }
-    public void UpdateMouseSensativity()
-    {
-        _sensValue = _sensSlider.value;
-        PlayerPrefs.SetFloat("MouseSensativity", _sensValue);
     }
 }

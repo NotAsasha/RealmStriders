@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.IO;
-using UnityEngine;
 using System;
+using UnityEngine;
 
 namespace FileSystem
 {
@@ -11,24 +7,23 @@ namespace FileSystem
     public class SettingsFile : GameFile
     {
         [Header("SettingsFile Info")]
-        
-
-
-        public int buttonPresses = 0;
+        public SettingsSave save = new();
         public override void ProcessData(string inputData)
         {
-            if (inputData == null || inputData.Length == 0) { buttonPresses = 0; return; }
+            if (inputData == null || inputData.Length == 0) { save = null; return; }
             Debug.Log("InputData:" + inputData + GetFullPath());
-            buttonPresses = Convert.ToInt32(inputData);
+            save = JsonUtility.FromJson<SettingsSave>(inputData);
         }
         public override string GetData()
         {
-            Debug.Log("GetData -- buttonPresses:" + buttonPresses + GetFullPath());
-            return buttonPresses.ToString();
+            string jsonSave = JsonUtility.ToJson(save);
+            return jsonSave;
         }
-        public void AddButtonClick()
-        {
-            buttonPresses++;
-        }
+    }
+    [Serializable]
+    public class SettingsSave
+    {
+        public string rebinds;
+        public float _sensValue;
     }
 }

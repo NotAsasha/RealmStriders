@@ -14,13 +14,10 @@ public class SteamInitialize : MonoBehaviour
     public string PlayerName;
     public SteamId PlayerSteamId;
     public string playerSteamIdString;
-
-    private bool daRealOne = false;
     public void Start()
     {
         if (instance == null)
         {
-            daRealOne = true;
             DontDestroyOnLoad(gameObject);
             instance = this;
             try
