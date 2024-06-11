@@ -10,7 +10,7 @@ namespace FileSystem
         public SettingsSave save = new();
         public override void ProcessData(string inputData)
         {
-            if (inputData == null || inputData.Length == 0) { save = null; return; }
+            if (inputData == null || inputData.Length < 5) { save = null; Debug.LogError("inputData is empty"); return; }
             Debug.Log("InputData:" + inputData + GetFullPath());
             save = JsonUtility.FromJson<SettingsSave>(inputData);
         }

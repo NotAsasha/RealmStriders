@@ -46,7 +46,7 @@ namespace Player
             Application.targetFrameRate = 240;
             player = GetComponent<CharacterController>();
             playerTransform = transform;
-
+            Debug.Log(_controls);
             _controls = new();
             _fileHandler = GameFileHandler.Instance;
             settingsFile = (SettingsFile)_fileHandler.SearchForFileByName("Settings");
@@ -59,6 +59,7 @@ namespace Player
         private void LoadBindings()
         {
             string rebinds = settingsFile.save.rebinds;
+            if (rebinds.Length < 5) { }
             if (!string.IsNullOrEmpty(rebinds))
             {
                 try { _controls.LoadBindingOverridesFromJson(rebinds); }

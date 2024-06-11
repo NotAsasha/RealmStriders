@@ -49,8 +49,7 @@ namespace Steam
             SteamMatchmaking.OnLobbyInvite += OnLobbyInvite;
             SteamFriends.OnGameLobbyJoinRequested += OnGameLobbyJoinRequested;
         }
-
-        private void OnDestroy()
+            private void OnDestroy()
         {
             SteamMatchmaking.OnLobbyCreated -= OnLobbyCreated;
             SteamMatchmaking.OnLobbyEntered -= OnLobbyEntered;
@@ -76,8 +75,7 @@ namespace Steam
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
 
             NetworkManager.Singleton.StartHost();
-            //GameObject player = Instantiate(playerPrefab);
-            //player.GetComponent<NetworkObject>().Spawn();
+           // SpawnPlayer(SteamClient.SteamId);
             CurrentLobby = await SteamMatchmaking.CreateLobbyAsync((int)maxMembers);
             if (!isFriendsOnly) CurrentLobby?.SetPublic();
         }
@@ -88,16 +86,20 @@ namespace Steam
             transport.targetSteamId = id;
 
             Debug.Log($"Joining room hosted by {transport.targetSteamId}", this);
-
-            //GameObject player = Instantiate(playerPrefab);
-            //player.GetComponent<NetworkObject>().Spawn();
-            //Debug.Log(player.GetComponent<NetworkObject>().OwnerClientId);
+           
+            // SpawnPlayer(id);
             if (NetworkManager.Singleton.StartClient())
                 Debug.Log("Client has joined!", this);
-
             PlayerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
         }
-
+        public void SpawnPlayer(SteamId id)
+        {
+            GameObject player = Instantiate(playerPrefab);
+            NetworkObject PlayerNetwork = player.GetComponent<NetworkObject>();
+            ulong PlayerId = PlayerNetwork.OwnerClientId;
+            PlayerNetwork.SpawnAsPlayerObject(PlayerId);
+            Debug.Log(player.GetComponent<NetworkObject>().OwnerClientId);
+        }
         public void Disconnect()
         {
             Debug.Log($"Disconnect");
@@ -110,7 +112,7 @@ namespace Steam
         }
         public async void TryConnectLobby(uint id)
         {
-            await SteamMatchmaking.JoinLobbyAsync(id);
+            CurrentLobby = await SteamMatchmaking.JoinLobbyAsync(id);
         }
         public async Task<bool> RefreshLobbies(int maxResults = 20)
         {
@@ -171,12 +173,12 @@ namespace Steam
         }
 
         private void OnLobbyEntered(Lobby lobby)
-        {
+        {   
             Debug.Log($"You have entered in lobby, clientId={NetworkManager.Singleton.LocalClientId}", this);
 
             if (NetworkManager.Singleton.IsHost)
                 return;
-
+            CurrentLobby = lobby;
             StartClient(lobby.Owner.Id);
         }
 

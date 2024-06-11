@@ -53,8 +53,7 @@ namespace Player.Voice
         }
         private void ListenForVoice()
         {
-            if (!Application.isFocused) return;
-
+            if (!Application.isFocused || !SteamClient.IsValid) return;
             if (SteamUser.HasVoiceData)
             {
                 Debug.LogError("HasVoiceData");

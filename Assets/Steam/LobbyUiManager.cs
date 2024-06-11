@@ -6,12 +6,13 @@ namespace Menu
 {
     public class LobbyUiManager : MonoBehaviour
     {
-        [Header("Steam")]
-        [SerializeField] private SteamManager _steamManager;
+        [Header("SetUp")]
         [SerializeField] private Toggle _friendsOnly;
+        private SteamManager _steamManager;
 
         public void CreateLobbyButton()
         {
+            _steamManager = SteamManager.Instance;
             _steamManager.StartHost(6, _friendsOnly.isOn);
         }
     }
