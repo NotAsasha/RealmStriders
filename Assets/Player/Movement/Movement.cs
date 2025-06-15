@@ -63,8 +63,8 @@ namespace Player
             if (!string.IsNullOrEmpty(rebinds))
             {
                 try { _controls.LoadBindingOverridesFromJson(rebinds); }
-                catch { Debug.LogWarning("Unable to rewrite bindings"); }
-                Debug.Log("Bindings loaded!"); 
+                catch { Debug.LogWarning("---Movement: Unable to rewrite bindings"); }
+                Debug.Log("---Movement: Bindings loaded!"); 
             }
         }
         private void OnJump(InputAction.CallbackContext obj)

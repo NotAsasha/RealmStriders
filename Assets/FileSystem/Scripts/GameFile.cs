@@ -13,7 +13,7 @@ namespace FileSystem
          encryptionCodeWord - Word to be used as a password for encryption.
          ---Has basic methods:
          GetFullPath(), returns full path of the file.
-         ProcessData(), does something with data from the file on drive, meant to be overdrived.
+         ProcessData(), does something with data from the file on drive, meant to be overwriten.
          GetData(), returns every data from this object to store on a drive.
          Load(),Save(),Delete() - directly effects file on a drive.
          DataEncryptDecrypt() - Encrypts given data using key word from "encryptionCodeWord".
@@ -44,7 +44,7 @@ namespace FileSystem
         /// </summary>
         public virtual void ProcessData(string inputData)
         {
-           Debug.Log(inputData);
+            Debug.Log("---GameFile: " + inputData);
         }
         /// <summary>
         /// Returns every data from this object to store on a drive.
@@ -73,7 +73,7 @@ namespace FileSystem
             }
             catch (Exception e)
             {
-                Debug.LogError("Error occured when trying to load data from file: " + filePath + "\n" + e);
+                Debug.LogError("---GameFile: Error occured when trying to load data from file: " + filePath + "\n" + e);
             }
         }
         /// <summary>
@@ -102,9 +102,9 @@ namespace FileSystem
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error saving data to file: {filePath}\n{e}");
+                Debug.LogError($"---GameFile: Error saving data to file: {filePath}\n{e}");
             }
-            Debug.Log("File saved:" + filePath);
+            Debug.Log($"---{nameof(GameFile)}: File saved: {filePath}");
         }
         /// <summary>
         /// Deletes current file
@@ -114,7 +114,7 @@ namespace FileSystem
             string path = Path.Combine(Application.persistentDataPath + GetFullPath());
             File.Delete(path);
             ProcessData("");
-            Debug.Log("File deleted:" + path);
+            Debug.Log($"---{nameof(GameFile)} File deleted: {path}");
         }
         /// <summary>
         /// Encrypts given data
@@ -128,6 +128,6 @@ namespace FileSystem
             }
             return modifiedData;
         }
-        
+
     }
 }

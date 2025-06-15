@@ -70,6 +70,9 @@ namespace Steam
 
         public async void StartHost(uint maxMembers, bool isFriendsOnly)
         {
+            Debug.Log($"SteamClient.IsValid = {SteamClient.IsValid}");
+            Debug.Log($"NetworkManager.Singleton exists = {NetworkManager.Singleton != null}");
+            Debug.Log($"transport = {transport}");
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;

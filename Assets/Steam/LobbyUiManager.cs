@@ -1,3 +1,4 @@
+using FileSystem;
 using Steam;
 using Steamworks;
 using UnityEngine;
@@ -15,5 +16,10 @@ namespace Menu
             _steamManager = SteamManager.Instance;
             _steamManager.StartHost(6, _friendsOnly.isOn);
         }
+
+        public void DeleteFiles()
+        {
+            GameFileHandler.Instance.DeleteAvaible();
+        }
     }
-}
+} 

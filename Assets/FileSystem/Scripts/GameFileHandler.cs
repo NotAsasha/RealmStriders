@@ -16,6 +16,7 @@ namespace FileSystem
         private void Awake()
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
             LoadAll(availableFiles);
         }
         public GameFile SearchForFileByName(string name)
@@ -49,6 +50,7 @@ namespace FileSystem
             foreach (GameFile file in filesToLoad)
             {
                 file.Delete();
+                
             }
         }
     }

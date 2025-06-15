@@ -7,10 +7,16 @@ namespace FileSystem
     public class SettingsFile : GameFile
     {
         [Header("SettingsFile Info")]
-        public SettingsSave save = new();
+        public SettingsSave save = new(100);
         public override void ProcessData(string inputData)
         {
-            if (inputData == null || inputData.Length < 5) { save = null; Debug.LogError("inputData is empty"); return; }
+            if (string.IsNullOrWhiteSpace(inputData) || inputData.Length < 5)
+            {
+                Debug.LogWarning("InputData is empty, resetting to default save");
+                Save(false);
+                return;
+            }
+
             Debug.Log("InputData:" + inputData + GetFullPath());
             save = JsonUtility.FromJson<SettingsSave>(inputData);
         }
@@ -23,6 +29,7 @@ namespace FileSystem
     [Serializable]
     public class SettingsSave
     {
+        public SettingsSave(int a) { _sensValue = a; }
         public string rebinds;
         public float _sensValue;
     }

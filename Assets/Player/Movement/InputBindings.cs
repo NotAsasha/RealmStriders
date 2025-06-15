@@ -14,6 +14,7 @@ namespace Player
         private GameFileHandler _fileHandler;
         private RebindingOperation rebindingOperation;
         private InputAction inputAction;
+        private bool isRebinding = false;
         public enum ActionToBind
         {
             Movement = 0,
@@ -37,15 +38,16 @@ namespace Player
             if (!string.IsNullOrEmpty(rebinds))
             {
                 try { _controls.LoadBindingOverridesFromJson(rebinds); }
-                catch { Debug.LogWarning("Unable to rewrite bindings"); }
-                Debug.Log("Bindings loaded!");
+                catch { Debug.LogWarning("---InputBindings: Unable to rewrite bindings"); }
+                Debug.Log("---InputBindings: Bindings loaded!");
+                
             }
         }
         public void Save()
         {
             settingsFile.save.rebinds = _controls.SaveBindingOverridesAsJson();
             settingsFile.Save(false);
-            Debug.Log("Saved!");
+            Debug.Log("---InputBindings: Bindings saved!");
         }
         public void CallRebind()
         {
@@ -67,6 +69,9 @@ namespace Player
         }
         public void StartRebinding(InputAction rebindingAction)
         {
+            if (isRebinding) return;
+            isRebinding = true;
+
             rebindingAction.Disable();
             rebindingOperation = rebindingAction.PerformInteractiveRebinding()
                 .WithControlsExcluding("Mouse")
@@ -76,12 +81,19 @@ namespace Player
         }
         private void RebindComplete(InputAction rebindingAction)
         {
-            rebindingOperation.Dispose();
 
+            rebindingOperation.Dispose();
+            isRebinding = false;
             rebindingAction.Enable();
             text.text = rebindingAction.GetBindingDisplayString(0);
-            Debug.LogWarning(rebindingAction.GetBindingDisplayString(0));
             Save();
+        }
+        public void Update()
+        {
+            if (isRebinding && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                rebindingOperation?.Cancel();
+            }
         }
     }
 }

@@ -12,12 +12,12 @@ namespace FileSystem
         public override void ProcessData(string inputData)
         {
             if (inputData == null || inputData.Length == 0) { buttonPresses = 0; return; }
-            Debug.Log("InputData:" + inputData + GetFullPath());
+            Debug.Log($"---{nameof(TestGameFile)}: {inputData} {GetFullPath()}");
             buttonPresses = Convert.ToInt32(inputData);
         }
         public override string GetData()
         {
-            Debug.Log("GetData -- buttonPresses:" + buttonPresses + GetFullPath());
+            Debug.Log($"GetData -- buttonPresses:" + buttonPresses + GetFullPath());
             return buttonPresses.ToString();
         }
         public void AddButtonClick()
