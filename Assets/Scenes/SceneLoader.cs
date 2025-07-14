@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,8 +10,14 @@ namespace Menu
 
         public void LoadScene()
         {
-            SceneManager.LoadScene(_sceneToLoad);
+            if (NetworkManager.Singleton.IsServer)
+            {
+                NetworkManager.Singleton.SceneManager.LoadScene(_sceneToLoad, LoadSceneMode.Single);
+            }
+            else
+            {
+                Debug.Log("Waiting for server to load scene...");
+            }
         }
-
     }
 }

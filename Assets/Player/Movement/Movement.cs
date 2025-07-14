@@ -27,8 +27,11 @@ namespace Player
         [Header("Other Settings")]
         public bool isNetwork = true;
 
-        public static Controls _controls;
-        public static bool isPaused = false;
+        public static Movement instance;
+
+        public Controls _controls;
+        public bool isPaused;
+        public bool isInInteraction;
 
         private bool isGrounded;
         private Vector3 velocity = new();
@@ -38,15 +41,19 @@ namespace Player
         private GameFileHandler _fileHandler;
 
         private const KeyCode EscapeKey = KeyCode.Escape;
-        void Start()
+        public override void OnNetworkSpawn()
         {
-            // Checks of you are owner of this Network Object and if Network is turned on
-            if (!IsOwner && isNetwork) enabled = false;
+
+            if (!IsOwner)
+            {
+                enabled = false;
+                return;
+            }
+            instance = this; 
 
             Application.targetFrameRate = 240;
             player = GetComponent<CharacterController>();
             playerTransform = transform;
-            Debug.Log(_controls);
             _controls = new();
             _fileHandler = GameFileHandler.Instance;
             settingsFile = (SettingsFile)_fileHandler.SearchForFileByName("Settings");
@@ -77,23 +84,28 @@ namespace Player
         }
         private void OnPause(InputAction.CallbackContext obj)
         {
+
             isPaused = !isPaused;
+
             if (isPaused)
             {
-                _controls.Gameplay.Disable();
+                _controls.Gameplay.Movement.Disable();
+                _controls.Gameplay.Jump.Disable();
+                _controls.Gameplay.Voice.Disable();
                 _controls.UI.Enable();
             }
             else
             {
-                _controls.Gameplay.Enable();
-                _controls.UI.Disable();
+                if (isInInteraction) return;
+                _controls.Gameplay.Movement.Enable();
+                _controls.Gameplay.Jump.Enable();
+                _controls.Gameplay.Voice.Enable();
+                _controls.UI.Disable(); 
             }
-
         }
+
         void FixedUpdate()
         {
-            if (isPaused) return;
-
             isGrounded = Physics.Raycast(playerTransform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
             if (isGrounded && velocity.y < 0) velocity.y = 0f;
 

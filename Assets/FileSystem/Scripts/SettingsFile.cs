@@ -12,6 +12,7 @@ namespace FileSystem
         {
             if (string.IsNullOrWhiteSpace(inputData) || inputData.Length < 5)
             {
+                save = new(100);
                 Debug.LogWarning("InputData is empty, resetting to default save");
                 Save(false);
                 return;
@@ -22,7 +23,7 @@ namespace FileSystem
         }
         public override string GetData()
         {
-            string jsonSave = JsonUtility.ToJson(save);
+            string jsonSave = JsonUtility.ToJson(save); 
             return jsonSave;
         }
     }

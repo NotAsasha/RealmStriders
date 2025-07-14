@@ -18,12 +18,12 @@ public class BootstrapManager : MonoBehaviour
         // (Опціонально) Затримка — на випадок, якщо треба трохи почекати
         yield return new WaitForSeconds(1f);
 
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneToLoad);
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneToLoad);  
 
         while (!asyncLoad.isDone)
-        {
+        { 
             // (Опціонально) Можна оновлювати progress-бар: asyncLoad.progress
-            yield return null;
+            yield return null; 
         }
     }
-}
+} 

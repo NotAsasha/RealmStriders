@@ -41,7 +41,7 @@ namespace Player.Voice
             source.loop = true;
             source.Play();
 
-            Movement._controls.Gameplay.Voice.performed += ChangeVoiceRecordState;
+            Movement.instance._controls.Gameplay.Voice.performed += ChangeVoiceRecordState;
         }
         private void ChangeVoiceRecordState(InputAction.CallbackContext obj)
         {
@@ -86,7 +86,7 @@ namespace Player.Voice
         private void VoiceDataClientRpc(byte[] compressed, int bytesWritten, ulong senderId)
         {
             //Debug.Log(senderId + "is Sendler ID and " + OwnerClientId + "is Owner client ID");
-            //if (senderId == OwnerClientId) return;
+            if (senderId == OwnerClientId) return;
 
             // Clear the input stream
             output.SetLength(0);

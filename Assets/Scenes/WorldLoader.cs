@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public class WorldLoader : MonoBehaviour
@@ -10,19 +11,25 @@ public class WorldLoader : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            UnloadWorld(worldToLoad);
+            if (SceneManager.loadedSceneCount > 1) { UnloadWorld(SceneManager.GetSceneAt(SceneManager.loadedSceneCount - 1).name); }
             LoadWorld(worldToLoad);
         }
     }
 
     public void LoadWorld(string sceneToLoad)
     {
-        SceneManager.LoadScene(worldToLoad, LoadSceneMode.Additive);
+        if (NetworkManager.Singleton.IsServer)
+        {
+            NetworkManager.Singleton.SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
+        }
+        else
+        {
+            Debug.Log("Waiting for server to load scene...");
+        }
     }
     public void UnloadWorld(string sceneToLoad)
     {
-        if (SceneManager.loadedSceneCount < 2) { return; }
-        Scene sceneToUnload = SceneManager.GetSceneAt(SceneManager.loadedSceneCount - 1);
-        SceneManager.UnloadSceneAsync(sceneToUnload);
+        Scene sceneToUnload = SceneManager.GetSceneByName(sceneToLoad);
+        NetworkManager.Singleton.SceneManager.UnloadScene(sceneToUnload);
     }
 }

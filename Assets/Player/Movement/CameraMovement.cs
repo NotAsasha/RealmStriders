@@ -9,35 +9,66 @@ namespace Player
     {
         [Header("Set Up")]
         public Transform playerBody;
+        public LayerMask layerMask;
         [Header("Camera")]
         public float mouseSensitivity = 250f;
-
+        public float hitDistance = 2.0f;
         [Header("Other Settings")]
         public bool isNetwork = true;
 
         private float xRotation = 0f;
-        void Start()
+        public Vector3 StartPosition;
+        public override void OnNetworkSpawn()
         {
-            // Checks of you are owner of this Network Object and if Network is turned on
-            if (!IsOwner && isNetwork)
+            if (!IsOwner)
+            {
                 gameObject.SetActive(false);
+                return;
+            }
+
+            StartPosition = transform.localPosition;
 
             // Locks your cursor to the game
-            Movement._controls.System.Pause.performed += UpdateCursorState;
+            Movement.instance._controls.System.Pause.performed += UpdateCursorState;
+            Movement.instance._controls.Gameplay.Interact.performed += Interact;
             Cursor.lockState = CursorLockMode.Locked;
             SettingsFile file = (SettingsFile)GameFileHandler.Instance.SearchForFileByName("Settings");
             mouseSensitivity = file.save._sensValue;
         }
-        private void UpdateCursorState(InputAction.CallbackContext obj)
+        public void UpdateCursorState(InputAction.CallbackContext obj)
         {
-            Cursor.lockState = Movement.isPaused ? CursorLockMode.None : CursorLockMode.Locked;
+            Cursor.lockState = (Movement.instance.isPaused || Movement.instance.isInInteraction)
+    ? CursorLockMode.None
+    : CursorLockMode.Locked;
+
+        }
+
+        private IInteractable interactable;
+        private void Interact(InputAction.CallbackContext obj)
+        {
+            if (Movement.instance.isPaused) return;
+            if (interactable != null)
+            {
+                interactable.StopInteraction(gameObject); 
+                Debug.Log("No Interacted");
+                interactable = null;
+                return;
+            }
+            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, hitDistance, layerMask))
+            {
+                interactable = hit.collider.GetComponent<IInteractable>();
+                if (interactable.IsTaken())
+                {
+                    interactable = null;
+                    return;
+                }
+                interactable?.Interact(gameObject);
+                Debug.Log("Interacted");
+            }
         }
         void Update()
         {
-            if (Movement.isPaused) 
-            {
-                return;
-            }
+            if (Movement.instance.isPaused || Movement.instance.isInInteraction) return;
 
             // Checks if there is a Player Body attached
             if (playerBody == null)

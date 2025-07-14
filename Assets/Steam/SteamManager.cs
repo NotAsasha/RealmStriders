@@ -78,7 +78,7 @@ namespace Steam
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
 
             NetworkManager.Singleton.StartHost();
-           // SpawnPlayer(SteamClient.SteamId);
+            //SpawnPlayer(SteamClient.SteamId);
             CurrentLobby = await SteamMatchmaking.CreateLobbyAsync((int)maxMembers);
             if (!isFriendsOnly) CurrentLobby?.SetPublic();
         }
@@ -90,14 +90,14 @@ namespace Steam
 
             Debug.Log($"Joining room hosted by {transport.targetSteamId}", this);
            
-            // SpawnPlayer(id);
+           // SpawnPlayer(id);
             if (NetworkManager.Singleton.StartClient())
                 Debug.Log("Client has joined!", this);
             PlayerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
         }
         public void SpawnPlayer(SteamId id)
         {
-            GameObject player = Instantiate(playerPrefab);
+            GameObject player = Instantiate(playerPrefab, new Vector3(0, 1, 0), new Quaternion(0,0,0,0));
             NetworkObject PlayerNetwork = player.GetComponent<NetworkObject>();
             ulong PlayerId = PlayerNetwork.OwnerClientId;
             PlayerNetwork.SpawnAsPlayerObject(PlayerId);

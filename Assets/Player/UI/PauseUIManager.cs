@@ -4,6 +4,7 @@ using Steamworks;
 using Steamworks.Data;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,10 +14,9 @@ public class PauseUIManager : MonoBehaviour
     public Transform cardsParent;
     public GameObject playerCard;
     void Start()
-    {
+    { 
         SteamMatchmaking.OnLobbyDataChanged += UpdatePauseUI;
-        Debug.Log(Movement._controls);
-        Movement._controls.System.Pause.performed += UpdateMenuState;
+        Movement.instance._controls.System.Pause.performed += UpdateMenuState;
     }
     private void Update()
     {
