@@ -7,9 +7,11 @@ using Steam;
 public class GameManager : NetworkBehaviour
 {
     public NetworkVariable<int> teamRating = new(1, writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> teamMoney = new(1000, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<bool> hasStartedMission = new(false, writePerm: NetworkVariableWritePermission.Server);
 
-
+    private int alivePlayers = 0;
+    
     public static GameManager instance = null;
     private void Awake()
     {
@@ -32,50 +34,78 @@ public class GameManager : NetworkBehaviour
     {
         if (newValue)
         {
-            Debug.Log("---GameManager: Start Mission");
+            Debug.Log("---MissionManager: Start Mission.");
             StartMission();
         }
         else
         {
-            Debug.Log($"---GameManager: End Mission, Rating before: {teamRating.Value}");
+            Debug.Log($"---MissionManager: End Mission, Rating before: {teamRating.Value}.");
             StopMission();
         }
     }
+    [ServerRpc]
+    public void OnPlayerDeathServerRpc()
+    {
+        alivePlayers -= 1;
+        Debug.Log($"---MissionManager: Allive players: {alivePlayers}.");
+        if (alivePlayers <= 0)
+        {
+            Debug.Log("---MissionManager: Everyone died, stopping mission.");
+            StopMissionServerRpc();
+        }
+    }
 
-#region Rpc
-
+#region MissionRpc
     [ServerRpc(RequireOwnership = false)]
     public void StartMissionServerRpc()
     {
         if (hasStartedMission.Value) return;
+
+        //Spawn Monsters
+
+        alivePlayers = NetworkManager.Singleton.ConnectedClients.Count;
+
+        //Stop Lobby Connections
+        if (SteamManager.Instance.CurrentLobby != null)
+            SteamManager.Instance.CurrentLobby.Value.SetJoinable(false);
+
         hasStartedMission.Value = true;
     }
+
 
     [ServerRpc(RequireOwnership = false)]
     public void StopMissionServerRpc()
     {
+        RevivePlayers();
         if (!hasStartedMission.Value) return;
         hasStartedMission.Value = false;
-    }
-#endregion
 
-    private void StartMission()
-    {
-        //Stop Lobby Connections
-        SteamManager.Instance.CurrentLobby.Value.SetJoinable(false);
-
-        //Open Portal
-        //Spawn Monsters
-    }
-    private void StopMission()
-    {
-        //Resume Lobby Connections
-        SteamManager.Instance.CurrentLobby.Value.SetJoinable(true);
-
-        //Close portal
         //Calculate rating
 
 
-    }
 
+        //Resume Lobby Connections
+        if (SteamManager.Instance.CurrentLobby != null)
+            SteamManager.Instance.CurrentLobby.Value.SetJoinable(true);
+    }
+    private void RevivePlayers()
+    {
+        foreach (var player in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            var human = player.PlayerObject.gameObject.GetComponent<Human>();
+            human.isDead.Value = false;
+            human.playerHealth.Value = Human.defaultHealth;
+        }
+    }
+#endregion
+
+
+    private void StartMission()
+    {
+        //Open Portal
+    }
+    private void StopMission()
+    {
+        //Close portal
+    }
 }

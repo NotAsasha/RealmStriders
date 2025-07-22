@@ -70,9 +70,7 @@ namespace Steam
 
         public async void StartHost(uint maxMembers, bool isFriendsOnly)
         {
-            Debug.Log($"SteamClient.IsValid = {SteamClient.IsValid}");
-            Debug.Log($"NetworkManager.Singleton exists = {NetworkManager.Singleton != null}");
-            Debug.Log($"transport = {transport}");
+            Debug.Log($"---CrewManager: You have created a team!");
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
@@ -88,11 +86,11 @@ namespace Steam
             NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnected;
             transport.targetSteamId = id;
 
-            Debug.Log($"Joining room hosted by {transport.targetSteamId}", this);
+            Debug.Log($"---CrewManager: Joining team hosted by {transport.targetSteamId}", this);
            
            // SpawnPlayer(id);
             if (NetworkManager.Singleton.StartClient())
-                Debug.Log("Client has joined!", this);
+                Debug.Log("---CrewManager: Member has joined!", this);
             PlayerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
         }
         public void SpawnPlayer(SteamId id)
@@ -105,7 +103,7 @@ namespace Steam
         }
         public void Disconnect()
         {
-            Debug.Log($"Disconnect");
+            Debug.Log($"---CrewManager: Left team.");
             CurrentLobby?.Leave();
 
             if (NetworkManager.Singleton == null)

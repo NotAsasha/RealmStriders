@@ -1,3 +1,4 @@
+using Steam;
 using Steamworks;
 using System.Collections.Generic;
 using System.IO;
@@ -28,7 +29,7 @@ namespace Player.Voice
 
         private void Start()
         {
-            if (!IsOwner) enabled = false;
+            if (!IsOwner || SteamManager.Instance.CurrentLobby == null) enabled = false;
 
             optimalRate = (int)SteamUser.OptimalSampleRate;
             clipBufferSize = optimalRate * 5;

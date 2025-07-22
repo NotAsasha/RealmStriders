@@ -6,10 +6,13 @@ namespace Player
     {
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Plate"))
-            {
-                if (IsHost || IsServer) other.GetComponent<PressurePlate>().CallButtonPressServerRpc();
-            }
+            if (IsHost || IsServer)
+                other.GetComponent<ICollidable>()?.OnColliderEnter(gameObject);
+        }
+        private void OnTriggerExit(Collider other)
+        {
+            if (IsHost || IsServer)
+                other.GetComponent<ICollidable>()?.OnColliderExit(gameObject);
         }
     }
 }

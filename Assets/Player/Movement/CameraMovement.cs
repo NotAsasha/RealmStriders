@@ -1,5 +1,6 @@
 using FileSystem;
 using Unity.Netcode;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -38,8 +39,8 @@ namespace Player
         public void UpdateCursorState(InputAction.CallbackContext obj)
         {
             Cursor.lockState = (Movement.instance.isPaused || Movement.instance.isInInteraction)
-    ? CursorLockMode.None
-    : CursorLockMode.Locked;
+        ? CursorLockMode.None
+        : CursorLockMode.Locked;
 
         }
 
@@ -47,11 +48,20 @@ namespace Player
         private void Interact(InputAction.CallbackContext obj)
         {
             if (Movement.instance.isPaused) return;
+
+
             if (interactable != null)
             {
                 interactable.StopInteraction(gameObject); 
-                Debug.Log("No Interacted");
                 interactable = null;
+                var movement = Movement.instance;
+                movement.isInInteraction = false;
+                Cursor.lockState = CursorLockMode.Locked;
+                movement._controls.Gameplay.Enable();
+                movement._controls.UI.Disable();
+
+                GetComponentInParent<Inventory>().userInterface.gameObject.SetActive(true);
+
                 return;
             }
             if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, hitDistance, layerMask))
@@ -62,8 +72,27 @@ namespace Player
                     interactable = null;
                     return;
                 }
-                interactable?.Interact(gameObject);
-                Debug.Log("Interacted");
+                if (!interactable.IsSingleUse())
+                {
+                    var movement = Movement.instance;
+                    movement.isInInteraction = true;
+                    movement._controls.Gameplay.Disable();
+                    movement._controls.Gameplay.Interact.Enable();
+                    movement._controls.UI.Enable();
+                    Cursor.lockState = CursorLockMode.None;
+
+                    GetComponentInParent<Inventory>().userInterface.gameObject.SetActive(false);
+                }
+
+                interactable.Interact(gameObject);
+
+                if (interactable.IsSingleUse())
+                {
+                    interactable = null;
+                    return;
+                }
+
+
             }
         }
         void Update()

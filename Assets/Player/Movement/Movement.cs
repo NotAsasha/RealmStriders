@@ -62,6 +62,7 @@ namespace Player
             _controls.Gameplay.Enable();
             _controls.Gameplay.Jump.performed += OnJump;
             _controls.System.Pause.performed += OnPause;
+
         }
         private void LoadBindings()
         {
@@ -89,17 +90,14 @@ namespace Player
 
             if (isPaused)
             {
-                _controls.Gameplay.Movement.Disable();
-                _controls.Gameplay.Jump.Disable();
-                _controls.Gameplay.Voice.Disable();
+                _controls.Gameplay.Disable();
+                _controls.Gameplay.Interact.Enable();
                 _controls.UI.Enable();
             }
             else
             {
                 if (isInInteraction) return;
-                _controls.Gameplay.Movement.Enable();
-                _controls.Gameplay.Jump.Enable();
-                _controls.Gameplay.Voice.Enable();
+                _controls.Gameplay.Enable();
                 _controls.UI.Disable(); 
             }
         }

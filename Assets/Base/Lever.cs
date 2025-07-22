@@ -14,31 +14,18 @@ public class Lever : NetworkBehaviour, IInteractable
     public void Interact(GameObject _player)
     {
         SetTakenServerRpc(true);
-        var movement = Movement.instance;
-        movement.isInInteraction = true;
-        movement._controls.Gameplay.Movement.Disable();
-        movement._controls.Gameplay.Jump.Disable();
-        movement._controls.UI.Enable();
-        Cursor.lockState = CursorLockMode.None;
+
         _player.transform.position = transform.position + CameraPositionOffset;
         _player.transform.rotation = CameraRotation;
 
         leverCanvas.worldCamera = _player.GetComponent<Camera>();
-        // можливо, активуй UI терміналу
     }
 
     public void StopInteraction(GameObject _player)
     {
         SetTakenServerRpc(false);
 
-        var movement = Movement.instance;
-        movement.isInInteraction = false;
-        Cursor.lockState = CursorLockMode.Locked;
-        movement._controls.Gameplay.Movement.Enable();
-        movement._controls.Gameplay.Jump.Enable();
-        movement._controls.UI.Disable();
         _player.transform.localPosition = _player.GetComponent<CameraMovement>().StartPosition;
-        // закрий UI
     }
     [ServerRpc(RequireOwnership = false)]
     public void SetTakenServerRpc(bool _whatToSet)
@@ -51,12 +38,12 @@ public class Lever : NetworkBehaviour, IInteractable
     #endregion
 
 
-
-    
-    [ServerRpc(RequireOwnership = false)]
-    public void SwitchMissionStateServerRpc()
+    public void SwitchMissionState()
     {
-        GameManager.instance.hasStartedMission.Value = !GameManager.instance.hasStartedMission.Value;
+        if (!GameManager.instance.hasStartedMission.Value)
+            GameManager.instance.StartMissionServerRpc();
+        else
+            GameManager.instance.StopMissionServerRpc();
     }
 
     // Tut bug, new players will not have the color updated on join, NetworkVariables synchronize after the OnNetworkSpawn call

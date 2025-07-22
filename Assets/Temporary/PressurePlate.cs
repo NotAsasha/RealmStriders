@@ -2,11 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using FileSystem;
-using Unity.VisualScripting;
 using Unity.Netcode;
 using TMPro;
-using Unity.Burst.CompilerServices;
-public class PressurePlate : NetworkBehaviour
+public class PressurePlate : NetworkBehaviour, ICollidable
 {
     [SerializeField] private string _saveFileName;
     [SerializeField] private GameObject _pressurePlate;
@@ -22,6 +20,12 @@ public class PressurePlate : NetworkBehaviour
         testGameFile = (TestGameFile)_fileHandler.SearchForFileByName(_saveFileName);
         _pressesCounter.text = "Button press count: " + testGameFile.buttonPresses;
     }
+
+    public void OnColliderEnter(GameObject collider)
+    {
+        CallButtonPressServerRpc();
+    }
+
     [ClientRpc]
     private void UiUpdateClientRPC(int pressesAmount)
     {

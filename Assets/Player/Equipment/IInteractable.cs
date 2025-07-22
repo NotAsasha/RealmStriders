@@ -1,8 +1,8 @@
 using UnityEngine;
-
 public interface IInteractable
 {
-    bool IsTaken() { return false; }
+    bool IsSingleUse() => false;
+    bool IsTaken() => false;
     void Interact(GameObject interactor);
     void StopInteraction(GameObject interactor);
 }
