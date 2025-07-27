@@ -11,21 +11,14 @@ namespace Player
     public class Movement : NetworkBehaviour
     {
         [Header("Movement")]
-        CharacterController player;
         [SerializeField] private float moveSpeed = 7.5f;
         [SerializeField] private float runSpeed = 10f;
         [SerializeField] private float gravity = Physics.gravity.y;
         [SerializeField] private float jumpHeight = 1f;
 
-        [Header("Keybinds")]
-        public KeyCode jumpKey = KeyCode.Space;
-
         [Header("Ground Check")]
         public float playerHeight = 1.75f;
         public LayerMask whatIsGround;
-
-        [Header("Other Settings")]
-        public bool isNetwork = true;
 
         public static Movement instance;
 
@@ -33,6 +26,7 @@ namespace Player
         public bool isPaused;
         public bool isInInteraction;
 
+        private CharacterController player;
         private bool isGrounded;
         private Vector3 velocity = new();
         private float currentSpeed;
@@ -40,30 +34,44 @@ namespace Player
         private SettingsFile settingsFile;
         private GameFileHandler _fileHandler;
 
-        private const KeyCode EscapeKey = KeyCode.Escape;
+        #region Unity Lifecycle
+
         public override void OnNetworkSpawn()
         {
-
             if (!IsOwner)
             {
                 enabled = false;
                 return;
             }
-            instance = this; 
+            SetupSingletone();
 
-            Application.targetFrameRate = 240;
+            _controls = new();
             player = GetComponent<CharacterController>();
             playerTransform = transform;
-            _controls = new();
             _fileHandler = GameFileHandler.Instance;
+
             settingsFile = (SettingsFile)_fileHandler.SearchForFileByName("Settings");
             LoadBindings();
             _controls.System.Enable();
             _controls.Gameplay.Enable();
-            _controls.Gameplay.Jump.performed += OnJump;
-            _controls.System.Pause.performed += OnPause;
 
+            SetupInputHandlers();
         }
+        public override void OnNetworkDespawn()
+        {
+            CleanupInputHandlers();
+        }
+
+        #endregion
+
+        #region Initialization
+
+        private void SetupSingletone()
+        {
+            if (instance != null) Destroy(instance);
+            instance = this;
+        }
+
         private void LoadBindings()
         {
             string rebinds = settingsFile.save.rebinds;
@@ -75,31 +83,54 @@ namespace Player
                 Debug.Log("---Movement: Bindings loaded!"); 
             }
         }
+
+        private void SetupInputHandlers()
+        {
+            _controls.Gameplay.Jump.performed += OnJump;
+            _controls.System.Pause.performed += OnPause;
+        }
+
+        private void CleanupInputHandlers()
+        {
+            _controls.Gameplay.Jump.performed -= OnJump;
+            _controls.System.Pause.performed -= OnPause;
+        }
+
+        #endregion
+
+        #region Input Handling
+
         private void OnJump(InputAction.CallbackContext obj)
         {
             // Handle jumping
-            if (isGrounded)
-            {
-                velocity.y = Mathf.Sqrt(2f * jumpHeight * Mathf.Abs(gravity));
-            }
+            if (!isGrounded) return;
+            velocity.y = Mathf.Sqrt(2f * jumpHeight * Mathf.Abs(gravity));
         }
         private void OnPause(InputAction.CallbackContext obj)
         {
-
             isPaused = !isPaused;
 
             if (isPaused)
-            {
-                _controls.Gameplay.Disable();
-                _controls.Gameplay.Interact.Enable();
-                _controls.UI.Enable();
-            }
+                SwitchToInteractionControls();
             else
             {
                 if (isInInteraction) return;
-                _controls.Gameplay.Enable();
-                _controls.UI.Disable(); 
+                SwitchToGameplayControls();
             }
+        }
+
+        #endregion
+
+        public void SwitchToGameplayControls()
+        {
+            _controls.Gameplay.Enable();
+            _controls.UI.Disable();
+        }
+        public void SwitchToInteractionControls()
+        {
+            _controls.Gameplay.Disable();
+            _controls.Gameplay.Interact.Enable();
+            _controls.UI.Enable();
         }
 
         void FixedUpdate()
@@ -108,20 +139,15 @@ namespace Player
             if (isGrounded && velocity.y < 0) velocity.y = 0f;
 
             var MovementControls = _controls.Gameplay.Movement;
+
             // Calculate movement direction and speed
             Vector3 move = playerTransform.right * MovementControls.ReadValue<Vector3>().x + playerTransform.forward * MovementControls.ReadValue<Vector3>().z;
             if (move.magnitude > 1) move.Normalize();
-
-            // Set the current speed based on whether the run key is pressed
             currentSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : moveSpeed;
 
-            // Calculate the final position using the movement direction and speed
+            // Apply movement
             Vector3 finalPosition = currentSpeed * move + velocity;
-
-            // Apply the final position to the character controller
             player.Move(finalPosition * Time.deltaTime);
-
-            // Apply gravity to the velocity
             velocity.y += gravity * Time.deltaTime;
         }
     }

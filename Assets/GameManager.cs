@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using Steam;
@@ -13,22 +12,43 @@ public class GameManager : NetworkBehaviour
     private int alivePlayers = 0;
     
     public static GameManager instance = null;
+
+    #region Unity Lifecycle
+
     private void Awake()
     {
-        if (instance != null) Destroy(instance);
-        instance = this;
+        SetupSingletone();
+        SetupInputHandlers();
         DontDestroyOnLoad(gameObject);
-    }
 
-    private void OnEnable()
-    {
-        hasStartedMission.OnValueChanged += OnMissionStatusChanged;
+        Application.targetFrameRate = 240;
     }
 
     private void OnDisable()
     {
+        CleanupInputHandlers();
+    }
+
+    #endregion
+
+    #region Initialization
+
+    private void SetupSingletone()
+    {
+        if (instance != null) Destroy(instance);
+        instance = this;
+    }
+
+    private void SetupInputHandlers()
+    {
+        hasStartedMission.OnValueChanged += OnMissionStatusChanged;
+    }
+
+    private void CleanupInputHandlers()
+    {
         hasStartedMission.OnValueChanged -= OnMissionStatusChanged;
     }
+    #endregion
 
     private void OnMissionStatusChanged(bool oldValue, bool newValue)
     {
@@ -43,7 +63,8 @@ public class GameManager : NetworkBehaviour
             StopMission();
         }
     }
-    [ServerRpc]
+
+    [ServerRpc(RequireOwnership = false)]
     public void OnPlayerDeathServerRpc()
     {
         alivePlayers -= 1;
@@ -51,11 +72,11 @@ public class GameManager : NetworkBehaviour
         if (alivePlayers <= 0)
         {
             Debug.Log("---MissionManager: Everyone died, stopping mission.");
-            StopMissionServerRpc();
+           // StopMissionServerRpc();
         }
     }
 
-#region MissionRpc
+    #region MissionRpc
     [ServerRpc(RequireOwnership = false)]
     public void StartMissionServerRpc()
     {
@@ -63,6 +84,7 @@ public class GameManager : NetworkBehaviour
 
         //Spawn Monsters
 
+        RevivePlayers();
         alivePlayers = NetworkManager.Singleton.ConnectedClients.Count;
 
         //Stop Lobby Connections
@@ -71,7 +93,6 @@ public class GameManager : NetworkBehaviour
 
         hasStartedMission.Value = true;
     }
-
 
     [ServerRpc(RequireOwnership = false)]
     public void StopMissionServerRpc()
@@ -97,13 +118,14 @@ public class GameManager : NetworkBehaviour
             human.playerHealth.Value = Human.defaultHealth;
         }
     }
-#endregion
+    #endregion
 
 
     private void StartMission()
     {
         //Open Portal
     }
+
     private void StopMission()
     {
         //Close portal

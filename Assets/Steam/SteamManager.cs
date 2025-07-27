@@ -88,7 +88,7 @@ namespace Steam
 
             Debug.Log($"---CrewManager: Joining team hosted by {transport.targetSteamId}", this);
            
-           // SpawnPlayer(id);
+            //SpawnPlayer(id);
             if (NetworkManager.Singleton.StartClient())
                 Debug.Log("---CrewManager: Member has joined!", this);
             PlayerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;

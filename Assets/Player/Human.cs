@@ -8,6 +8,15 @@ public class Human : NetworkBehaviour, IEntity
     public NetworkVariable<bool> isDead = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public NetworkVariable<float> playerHealth = new(defaultHealth, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+    private Animator animator;
+    private CharacterController characterController;
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+        characterController = GetComponent<CharacterController>();
+       // ToggleRagdoll(false);
+    }
+
     public override void OnNetworkSpawn()
     {
         isDead.OnValueChanged += OnDeathStateChange;
@@ -35,11 +44,20 @@ public class Human : NetworkBehaviour, IEntity
     }
     private void KillPlayer()
     {
-        GetComponent<Movement>().enabled = false;
+        if (!IsOwner) return;
+        ToggleRagdoll(true);
         GameManager.instance.OnPlayerDeathServerRpc();
     }
     private void RevivePlayer()
     {
-        GetComponent<Movement>().enabled = true;
+        if (!IsOwner) return;
+        ToggleRagdoll(false);
+    }
+
+    private void ToggleRagdoll(bool isActive)
+    {
+        GetComponent<Movement>().enabled = !isActive;
+        animator.enabled = !isActive;
+        characterController.enabled = !isActive;
     }
 }

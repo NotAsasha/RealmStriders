@@ -12,11 +12,11 @@ namespace Menu
         private GameFileHandler _fileHandler;
         private void Start()
         {
-            // SteamMatchmaking.OnLobbyDataChanged += UpdateLobbyMembers;
 
             _fileHandler = GameFileHandler.Instance;
             settingsFile = (SettingsFile)_fileHandler.SearchForFileByName("Settings");
             _sensValue = settingsFile.save._sensValue;
+
             if (_sensValue == 0)
             {
                 UpdateMouseSensativity();

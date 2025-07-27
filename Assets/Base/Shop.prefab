@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4252644619709396010}
   - component: {fileID: 8034173572900057207}
   - component: {fileID: 342288718760526457}
+  - component: {fileID: 2424807096768495236}
   m_Layer: 5
   m_Name: Landmine
   m_TagString: Untagged
@@ -95,6 +96,27 @@ MonoBehaviour:
   itemPrice: 50
   itemPrefab: {fileID: 4681638334793861101, guid: dadbc1d8639bdd04eb0454ead383975f,
     type: 3}
+--- !u!114 &2424807096768495236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401164040581067043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 407959733
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
 --- !u!1 &1066549596677737436
 GameObject:
   m_ObjectHideFlags: 0
@@ -211,6 +233,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPosition: {x: 0, y: 1, z: 0}
+  cards: []
 --- !u!1 &1158781259080157575
 GameObject:
   m_ObjectHideFlags: 0
@@ -501,7 +524,7 @@ GameObject:
   - component: {fileID: 4192230696141965898}
   - component: {fileID: 9124823254289067035}
   m_Layer: 6
-  m_Name: Terminal
+  m_Name: Shop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1190,6 +1213,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPosition: {x: 0, y: 1, z: 0}
+  cards:
+  - {fileID: 759900063338508794}
+  - {fileID: 342288718760526457}
 --- !u!1 &3241449661996462234
 GameObject:
   m_ObjectHideFlags: 0
@@ -1335,7 +1361,6 @@ GameObject:
   - component: {fileID: 2810140332311069077}
   - component: {fileID: 6479539845260460410}
   - component: {fileID: 1901984401779700876}
-  - component: {fileID: 8799324050146021938}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1427,27 +1452,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &8799324050146021938
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3764683349220989381}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 407959733
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 0
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!1 &4061722850049802190
 GameObject:
   m_ObjectHideFlags: 0
@@ -2273,6 +2277,7 @@ GameObject:
   - component: {fileID: 8420707728185184666}
   - component: {fileID: 5377580097883638698}
   - component: {fileID: 759900063338508794}
+  - component: {fileID: 3247026514194506005}
   m_Layer: 5
   m_Name: LeafBlower
   m_TagString: Untagged
@@ -2356,3 +2361,24 @@ MonoBehaviour:
   itemPrice: 100
   itemPrefab: {fileID: 5378884093511454725, guid: 252081321d2dabb448471f25b38bbe31,
     type: 3}
+--- !u!114 &3247026514194506005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8733267518156431417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 407959733
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0

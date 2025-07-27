@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class ItemCard : MonoBehaviour
 {
-    [SerializeField] string itemName;
+    public string itemName;
     [SerializeField] int itemPrice;
-    [SerializeField] NetworkObject itemPrefab;
+    public NetworkObject itemPrefab;
 
     Shop shop;
 
@@ -15,6 +15,6 @@ public class ItemCard : MonoBehaviour
     }
     public void BuyItem()
     {
-        shop.BuyItem(itemPrefab, itemPrice);
+        shop.BuyItemServerRpc(itemName, itemPrice);
     }
 }

@@ -1,43 +1,8 @@
 using Player;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using UnityEngine;
-
-public class Lever : NetworkBehaviour, IInteractable
+public class Lever : NetworkBehaviour
 {
-    [SerializeField] private Canvas leverCanvas;
-    [SerializeField] private Vector3 CameraPositionOffset = new Vector3(0.25f, 0.25f, -0.5f);
-    [SerializeField] private Quaternion CameraRotation = Quaternion.Euler(0, 0, 0);
-
-    #region Interatcion
-    private NetworkVariable<bool> _isTaken = new(writePerm: NetworkVariableWritePermission.Server);
-    public void Interact(GameObject _player)
-    {
-        SetTakenServerRpc(true);
-
-        _player.transform.position = transform.position + CameraPositionOffset;
-        _player.transform.rotation = CameraRotation;
-
-        leverCanvas.worldCamera = _player.GetComponent<Camera>();
-    }
-
-    public void StopInteraction(GameObject _player)
-    {
-        SetTakenServerRpc(false);
-
-        _player.transform.localPosition = _player.GetComponent<CameraMovement>().StartPosition;
-    }
-    [ServerRpc(RequireOwnership = false)]
-    public void SetTakenServerRpc(bool _whatToSet)
-    {
-        _isTaken.Value = _whatToSet;
-    }
-
-    public bool IsTaken() { return _isTaken.Value; }
-
-    #endregion
-
-
     public void SwitchMissionState()
     {
         if (!GameManager.instance.hasStartedMission.Value)

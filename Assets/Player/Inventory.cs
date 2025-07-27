@@ -3,113 +3,399 @@ using Unity.Netcode;
 using System;
 using Player;
 using UnityEngine.InputSystem;
-public class Inventory : NetworkBehaviour
-    //In multiplayer:
-    //SetActive does not synchronize
-    //parent changing not working on client
+
+namespace InventorySystem
 {
-    public int capacity = 4;
-    [SerializeField] Vector3 handPosition;
-    public Transform userInterface;
-    [SerializeField] GameObject slotPrefab;
-
-    public ITakable[] items;
-    public UISlot[] slots;
-    public int activeSlotIndex;
-
-
-    private Controls controls;
-    void Start()
+    public class Inventory : NetworkBehaviour
     {
-        items = new ITakable[capacity];
-        slots = new UISlot[capacity];
-        controls = Movement.instance._controls;
-        controls.Gameplay.MouseWheel.performed += ChangeSlot;
-        controls.Gameplay.Use.performed += UseItem;
-        controls.Gameplay.Drop.performed += DropItem;
+        [Header("Configuration")]
+        public int capacity = 4;
+        [SerializeField] private Vector3 handPosition;
+        [SerializeField] public Transform userInterface;
+        [SerializeField] private GameObject slotPrefab;
+        [SerializeField] private LayerMask layer;
 
-        UpdateUI();
-    }
-    public override void OnDestroy()
-    {
-        controls.Gameplay.MouseWheel.performed -= ChangeSlot;
-        controls.Gameplay.Use.performed -= UseItem;
-        controls.Gameplay.Drop.performed -= DropItem;
-    }
-    public void AddItem(GameObject _toAdd, int _slot)
-    {
-        if (items[_slot] != null) return;
+        [Header("Current State")]
+        [SerializeField] private int activeSlotIndex;
 
-        items[_slot] = _toAdd.GetComponent<ITakable>();
-        _toAdd.transform.parent = gameObject.transform;
-        _toAdd.transform.localPosition = handPosition;
-        _toAdd.transform.localEulerAngles = new Vector3(0,0,0);
+        // Arrays for items and UI
+        private ITakable[] items;
+        private UISlot[] slots;
+        
+        // Input controls
+        private Controls controls;
 
-        UpdateUI();
-    }
-    public void DropItem(InputAction.CallbackContext obj)
-    {
-        if (Movement.instance.isInInteraction) return;
-
-        ITakable toDrop = items[activeSlotIndex];
-        if (toDrop == null) return;
-        GameObject toDropObject = toDrop.GetGameObject();
-        items[activeSlotIndex] = null;
-        toDropObject.transform.parent = null;
-        toDropObject.SetActive(true);
-        toDrop.Drop(gameObject);
-
-        UpdateUI();
-    }
-    void ChangeSlot(InputAction.CallbackContext obj)
-    {
-        if (Movement.instance.isInInteraction) return;
-
-        //Read controls
-        float scrool = controls.Gameplay.MouseWheel.ReadValue<float>();
-        if (scrool == 0) return;
-
-        //Checks for out of bounds
-        int diff = activeSlotIndex;
-        diff = scrool > 0 ? diff += 1 : diff -= 1;
-        if (diff >= capacity || diff < 0) return;
-
-
-        //Actual change
-        items[activeSlotIndex]?.GetGameObject().SetActive(false);
-        activeSlotIndex = diff;
-        items[activeSlotIndex]?.GetGameObject().SetActive(true);
-
-        UpdateUI();
-
-    }
-
-    void UseItem(InputAction.CallbackContext obj) {
-        if (Movement.instance.isInInteraction) return;
-
-        items[activeSlotIndex]?.Use(gameObject);
-    }
-
-    void UpdateUI()
-    {
-        if (userInterface.childCount > capacity)
+        #region Unity Lifecycle
+        
+        void Start()
         {
-            throw new OverflowException("More UI slots than inventory can process");
+            InitializeInventory();
+            SetupInputHandlers();
+            UpdateUI();
         }
-        if (userInterface.childCount == 0) CreateUISlots();
 
-
-        for (int i = 0; i < capacity; i++)
+        public override void OnDestroy()
         {
-            slots[i].UpdateUI(items[i] != null, i == activeSlotIndex);
+            CleanupInputHandlers();
         }
-    }
 
-    void CreateUISlots()
-    {
-        for (int i = 0; i < capacity; i++)
+        #endregion
+
+        #region Initialization
+
+        private void InitializeInventory()
         {
-            slots[i] = Instantiate(slotPrefab, userInterface).GetComponent<UISlot>();
+            items = new ITakable[capacity];
+            slots = new UISlot[capacity];
+            
+            if (Movement.instance?._controls != null)
+            {
+                controls = Movement.instance._controls;
+            }
+            else
+            {
+                Debug.LogError("Movement controls not found!");
+            }
         }
+
+        private void SetupInputHandlers()
+        {
+            if (controls == null) return;
+
+            controls.Gameplay.MouseWheel.performed += OnMouseWheelChanged;
+            controls.Gameplay.Use.performed += OnUseItem;
+            controls.Gameplay.Drop.performed += OnDropItem;
+        }
+
+        private void CleanupInputHandlers()
+        {
+            if (controls == null) return;
+
+            controls.Gameplay.MouseWheel.performed -= OnMouseWheelChanged;
+            controls.Gameplay.Use.performed -= OnUseItem;
+            controls.Gameplay.Drop.performed -= OnDropItem;
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public bool AddItem(GameObject itemToAdd, int targetSlot = -1)
+        {
+            if (itemToAdd == null) return false;
+
+            ITakable takableComponent = itemToAdd.GetComponent<ITakable>();
+            if (takableComponent == null) return false;
+
+            // If no slot specified, find first empty slot
+            if (targetSlot == -1)
+            {
+                targetSlot = FindEmptySlot();
+                if (targetSlot == -1) return false; // Inventory full
+            }
+
+            // Check if target slot is valid and empty
+            if (!IsValidSlot(targetSlot) || items[targetSlot] != null) 
+                return false;
+
+            if (targetSlot != activeSlotIndex)
+                SetItemActiveServerRpc(itemToAdd, false);
+
+            items[targetSlot] = takableComponent;
+            SetItemParentServerRpc(itemToAdd, gameObject);
+            UpdateUI();
+            
+            return true;
+        }
+
+        public bool RemoveItem(int slot)
+        {
+            if (!IsValidSlot(slot) || items[slot] == null) 
+                return false;
+
+            items[slot] = null;
+            UpdateUI();
+            return true;
+        }
+
+        public ITakable GetActiveItem()
+        {
+            return IsValidSlot(activeSlotIndex) ? items[activeSlotIndex] : null;
+        }
+
+        public ITakable GetItem(int slot)
+        {
+            return IsValidSlot(slot) ? items[slot] : null;
+        }
+
+        public void ToggleUI(bool _isActive)
+        {
+            userInterface.gameObject.SetActive(_isActive);
+        }
+        #endregion
+
+        #region Input Handling
+
+        private void OnMouseWheelChanged(InputAction.CallbackContext context)
+        {
+            if (IsPlayerInInteraction()) return;
+
+            float scrollValue = context.ReadValue<float>();
+            if (Mathf.Approximately(scrollValue, 0f)) return;
+
+            int newSlotIndex = CalculateNewSlotIndex(scrollValue);
+            if (newSlotIndex == activeSlotIndex) return;
+
+            ChangeActiveSlot(newSlotIndex);
+        }
+
+        private void OnUseItem(InputAction.CallbackContext context)
+        {
+            if (IsPlayerInInteraction()) return;
+
+            ITakable activeItem = GetActiveItem();
+            RemoveItem(activeSlotIndex);
+            activeItem?.Use(gameObject);
+        }
+
+        private void OnDropItem(InputAction.CallbackContext context)
+        {
+            ITakable itemToDrop = GetActiveItem();
+            if (itemToDrop == null) return;
+
+            items[activeSlotIndex] = null;
+            DropItemServerRpc(itemToDrop.GetGameObject());
+            UpdateUI();
+        }
+
+        #endregion
+
+        #region Private Helper Methods
+
+        private bool IsPlayerInInteraction()
+        {
+            return Movement.instance != null && Movement.instance.isInInteraction;
+        }
+
+        private int FindEmptySlot()
+        {
+            if (items[activeSlotIndex] == null) return activeSlotIndex;
+
+            for (int i = 0; i < capacity; i++)
+            {
+                if (items[i] == null) return i;
+            }
+            return -1;
+        }
+
+        private bool IsValidSlot(int slot)
+        {
+            return slot >= 0 && slot < capacity;
+        }
+
+        private int CalculateNewSlotIndex(float scrollValue)
+        {
+            int direction = scrollValue > 0 ? -1 : 1;
+            int newIndex = activeSlotIndex + direction;
+
+            // Wrap around if out of bounds
+            if (newIndex >= capacity) newIndex = 0;
+            else if (newIndex < 0) newIndex = capacity - 1;
+
+            return newIndex;
+        }
+
+        private void ChangeActiveSlot(int newSlotIndex)
+        {
+            // Deactivate current item
+            ITakable currentItem = GetActiveItem();
+            if (currentItem != null)
+            {
+                SetItemActiveServerRpc(currentItem.GetGameObject(), false);
+            }
+
+            // Change active slot
+            activeSlotIndex = newSlotIndex;
+
+            // Activate new item
+            ITakable newItem = GetActiveItem();
+            if (newItem != null)
+            {
+                SetItemActiveServerRpc(newItem.GetGameObject(), true);
+            }
+
+            UpdateUI();
+        }
+
+        #endregion
+
+        #region UI Management
+
+        private void UpdateUI()
+        {
+            ValidateUISetup();
+            
+            if (userInterface.childCount == 0) 
+            {
+                CreateUISlots();
+            }
+
+            for (int i = 0; i < capacity; i++)
+            {
+                bool hasItem = items[i] != null;
+                bool isActive = i == activeSlotIndex;
+                slots[i].UpdateUI(hasItem, isActive);
+            }
+        }
+
+        private void ValidateUISetup()
+        {
+            if (userInterface.childCount > capacity)
+            {
+                Debug.LogError($"UI has more slots ({userInterface.childCount}) than inventory capacity ({capacity})!");
+            }
+        }
+
+        private void CreateUISlots()
+        {
+            for (int i = 0; i < capacity; i++)
+            {
+                GameObject slotObject = Instantiate(slotPrefab, userInterface);
+                slots[i] = slotObject.GetComponent<UISlot>();
+                
+                if (slots[i] == null)
+                {
+                    Debug.LogError($"Slot prefab at index {i} doesn't have UISlot component!");
+                }
+            }
+        }
+
+        #endregion
+
+        #region Network RPCs
+
+        [ServerRpc(RequireOwnership = false)]
+        public void SetItemActiveServerRpc(NetworkObjectReference objRef, bool isActive)
+        {
+            if (objRef.TryGet(out NetworkObject networkObject))
+            {
+                networkObject.gameObject.SetActive(isActive);
+                SetItemActiveClientRpc(objRef, isActive);
+            }
+            else
+            {
+                Debug.LogWarning("Failed to get network object for SetItemActive");
+            }
+        }
+        [ClientRpc]
+        public void SetItemActiveClientRpc(NetworkObjectReference objRef, bool isActive)
+        {
+            if (IsServer) return;
+            objRef.TryGet(out NetworkObject networkObject);
+            networkObject.gameObject.SetActive(isActive);
+        }
+       [ServerRpc(RequireOwnership = false)]
+        public void SetItemParentServerRpc(NetworkObjectReference objRef, NetworkObjectReference newParentRef)
+        {
+            if (!objRef.TryGet(out NetworkObject obj))
+            {
+                Debug.LogWarning("Failed to get item object for SetItemParent");
+                return;
+            }
+
+            if (!newParentRef.TryGet(out NetworkObject newParent))
+            {
+                Debug.LogWarning("Failed to get parent object for SetItemParent");
+                return;
+            }
+
+            obj.transform.SetParent(newParent.transform);
+            obj.transform.localPosition = handPosition;
+            obj.transform.localRotation = Quaternion.identity;
+
+            SetItemParentClientRpc(objRef, newParentRef);
+        }
+
+        [ClientRpc]
+        private void SetItemParentClientRpc(NetworkObjectReference objRef, NetworkObjectReference newParentRef)
+        {
+            if (IsServer) return;
+            if (objRef.TryGet(out NetworkObject obj) && newParentRef.TryGet(out NetworkObject newParent))
+            {
+                obj.transform.SetParent(newParent.transform);
+                obj.transform.localPosition = handPosition;
+                obj.transform.localRotation = Quaternion.identity;
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void DropItemServerRpc(NetworkObjectReference objRef)
+        {
+            if (!objRef.TryGet(out NetworkObject networkObject))
+            {
+                Debug.LogWarning("Failed to get network object for DropItem");
+                return;
+            }
+
+            if (!Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 1f, layer))
+                networkObject.transform.localPosition = handPosition + new Vector3(0, 0, 0.75f);
+            networkObject.transform.parent = null;
+            
+            if (!networkObject.gameObject.activeSelf)
+            {
+                networkObject.gameObject.SetActive(true);
+            }
+
+            ITakable takable = networkObject.GetComponent<ITakable>();
+            takable?.Drop(gameObject);
+
+            DropItemClientRpc(objRef);
+        }
+
+        [ClientRpc]
+        private void DropItemClientRpc(NetworkObjectReference objRef)
+        {
+            if (!IsServer)
+            {
+                if (objRef.TryGet(out NetworkObject networkObject))
+                {
+                    networkObject.transform.parent = null;
+                    
+                    if (!networkObject.gameObject.activeSelf)
+                    {
+                        networkObject.gameObject.SetActive(true);
+                    }
+                }
+            }
+        }
+
+        [ServerRpc]
+        public void DeparentObjectServerRpc(NetworkObjectReference objectRef)
+        {
+            if (objectRef.TryGet(out NetworkObject networkObject))
+            {
+                networkObject.transform.parent = null;
+            }
+            else
+            {
+                Debug.LogWarning("Failed to get network object for Deparent");
+            }
+        }
+
+        #endregion
+
+        #region Debug and Utilities
+
+        public void DebugInventoryState()
+        {
+            Debug.Log($"Inventory State - Active Slot: {activeSlotIndex}");
+            for (int i = 0; i < capacity; i++)
+            {
+                string itemName = items[i]?.GetGameObject().name ?? "Empty";
+                Debug.Log($"Slot {i}: {itemName}");
+            }
+        }
+
+        #endregion
     }
 }

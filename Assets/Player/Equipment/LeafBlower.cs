@@ -1,34 +1,31 @@
-using Unity.VisualScripting;
+using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
-public class LeafBlower : MonoBehaviour, ITakable
+namespace InventorySystem
 {
-    public bool IsSingleUse() => true;
-    public void Interact(GameObject player)
+    public class LeafBlower : Item
     {
-        Take(player);
-    }
-    public void StopInteraction(GameObject player) 
-    {
-        Drop(player);
-    }
 
-    public void Take(GameObject player)
-    {
-        var inventory = player.GetComponentInParent<Inventory>();
-        inventory.AddItem(gameObject, inventory.activeSlotIndex);
-        GetComponent<Collider>().enabled = false;
-        GetComponent<Rigidbody>().isKinematic = true;
-    }
-    public void Drop(GameObject player)
-    {
-        GetComponent<Collider>().enabled = true;
-        GetComponent<Rigidbody>().isKinematic = false;
-    }
-    public void Use(GameObject player)
-    {
-        Debug.Log("Using Leaf-Blower");
-    }
+        #region Item Specific Functionality
 
-    public GameObject GetGameObject() => gameObject;
+        override protected void ExecuteItemAction(GameObject player)
+        {
+            // Example implementation - replace with actual leaf blower logic
+            Debug.Log("Blowing leaves with powerful wind!");
+
+            // You could add:
+            // - Particle effects
+            // - Sound effects
+            // - Physics interactions with nearby objects
+            // - Cooldown mechanics
+
+            // If this is a single-use item, you might want to destroy it or remove it from inventory
+            if (isSingleUse)
+            {
+                HandleSingleUseItem(player);
+            }
+        }
+        #endregion
+    }
 }

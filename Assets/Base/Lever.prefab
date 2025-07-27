@@ -272,6 +272,7 @@ GameObject:
   - component: {fileID: 5116939074936347654}
   - component: {fileID: 962273865330854109}
   - component: {fileID: 3480144542223059622}
+  - component: {fileID: 1468237414458762737}
   m_Layer: 0
   m_Name: Lever
   m_TagString: Untagged
@@ -1374,5 +1375,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   leverCanvas: {fileID: 7837741364713403762}
+  CameraPositionOffset: {x: 0.15, y: 0.25, z: -0.85}
+  CameraRotation: {x: 0, y: 0, z: 0, w: 1}
+--- !u!114 &1468237414458762737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4950199021809964656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ebb1acce09eaa44891f4586fc85ba4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  terminalCanvas: {fileID: 7837741364713403762}
   CameraPositionOffset: {x: 0.15, y: 0.25, z: -0.85}
   CameraRotation: {x: 0, y: 0, z: 0, w: 1}

@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 1326511078990972314}
   - component: {fileID: 7748814014061703546}
   - component: {fileID: 2719742302886296142}
-  - component: {fileID: 6125430410411532794}
   - component: {fileID: 5378884093511454725}
+  - component: {fileID: 6125430410411532794}
   - component: {fileID: 8885636552384076412}
   - component: {fileID: 2576896136054975204}
   - component: {fileID: 572916864751113698}
@@ -423,7 +423,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 727
+  m_VersionIndex: 730
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -457,18 +457,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000002, y: 0.48734614, z: 1.0126085}
   m_Center: {x: -0.49999985, y: 0.24367283, z: -0.49369574}
---- !u!114 &6125430410411532794
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 346603778525427476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d247d9a16cc4bb429240ae4703ff191, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &5378884093511454725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -490,6 +478,19 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &6125430410411532794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346603778525427476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d247d9a16cc4bb429240ae4703ff191, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSingleUse: 1
 --- !u!114 &8885636552384076412
 MonoBehaviour:
   m_ObjectHideFlags: 0

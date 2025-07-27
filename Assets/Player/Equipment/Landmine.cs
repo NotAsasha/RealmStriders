@@ -1,40 +1,17 @@
+using InventorySystem;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Landmine : NetworkBehaviour, ITakable, ICollidable
+public class Landmine : Item, ICollidable
 {
-    //
     [SerializeField] float explosionRadius = 10;
-    [SerializeField] float damage = 200;
+    [SerializeField] float damage = 500;
+    [SerializeField] ParticleSystem emit;
     [SerializeField] LayerMask entityLayer;
     [SerializeField] LayerMask wallLayer;
 
-    public bool IsSingleUse() => true;
-    public void Interact(GameObject player)
-    {
-        Take(player);
-    }
-    public void StopInteraction(GameObject player)
-    {
-        Drop(player);
-    }
-
-    public void Take(GameObject player)
-    {
-        var inventory = player.GetComponentInParent<Inventory>();
-        inventory.AddItem(gameObject, inventory.activeSlotIndex);
-        GetComponent<Collider>().enabled = false;
-        GetComponent<Rigidbody>().isKinematic = true;
-    }
-    public void Drop(GameObject player)
-    {
-        GetComponent<Collider>().enabled = true;
-        GetComponent<Rigidbody>().isKinematic = false;
-    }
-    public GameObject GetGameObject() => gameObject;
-
-
-    public void Use(GameObject player)
+    bool isTriggered = false;
+    protected override void ExecuteItemAction(GameObject player)
     {
         ExplodeServerRpc();
         Debug.Log("---Landmine: Used!");
@@ -42,15 +19,18 @@ public class Landmine : NetworkBehaviour, ITakable, ICollidable
 
     public void OnColliderEnter(GameObject collider)
     {
+        if (isCurrentlyHeld) return;
+        isTriggered = true;
         Debug.Log("---Landmine: Collided with something!");
     }
+
     public void OnColliderExit(GameObject collider)
     {
-        if (!IsServer) return;
+        if (!IsServer || isCurrentlyHeld || !isTriggered) return;
         ExplodeServerRpc();
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void ExplodeServerRpc()
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, explosionRadius, entityLayer);
@@ -58,9 +38,11 @@ public class Landmine : NetworkBehaviour, ITakable, ICollidable
         {
             ApplyDamage(collider);
         }
+
         ExplodeClientRpc();
-        Destroy(gameObject);
+        NetworkObject.Despawn(true);
     }
+
     void ApplyDamage(Collider _collider)
     {
         //Calculate all vectors
@@ -77,12 +59,30 @@ public class Landmine : NetworkBehaviour, ITakable, ICollidable
         entity.AddHealth(-damageToApply);
 
 
+
         if (entity.IsDead())
+        {
+            var rigidbody = _collider.GetComponent<Rigidbody>();
+            if (rigidbody != null)
+            {
+                _collider.GetComponent<Rigidbody>()?.AddForce(direction * 10f);
+            }
+            
             Debug.Log("---Landmine: Killed some entity.");
+        }
     }
+
+
     [ClientRpc]
     private void ExplodeClientRpc()
     {
         Debug.Log("---Landmine: Boom!");
+        PlayParticles();
+    }
+    private void PlayParticles()
+    {
+        emit.transform.parent = null;
+        emit.Play();
+        Destroy(emit.gameObject, 2f);
     }
 }
