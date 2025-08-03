@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Landmine : Item, ICollidable
 {
-    [SerializeField] float explosionRadius = 10;
-    [SerializeField] float damage = 500;
+    [SerializeField] float explosionRadius = 5;
+    [SerializeField] float damage = 1f;
     [SerializeField] ParticleSystem emit;
     [SerializeField] LayerMask entityLayer;
     [SerializeField] LayerMask wallLayer;
@@ -13,27 +13,28 @@ public class Landmine : Item, ICollidable
     bool isTriggered = false;
     protected override void ExecuteItemAction(GameObject player)
     {
-        ExplodeServerRpc();
         Debug.Log("---Landmine: Used!");
+        ExplodeServerRpc();
     }
 
     public void OnColliderEnter(GameObject collider)
     {
         if (isCurrentlyHeld) return;
-        isTriggered = true;
         Debug.Log("---Landmine: Collided with something!");
+        isTriggered = true;
     }
 
     public void OnColliderExit(GameObject collider)
     {
         if (!IsServer || isCurrentlyHeld || !isTriggered) return;
+        isTriggered = false;
         ExplodeServerRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]
     public void ExplodeServerRpc()
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, explosionRadius, entityLayer);
+        Collider[] hits = Physics.OverlapSphere(transform.position, explosionRadius, entityLayer, QueryTriggerInteraction.Ignore);
         foreach (Collider collider in hits)
         {
             ApplyDamage(collider);
@@ -53,11 +54,12 @@ public class Landmine : Item, ICollidable
         //Check for walls
         if (Physics.Raycast(transform.position, direction, out RaycastHit hit, distanceToTarget, wallLayer)) return;
 
-        //Apply damage
-        var entity = _collider.GetComponent<IEntity>();
-        float damageToApply = damage / Mathf.Max(distanceToTarget, 1f);
-        entity.AddHealth(-damageToApply);
+        //Apply damage (can depand on distance)
+        var entity = _collider.GetComponent<Entity>();
+        // float damageToApply = damage / Mathf.Max(distanceToTarget, 1f);
+        entity.AddHealth(-damage);
 
+        Debug.Log("---Landmine: Damaged entity.");
 
 
         if (entity.IsDead())

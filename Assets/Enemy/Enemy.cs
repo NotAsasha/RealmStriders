@@ -6,52 +6,33 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.AI;
 
-public class Enemy : NetworkBehaviour, IEntity
+public class Enemy : Entity, ICollidable
 {
-    public const float defaultHealth = 200f;
-    public NetworkVariable<bool> isDead = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-    public NetworkVariable<float> entityHealth = new(defaultHealth, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public float damage = 1f;
 
     private Animator animator;
     private ChasePlayer vision;
     private NavMeshAgent agent;
     private RandomMove randMove;
-    private Rigidbody rigidbody;
+    private Rigidbody playerRigidbody;
+
+    #region Initialization
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
         vision = GetComponent<ChasePlayer>();
         agent = GetComponent<NavMeshAgent>();
         randMove = GetComponent<RandomMove>();
-        rigidbody = GetComponent<Rigidbody>();
+        playerRigidbody = GetComponent<Rigidbody>();
         ToggleRagdoll(false);
     }
 
-    public override void OnNetworkSpawn()
-    {
-        isDead.OnValueChanged += OnDeathStateChange;
-    }
-    public override void OnNetworkDespawn()
-    {
-        isDead.OnValueChanged -= OnDeathStateChange;
-    }
-    public bool IsDead() => isDead.Value;
-    public float GetHealth() => entityHealth.Value;
-    public void AddHealth(float _health)
-    {
+    #endregion
 
-        entityHealth.Value += _health;
-        if (entityHealth.Value <= 0 && !isDead.Value)
-        {
-            isDead.Value = true;
-            Debug.Log($"---Enemy {OwnerClientId} was killed!");
-        }
-    }
-    private void OnDeathStateChange(bool oldValue, bool _isDead)
-    {
-        if (_isDead) KillPlayer();
-    }
-    private void KillPlayer()
+    #region Entity
+
+    override protected void KillEntity()
     {
         if (!IsOwner) return;
         ToggleRagdoll(true);
@@ -63,14 +44,39 @@ public class Enemy : NetworkBehaviour, IEntity
         vision.enabled = !isActive;
         agent.enabled = !isActive;
         randMove.enabled = !isActive;
-        rigidbody.isKinematic = !isActive;
+        playerRigidbody.isKinematic = !isActive;
     }
+
+    #endregion
+
+    #region ICollidable
+
+    public void OnColliderEnter(GameObject collider)
+    {
+        if (!IsServer || isDead.Value) return;
+        var player = collider.GetComponent<Human>();
+        if (player == null || player.isDead.Value) return;
+
+        PlayerBiteClientRpc(collider);
+        player.AddHealth(-damage);
+    }
+
+    [ClientRpc]
+    virtual protected void PlayerBiteClientRpc(NetworkObjectReference obj)
+    {
+        obj.TryGet(out NetworkObject player);
+        Debug.Log($"---Enemy: Eaten {player.name}");
+    }
+
+    #endregion
+
+
 
     private void FixedUpdate()
     {
         if (!IsServer || isDead.Value) return;
 
-        vision.DrawViewState();
+        vision.DrawViewState(); //draw vision boundaries
 
         var player = vision.PlayerInSight();
         if (player != null)
@@ -80,14 +86,13 @@ public class Enemy : NetworkBehaviour, IEntity
         }
         else
         {
-            if (agent.remainingDistance <= agent.stoppingDistance) //done with path
+            if (agent.remainingDistance > agent.stoppingDistance) return; //not done with path
+
+            Vector3 point;
+            if (randMove.RandomPoint(transform.position, randMove.range, out point)) //choose where to go
             {
-                Vector3 point;
-                if (randMove.RandomPoint(transform.position, randMove.range, out point)) //pass in our centre point and radius of area
-                {
-                    Debug.DrawRay(point, Vector3.up, Color.blue, 1.0f); //so you can see with gizmos
-                    agent.SetDestination(point);
-                }
+                Debug.DrawRay(point, Vector3.up, Color.blue, 1.0f); //so you can see with gizmos
+                agent.SetDestination(point);
             }
         }
     }

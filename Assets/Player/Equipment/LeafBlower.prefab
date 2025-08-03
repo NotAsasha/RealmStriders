@@ -35,7 +35,7 @@ Transform:
   m_GameObject: {fileID: 346603778525427476}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1, y: 0, z: 14}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.2, y: 0.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -490,7 +490,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d247d9a16cc4bb429240ae4703ff191, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isSingleUse: 1
+  isConsumable: 0
+  entityLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  maxDistance: 10
 --- !u!114 &8885636552384076412
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -510,9 +514,9 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01

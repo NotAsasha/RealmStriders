@@ -1,22 +1,23 @@
+using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 
 namespace InventorySystem
 {
-    public abstract class Item : NetworkBehaviour, ITakable
+    public class Item : NetworkBehaviour, IInteractable
     {
         [Header("Item Settings")]
-        [SerializeField] protected bool isSingleUse = true;
+        [SerializeField] protected bool isConsumable = false;
+        [SerializeField] public int sellPrice = 10;
 
-        // Cached components
+
         private Collider itemCollider;
         private Rigidbody itemRigidbody;
         private NetworkTransform itemNetworkTransform;
         private NetworkRigidbody itemNetworkRigidbody;
 
-        // State tracking
-        protected bool isCurrentlyHeld = false;
+        public bool isCurrentlyHeld = false;
 
         #region Unity Lifecycle
 
@@ -38,9 +39,11 @@ namespace InventorySystem
 
         #endregion
 
-        #region ITakable Implementation
+        #region Item Implementation
 
-        public bool IsSingleUse() => isSingleUse;
+        public bool IsConsumable() => isConsumable;
+        public bool IsSingleUse() => true;
+
 
         public void Interact(GameObject player)
         {
@@ -56,7 +59,7 @@ namespace InventorySystem
         {
             if (isCurrentlyHeld)
             {
-                Debug.LogWarning("Cannot take item - item already held");
+                Debug.LogWarning("---Item: Cannot take - already held");
                 return;
             }
 
@@ -73,7 +76,7 @@ namespace InventorySystem
             }
             else
             {
-                Debug.Log("Inventory is full or item couldn't be added!");
+                Debug.Log("---Item: Inventory is full or idk what happened");
             }
         }
 
@@ -81,17 +84,15 @@ namespace InventorySystem
         {
             if (!isCurrentlyHeld)
             {
-                Debug.LogWarning("Trying to drop item that isn't held");
+                Debug.LogWarning("---Item: Trying to drop item that isn't held");
                 return;
             }
 
             isCurrentlyHeld = false;
 
-            // Відразу включаємо фізику локально
             SetPhysicsState(true);
 
             DropServerRpc();
-
         }
 
         virtual public void Use(GameObject player)
@@ -104,17 +105,15 @@ namespace InventorySystem
 
             Debug.Log($"Using {gameObject.name} by {player.name}");
 
-            // Add your leaf blower functionality here
+            //Do things
             ExecuteItemAction(player);
         }
-
-        public GameObject GetGameObject() => gameObject;
 
         #endregion
 
         #region Item Specific Functionality
 
-        abstract protected void ExecuteItemAction(GameObject player);
+        virtual protected void ExecuteItemAction(GameObject player) { return; }
 
         virtual protected void HandleSingleUseItem(GameObject player)
         {
@@ -127,7 +126,7 @@ namespace InventorySystem
                 // Find this item in inventory and remove it
                 for (int i = 0; i < inventory.capacity; i++)
                 {
-                    if (inventory.GetItem(i)?.GetGameObject() == gameObject)
+                    if (inventory.GetItem(i)?.gameObject == gameObject)
                     {
                         inventory.RemoveItem(i);
                         break;
@@ -144,7 +143,6 @@ namespace InventorySystem
         [ServerRpc(RequireOwnership = false)]
         private void TakeServerRpc()
         {
-            // Синхронізуємо стан з усіма клієнтами, крім того хто взяв
             TakeClientRpc();
         }
 
@@ -153,7 +151,6 @@ namespace InventorySystem
         {
             SetPhysicsState(false);
             isCurrentlyHeld = true;
-
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -170,7 +167,7 @@ namespace InventorySystem
         }
 
         [ServerRpc(RequireOwnership = false)]
-        protected void DestroyItemServerRpc()
+        public void DestroyItemServerRpc()
         {
             if (NetworkObject != null)
             {

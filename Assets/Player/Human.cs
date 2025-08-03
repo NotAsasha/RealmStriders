@@ -2,62 +2,43 @@ using UnityEngine;
 using Unity.Netcode;
 using Player;
 using System.Collections;
-public class Human : NetworkBehaviour, IEntity
+public class Human : Entity
 {
-    public const float defaultHealth = 100f;
-    public NetworkVariable<bool> isDead = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-    public NetworkVariable<float> playerHealth = new(defaultHealth, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-
     private Animator animator;
     private CharacterController characterController;
     private void Awake()
-    {
+    { 
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
-       // ToggleRagdoll(false);
+        ToggleRagdoll(false);
     }
 
-    public override void OnNetworkSpawn()
+    override protected void KillEntity()
     {
-        isDead.OnValueChanged += OnDeathStateChange;
-    }
-    public override void OnNetworkDespawn()
-    {
-        isDead.OnValueChanged -= OnDeathStateChange;
-    }
-    public bool IsDead() => isDead.Value;
-    public float GetHealth() => playerHealth.Value;
-    public void AddHealth(float _health)
-    {
-
-        playerHealth.Value += _health;
-        if (playerHealth.Value <= 0 && !isDead.Value)
+        ToggleRagdoll(true);
+        if (IsOwner)
         {
-            isDead.Value = true;
-            Debug.Log($"---Crew member {OwnerClientId} was killed!");
+            GameManager.instance.OnPlayerDeathServerRpc();
         }
     }
-    private void OnDeathStateChange(bool oldValue, bool _isDead)
+    override protected void ReviveEntity()
     {
-        if (_isDead) KillPlayer();
-        else RevivePlayer();
-    }
-    private void KillPlayer()
-    {
-        if (!IsOwner) return;
-        ToggleRagdoll(true);
-        GameManager.instance.OnPlayerDeathServerRpc();
-    }
-    private void RevivePlayer()
-    {
-        if (!IsOwner) return;
+        Debug.Log($"---Human: Reviving myself");
         ToggleRagdoll(false);
     }
 
     private void ToggleRagdoll(bool isActive)
     {
-        GetComponent<Movement>().enabled = !isActive;
+        if (IsOwner)
+        {
+            Movement.instance.enabled = !isActive;
+            if (isActive)
+                Movement.instance.SwitchToInteractionControls();
+            else
+                Movement.instance.SwitchToGameplayControls();
+        }
         animator.enabled = !isActive;
         characterController.enabled = !isActive;
+        Debug.Log($"---Human: Toggled ragdoll: {isActive}");
     }
 }

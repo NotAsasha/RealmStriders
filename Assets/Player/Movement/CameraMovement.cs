@@ -12,6 +12,7 @@ namespace Player
     {
         [Header("Set Up")]
         public Transform playerBody;
+        public Transform ragdollHead;
         public LayerMask layerMask;
         [Header("Camera")]
         public float mouseSensitivity = 250f;
@@ -21,6 +22,8 @@ namespace Player
         private float xRotation = 0f;
         private IInteractable interactable;
         private Movement movement;
+        private Human human;
+
         #region Unity Lifecycle
 
         public override void OnNetworkSpawn()
@@ -33,6 +36,7 @@ namespace Player
 
             StartPosition = transform.localPosition;
             movement = Movement.instance;
+            human = GetComponentInParent<Human>();
             SettingsFile file = (SettingsFile)GameFileHandler.Instance.SearchForFileByName("Settings");
             mouseSensitivity = file.save._sensValue;
 
@@ -57,11 +61,13 @@ namespace Player
         {
             Movement.instance._controls.System.Pause.performed += OnPausePerformed;
             Movement.instance._controls.Gameplay.Interact.performed += OnInteract;
+            human.isDead.OnValueChanged += OnDeathStateCnange;
         }
         private void ClearupInputHandlers()
         {
             Movement.instance._controls.System.Pause.performed -= OnPausePerformed;
             Movement.instance._controls.Gameplay.Interact.performed -= OnInteract;
+            human.isDead.OnValueChanged -= OnDeathStateCnange;
         }
 
         #endregion
@@ -85,6 +91,22 @@ namespace Player
             }
 
             StartInteraction();
+        }
+
+        private void OnDeathStateCnange(bool old, bool _isDead)
+        {
+            if (human.isDead.Value)
+            {
+                if (!ragdollHead) return;
+                transform.parent = ragdollHead;
+                transform.localPosition = Vector3.zero;
+            }
+            else
+            {
+                transform.parent = playerBody;
+                transform.localPosition = StartPosition;
+                transform.localEulerAngles = Vector3.zero;
+            }
         }
 
         #endregion
@@ -147,7 +169,7 @@ namespace Player
 
         void Update()
         {
-            if (movement.isPaused || movement.isInInteraction) return;
+            if (movement.isPaused || movement.isInInteraction || human.isDead.Value) return;
 
             // Checks if there is a Player Body attached
             if (playerBody == null)

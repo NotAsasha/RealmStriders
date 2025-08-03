@@ -1,31 +1,36 @@
-using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
+using Player;
 
 namespace InventorySystem
 {
     public class LeafBlower : Item
     {
+        [SerializeField] LayerMask entityLayer;
+        [SerializeField] float maxDistance = 20f;
 
         #region Item Specific Functionality
 
         override protected void ExecuteItemAction(GameObject player)
         {
-            // Example implementation - replace with actual leaf blower logic
+            if (!Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, maxDistance, entityLayer)) return;
+
+            Entity entity = hit.transform.gameObject.GetComponent<Entity>();
+            if (entity.GetHealth() < 1f && !entity.isDead.Value)
+            {
+                entity.TurnIntoSphereServerRpc();
+            }
+
+
+            Debug.Log($"---LeafBlower: Entity danger: {entity.GetHealth()}");
+
             Debug.Log("Blowing leaves with powerful wind!");
 
-            // You could add:
             // - Particle effects
             // - Sound effects
-            // - Physics interactions with nearby objects
+            // - Physics interactions with enemies
             // - Cooldown mechanics
-
-            // If this is a single-use item, you might want to destroy it or remove it from inventory
-            if (isSingleUse)
-            {
-                HandleSingleUseItem(player);
-            }
         }
         #endregion
+
     }
 }

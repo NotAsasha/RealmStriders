@@ -406,10 +406,15 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 149505703480053092, guid: 097b035102c7046429bb2ebe8efa9eaa,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa,
         type: 3}
       propertyPath: m_Name
-      value: Capsule
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 7185718866269338340, guid: 097b035102c7046429bb2ebe8efa9eaa,
         type: 3}

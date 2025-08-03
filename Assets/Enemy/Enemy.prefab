@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2331233842958963472}
   - component: {fileID: 4685151852568658054}
   - component: {fileID: 149505703480053092}
+  - component: {fileID: 4496626654241809285}
   - component: {fileID: 7185718866269338340}
   - component: {fileID: 386711583038415671}
   - component: {fileID: 4771708525256896814}
@@ -120,6 +121,29 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!136 &4496626654241809285
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5629089953353955407}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.75
+  m_Height: 2.5
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &7185718866269338340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,7 +156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 285957974
+  GlobalObjectIdHash: 3248624841
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 1
   SynchronizeTransform: 1
@@ -236,7 +260,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   eyeLocalPosition: {x: 0, y: 1, z: 0}
   viewDistance: 20
-  viewAngle: 60
+  viewAngle: 120
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -255,10 +279,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5aec305521103d4496d255c6f12eaaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dangerLevel: 1.5
+  glassCage: {fileID: 707610815179461094, guid: de46285eca51e2d4c9e0994d3b25a964,
+    type: 3}
   isDead:
     m_InternalValue: 0
   entityHealth:
-    m_InternalValue: 200
+    m_InternalValue: 1.5
+  damage: 1
 --- !u!114 &-6363728834847499910
 MonoBehaviour:
   m_ObjectHideFlags: 0

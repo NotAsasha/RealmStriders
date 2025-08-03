@@ -19,7 +19,7 @@ namespace InventorySystem
         [SerializeField] private int activeSlotIndex;
 
         // Arrays for items and UI
-        private ITakable[] items;
+        private Item[] items;
         private UISlot[] slots;
         
         // Input controls
@@ -45,7 +45,7 @@ namespace InventorySystem
 
         private void InitializeInventory()
         {
-            items = new ITakable[capacity];
+            items = new Item[capacity];
             slots = new UISlot[capacity];
             
             if (Movement.instance?._controls != null)
@@ -84,7 +84,7 @@ namespace InventorySystem
         {
             if (itemToAdd == null) return false;
 
-            ITakable takableComponent = itemToAdd.GetComponent<ITakable>();
+            Item takableComponent = itemToAdd.GetComponent<Item>();
             if (takableComponent == null) return false;
 
             // If no slot specified, find first empty slot
@@ -118,12 +118,12 @@ namespace InventorySystem
             return true;
         }
 
-        public ITakable GetActiveItem()
+        public Item GetActiveItem()
         {
             return IsValidSlot(activeSlotIndex) ? items[activeSlotIndex] : null;
         }
 
-        public ITakable GetItem(int slot)
+        public Item GetItem(int slot)
         {
             return IsValidSlot(slot) ? items[slot] : null;
         }
@@ -153,18 +153,19 @@ namespace InventorySystem
         {
             if (IsPlayerInInteraction()) return;
 
-            ITakable activeItem = GetActiveItem();
-            RemoveItem(activeSlotIndex);
+            Item activeItem = GetActiveItem();
+            if (activeItem != null && activeItem.IsConsumable())
+                RemoveItem(activeSlotIndex);
             activeItem?.Use(gameObject);
         }
 
         private void OnDropItem(InputAction.CallbackContext context)
         {
-            ITakable itemToDrop = GetActiveItem();
+            Item itemToDrop = GetActiveItem();
             if (itemToDrop == null) return;
 
             items[activeSlotIndex] = null;
-            DropItemServerRpc(itemToDrop.GetGameObject());
+            DropItemServerRpc(itemToDrop.gameObject);
             UpdateUI();
         }
 
@@ -208,20 +209,20 @@ namespace InventorySystem
         private void ChangeActiveSlot(int newSlotIndex)
         {
             // Deactivate current item
-            ITakable currentItem = GetActiveItem();
+            Item currentItem = GetActiveItem();
             if (currentItem != null)
             {
-                SetItemActiveServerRpc(currentItem.GetGameObject(), false);
+                SetItemActiveServerRpc(currentItem.gameObject, false);
             }
 
             // Change active slot
             activeSlotIndex = newSlotIndex;
 
             // Activate new item
-            ITakable newItem = GetActiveItem();
+            Item newItem = GetActiveItem();
             if (newItem != null)
             {
-                SetItemActiveServerRpc(newItem.GetGameObject(), true);
+                SetItemActiveServerRpc(newItem.gameObject, true);
             }
 
             UpdateUI();
@@ -346,7 +347,7 @@ namespace InventorySystem
                 networkObject.gameObject.SetActive(true);
             }
 
-            ITakable takable = networkObject.GetComponent<ITakable>();
+            Item takable = networkObject.GetComponent<Item>();
             takable?.Drop(gameObject);
 
             DropItemClientRpc(objRef);
@@ -391,7 +392,7 @@ namespace InventorySystem
             Debug.Log($"Inventory State - Active Slot: {activeSlotIndex}");
             for (int i = 0; i < capacity; i++)
             {
-                string itemName = items[i]?.GetGameObject().name ?? "Empty";
+                string itemName = items[i]?.gameObject.name ?? "Empty";
                 Debug.Log($"Slot {i}: {itemName}");
             }
         }
