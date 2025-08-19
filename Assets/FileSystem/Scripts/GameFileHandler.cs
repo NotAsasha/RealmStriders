@@ -19,6 +19,7 @@ namespace FileSystem
             DontDestroyOnLoad(gameObject);
             LoadAll(availableFiles);
         }
+
         public GameFile SearchForFileByName(string name)
         {
             foreach (var file in availableFiles)
@@ -27,7 +28,9 @@ namespace FileSystem
             };
             return null;
         }
+
         public void DeleteAvaible() => DeleteAll(availableFiles);
+
         public void LoadAll(List<GameFile> filesToLoad)
         {
             if (filesToLoad == null || filesToLoad.Count == 0)
@@ -40,6 +43,7 @@ namespace FileSystem
                 file.Load(false);
             }
         }
+
         public void DeleteAll(List<GameFile> filesToLoad)
         {
             if (filesToLoad == null || filesToLoad.Count == 0)

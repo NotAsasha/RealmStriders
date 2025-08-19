@@ -7,12 +7,11 @@ namespace FileSystem
     public class SettingsFile : GameFile
     {
         [Header("SettingsFile Info")]
-        public SettingsSave save = new(100);
+        public SettingsSave save;
         public override void ProcessData(string inputData)
         {
             if (string.IsNullOrWhiteSpace(inputData) || inputData.Length < 5)
             {
-                save = new(100);
                 Debug.LogWarning("InputData is empty, resetting to default save");
                 Save(false);
                 return;
@@ -30,8 +29,7 @@ namespace FileSystem
     [Serializable]
     public class SettingsSave
     {
-        public SettingsSave(int a) { _sensValue = a; }
         public string rebinds;
-        public float _sensValue;
+        public float _sensValue = 100;
     }
 }
