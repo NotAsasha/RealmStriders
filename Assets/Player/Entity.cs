@@ -43,7 +43,7 @@ public abstract class Entity : NetworkBehaviour
 
     private void OnDeathStateChange(bool oldValue, bool _isDead)
     {
-        if (_isDead) KillEntity();
+        if (isDead.Value) KillEntity();
         else ReviveEntity();
     }
 

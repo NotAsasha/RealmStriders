@@ -29,7 +29,11 @@ namespace Player.Voice
 
         private void Start()
         {
-            if (!IsOwner || SteamManager.Instance.CurrentLobby == null) enabled = false;
+            if (!IsOwner)
+            {
+                enabled = false;
+                return;
+            }
 
             optimalRate = (int)SteamUser.OptimalSampleRate;
             clipBufferSize = optimalRate * 5;

@@ -1,8 +1,10 @@
 using FileSystem;
 using Steamworks;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 
 namespace Player
@@ -25,6 +27,9 @@ namespace Player
         public Controls _controls;
         public bool isPaused;
         public bool isInInteraction;
+
+        public AudioSource audioSource;
+        public AudioResource[] stepSounds;
 
         private CharacterController player;
         private bool isGrounded;
@@ -135,7 +140,7 @@ namespace Player
 
         void FixedUpdate()
         {
-            isGrounded = Physics.Raycast(playerTransform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
+            isGrounded = Physics.Raycast(playerTransform.position, Vector3.down, playerHeight * 0.5f + 0.5f, whatIsGround);
             if (isGrounded && velocity.y < 0) velocity.y = 0f;
 
             var MovementControls = _controls.Gameplay.Movement;
@@ -143,12 +148,35 @@ namespace Player
             // Calculate movement direction and speed
             Vector3 move = playerTransform.right * MovementControls.ReadValue<Vector3>().x + playerTransform.forward * MovementControls.ReadValue<Vector3>().z;
             if (move.magnitude > 1) move.Normalize();
-            currentSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : moveSpeed;
+
+            bool isRunning = Input.GetKey(KeyCode.LeftShift);
+            currentSpeed = isRunning ? runSpeed : moveSpeed;
+
+            //Steps sound
+            if (isSoundReady && isGrounded && player.velocity.magnitude > 0.3f) PlayStepsSound(isRunning ? 0.3f : 0.5f);
+            
 
             // Apply movement
             Vector3 finalPosition = currentSpeed * move + velocity;
             player.Move(finalPosition * Time.deltaTime);
             velocity.y += gravity * Time.deltaTime;
+        }
+
+        bool isSoundReady = true;
+        private void PlayStepsSound(float cooldown)
+        {
+            isSoundReady = false;
+            int soundsCount = stepSounds.Length;
+            audioSource.resource = stepSounds[Random.Range(0, soundsCount)];
+            audioSource.Play();
+            StartCoroutine(SoundTimer(cooldown));
+        }
+
+        private IEnumerator SoundTimer(float cooldown)
+        {
+            yield return new WaitForSeconds(cooldown);
+            isSoundReady = true;
+            audioSource.Stop();
         }
     }
 }

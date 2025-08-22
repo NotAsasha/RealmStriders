@@ -14,7 +14,7 @@ public class ChasePlayer : MonoBehaviour
         halfAngle = viewAngle * 0.5f;
     }
 
-    public GameObject PlayerInSight()
+    public GameObject EntityInSight(bool countEnemies = false)
     {
         Vector3 eyePosition = transform.position + eyeLocalPosition;
         Collider[] players = Physics.OverlapSphere(eyePosition, viewDistance, playerLayer);
@@ -24,10 +24,18 @@ public class ChasePlayer : MonoBehaviour
             Vector3 direction = player.transform.position - transform.position;
             if (Vector3.Angle(direction, transform.forward) <= halfAngle)
             {
-                if (!Physics.Raycast(eyePosition, direction, direction.magnitude, wallLayer))
-                {
-                    return player.gameObject;
-                }
+                // if entity is behind a wall
+                if (Physics.Raycast(eyePosition, direction, direction.magnitude, wallLayer)) continue;
+
+                //if is dead
+                var entity = player.GetComponent<Entity>();
+                if (entity == null || entity.isDead.Value) continue;
+
+                //if is enemy
+                if (!countEnemies && player.GetComponent<Enemy>() != null) continue;
+
+                return player.gameObject;
+                
             }
         }
         return null;

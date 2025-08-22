@@ -86,7 +86,6 @@ namespace Player
             if (movement.isInInteraction)
             {
                 StopInteraction();
-                ToggleInteractionUI(false);
                 return;
             }
 
@@ -97,6 +96,8 @@ namespace Player
         {
             if (human.isDead.Value)
             {
+                if (Movement.instance.isInInteraction) StopInteraction();
+
                 if (!ragdollHead) return;
                 transform.parent = ragdollHead;
                 transform.localPosition = Vector3.zero;
@@ -133,7 +134,7 @@ namespace Player
             if (isSingleUse) interactable = null;
         }
 
-        private void StopInteraction()
+        public void StopInteraction()
         {
             if (interactable == null)
             {
@@ -143,6 +144,8 @@ namespace Player
 
             interactable.StopInteraction(gameObject);
             interactable = null;
+
+            ToggleInteractionUI(false);
         }
 
         private void ToggleInteractionUI(bool _isInteracting)

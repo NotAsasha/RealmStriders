@@ -1,19 +1,27 @@
-using NUnit.Framework;
-using Player;
-using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.AI;
+using System.Collections;
+using System.Drawing;
+using UnityEngine.Audio;
 
 public class Enemy : Entity, ICollidable
 {
     public float damage = 1f;
+    public bool overAggresive = false;
+    public float moveRange = 10f;
+
+
+    public float stepSoundCooldown = 0.3f;
+    public AudioSource audioSource;
+    public AudioResource[] stepSounds;
+
+    private EnemyState enemyState = EnemyState.isMoving;
 
     private Animator animator;
     private ChasePlayer vision;
     private NavMeshAgent agent;
-    private RandomMove randMove;
     private Rigidbody playerRigidbody;
 
     #region Initialization
@@ -23,7 +31,6 @@ public class Enemy : Entity, ICollidable
         animator = GetComponent<Animator>();
         vision = GetComponent<ChasePlayer>();
         agent = GetComponent<NavMeshAgent>();
-        randMove = GetComponent<RandomMove>();
         playerRigidbody = GetComponent<Rigidbody>();
         ToggleRagdoll(false);
     }
@@ -43,7 +50,6 @@ public class Enemy : Entity, ICollidable
         animator.enabled = !isActive;
         vision.enabled = !isActive;
         agent.enabled = !isActive;
-        randMove.enabled = !isActive;
         playerRigidbody.isKinematic = !isActive;
     }
 
@@ -53,16 +59,17 @@ public class Enemy : Entity, ICollidable
 
     public void OnColliderEnter(GameObject collider)
     {
-        if (!IsServer || isDead.Value) return;
-        var player = collider.GetComponent<Human>();
+        if (!IsServer || isDead.Value || !GameManager.instance.hasStartedMission.Value) return;
+        var player = collider.GetComponent<Entity>();
         if (player == null || player.isDead.Value) return;
+        if (!overAggresive && collider.GetComponent<Enemy>() != null) return;
 
-        PlayerBiteClientRpc(collider);
+        BiteClientRpc(collider);
         player.AddHealth(-damage);
     }
 
     [ClientRpc]
-    virtual protected void PlayerBiteClientRpc(NetworkObjectReference obj)
+    virtual protected void BiteClientRpc(NetworkObjectReference obj)
     {
         obj.TryGet(out NetworkObject player);
         Debug.Log($"---Enemy: Eaten {player.name}");
@@ -70,30 +77,90 @@ public class Enemy : Entity, ICollidable
 
     #endregion
 
-
-
     private void FixedUpdate()
     {
-        if (!IsServer || isDead.Value) return;
+        if (isDead.Value) return;
 
+        if (isSoundReady) PlayStepsSound(stepSoundCooldown);
+
+        if (!IsServer) return;
+        //first priority, run
+        if (enemyState == EnemyState.isRunning)
+        {
+            if (agent.remainingDistance > agent.stoppingDistance) return;
+            enemyState = EnemyState.isMoving;
+        }
+
+        //second priority, search for player
+        if (ChasePlayer(overAggresive)) return;
+
+        //third priority, go to the target location
+        if (agent.remainingDistance > agent.stoppingDistance) return; //not done with path
+
+        //forth priority, go somewhere
+        Move();
+    }
+
+    private void Run()
+    {
+        Move();
+        enemyState = EnemyState.isRunning;
+    }
+
+    private bool ChasePlayer(bool _countEnemies = false)
+    {
         vision.DrawViewState(); //draw vision boundaries
 
-        var player = vision.PlayerInSight();
+        var player = vision.EntityInSight(_countEnemies);
         if (player != null)
         {
             agent.SetDestination(player.transform.position);
-            Debug.Log("Found!");
+            enemyState = EnemyState.isChasingPlayer;
         }
-        else
-        {
-            if (agent.remainingDistance > agent.stoppingDistance) return; //not done with path
+        return (player != null);
+    }
 
-            Vector3 point;
-            if (randMove.RandomPoint(transform.position, randMove.range, out point)) //choose where to go
-            {
-                Debug.DrawRay(point, Vector3.up, Color.blue, 1.0f); //so you can see with gizmos
-                agent.SetDestination(point);
-            }
+    public void Lure(Vector3 _coords)
+    {
+        if (!IsServer || enemyState < EnemyState.isChasingSound) return;
+        if (agent.SetDestination(_coords))
+        {
+            enemyState = EnemyState.isChasingSound;
         }
     }
+
+    private void Move()
+    {
+        Vector3 point;
+        if (RandomMove.RandomPoint(transform.position, moveRange, out point)) //choose where to go
+        {
+            Debug.DrawRay(point, Vector3.up, UnityEngine.Color.blue, 1.0f); //so you can see with gizmos
+            agent.SetDestination(point);
+            enemyState = EnemyState.isMoving;
+        }
+    }
+
+    bool isSoundReady = true;
+    private void PlayStepsSound(float cooldown)
+    {
+        isSoundReady = false;
+        int soundsCount = stepSounds.Length;
+        audioSource.resource = stepSounds[Random.Range(0, soundsCount)];
+        audioSource.Play();
+        StartCoroutine(SoundTimer(cooldown));
+    }
+
+    private IEnumerator SoundTimer(float cooldown)
+    {
+        yield return new WaitForSeconds(cooldown);
+        isSoundReady = true;
+        audioSource.Stop();
+    }
+}
+public enum EnemyState
+{
+    isRunning = 0,
+    isChasingPlayer = 1,
+    isChasingSound = 2,
+    isMoving = 3,
 }

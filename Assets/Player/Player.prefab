@@ -1195,7 +1195,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 247
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -2046,6 +2046,11 @@ MonoBehaviour:
     m_Bits: 1
   isPaused: 0
   isInInteraction: 0
+  audioSource: {fileID: -9047785158912128643}
+  stepSounds:
+  - {fileID: 8300000, guid: e64eac18257a7004f944ef3c91520d1b, type: 3}
+  - {fileID: 8300000, guid: 8107dc939c211fe4c8069d6a30846cc1, type: 3}
+  - {fileID: 8300000, guid: 5f7ce3e3e3fb9d14c8945e531026aa76, type: 3}
 --- !u!143 &9155629318535776824
 CharacterController:
   m_ObjectHideFlags: 0
@@ -2139,8 +2144,8 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
+  m_PlayOnAwake: 0
+  m_Volume: 0.67
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -2257,10 +2262,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90faabe9c46719f40af8408b627c7dc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dangerLevel: 1
+  glassCage: {fileID: 0}
   isDead:
     m_InternalValue: 0
-  playerHealth:
-    m_InternalValue: 100
+  entityHealth:
+    m_InternalValue: 1
 --- !u!95 &5017923243239964587
 Animator:
   serializedVersion: 7

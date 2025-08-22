@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Player;
 using System.Collections;
+using Unity.VisualScripting;
 public class Human : Entity
 {
     private Animator animator;

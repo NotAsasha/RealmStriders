@@ -42,7 +42,7 @@ public class WorldChooser : NetworkBehaviour
             var child = parent.GetChild(i).GetComponent<WorldCard>();
             child.parent = this;
             child.missionName.Value = (NetString)$"World{i + 1}";
-            child.enemiesCount.Value = Random.Range(1, 5);
+            child.enemiesCount.Value = EnemySpawner.RandomEnemiesNumber(GameManager.instance.teamRating.Value + i - 1);
             child.avarageDanger.Value = Random.Range(1, 5);
         }
     }

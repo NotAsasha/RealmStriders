@@ -4,15 +4,17 @@ using UnityEngine;
 using Steam;
 using UnityEngine.SceneManagement;
 using UnityEngine.Rendering.Universal;
+using Unity.Networking.Transport;
+using NUnit.Framework;
+using System.Collections.Generic;
 
 public class GameManager : NetworkBehaviour
 {
-    [SerializeField] Vector3 spawnPoint = new(0f,1f,0f);
+    [SerializeField] Vector3 spawnPoint = new(0f, 1f, 0f);
     [SerializeField] int defaultMissionTime = 360;
     [SerializeField] int maxTimeSpread = 120;
 
-
-    public NetworkVariable<int> teamRating = new(1, writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> teamRating = new(3, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<int> teamMoney = new(1000, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<bool> hasStartedMission = new(false, writePerm: NetworkVariableWritePermission.Server);
 
@@ -22,11 +24,16 @@ public class GameManager : NetworkBehaviour
 
     public int AlivePlayersCount { get => alivePlayers; }
 
+    public Scene missionScene;
     public string missionName = "World1";
     public int enemiesCount = 1;
     public float avarageDanger = 1;
 
+    public List<Enemy> activeEnemies = new();
+
     public static GameManager instance = null;
+
+    private EnemySpawner spawner;
 
     #region Unity Lifecycle
 
@@ -40,6 +47,7 @@ public class GameManager : NetworkBehaviour
         InvokeRepeating(nameof(Radiation), 0f, 1f);
 
         Application.targetFrameRate = 240;
+        spawner = GetComponent<EnemySpawner>();
     }
 
     private void OnDisable()
@@ -172,10 +180,9 @@ public class GameManager : NetworkBehaviour
         }
         else
         {
-            if (avarageDanger > _current)
-            {
-                _current += 1;
-            }
+
+            _current += 1;
+
         }
 
         return _current;
@@ -201,15 +208,27 @@ public class GameManager : NetworkBehaviour
             Debug.LogError("---MissionManager: Trying to load mission without ending the previous one.");
         }
 
-        if (NetworkManager.Singleton.IsServer)
-        {
-            NetworkManager.Singleton.SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
-            currentSceneName = sceneToLoad;
-        }
-        else
+        if (!IsServer)
         {
             Debug.Log("Waiting for server to load scene...");
+            return;
         }
+
+        //Scene
+        NetworkManager.Singleton.SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
+        Scene sceneToUnload = SceneManager.GetSceneByName(sceneToLoad);
+        currentSceneName = sceneToLoad;
+        missionScene = sceneToUnload;
+
+        //Enemies
+
+        NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(ulong conn, string sceneName, LoadSceneMode mode)
+    {
+        spawner.SpawnEnemies(teamRating.Value, enemiesCount);
+        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded; // відписка
     }
 
     public void UnloadWorld()
@@ -219,6 +238,13 @@ public class GameManager : NetworkBehaviour
             Debug.LogError("---MissionManager: Trying to stop non-existing mission.");
             return;
         }
+
+        foreach (var enemy in activeEnemies)
+        {
+            enemy.GetComponent<NetworkObject>().Despawn();
+            Destroy(enemy.gameObject);
+        }
+        activeEnemies.Clear();
 
         Scene sceneToUnload = SceneManager.GetSceneByName(currentSceneName);
         NetworkManager.Singleton.SceneManager.UnloadScene(sceneToUnload);
@@ -236,5 +262,4 @@ public class GameManager : NetworkBehaviour
             StopMissionServerRpc();
         }
     }
-
 }

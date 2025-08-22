@@ -119,6 +119,37 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &92385580 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7820787048139737313, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
+    type: 3}
+  m_PrefabInstance: {fileID: 6598072698000735035}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &92385584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92385580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b8689e5529df544c854fe3be3ba91f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemiesByDanger:
+  - enemies:
+    - {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
+  - enemies:
+    - {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
+  - enemies:
+    - {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
+  - enemies:
+    - {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
+  - enemies:
+    - {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
+  distanceFromPortal: 50
+  maxDistance: 120
 --- !u!1 &938603029
 GameObject:
   m_ObjectHideFlags: 0
@@ -362,12 +393,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2282627832020832903, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
         type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2282627832020832903, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
+        type: 3}
       propertyPath: teamMoney.m_InternalValue
-      value: 1000
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 2282627832020832903, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
         type: 3}
       propertyPath: teamRating.m_InternalValue
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6244321503512960038, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
+        type: 3}
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6244321503512960038, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
@@ -388,7 +429,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7820787048139737313, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 92385584}
   m_SourcePrefab: {fileID: 100100000, guid: ba8c9fbdbd0abe540b40343a6c52b80b, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
