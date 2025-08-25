@@ -1,52 +1,70 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
-public class PortalTeleporter : MonoBehaviour {
+public class PortalTeleporter : MonoBehaviour
+{
+    public Transform receiver;
+    public Transform enemyReceiver;
 
-	public Transform player;
-	public Transform reciever;
 
-	private bool playerIsOverlapping = false;
+    private bool objectIsOverlapping = false;
+    private Transform objectToTeleport;
 
-	// Update is called once per frame
-	void Update () {
-		if (playerIsOverlapping)
-		{
+    private void Update()
+    {
+        if (objectIsOverlapping && objectToTeleport != null)
+        {
+            Vector3 portalToObject = objectToTeleport.position - transform.position;
+            float dotProduct = Vector3.Dot(transform.up, portalToObject);
+            if (dotProduct < 0f)
+            {
+                Debug.Log($"---Portal: Teleporting {objectToTeleport.name} to {receiver.name}");
 
-			Vector3 portalToPlayer = player.position - transform.position;
-			float dotProduct = Vector3.Dot(transform.up, portalToPlayer);
+                //Quaternion portalRotationDifference = receiver.rotation * Quaternion.Inverse(transform.rotation);
 
-			// If this is true: The player has moved across the portal
-			if (dotProduct < 0f)
-			{
-				// Teleport him!
-				float rotationDiff = -Quaternion.Angle(transform.rotation, reciever.rotation);
-				rotationDiff += 180;
-				player.Rotate(Vector3.up, rotationDiff);
+                CharacterController cc = objectToTeleport.GetComponent<CharacterController>();
+                if (cc != null) cc.enabled = false;
 
-				Vector3 positionOffset = Quaternion.Euler(0f, rotationDiff, 0f) * portalToPlayer;
-				player.position = reciever.position + positionOffset;
+                //NavMeshAgent nma = objectToTeleport.GetComponent<NavMeshAgent>();
+                //if (nma != null) nma.enabled = false;
 
-				playerIsOverlapping = false;
-			}
-		}
-	}
 
-	void OnTriggerEnter (Collider other)
-	{
-		if (other.CompareTag("Player"))
-		{
-			playerIsOverlapping = true;
-			player = other.transform;
+                //objectToTeleport.rotation = portalRotationDifference * objectToTeleport.rotation;
+                objectToTeleport.position = receiver.position + /* portalRotationDifference * */ portalToObject;
+
+                if (cc != null) cc.enabled = true;
+                //if (nma != null) nma.enabled = true;
+
+                objectIsOverlapping = false;
+            }
         }
-	}
+    }
 
-	void OnTriggerExit (Collider other)
-	{
-		if (other.tag == "Player")
-		{
-			playerIsOverlapping = false;
-		}
-	}
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            objectToTeleport = other.transform;
+            objectIsOverlapping = true;
+            //Debug.Log($"---{name}: {other.gameObject.name} entered.");
+        }
+        else if (other.gameObject.GetComponent<ICollidable>() != null)
+        {
+            if (other.TryGetComponent<NavMeshAgent>(out var nma)) nma.enabled = false;
+            other.transform.position = enemyReceiver.position;
+            if (nma != null) nma.enabled = true;
+
+            if (other.TryGetComponent<Enemy>(out var en)) en.Lure(enemyReceiver.position);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.transform == objectToTeleport)
+        {
+            //Debug.Log($"---{name}: {other.gameObject.name} exited.");
+            objectIsOverlapping = false;
+            objectToTeleport = null;
+        }
+    }
 }

@@ -7,10 +7,11 @@ using UnityEngine.Rendering.Universal;
 using Unity.Networking.Transport;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 
 public class GameManager : NetworkBehaviour
 {
-    [SerializeField] Vector3 spawnPoint = new(0f, 1f, 0f);
+    public Vector3 spawnPoint = new(0f, -49f, 0f);
     [SerializeField] int defaultMissionTime = 360;
     [SerializeField] int maxTimeSpread = 120;
 
@@ -180,9 +181,11 @@ public class GameManager : NetworkBehaviour
         }
         else
         {
-
-            _current += 1;
-
+            bool areAllDead = activeEnemies.Any(enemy => enemy.isDead.Value);
+            if (areAllDead)
+            {
+                _current += 1;
+            }
         }
 
         return _current;
@@ -191,11 +194,13 @@ public class GameManager : NetworkBehaviour
     private void StartMission()
     {
         //Open Portal
+        PortalManager.instance.ChangeState(true);
     }
 
     private void StopMission()
     {
         //Close portal
+        PortalManager.instance.ChangeState(false);
     }
 
     #region World Manager

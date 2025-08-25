@@ -77,13 +77,24 @@ public class Enemy : Entity, ICollidable
 
     #endregion
 
-    private void FixedUpdate()
+    private float nextUpdate;
+    void Update()
     {
-        if (isDead.Value) return;
+        if (!IsServer || isDead.Value) return;
 
+        vision.DrawViewState(); //draw vision boundaries
+
+        if (Time.time >= nextUpdate)
+        {
+            nextUpdate = Time.time + 0.3f + Random.Range(0f, 0.1f);
+            Think();
+        }
+    }
+
+    private void Think()
+    {
         if (isSoundReady) PlayStepsSound(stepSoundCooldown);
 
-        if (!IsServer) return;
         //first priority, run
         if (enemyState == EnemyState.isRunning)
         {
@@ -109,12 +120,14 @@ public class Enemy : Entity, ICollidable
 
     private bool ChasePlayer(bool _countEnemies = false)
     {
-        vision.DrawViewState(); //draw vision boundaries
-
         var player = vision.EntityInSight(_countEnemies);
         if (player != null)
         {
-            agent.SetDestination(player.transform.position);
+            Vector3 target = player.transform.position;
+            if ((agent.destination - target).sqrMagnitude > 0.5f * 0.5f)
+            {
+                agent.SetDestination(target);
+            }
             enemyState = EnemyState.isChasingPlayer;
         }
         return (player != null);

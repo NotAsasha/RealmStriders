@@ -8,10 +8,20 @@ public class Human : Entity
     private Animator animator;
     private CharacterController characterController;
     private void Awake()
-    { 
+    {
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
         ToggleRagdoll(false);
+
+        ToSpawnPoint();
+    }
+
+    private void ToSpawnPoint()
+    {
+        CharacterController cc = GetComponent<CharacterController>();
+        cc.enabled = false;
+        transform.position = GameManager.instance.spawnPoint;
+        cc.enabled = true;
     }
 
     override protected void KillEntity()

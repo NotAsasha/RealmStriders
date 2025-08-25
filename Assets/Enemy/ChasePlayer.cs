@@ -14,7 +14,7 @@ public class ChasePlayer : MonoBehaviour
         halfAngle = viewAngle * 0.5f;
     }
 
-    public GameObject EntityInSight(bool countEnemies = false)
+    public GameObject EntityInSight(bool chaseEnemies = false)
     {
         Vector3 eyePosition = transform.position + eyeLocalPosition;
         Collider[] players = Physics.OverlapSphere(eyePosition, viewDistance, playerLayer);
@@ -32,7 +32,7 @@ public class ChasePlayer : MonoBehaviour
                 if (entity == null || entity.isDead.Value) continue;
 
                 //if is enemy
-                if (!countEnemies && player.GetComponent<Enemy>() != null) continue;
+                if (!chaseEnemies && player.GetComponent<Enemy>() != null) continue;
 
                 return player.gameObject;
                 
