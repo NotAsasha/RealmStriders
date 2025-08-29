@@ -8,7 +8,7 @@ public class Button : NetworkBehaviour, IInteractable
     [SerializeField] private float cooldown = 0f;
     [SerializeField] private UnityEvent onInteract;
 
-    private NetworkVariable<bool> isReady = new(true, 0);
+    public NetworkVariable<bool> isReady = new(true, 0);
 
     public bool IsSingleUse() => true;
     public void Interact(GameObject _player)
@@ -24,7 +24,7 @@ public class Button : NetworkBehaviour, IInteractable
         
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void StartCooldownServerRpc()
     {
         StartCoroutine(Cooldown());

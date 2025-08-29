@@ -16,12 +16,11 @@ public class Human : Entity
         ToSpawnPoint();
     }
 
-    private void ToSpawnPoint()
+    public void ToSpawnPoint()
     {
-        CharacterController cc = GetComponent<CharacterController>();
-        cc.enabled = false;
+        characterController.enabled = false;
         transform.position = GameManager.instance.spawnPoint;
-        cc.enabled = true;
+        characterController.enabled = true;
     }
 
     override protected void KillEntity()
@@ -36,6 +35,11 @@ public class Human : Entity
     {
         Debug.Log($"---Human: Reviving myself");
         ToggleRagdoll(false);
+    }
+
+    override protected void OnFreezeStateChange(bool oldV, bool isFreezed)
+    {
+        characterController.enabled = !isFreezed && !isDead.Value;
     }
 
     private void ToggleRagdoll(bool isActive)

@@ -172,7 +172,7 @@ namespace Player
 
         void Update()
         {
-            if (movement.isPaused || movement.isInInteraction || human.isDead.Value) return;
+            if (movement.isPaused || movement.isInInteraction || human.isDead.Value || human.isFreezed.Value) return;
 
             // Checks if there is a Player Body attached
             if (playerBody == null)

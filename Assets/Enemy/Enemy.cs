@@ -11,7 +11,7 @@ public class Enemy : Entity, ICollidable
     public float damage = 1f;
     public bool overAggresive = false;
     public float moveRange = 10f;
-
+    public float defaultSpeed = 5f;
 
     public float stepSoundCooldown = 0.3f;
     public AudioSource audioSource;
@@ -26,12 +26,14 @@ public class Enemy : Entity, ICollidable
 
     #region Initialization
 
-    private void Awake()
+    private void Start()
     {
         animator = GetComponent<Animator>();
         vision = GetComponent<ChasePlayer>();
         agent = GetComponent<NavMeshAgent>();
         playerRigidbody = GetComponent<Rigidbody>();
+
+        agent.speed = defaultSpeed;
         ToggleRagdoll(false);
     }
 
@@ -45,12 +47,20 @@ public class Enemy : Entity, ICollidable
         ToggleRagdoll(true);
     }
 
+    override protected void OnFreezeStateChange(bool oldV, bool isFreezed)
+    {
+        animator.speed = isFreezed ? 0 : 1;
+        agent.speed = isFreezed ? 0 : defaultSpeed;
+    }
+
     private void ToggleRagdoll(bool isActive)
     {
+        Debug.Log($"ToggleRagdoll {isActive}");
         animator.enabled = !isActive;
         vision.enabled = !isActive;
         agent.enabled = !isActive;
         playerRigidbody.isKinematic = !isActive;
+        Debug.Log($"playerRigidbody.isKinematic {playerRigidbody.isKinematic}");
     }
 
     #endregion
@@ -59,7 +69,7 @@ public class Enemy : Entity, ICollidable
 
     public void OnColliderEnter(GameObject collider)
     {
-        if (!IsServer || isDead.Value || !GameManager.instance.hasStartedMission.Value) return;
+        if (!IsServer || isDead.Value || isFreezed.Value || !GameManager.instance.hasStartedMission.Value) return;
         var player = collider.GetComponent<Entity>();
         if (player == null || player.isDead.Value) return;
         if (!overAggresive && collider.GetComponent<Enemy>() != null) return;
@@ -80,7 +90,7 @@ public class Enemy : Entity, ICollidable
     private float nextUpdate;
     void Update()
     {
-        if (!IsServer || isDead.Value) return;
+        if (!IsServer || isDead.Value || isFreezed.Value) return;
 
         vision.DrawViewState(); //draw vision boundaries
 
@@ -112,7 +122,7 @@ public class Enemy : Entity, ICollidable
         Move();
     }
 
-    private void Run()
+    public void Run()
     {
         Move();
         enemyState = EnemyState.isRunning;

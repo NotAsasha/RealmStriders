@@ -48,7 +48,7 @@ public class PortalTeleporter : MonoBehaviour
             objectIsOverlapping = true;
             //Debug.Log($"---{name}: {other.gameObject.name} entered.");
         }
-        else if (other.gameObject.GetComponent<ICollidable>() != null)
+        else if (other.gameObject.GetComponent<Enemy>() != null)
         {
             if (other.TryGetComponent<NavMeshAgent>(out var nma)) nma.enabled = false;
             other.transform.position = enemyReceiver.position;

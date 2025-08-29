@@ -16,6 +16,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] int maxTimeSpread = 120;
 
     public NetworkVariable<int> teamRating = new(3, writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> looseRating = new(0, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<int> teamMoney = new(1000, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<bool> hasStartedMission = new(false, writePerm: NetworkVariableWritePermission.Server);
 
@@ -120,7 +121,6 @@ public class GameManager : NetworkBehaviour
         if (SteamManager.Instance.CurrentLobby != null)
             SteamManager.Instance.CurrentLobby.Value.SetJoinable(false);
 
-
         LoadWorld(missionName, enemiesCount, avarageDanger);
         StartTimer();
 
@@ -136,6 +136,13 @@ public class GameManager : NetworkBehaviour
 
         //Calculate rating
         teamRating.Value = CalculateRating(teamRating.Value);
+        looseRating.Value += 1;
+
+        if (teamRating.Value <= looseRating.Value)
+        {
+            //Loose
+            Debug.Log("---MissionManager: Game Over, you lost...");
+        }
 
         UnloadWorld();
         missionName = "";
@@ -150,12 +157,12 @@ public class GameManager : NetworkBehaviour
     {
         foreach (var player in NetworkManager.Singleton.ConnectedClientsList)
         {
-            Debug.Log($"Reviving player: {player.ClientId}");
-            var human = player.PlayerObject.gameObject.GetComponent<Entity>();
+            Debug.Log($"---Mission: Reviving player: {player.ClientId}");
+            var human = player.PlayerObject.gameObject.GetComponent<Human>();
             if (human.isDead.Value)
             {
-                human.transform.position = spawnPoint;
                 human.isDead.Value = false;
+                human.ToSpawnPoint();
             }
             human.entityHealth.Value = human.dangerLevel;
         }
@@ -187,7 +194,7 @@ public class GameManager : NetworkBehaviour
                 _current += 1;
             }
         }
-
+        
         return _current;
     }
 

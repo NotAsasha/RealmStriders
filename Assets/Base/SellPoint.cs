@@ -8,7 +8,7 @@ public class SellPoint : NetworkBehaviour
     [SerializeField] private Vector3 boxSize = new Vector3(0.5f, 0.5f, 2);
     [SerializeField] private LayerMask itemLayer;
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void OnSellServerRpc()
     {
         Debug.Log($"---SellPoint: Started selling!");

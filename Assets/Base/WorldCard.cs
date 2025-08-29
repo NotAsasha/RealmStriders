@@ -35,7 +35,7 @@ public class WorldCard : NetworkBehaviour
         SetMissionServerRpc(missionName.Value, enemiesCount.Value, avarageDanger.Value);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void SetMissionServerRpc(NetString missionName, int enemiesCount, float avarageDanger)
     {
         if (GameManager.instance.hasStartedMission.Value) return;

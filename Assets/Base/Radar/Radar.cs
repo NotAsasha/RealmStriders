@@ -6,23 +6,26 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 public class Radar : Terminal
 {
+    [Header("Settings")]
     [SerializeField] private float moveSpeed = 2f;
+    [SerializeField] private Vector2 border = new Vector2(5f, 5f);
+
+    [Header("References")] 
+    public Camera radarCamera;
     [SerializeField] private Transform crosshair;
     [SerializeField] private Transform screen;
-    [SerializeField] private Vector2 border = new Vector2(5f, 5f);
-    [SerializeField] private Camera radarCamera;
-
     [SerializeField] private NetworkObject beamPrefab;
     [SerializeField] private float mapSizeMultiplier = 25.6f;
 
     private int playerID;
     InputAction control;
+    NetworkObject beam;
+
     override public void OnNetworkSpawn() {
         playerID = (int)Movement.instance.GetComponent<NetworkObject>().OwnerClientId;
         control = Movement.instance._controls.UI.Navigate;
     }
 
-    NetworkObject beam;
     [ServerRpc(RequireOwnership = false)]
     public void SpawnBeamServerRpc()
     {
@@ -50,7 +53,7 @@ public class Radar : Terminal
         Vector3 move = moveDir * moveSpeed * Time.deltaTime;
 
         // Compute new position
-        Vector3 newLocalPos = crosshair.localPosition + move;
+        Vector3 newLocalPos = crosshair.localPosition - move;
 
         // Clamp position within minimap bounds
         newLocalPos.x = Mathf.Clamp(newLocalPos.x, -border.x, border.x);
@@ -59,5 +62,4 @@ public class Radar : Terminal
 
         crosshair.localPosition = newLocalPos;
     }
-
 }

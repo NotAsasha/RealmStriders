@@ -1,23 +1,33 @@
 using UnityEngine;
 using TMPro;
+using Unity.Netcode;
+using UnityEngine.UI;
 
-public class RatingScreen : MonoBehaviour
+public class RatingScreen : NetworkBehaviour
 {
     [SerializeField] TMP_Text screen;
+    [SerializeField] Slider teamRatingSlider;
+    [SerializeField] Slider minRatingSlider;
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        GameManager.instance.teamRating.OnValueChanged += OnRatingChange;
-        OnRatingChange(0, GameManager.instance.teamRating.Value);
-    }
+        var teamRating = GameManager.instance.teamRating;
+        var looseRating = GameManager.instance.looseRating;
 
-    private void OnDestroy()
-    {
-        GameManager.instance.teamRating.OnValueChanged -= OnRatingChange;
-    }
+        teamRating.OnValueChanged += (oldV, newV) =>
+        {
+            screen.text = newV.ToString();
+            teamRatingSlider.value = newV;
+        };
 
-    private void OnRatingChange(int oldV, int _rating)
-    {
-        screen.text = _rating.ToString();
+        looseRating.OnValueChanged += (oldV, newV) =>
+        {
+            minRatingSlider.value = newV;
+        };
+
+        // Update at the beginning
+        screen.text = teamRating.Value.ToString();
+        teamRatingSlider.value = teamRating.Value;
+        minRatingSlider.value = looseRating.Value;
     }
 }
