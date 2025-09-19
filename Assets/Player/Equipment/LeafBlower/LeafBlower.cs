@@ -7,11 +7,13 @@ namespace InventorySystem
     {
         [SerializeField] LayerMask entityLayer;
         [SerializeField] float maxDistance = 20f;
+        [SerializeField] ParticleSystem particle;
 
         #region Item Specific Functionality
 
         override protected void ExecuteItemAction(GameObject player)
         {
+            particle.Play();
             if (!Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, maxDistance, entityLayer)) return;
 
             Entity entity = hit.transform.gameObject.GetComponent<Entity>();

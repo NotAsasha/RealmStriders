@@ -48,7 +48,8 @@ public class GameManager : NetworkBehaviour
         //Decrease timer every second
         InvokeRepeating(nameof(Radiation), 0f, 1f);
 
-        Application.targetFrameRate = 240;
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 1000;
         spawner = GetComponent<EnemySpawner>();
     }
 
@@ -162,7 +163,6 @@ public class GameManager : NetworkBehaviour
             if (human.isDead.Value)
             {
                 human.isDead.Value = false;
-                human.ToSpawnPoint();
             }
             human.entityHealth.Value = human.dangerLevel;
         }

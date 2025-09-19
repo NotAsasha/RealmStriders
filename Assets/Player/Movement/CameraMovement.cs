@@ -1,11 +1,10 @@
 using FileSystem;
 using Unity.Netcode;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using InventorySystem;
-using UnityEngine.Rendering.Universal;
 using Unity.Cinemachine;
+
 namespace Player
 {
     public class CameraMovement : NetworkBehaviour
@@ -15,7 +14,7 @@ namespace Player
         public Transform ragdollHead;
         public LayerMask layerMask;
         [Header("Camera")]
-        public float mouseSensitivity = 250f;
+        public float mouseSensitivity = 1f;
         public float hitDistance = 2.0f;
         public Vector3 StartPosition;
 
@@ -132,6 +131,10 @@ namespace Player
             ToggleInteractionUI(!isSingleUse);
 
             if (isSingleUse) interactable = null;
+            else
+            {
+                transform.parent = hit.collider.gameObject.transform;
+            }
         }
 
         public void StopInteraction()
@@ -144,6 +147,8 @@ namespace Player
 
             interactable.StopInteraction(gameObject);
             interactable = null;
+            transform.parent = playerBody;
+            transform.localPosition = StartPosition;
 
             ToggleInteractionUI(false);
         }
@@ -170,9 +175,11 @@ namespace Player
 
         #endregion
 
+        private Vector2 previousLook;
+
         void Update()
         {
-            if (movement.isPaused || movement.isInInteraction || human.isDead.Value || human.isFreezed.Value) return;
+            if (movement.isPaused || movement.isInInteraction || human.isDead.Value || human.IsEffectActive(EffectType.Freeze)) return;
 
             // Checks if there is a Player Body attached
             if (playerBody == null)
@@ -181,8 +188,12 @@ namespace Player
                 return;
             }
 
-            float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-            float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+            Vector2 lookInput = Movement.instance._controls.Gameplay.Look.ReadValue<Vector2>();
+            Vector2 smoothLook = Vector2.Lerp(previousLook, lookInput, 0.5f);
+            previousLook = smoothLook;
+
+            float mouseX = lookInput.x * mouseSensitivity;
+            float mouseY = lookInput.y * mouseSensitivity;
 
             // Rotates the camera and a player body
             xRotation -= mouseY;

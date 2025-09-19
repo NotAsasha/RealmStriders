@@ -105,7 +105,6 @@ namespace Steam
         {
             Debug.Log($"---CrewManager: Left team.");
             CurrentLobby?.Leave();
-
             if (NetworkManager.Singleton == null)
                 return;
 

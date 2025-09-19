@@ -19,7 +19,6 @@ public class PlayerCard : MonoBehaviour
         if (linkedPlayer == null) return; 
         KickPlayerServerRpc(currentLobby, linkedPlayer);
 
-
         if (currentLobby.IsOwnedBy(SteamClient.SteamId))
         {
             Debug.Log("TO DO!!!!!!!!!!!!!!!!!!!!");
@@ -31,12 +30,14 @@ public class PlayerCard : MonoBehaviour
     {
         LeaveLobbyClientRpc(lobby, player);
     }
+
     [ClientRpc]
     public void LeaveLobbyClientRpc(Lobby lobby, SteamPlayer player)
     {
         Debug.Log("Kicked Player --- " + player.PlayerName);
-        if (player.PlayerSteamId == SteamClient.SteamId) {
-            SteamManager.Instance.Disconnect();
-        }
+        if (player.PlayerSteamId != SteamClient.SteamId) return;
+
+        SteamManager.Instance.Disconnect();
+        SceneManager.LoadScene(1);
     }
 }

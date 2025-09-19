@@ -12,6 +12,8 @@ namespace InventorySystem
         [SerializeField] LayerMask entityLayer;
         [SerializeField] LayerMask wallLayer;
 
+        [SerializeField] Renderer indicator;
+
         bool isTriggered = false;
         protected override void ExecuteItemAction(GameObject player)
         {
@@ -19,9 +21,12 @@ namespace InventorySystem
             ExplodeServerRpc();
         }
 
+        public bool IsTaken() { return isTriggered; }
+
         public void OnColliderEnter(GameObject collider)
         {
             if (isCurrentlyHeld) return;
+            indicator.material.color = Color.green;
             Debug.Log("---Landmine: Collided with something!");
             isTriggered = true;
         }

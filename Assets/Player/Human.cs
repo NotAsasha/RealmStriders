@@ -6,7 +6,7 @@ using Unity.VisualScripting;
 public class Human : Entity
 {
     private Animator animator;
-    private CharacterController characterController;
+    public CharacterController characterController;
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -34,6 +34,7 @@ public class Human : Entity
     override protected void ReviveEntity()
     {
         Debug.Log($"---Human: Reviving myself");
+        ToSpawnPoint();
         ToggleRagdoll(false);
     }
 

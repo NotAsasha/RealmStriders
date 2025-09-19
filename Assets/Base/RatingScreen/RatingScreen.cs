@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class RatingScreen : NetworkBehaviour
 {
-    [SerializeField] TMP_Text screen;
     [SerializeField] Slider teamRatingSlider;
     [SerializeField] Slider minRatingSlider;
 
@@ -16,7 +15,6 @@ public class RatingScreen : NetworkBehaviour
 
         teamRating.OnValueChanged += (oldV, newV) =>
         {
-            screen.text = newV.ToString();
             teamRatingSlider.value = newV;
         };
 
@@ -26,7 +24,6 @@ public class RatingScreen : NetworkBehaviour
         };
 
         // Update at the beginning
-        screen.text = teamRating.Value.ToString();
         teamRatingSlider.value = teamRating.Value;
         minRatingSlider.value = looseRating.Value;
     }

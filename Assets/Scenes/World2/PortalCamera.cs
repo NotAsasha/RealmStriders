@@ -11,7 +11,7 @@ public class PortalCamera : MonoBehaviour {
 
     private void OnEnable()
     {
-        playerCamera = Movement.instance.GetComponentInChildren<Camera>().transform;
+        playerCamera = Movement.instance.playerCamera.transform;
     }
 
     void LateUpdate()

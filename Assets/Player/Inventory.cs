@@ -63,6 +63,7 @@ namespace InventorySystem
             if (controls == null) return;
 
             controls.Gameplay.MouseWheel.performed += OnMouseWheelChanged;
+            controls.Gameplay.SwitchSlot.performed += OnSlotSwitched;
             controls.Gameplay.Use.performed += OnUseItem;
             controls.Gameplay.Drop.performed += OnDropItem;
         }
@@ -72,6 +73,7 @@ namespace InventorySystem
             if (controls == null) return;
 
             controls.Gameplay.MouseWheel.performed -= OnMouseWheelChanged;
+            controls.Gameplay.SwitchSlot.performed -= OnSlotSwitched;
             controls.Gameplay.Use.performed -= OnUseItem;
             controls.Gameplay.Drop.performed -= OnDropItem;
         }
@@ -149,7 +151,16 @@ namespace InventorySystem
             ChangeActiveSlot(newSlotIndex);
         }
 
-        private void OnUseItem(InputAction.CallbackContext context)
+        private void OnSlotSwitched(InputAction.CallbackContext context)
+        {
+            if (IsPlayerInInteraction()) return;
+
+            int newSlot = context.ReadValue<int>();
+            if (newSlot == activeSlotIndex) return;
+            ChangeActiveSlot(newSlot);
+        }
+
+            private void OnUseItem(InputAction.CallbackContext context)
         {
             if (IsPlayerInInteraction()) return;
 
@@ -395,6 +406,12 @@ namespace InventorySystem
                 string itemName = items[i]?.gameObject.name ?? "Empty";
                 Debug.Log($"Slot {i}: {itemName}");
             }
+        }
+
+        public void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.blueViolet;
+            Gizmos.DrawSphere(transform.position + handPosition, 0.1f);
         }
 
         #endregion

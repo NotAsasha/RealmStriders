@@ -1,7 +1,9 @@
 using FileSystem;
 using Steam;
 using Steamworks;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 namespace Menu
 {
@@ -15,6 +17,7 @@ namespace Menu
         {
             _steamManager = SteamManager.Instance;
             _steamManager.StartHost(6, _friendsOnly.isOn);
+            NetworkManager.Singleton.SceneManager.LoadScene("Lobby", LoadSceneMode.Single);
         }
 
         public void DeleteFiles()

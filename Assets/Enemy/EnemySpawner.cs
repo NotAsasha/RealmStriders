@@ -37,7 +37,6 @@ public class EnemySpawner : NetworkBehaviour
 
             enemy.transform.position = new(position.x, position.y + 1.5f, position.z);
             enemy.Spawn(true);
-            Debug.LogError($"Added {danger}");
 
             GameManager.instance.activeEnemies.Add(enemy.GetComponent<Enemy>());
         }

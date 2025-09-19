@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using static UnityEngine.EventSystems.EventTrigger;
+using UnityEngine.UI;
 
 namespace InventorySystem
 {
@@ -9,6 +10,8 @@ namespace InventorySystem
         [SerializeField] LayerMask entityLayer;
         [SerializeField] float maxDistance = 20f;
         [SerializeField] TMP_Text danger;
+        [SerializeField] Image freezeIcon;
+        [SerializeField] Image waterIcon;
 
         #region Item Specific Functionality
 
@@ -21,11 +24,17 @@ namespace InventorySystem
                 Entity entity = hit.transform.gameObject.GetComponent<Entity>();
 
                 danger.text = entity.GetHealth().ToString();
+
+                freezeIcon.color = entity.IsEffectActive(EffectType.Freeze) ? Color.white : Color.black;
+                waterIcon.color = entity.IsEffectActive(EffectType.Water) ? Color.white : Color.black;
+
                 Debug.Log($"---Scanner: Entity danger: {entity.GetHealth()}");
             }
             else
             {
-                danger.text = "Not found";
+                freezeIcon.color = Color.black;
+                waterIcon.color = Color.black;
+                danger.text = "Not Found";
             }
             // - Particle effects
             // - Sound effects

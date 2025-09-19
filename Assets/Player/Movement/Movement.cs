@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace Player
@@ -23,6 +24,7 @@ namespace Player
         public LayerMask whatIsGround;
 
         public static Movement instance;
+        public Camera playerCamera;
 
         public Controls _controls;
         public bool isPaused;
@@ -32,13 +34,12 @@ namespace Player
         public AudioResource[] stepSounds;
 
         private CharacterController player;
-        private bool isGrounded;
         private Vector3 velocity = new();
         private float currentSpeed;
         private Transform playerTransform;
         private SettingsFile settingsFile;
         private GameFileHandler _fileHandler;
-
+        private bool jumpRequested;
         #region Unity Lifecycle
 
         public override void OnNetworkSpawn()
@@ -54,6 +55,7 @@ namespace Player
             player = GetComponent<CharacterController>();
             playerTransform = transform;
             _fileHandler = GameFileHandler.Instance;
+            playerCamera = GetComponentInChildren<Camera>();
 
             settingsFile = (SettingsFile)_fileHandler.SearchForFileByName("Settings");
             LoadBindings();
@@ -105,12 +107,12 @@ namespace Player
 
         #region Input Handling
 
-        private void OnJump(InputAction.CallbackContext obj)
+        private void OnJump(InputAction.CallbackContext ctx)
         {
-            // Handle jumping
-            if (!isGrounded) return;
-            velocity.y = Mathf.Sqrt(2f * jumpHeight * Mathf.Abs(gravity));
+            if (ctx.performed)
+                jumpRequested = true;
         }
+
         private void OnPause(InputAction.CallbackContext obj)
         {
             isPaused = !isPaused;
@@ -138,10 +140,10 @@ namespace Player
             _controls.UI.Enable();
         }
 
-        void FixedUpdate()
+        Vector3 previousMove;
+        void Update()
         {
-            isGrounded = Physics.Raycast(playerTransform.position, Vector3.down, playerHeight * 0.5f + 0.5f, whatIsGround);
-            if (isGrounded && velocity.y < 0) velocity.y = 0f;
+            if (player.isGrounded && velocity.y < 0) velocity.y = 0f;
 
             var MovementControls = _controls.Gameplay.Movement;
 
@@ -149,16 +151,25 @@ namespace Player
             Vector3 move = playerTransform.right * MovementControls.ReadValue<Vector3>().x + playerTransform.forward * MovementControls.ReadValue<Vector3>().z;
             if (move.magnitude > 1) move.Normalize();
 
+            if (jumpRequested && player.isGrounded)
+            {
+                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                jumpRequested = false;
+            }
+
             bool isRunning = Input.GetKey(KeyCode.LeftShift);
             currentSpeed = isRunning ? runSpeed : moveSpeed;
 
             //Steps sound
-            if (isSoundReady && isGrounded && player.velocity.magnitude > 0.3f) PlayStepsSound(isRunning ? 0.3f : 0.5f);
+            if (isSoundReady && player.isGrounded && player.velocity.magnitude > 0.3f) PlayStepsSound(isRunning ? 0.3f : 0.5f);
             
 
             // Apply movement
-            Vector3 finalPosition = currentSpeed * move + velocity;
-            player.Move(finalPosition * Time.deltaTime);
+            Vector3 targetMove = move * currentSpeed;
+            Vector3 smoothMove = Vector3.Lerp(previousMove, targetMove, 10f * Time.deltaTime);
+            previousMove = smoothMove;
+
+            player.Move((smoothMove + velocity) * Time.deltaTime);
             velocity.y += gravity * Time.deltaTime;
         }
 

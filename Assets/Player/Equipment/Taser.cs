@@ -40,7 +40,9 @@ namespace InventorySystem
             {
                 if (hit.transform.TryGetComponent<Entity>(out var entity))
                 {
-                    entity.FreezeServerRpc(freezeTime);
+                    entity.ApplyEffectServerRpc(EffectType.Freeze, freezeTime);
+                    if (entity.IsEffectActive(EffectType.Water)) entity.AddHealth(-0.5f);
+
                     Debug.Log($"---Taser: Shot entity: {entity.name}");
                 }
             }

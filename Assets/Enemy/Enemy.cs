@@ -24,6 +24,8 @@ public class Enemy : Entity, ICollidable
     private NavMeshAgent agent;
     private Rigidbody playerRigidbody;
 
+    private bool isLocalFreezed = false;
+
     #region Initialization
 
     private void Start()
@@ -51,6 +53,7 @@ public class Enemy : Entity, ICollidable
     {
         animator.speed = isFreezed ? 0 : 1;
         agent.speed = isFreezed ? 0 : defaultSpeed;
+        isLocalFreezed = isFreezed;
     }
 
     private void ToggleRagdoll(bool isActive)
@@ -69,7 +72,7 @@ public class Enemy : Entity, ICollidable
 
     public void OnColliderEnter(GameObject collider)
     {
-        if (!IsServer || isDead.Value || isFreezed.Value || !GameManager.instance.hasStartedMission.Value) return;
+        if (!IsServer || isDead.Value || isLocalFreezed || !GameManager.instance.hasStartedMission.Value) return;
         var player = collider.GetComponent<Entity>();
         if (player == null || player.isDead.Value) return;
         if (!overAggresive && collider.GetComponent<Enemy>() != null) return;
@@ -90,7 +93,7 @@ public class Enemy : Entity, ICollidable
     private float nextUpdate;
     void Update()
     {
-        if (!IsServer || isDead.Value || isFreezed.Value) return;
+        if (!IsServer || isDead.Value || isLocalFreezed) return;
 
         vision.DrawViewState(); //draw vision boundaries
 

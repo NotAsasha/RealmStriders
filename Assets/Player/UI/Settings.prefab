@@ -146,7 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2837e0d1d3006684b91f367eab69148b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneToLoad: Lobby
+  _sceneToLoad: Base
   _isNetwork: 0
 --- !u!1 &377281016628731196
 GameObject:
@@ -2842,10 +2842,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 4054845199126041903}
   m_HandleRect: {fileID: 5209469608118253508}
   m_Direction: 0
-  m_MinValue: 1
-  m_MaxValue: 500
-  m_WholeNumbers: 1
-  m_Value: 250
+  m_MinValue: 0.01
+  m_MaxValue: 0.5
+  m_WholeNumbers: 0
+  m_Value: 0.25
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:

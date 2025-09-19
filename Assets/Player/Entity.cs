@@ -2,6 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
 using System.Collections;
+using System.Collections.Generic;
 
 public abstract class Entity : NetworkBehaviour
 {
@@ -10,18 +11,31 @@ public abstract class Entity : NetworkBehaviour
 
     public NetworkVariable<bool> isDead = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public NetworkVariable<float> entityHealth = new(1f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-    public NetworkVariable<bool> isFreezed = new(false);
+
+    private Dictionary<EffectType, NetworkVariable<bool>> effects;
+
+
+    #region Initialization
+
     public override void OnNetworkSpawn()
     {
+        effects = new Dictionary<EffectType, NetworkVariable<bool>>()
+        {
+            { EffectType.Freeze, new NetworkVariable<bool>(false) },
+            { EffectType.Water,  new NetworkVariable<bool>(false) },
+            { EffectType.Fire,   new NetworkVariable<bool>(false) }
+        };
+
         isDead.OnValueChanged += OnDeathStateChange;
-        isFreezed.OnValueChanged += OnFreezeStateChange;
+        effects[EffectType.Freeze].OnValueChanged += OnFreezeStateChange;
     }
     public override void OnNetworkDespawn()
     {
         isDead.OnValueChanged -= OnDeathStateChange;
-        isFreezed.OnValueChanged -= OnFreezeStateChange;
-
+        effects[EffectType.Freeze].OnValueChanged -= OnFreezeStateChange;
     }
+
+    #endregion
 
     public bool IsDead() => isDead.Value;
     public float GetHealth() => entityHealth.Value;
@@ -45,18 +59,32 @@ public abstract class Entity : NetworkBehaviour
         isDead.Value = true;
     }
 
+    #region Effects
+
+    Coroutine cor;
     [ServerRpc(RequireOwnership = false)]
-    public void FreezeServerRpc(float seconds)
+    public void ApplyEffectServerRpc(EffectType type, float seconds)
     {
-        StartCoroutine(FreezeTimer(seconds));
+        if (IsEffectActive(type) && cor != null)
+        {
+            StopCoroutine(cor);
+        }
+        cor = StartCoroutine(EffectTimer(type, seconds));
     }
 
-    private IEnumerator FreezeTimer(float freezeTime)
+    private IEnumerator EffectTimer(EffectType type, float duration)
     {
-        isFreezed.Value = true;
-        yield return new WaitForSeconds(freezeTime);
-        isFreezed.Value = false;
+        var status = effects[type];
+
+        status.Value = true;
+        yield return new WaitForSeconds(duration);
+        status.Value = false;
+        cor = null;
     }
+
+    public bool IsEffectActive(EffectType type) => effects[type].Value;
+
+    #endregion
 
     protected void OnDeathStateChange(bool oldValue, bool _isDead)
     {
@@ -67,4 +95,10 @@ public abstract class Entity : NetworkBehaviour
 
     virtual protected void KillEntity() { }
     virtual protected void ReviveEntity() { }
+}
+public enum EffectType
+{
+    Freeze,
+    Water,
+    Fire
 }
