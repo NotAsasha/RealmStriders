@@ -3,15 +3,18 @@ using Unity.Netcode;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 public class EnemySpawner : NetworkBehaviour
 {
     [SerializeField] private EnemyPool[] enemiesByDanger;
 
-    public float distanceFromPortal = 30f;
-    public float maxDistance = 120f;
+    [SerializeField] Vector3 worldCenter = new(0f,50f,0f);
+    [SerializeField] float portalArea = 30f;
 
-    private float spawnOffset = 10f;
+    [SerializeField] float spawnRadius = 10f;
+
+    private Vector3 portalPos = new(3f, 50f, 0f);
 
     //void Start()
     //{
@@ -31,13 +34,14 @@ public class EnemySpawner : NetworkBehaviour
             if (pool.Length == 0) continue;
             
             RandomMapPoint(out var position);
-            Debug.Log($"Spawned Enemy at: {position}");
-            var enemy = Instantiate(pool[Random.Range(0, pool.Length)],
-                GameManager.instance.missionScene).GetComponent<NetworkObject>();
-
-            enemy.transform.position = new(position.x, position.y + 1.5f, position.z);
-            enemy.Spawn(true);
-
+            var prefab = pool[Random.Range(0, pool.Length)];
+            var enemyObj = Instantiate(prefab,
+                position + Vector3.up * 1.5f,
+                Quaternion.identity
+            );
+            SceneManager.MoveGameObjectToScene(enemyObj, GameManager.instance.missionScene);
+            var enemy = enemyObj.GetComponent<NetworkObject>();
+            enemy.Spawn(true); 
             GameManager.instance.activeEnemies.Add(enemy.GetComponent<Enemy>());
         }
     }
@@ -97,26 +101,20 @@ public class EnemySpawner : NetworkBehaviour
 
     public bool RandomMapPoint(out Vector3 position)
     {
-        float x;
-        float z;
-
-        for (int i = 0; i < 10; ++i)
+        Vector3 searchPos;
+        for (int i = 0; i < 20; ++i)
         {
-            do
-            {
-                x = Random.Range(-maxDistance, maxDistance);
-                z = Random.Range(-maxDistance, maxDistance);
-            }
-            while (Mathf.Abs(x) + Mathf.Abs(z) < distanceFromPortal + spawnOffset);
+            if (!RandomMove.RandomPoint(worldCenter, spawnRadius, out searchPos)) continue;
+            Debug.Log($"Tried {searchPos}");
 
-            Vector3 searchPos = new(x, 0, z);
-            if (RandomMove.RandomPoint(searchPos, spawnOffset, out position))
+            if (Vector3.Distance(searchPos, portalPos) > portalArea)
             {
+                position = searchPos;
                 return true;
             }
         }
-
-        position = new(0,0,50);
+        position = worldCenter;
+        Debug.Log($"Nooo {position}");
         return false;
     }
 
@@ -145,8 +143,14 @@ public class EnemySpawner : NetworkBehaviour
             Debug.Log($"Witin a rating: {i}, avarage enemies number was: {avgAmount}, and danger stats are: {star[0]}, {star[1]}, {star[2]}, {star[3]}, {star[4]}");
         }
     }
-    #endregion
 
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(worldCenter, spawnRadius);
+    }
+
+    #endregion
 }
 
 [System.Serializable]

@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using InventorySystem;
+using Player;
 
 public class WaterGun : Item
 {
@@ -12,7 +13,10 @@ public class WaterGun : Item
     override protected void ExecuteItemAction(GameObject player)
     {
         particle.Play();
-        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, maxDistance, entityLayer))
+        if (Physics.Raycast(
+                CameraMovement.instance.transform.position,
+                CameraMovement.instance.transform.forward,
+                out RaycastHit hit, maxDistance, entityLayer))
         {
             if (hit.transform.TryGetComponent<Entity>(out var entity))
             {
@@ -22,5 +26,4 @@ public class WaterGun : Item
         }
         else Debug.Log($"---WaterGun: Missed :(");
     }
-
 }

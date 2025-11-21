@@ -14,7 +14,10 @@ namespace InventorySystem
         override protected void ExecuteItemAction(GameObject player)
         {
             particle.Play();
-            if (!Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, maxDistance, entityLayer)) return;
+            if (!Physics.Raycast(
+                CameraMovement.instance.transform.position,
+                CameraMovement.instance.transform.forward,
+                out RaycastHit hit, maxDistance, entityLayer)) return;
 
             Entity entity = hit.transform.gameObject.GetComponent<Entity>();
             if (entity.GetHealth() < 1f && !entity.isDead.Value)

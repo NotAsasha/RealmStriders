@@ -108,8 +108,26 @@ namespace Steam
             if (NetworkManager.Singleton == null)
                 return;
 
-            NetworkManager.Singleton.Shutdown();
+            ResetNetwork();
         }
+
+        private void ResetNetwork()
+        {
+            if (NetworkManager.Singleton != null)
+            {
+                Debug.Log("[SteamManager] Resetting old NetworkManager");
+                NetworkManager.Singleton.Shutdown();
+                Destroy(NetworkManager.Singleton.gameObject);
+            }
+
+            if (GameManager.instance != null)
+            {
+                Debug.Log("[SteamManager] Resetting old GameManager");
+                Destroy(GameManager.instance.gameObject);
+                GameManager.instance = null;
+            }
+        }
+
         public async void TryConnectLobby(uint id)
         {
             CurrentLobby = await SteamMatchmaking.JoinLobbyAsync(id);

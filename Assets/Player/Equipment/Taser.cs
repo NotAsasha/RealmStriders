@@ -2,6 +2,7 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using System.Collections;
+using Player;
 
 namespace InventorySystem
 {
@@ -36,7 +37,10 @@ namespace InventorySystem
         {
             if (!isReady.Value) return;
 
-            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, maxDistance, entityLayer))
+            if (Physics.Raycast(
+                CameraMovement.instance.transform.position,
+                CameraMovement.instance.transform.forward,
+                out RaycastHit hit, maxDistance, entityLayer))
             {
                 if (hit.transform.TryGetComponent<Entity>(out var entity))
                 {

@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 1500}
+  m_AnchoredPosition: {x: 0, y: 1499.9972}
   m_SizeDelta: {x: 1000, y: 3000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1134967405687708986
@@ -451,6 +451,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -472,6 +474,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -1049,6 +1052,8 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &2113164729586776762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1062,8 +1067,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   terminalCanvas: {fileID: 4803776097742107709}
-  CameraPositionOffset: {x: 1.1, y: 1.55, z: 0.5}
-  CameraRotation: {x: 0.1227878, y: 0.6963642, z: -0.1227878, w: 0.6963642}
+  cameraOffset: {x: -1, y: 1.5, z: -0.5}
+  cameraEulerRotation: {x: 20, y: 90, z: 0}
+  moveDuration: 0.5
+  interactSound: {fileID: 0}
 --- !u!114 &3635413563001493150
 MonoBehaviour:
   m_ObjectHideFlags: 0

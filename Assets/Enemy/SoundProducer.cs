@@ -43,6 +43,6 @@ public class SoundProducer : NetworkBehaviour
     {
         Gizmos.color = Color.blueViolet;
         if (soundEmitor == null || soundRadius == 0) return;
-        Gizmos.DrawSphere(soundEmitor.position, soundRadius);
+        Gizmos.DrawWireSphere(soundEmitor.position, soundRadius);
     }
 }

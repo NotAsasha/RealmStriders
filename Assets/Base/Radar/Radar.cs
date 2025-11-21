@@ -10,7 +10,7 @@ public class Radar : Terminal
     [SerializeField] private float moveSpeed = 2f;
     [SerializeField] private Vector2 border = new Vector2(5f, 5f);
 
-    [Header("References")] 
+    [Header("References")]
     public Camera radarCamera;
     [SerializeField] private Transform crosshair;
     [SerializeField] private Transform screen;
@@ -21,7 +21,10 @@ public class Radar : Terminal
     InputAction control;
     NetworkObject beam;
 
-    override public void OnNetworkSpawn() {
+    override public void OnNetworkSpawn()
+    {
+        radarCamera.transform.position = new Vector3(0f, 100f, 0f);
+        radarCamera.transform.eulerAngles = new Vector3(90f, 180, 0f);
         playerID = (int)Movement.instance.GetComponent<NetworkObject>().OwnerClientId;
         control = Movement.instance._controls.UI.Navigate;
     }
@@ -47,15 +50,14 @@ public class Radar : Terminal
         if (!IsTaken() || playerID != ownerID) return;
 
         Vector2 input = control.ReadValue<Vector2>();
-        Vector3 moveDir = (crosshair.right * input.x + crosshair.up * input.y).normalized;
 
-        // Movement scaled by speed and deltaTime
-        Vector3 move = moveDir * moveSpeed * Time.deltaTime;
+        // Рух у локальній площині екрана
+        Vector3 move = moveSpeed * Time.deltaTime * new Vector3(input.x, 0f, input.y);
 
-        // Compute new position
-        Vector3 newLocalPos = crosshair.localPosition - move;
+        // Оновлення позиції
+        Vector3 newLocalPos = crosshair.localPosition + move;
 
-        // Clamp position within minimap bounds
+        // Обмеження межами екрана
         newLocalPos.x = Mathf.Clamp(newLocalPos.x, -border.x, border.x);
         newLocalPos.z = Mathf.Clamp(newLocalPos.z, -border.y, border.y);
         newLocalPos.y = 0f;

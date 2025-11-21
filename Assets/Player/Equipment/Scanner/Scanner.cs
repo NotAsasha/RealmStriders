@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.UI;
+using Player;
 
 namespace InventorySystem
 {
@@ -18,7 +19,10 @@ namespace InventorySystem
         override protected void ExecuteItemAction(GameObject player)
         {
 
-            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, maxDistance, entityLayer))
+            if (Physics.Raycast(
+                CameraMovement.instance.transform.position,
+                CameraMovement.instance.transform.forward,
+                out RaycastHit hit, maxDistance, entityLayer))
             {
 
                 Entity entity = hit.transform.gameObject.GetComponent<Entity>();

@@ -115,13 +115,14 @@ namespace Player
 
         private void OnPause(InputAction.CallbackContext obj)
         {
+            if (isInInteraction) return;
             isPaused = !isPaused;
 
             if (isPaused)
                 SwitchToInteractionControls();
             else
             {
-                if (isInInteraction) return;
+                
                 SwitchToGameplayControls();
             }
         }

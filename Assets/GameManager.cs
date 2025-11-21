@@ -12,8 +12,9 @@ using System.Linq;
 public class GameManager : NetworkBehaviour
 {
     public Vector3 spawnPoint = new(0f, -49f, 0f);
-    [SerializeField] int defaultMissionTime = 360;
-    [SerializeField] int maxTimeSpread = 120;
+    public float baseRadius = 20f;
+    public int defaultMissionTime = 360;
+    public int maxTimeSpread = 120;
 
     public NetworkVariable<int> teamRating = new(3, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<int> looseRating = new(0, writePerm: NetworkVariableWritePermission.Server);
@@ -64,8 +65,13 @@ public class GameManager : NetworkBehaviour
 
     private void SetupSingletone()
     {
-        if (instance != null) Destroy(instance);
-        instance = this;
+        if (instance == null)
+            instance = this;
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
     }
 
     private void SetupInputHandlers()
@@ -131,22 +137,41 @@ public class GameManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void StopMissionServerRpc()
     {
-        RevivePlayers();
-        if (!hasStartedMission.Value) return;
+        //revive if died in lobby
+        if (!hasStartedMission.Value)
+        {
+            RevivePlayers();
+            return;
+        }
         hasStartedMission.Value = false;
+
+        StartCoroutine(StopCooldown());
 
         //Calculate rating
         teamRating.Value = CalculateRating(teamRating.Value);
         looseRating.Value += 1;
-
         if (teamRating.Value <= looseRating.Value)
         {
             //Loose
             Debug.Log("---MissionManager: Game Over, you lost...");
+
+            SteamManager.Instance.Disconnect();
+            SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);
+            return;
+        }
+        
+        //kill players out of base
+        if (alivePlayers > 0)
+        {
+            KillOutOfRangePlayers();
         }
 
+        //unload world
         UnloadWorld();
         missionName = "";
+
+        RevivePlayers();
+
         //Resume Lobby Connections
         if (SteamManager.Instance.CurrentLobby != null)
             SteamManager.Instance.CurrentLobby.Value.SetJoinable(true);
@@ -168,11 +193,28 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    private void KillOutOfRangePlayers()
+    {
+        foreach (var player in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            var human = player.PlayerObject.gameObject.GetComponent<Human>();
+            if (human.isDead.Value) continue;
+
+            float distancetoSpawn = Vector3.Distance(human.transform.position, spawnPoint);
+            if (distancetoSpawn > baseRadius) human.isDead.Value = true;
+        }
+    }
+
     private void StartTimer()
     {
         missionDuration = Random.Range(defaultMissionTime - maxTimeSpread, defaultMissionTime + maxTimeSpread);
 
         StartTimerClientRpc(missionDuration);
+    }
+
+    private IEnumerator StopCooldown()
+    {
+        yield return new WaitForSeconds(5f);
     }
 
     [ClientRpc]

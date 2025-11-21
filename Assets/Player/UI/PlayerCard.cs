@@ -29,15 +29,17 @@ public class PlayerCard : MonoBehaviour
     public void KickPlayerServerRpc(Lobby lobby, SteamPlayer player)
     {
         LeaveLobbyClientRpc(lobby, player);
+        if (player.PlayerSteamId != SteamClient.SteamId) return;
+
+        Debug.Log("Kicked yourselfff --- " + player.PlayerName);
+        SteamManager.Instance.Disconnect();
+
+        SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);
     }
 
     [ClientRpc]
     public void LeaveLobbyClientRpc(Lobby lobby, SteamPlayer player)
     {
         Debug.Log("Kicked Player --- " + player.PlayerName);
-        if (player.PlayerSteamId != SteamClient.SteamId) return;
-
-        SteamManager.Instance.Disconnect();
-        SceneManager.LoadScene(1);
     }
 }

@@ -141,15 +141,16 @@ MonoBehaviour:
   - enemies:
     - {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
   - enemies:
-    - {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
+    - {fileID: 5629089953353955407, guid: 88062001baa260540bde711249e9ce11, type: 3}
   - enemies:
     - {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
   - enemies:
     - {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
   - enemies:
     - {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
-  distanceFromPortal: 50
-  maxDistance: 120
+  worldCenter: {x: 0, y: 0, z: 0}
+  portalArea: 40
+  spawnRadius: 100
 --- !u!1 &938603029
 GameObject:
   m_ObjectHideFlags: 0
@@ -260,7 +261,7 @@ PrefabInstance:
         type: 3}
       propertyPath: NetworkConfig.NetworkTransport
       value: 
-      objectReference: {fileID: 1310004261}
+      objectReference: {fileID: 0}
     - target: {fileID: 4725066310195802639, guid: 0c959cfa7a27e6145b66a91600a7dac9,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -316,16 +317,95 @@ PrefabInstance:
       propertyPath: m_Name
       value: SteamManager
       objectReference: {fileID: 0}
+    - target: {fileID: 8440879159358415102, guid: 0c959cfa7a27e6145b66a91600a7dac9,
+        type: 3}
+      propertyPath: netManager
+      value: 
+      objectReference: {fileID: 3536044324485036899, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0c959cfa7a27e6145b66a91600a7dac9, type: 3}
---- !u!114 &1310004261 stripped
+--- !u!1001 &1686895971069943957
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 205792289764001937, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
+      propertyPath: m_Name
+      value: NetManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 1667530198343104088, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1667530198343104088, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1667530198343104088, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1667530198343104088, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1667530198343104088, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1667530198343104088, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1667530198343104088, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1667530198343104088, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1667530198343104088, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1667530198343104088, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4507242098273748686, guid: 958f3adf2e238d24bb1a2977b6492d0d,
+        type: 3}
+      propertyPath: NetworkConfig.NetworkTransport
+      value: 
+      objectReference: {fileID: 1686895971069943958}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 958f3adf2e238d24bb1a2977b6492d0d, type: 3}
+--- !u!114 &1686895971069943958 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4648680101724521505, guid: 0c959cfa7a27e6145b66a91600a7dac9,
+  m_CorrespondingSourceObject: {fileID: 3498538398588765859, guid: 958f3adf2e238d24bb1a2977b6492d0d,
     type: 3}
-  m_PrefabInstance: {fileID: 1310004260}
+  m_PrefabInstance: {fileID: 1686895971069943957}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
@@ -458,3 +538,4 @@ SceneRoots:
   - {fileID: 1087046330}
   - {fileID: 1310004260}
   - {fileID: 6598072698000735035}
+  - {fileID: 1686895971069943957}

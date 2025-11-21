@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 10, z: 0}
-  m_LocalScale: {x: 3, y: 1, z: 3}
+  m_LocalScale: {x: 4, y: 1, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8881780079078998430}
@@ -34038,6 +34038,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -34059,6 +34061,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -34148,6 +34151,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -34169,6 +34174,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -34240,6 +34246,8 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &386711583038415671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34592,22 +34600,22 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: fb6fa70fea0f8894b88b46d65fcfbd40,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.5279529
+      value: 0.7466382
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fb6fa70fea0f8894b88b46d65fcfbd40,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.47038892
+      value: -0.6652304
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fb6fa70fea0f8894b88b46d65fcfbd40,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.5279529
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fb6fa70fea0f8894b88b46d65fcfbd40,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.47038892
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fb6fa70fea0f8894b88b46d65fcfbd40,
         type: 3}
@@ -34617,7 +34625,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: fb6fa70fea0f8894b88b46d65fcfbd40,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 90
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fb6fa70fea0f8894b88b46d65fcfbd40,
         type: 3}

@@ -4,7 +4,6 @@ using Steamworks;
 using Steamworks.Data;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,18 +13,34 @@ public class PauseUIManager : MonoBehaviour
     public Transform cardsParent;
     public GameObject playerCard;
     void Start()
-    { 
+    {
         SteamMatchmaking.OnLobbyDataChanged += UpdatePauseUI;
         Movement.instance._controls.System.Pause.performed += UpdateMenuState;
     }
+
+    private void OnDisable()
+    {
+        SteamMatchmaking.OnLobbyDataChanged -= UpdatePauseUI;
+
+        Movement.instance._controls.System.Pause.performed -= UpdateMenuState;
+    }
+
     private void Update()
     {
-       if (Input.GetKeyDown(KeyCode.U)) { UpdatePauseUI(SteamManager.Instance.CurrentLobby.Value); }
+        if (Input.GetKeyDown(KeyCode.U)) { UpdatePauseUI(SteamManager.Instance.CurrentLobby.Value); }
     }
+
     void UpdateMenuState(InputAction.CallbackContext obj)
     {
-        pauseMenu.SetActive(!pauseMenu.activeSelf); 
+        if (Movement.instance == null) { Debug.LogError("NO INSTANCE"); }
+        if (Movement.instance.isInInteraction)
+        {
+            CameraMovement.instance.StopInteraction();
+            return;
+        }
+        pauseMenu.SetActive(!pauseMenu.activeSelf);
     }
+
     void UpdatePauseUI(Lobby lobby)
     {
         List<SteamPlayer> playerList = GetLobbyMembers(lobby);
@@ -36,9 +51,9 @@ public class PauseUIManager : MonoBehaviour
             var currentCard = Instantiate(playerCard, cardsParent).GetComponent<PlayerCard>();
             currentCard.linkedPlayer = player;
             currentCard.playerName.text = player.PlayerName;
-            
         }
     }
+
     public List<SteamPlayer> GetLobbyMembers(Lobby lobby)
     {
         List<SteamPlayer> playerList = new();
@@ -51,6 +66,7 @@ public class PauseUIManager : MonoBehaviour
         }
         return playerList;
     }
+
     void DestroyChildren(Transform parent)
     {
         foreach (Transform child in parent) Destroy(child.gameObject);

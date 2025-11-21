@@ -23,6 +23,8 @@ namespace Player
         private Movement movement;
         private Human human;
 
+        public static CameraMovement instance;
+
         #region Unity Lifecycle
 
         public override void OnNetworkSpawn()
@@ -32,6 +34,7 @@ namespace Player
                 gameObject.SetActive(false);
                 return;
             }
+            SetupSingletone();
 
             StartPosition = transform.localPosition;
             movement = Movement.instance;
@@ -56,6 +59,12 @@ namespace Player
 
         #region Initialization
 
+        private void SetupSingletone()
+        {
+            if (instance != null) Destroy(instance);
+            instance = this;
+        }
+
         private void SetupInputHandlers()
         {
             Movement.instance._controls.System.Pause.performed += OnPausePerformed;
@@ -75,6 +84,7 @@ namespace Player
 
         private void OnPausePerformed(InputAction.CallbackContext obj)
         {
+            if (movement.isInInteraction) return;
             UpdateCursorState();
         }
 

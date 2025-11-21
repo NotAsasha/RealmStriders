@@ -1922,6 +1922,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1943,6 +1945,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -2520,6 +2523,8 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &4192230696141965898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2533,8 +2538,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   terminalCanvas: {fileID: 2810140332311069077}
-  CameraPositionOffset: {x: -1.1, y: 1.55, z: -0.5}
-  CameraRotation: {x: 0.1227878, y: 0.6963642, z: -0.1227878, w: 0.6963642}
+  cameraOffset: {x: -1, y: 1.5, z: -0.5}
+  cameraEulerRotation: {x: 20, y: 90, z: 0}
+  moveDuration: 0.5
   interactSound: {fileID: 0}
 --- !u!114 &9124823254289067035
 MonoBehaviour:
@@ -5644,7 +5650,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2577047859064199877}
   m_HandleRect: {fileID: 3230487282668977852}
   m_Direction: 2
-  m_Value: 0.99999076
+  m_Value: 0.9999947
   m_Size: 0.54999846
   m_NumberOfSteps: 0
   m_OnValueChanged:

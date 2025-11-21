@@ -8,9 +8,13 @@ public class BeamDamage : NetworkBehaviour, ICollidable
     public void OnColliderEnter(GameObject collider)
     {
         if (!IsServer) return;
-        var player = collider.GetComponent<Entity>();
-        if (player == null || player.isDead.Value) return;
 
-        player.AddHealth(-damage);
+        if (collider.TryGetComponent<Entity>(out var entity) && !entity.isDead.Value)
+        {
+            Debug.Log($"---Beam: Shot entity: {entity.name}");
+
+            entity.ApplyEffectServerRpc(EffectType.Water, 5f);
+            entity.AddHealth(-damage);
+        }
     }
 }

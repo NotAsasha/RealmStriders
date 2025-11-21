@@ -155,12 +155,12 @@ namespace InventorySystem
         {
             if (IsPlayerInInteraction()) return;
 
-            int newSlot = context.ReadValue<int>();
+            int newSlot = (int)context.ReadValue<float>() - 1;
             if (newSlot == activeSlotIndex) return;
             ChangeActiveSlot(newSlot);
         }
 
-            private void OnUseItem(InputAction.CallbackContext context)
+        private void OnUseItem(InputAction.CallbackContext context)
         {
             if (IsPlayerInInteraction()) return;
 
@@ -219,6 +219,8 @@ namespace InventorySystem
 
         private void ChangeActiveSlot(int newSlotIndex)
         {
+            if (newSlotIndex > capacity + 1) throw new ArgumentOutOfRangeException();
+
             // Deactivate current item
             Item currentItem = GetActiveItem();
             if (currentItem != null)

@@ -96,7 +96,6 @@ public class Enemy : Entity, ICollidable
         if (!IsServer || isDead.Value || isLocalFreezed) return;
 
         vision.DrawViewState(); //draw vision boundaries
-
         if (Time.time >= nextUpdate)
         {
             nextUpdate = Time.time + 0.3f + Random.Range(0f, 0.1f);
