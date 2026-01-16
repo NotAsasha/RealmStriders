@@ -135,17 +135,23 @@ public class GameManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void StopMissionServerRpc()
+    public void StopMissionServerRpc() => StartCoroutine(StopMissionClock());
+
+    private IEnumerator StopMissionClock()
     {
         //revive if died in lobby
         if (!hasStartedMission.Value)
         {
+            yield return new WaitForSeconds(5f);
             RevivePlayers();
-            return;
+            yield break;
         }
-        hasStartedMission.Value = false;
 
-        StartCoroutine(StopCooldown());
+
+        //stop the mission
+        hasStartedMission.Value = false;
+        yield return new WaitForSeconds(5f);
+
 
         //Calculate rating
         teamRating.Value = CalculateRating(teamRating.Value);
@@ -155,22 +161,28 @@ public class GameManager : NetworkBehaviour
             //Loose
             Debug.Log("---MissionManager: Game Over, you lost...");
 
+            //TEMP - to main menu
             SteamManager.Instance.Disconnect();
             SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);
-            return;
+            yield break;
         }
-        
+
+
         //kill players out of base
         if (alivePlayers > 0)
         {
             KillOutOfRangePlayers();
         }
 
+
         //unload world
         UnloadWorld();
         missionName = "";
 
+
+        //revive
         RevivePlayers();
+
 
         //Resume Lobby Connections
         if (SteamManager.Instance.CurrentLobby != null)
@@ -210,11 +222,6 @@ public class GameManager : NetworkBehaviour
         missionDuration = Random.Range(defaultMissionTime - maxTimeSpread, defaultMissionTime + maxTimeSpread);
 
         StartTimerClientRpc(missionDuration);
-    }
-
-    private IEnumerator StopCooldown()
-    {
-        yield return new WaitForSeconds(5f);
     }
 
     [ClientRpc]

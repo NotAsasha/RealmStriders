@@ -17,12 +17,12 @@ public class Enemy : Entity, ICollidable
     public AudioSource audioSource;
     public AudioResource[] stepSounds;
 
-    private EnemyState enemyState = EnemyState.isMoving;
+    protected EnemyState enemyState = EnemyState.isMoving;
 
-    private Animator animator;
-    private ChasePlayer vision;
-    private NavMeshAgent agent;
-    private Rigidbody playerRigidbody;
+    protected Animator animator;
+    protected ChasePlayer vision;
+    protected NavMeshAgent agent;
+    protected Rigidbody playerRigidbody;
 
     private bool isLocalFreezed = false;
 
@@ -34,7 +34,6 @@ public class Enemy : Entity, ICollidable
         vision = GetComponent<ChasePlayer>();
         agent = GetComponent<NavMeshAgent>();
         playerRigidbody = GetComponent<Rigidbody>();
-
         agent.speed = defaultSpeed;
         ToggleRagdoll(false);
     }
@@ -101,11 +100,11 @@ public class Enemy : Entity, ICollidable
             nextUpdate = Time.time + 0.3f + Random.Range(0f, 0.1f);
             Think();
         }
+        if (isSoundReady && agent.velocity.magnitude > 0.1) PlayStepsSound(stepSoundCooldown);
     }
 
-    private void Think()
+    protected virtual void Think()
     {
-        if (isSoundReady) PlayStepsSound(stepSoundCooldown);
 
         //first priority, run
         if (enemyState == EnemyState.isRunning)
@@ -118,7 +117,7 @@ public class Enemy : Entity, ICollidable
         if (ChasePlayer(overAggresive)) return;
 
         //third priority, go to the target location
-        if (agent.remainingDistance > agent.stoppingDistance) return; //not done with path
+        if (agent.remainingDistance > agent.stoppingDistance & agent.pathStatus == NavMeshPathStatus.PathComplete) return; //not done with path
 
         //forth priority, go somewhere
         Move();
@@ -130,7 +129,7 @@ public class Enemy : Entity, ICollidable
         enemyState = EnemyState.isRunning;
     }
 
-    private bool ChasePlayer(bool _countEnemies = false)
+    protected virtual bool ChasePlayer(bool _countEnemies = false)
     {
         var player = vision.EntityInSight(_countEnemies);
         if (player != null)
@@ -154,7 +153,7 @@ public class Enemy : Entity, ICollidable
         }
     }
 
-    private void Move()
+    protected virtual void Move()
     {
         Vector3 point;
         if (RandomMove.RandomPoint(transform.position, moveRange, out point)) //choose where to go

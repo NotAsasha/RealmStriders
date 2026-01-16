@@ -3,6 +3,7 @@ using TMPro;
 using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.UI;
 using Player;
+using Unity.Netcode;
 
 namespace InventorySystem
 {
@@ -14,11 +15,24 @@ namespace InventorySystem
         [SerializeField] Image freezeIcon;
         [SerializeField] Image waterIcon;
 
+        NetworkVariable<bool> isOn = new(false, 0, 0);
+
         #region Item Specific Functionality
 
         override protected void ExecuteItemAction(GameObject player)
         {
+            SwitchStateServerRpc();
+        }
 
+        [ServerRpc]
+        private void SwitchStateServerRpc()
+        {
+            isOn.Value = !isOn.Value;
+        }
+
+        private void Update()
+        {
+            if (!isOn.Value) return;
             if (Physics.Raycast(
                 CameraMovement.instance.transform.position,
                 CameraMovement.instance.transform.forward,
@@ -44,9 +58,8 @@ namespace InventorySystem
             // - Sound effects
             // - Physics interactions with enemies
             // - Cooldown mechanics
-
         }
-        #endregion
 
+        #endregion
     }
 }

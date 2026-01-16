@@ -9,19 +9,25 @@ namespace InventorySystem
         [SerializeField] TMP_Text danger;
         private GameManager gameManager = GameManager.instance;
 
-        private bool isOn;
+        NetworkVariable<bool> isOn = new(false, 0, 0);
 
         #region Item Specific Functionality
 
         override protected void ExecuteItemAction(GameObject player)
         {
-            isOn = !isOn;
+            SwitchStateServerRpc();
+        }
+
+        [ServerRpc]
+        private void SwitchStateServerRpc()
+        {
+            isOn.Value = !isOn.Value;
         }
         #endregion
 
         private void Update()
         {
-            if (!isOn) return;
+            if (!isOn.Value) return;
             danger.text = gameManager.missionDuration.ToString();
         }
     }

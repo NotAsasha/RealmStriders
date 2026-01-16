@@ -16,6 +16,7 @@ namespace InventorySystem
         private Rigidbody itemRigidbody;
         private NetworkTransform itemNetworkTransform;
         private NetworkRigidbody itemNetworkRigidbody;
+        protected AudioSource audioSource;
 
         public bool isCurrentlyHeld = false;
 
@@ -35,6 +36,7 @@ namespace InventorySystem
             itemRigidbody = GetComponent<Rigidbody>();
             itemNetworkTransform = GetComponent<NetworkTransform>();
             itemNetworkRigidbody = GetComponent<NetworkRigidbody>();
+            audioSource = GetComponent<AudioSource>();
         }
 
         #endregion
