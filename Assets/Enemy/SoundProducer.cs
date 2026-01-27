@@ -1,5 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
+using System.Collections.Generic;
+using static Unity.VisualScripting.Member;
 
 public class SoundProducer : NetworkBehaviour
 {
@@ -9,12 +11,15 @@ public class SoundProducer : NetworkBehaviour
     //[SerializeField] LayerMask wallLayer;
 
     [SerializeField] AudioSource source;
-
+    [SerializeField] List<AudioClip> clip;
     //private void Awake() { }
 
     [ServerRpc(RequireOwnership = false)]
-    public void EmitSoundServerRpc(bool singleLure = false)
+    public void EmitSoundServerRpc(int soundIndex = 0, bool singleLure = false)
     {
+        if (!soundEmitor) soundEmitor = transform;
+
+        source.clip = clip[soundIndex];
         source.Play();
         EmitSoundClientRpc();
 
@@ -33,9 +38,10 @@ public class SoundProducer : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void EmitSoundClientRpc()
+    private void EmitSoundClientRpc(int soundIndex = 0)
     {
         if (IsServer) return;
+        source.clip = clip[soundIndex];
         source.Play();
     }
 

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6512724607825424963}
   - component: {fileID: 7775416432396546567}
   - component: {fileID: 8487714499696114830}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Buy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -144,7 +144,7 @@ GameObject:
   - component: {fileID: 7740894180952372394}
   - component: {fileID: 216859386348285907}
   - component: {fileID: 243613416076206462}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Danger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -282,7 +282,7 @@ GameObject:
   - component: {fileID: 6342007294859714306}
   - component: {fileID: 9050378700231049714}
   - component: {fileID: 6122967146154448703}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: WorldCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -371,6 +371,8 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &6122967146154448703
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -471,7 +473,7 @@ GameObject:
   - component: {fileID: 5945451828712778562}
   - component: {fileID: 7892863329531317192}
   - component: {fileID: 634827130494301321}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -607,7 +609,7 @@ GameObject:
   - component: {fileID: 2748102272337612997}
   - component: {fileID: 4225952634343867972}
   - component: {fileID: 6408097110031939390}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Enemies
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -743,7 +745,7 @@ GameObject:
   - component: {fileID: 1596078970498122456}
   - component: {fileID: 6086062017724095251}
   - component: {fileID: 4807858934695275895}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

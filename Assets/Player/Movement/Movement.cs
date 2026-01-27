@@ -144,6 +144,7 @@ namespace Player
         Vector3 previousMove;
         void Update()
         {
+            
             if (player.isGrounded && velocity.y < 0) velocity.y = 0f;
 
             var MovementControls = _controls.Gameplay.Movement;

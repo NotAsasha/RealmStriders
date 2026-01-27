@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ChasePlayer : MonoBehaviour
+public class EntityDetector : MonoBehaviour
 {
     [SerializeField] Vector3 eyeLocalPosition = new(0,1,0);
     [SerializeField] float viewDistance = 20.0f;

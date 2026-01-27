@@ -79,6 +79,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -100,6 +102,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -1082,6 +1085,8 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &2857707763473419342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1094,7 +1099,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c7c2aec3399c8c459ba336aae1d71d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screen: {fileID: 0}
   teamRatingSlider: {fileID: 3556255490369937801}
   minRatingSlider: {fileID: 3192870612080395069}
 --- !u!1 &846223033091181156
@@ -1108,7 +1112,7 @@ GameObject:
   - component: {fileID: 1964317711212713541}
   - component: {fileID: 8253893918479726742}
   - component: {fileID: 4482604231796634865}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1183,7 +1187,7 @@ GameObject:
   - component: {fileID: 5575609239586547262}
   - component: {fileID: 1009630777657581544}
   - component: {fileID: 1830140272293438245}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1258,7 +1262,7 @@ GameObject:
   - component: {fileID: 8274698550579776765}
   - component: {fileID: 3174958078452221595}
   - component: {fileID: 2701972794179009798}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1332,7 +1336,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6507815684175471244}
   - component: {fileID: 3556255490369937801}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: TeamRating
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1420,7 +1424,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8054152653157595423}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1462,7 +1466,7 @@ GameObject:
   - component: {fileID: 217907406348143577}
   - component: {fileID: 8252806659678929805}
   - component: {fileID: 3773305968873864344}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1588,6 +1592,8 @@ SpriteMask:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1609,6 +1615,7 @@ SpriteMask:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -1645,7 +1652,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4220289140203496297}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1683,7 +1690,7 @@ GameObject:
   - component: {fileID: 8294276905052953883}
   - component: {fileID: 6877925493511264170}
   - component: {fileID: 207480346823953284}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1757,7 +1764,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7594773813167990024}
   - component: {fileID: 3192870612080395069}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: MinRating
   m_TagString: Untagged
   m_Icon: {fileID: 0}

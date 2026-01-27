@@ -21,6 +21,7 @@ public class Human : Entity
         characterController.enabled = false;
         transform.position = GameManager.instance.spawnPoint;
         characterController.enabled = true;
+        
     }
 
     override protected void KillEntity()
@@ -56,5 +57,13 @@ public class Human : Entity
         animator.enabled = !isActive;
         characterController.enabled = !isActive;
         Debug.Log($"---Human: Toggled ragdoll: {isActive}");
+    }
+
+    private void Update()
+    {
+        if (characterController.enabled)
+        {
+            animator.speed = characterController.velocity.magnitude / 4;
+        }
     }
 }

@@ -20,9 +20,10 @@ public class Enemy : Entity, ICollidable
     protected EnemyState enemyState = EnemyState.isMoving;
 
     protected Animator animator;
-    protected ChasePlayer vision;
+    protected EntityDetector vision;
     protected NavMeshAgent agent;
     protected Rigidbody playerRigidbody;
+    protected Collider collider1;
 
     private bool isLocalFreezed = false;
 
@@ -31,11 +32,12 @@ public class Enemy : Entity, ICollidable
     private void Start()
     {
         animator = GetComponent<Animator>();
-        vision = GetComponent<ChasePlayer>();
+        vision = GetComponent<EntityDetector>();
         agent = GetComponent<NavMeshAgent>();
         playerRigidbody = GetComponent<Rigidbody>();
+        collider1 = GetComponent<Collider>();
         agent.speed = defaultSpeed;
-        ToggleRagdoll(false);
+        ToggleRagdoll(true);
     }
 
     #endregion
@@ -45,7 +47,7 @@ public class Enemy : Entity, ICollidable
     override protected void KillEntity()
     {
         if (!IsOwner) return;
-        ToggleRagdoll(true);
+        ToggleRagdoll(false);
     }
 
     override protected void OnFreezeStateChange(bool oldV, bool isFreezed)
@@ -57,11 +59,12 @@ public class Enemy : Entity, ICollidable
 
     private void ToggleRagdoll(bool isActive)
     {
-        Debug.Log($"ToggleRagdoll {isActive}");
-        animator.enabled = !isActive;
-        vision.enabled = !isActive;
-        agent.enabled = !isActive;
-        playerRigidbody.isKinematic = !isActive;
+        Debug.Log($"ToggleRagdoll, is entity alive - {isActive}");
+        animator.enabled = isActive;
+        vision.enabled = isActive;
+        agent.enabled = isActive;
+        //playerRigidbody.isKinematic = isActive;
+        collider1.isTrigger = isActive;
         Debug.Log($"playerRigidbody.isKinematic {playerRigidbody.isKinematic}");
     }
 

@@ -14,6 +14,13 @@ namespace InventorySystem
 
         [SerializeField] Renderer indicator;
 
+        SoundProducer soundProducer;
+
+        private void Start()
+        {
+            soundProducer = GetComponent<SoundProducer>();
+        }
+
         bool isTriggered = false;
         protected override void ExecuteItemAction(GameObject player)
         {
@@ -29,6 +36,7 @@ namespace InventorySystem
             indicator.material.color = Color.green;
             Debug.Log("---Landmine: Collided with something!");
             isTriggered = true;
+            soundProducer.EmitSoundServerRpc(0);
         }
 
         public void OnColliderExit(GameObject collider)
@@ -41,6 +49,7 @@ namespace InventorySystem
         [ServerRpc(RequireOwnership = false)]
         public void ExplodeServerRpc()
         {
+            soundProducer.EmitSoundServerRpc(1);
             Collider[] hits = Physics.OverlapSphere(transform.position, explosionRadius, entityLayer, QueryTriggerInteraction.Collide);
             foreach (Collider collider in hits)
             {
