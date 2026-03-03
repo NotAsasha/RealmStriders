@@ -14,7 +14,7 @@ public class SoundProducer : NetworkBehaviour
     [SerializeField] List<AudioClip> clip;
     //private void Awake() { }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void EmitSoundServerRpc(int soundIndex = 0, bool singleLure = false)
     {
         if (!soundEmitor) soundEmitor = transform;

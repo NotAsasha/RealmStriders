@@ -36,6 +36,7 @@ public class Lever : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
+        if (!GameManager.instance) return;
         GameManager.instance.hasStartedMission.OnValueChanged -= OnMissionStateChanged;
     }
 

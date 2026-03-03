@@ -2,9 +2,7 @@ using FileSystem;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using InventorySystem;
-using Unity.Cinemachine;
-
+using Player.InventorySystem;
 namespace Player
 {
     public class CameraMovement : NetworkBehaviour

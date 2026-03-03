@@ -17,24 +17,25 @@ public class EntityDetector : MonoBehaviour
     public GameObject EntityInSight(bool chaseEnemies = false)
     {
         Vector3 eyePosition = transform.position + eyeLocalPosition;
-        Collider[] players = Physics.OverlapSphere(eyePosition, viewDistance, playerLayer);
-        foreach (Collider player in players)
+        Collider[] nearbyEntities = Physics.OverlapSphere(eyePosition, viewDistance, playerLayer);
+
+        foreach (Collider entityColl in nearbyEntities)
         {
-            if (player.gameObject == gameObject) continue;
-            Vector3 direction = player.transform.position - transform.position;
+            if (entityColl.gameObject == gameObject) continue;
+            Vector3 direction = entityColl.transform.position - transform.position;
             if (Vector3.Angle(direction, transform.forward) <= halfAngle)
             {
                 // if entity is behind a wall
                 if (Physics.Raycast(eyePosition, direction, direction.magnitude, wallLayer)) continue;
 
                 //if is dead
-                var entity = player.GetComponent<Entity>();
+                var entity = entityColl.GetComponent<Entity>();
                 if (entity == null || entity.isDead.Value) continue;
 
                 //if is enemy
-                if (!chaseEnemies && player.GetComponent<Enemy>() != null) continue;
+                if (!chaseEnemies && entityColl.GetComponent<Enemy>() != null) continue;
 
-                return player.gameObject;
+                return entityColl.gameObject;
                 
             }
         }

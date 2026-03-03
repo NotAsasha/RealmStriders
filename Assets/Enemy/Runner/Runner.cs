@@ -4,8 +4,9 @@ using UnityEngine.Rendering;
 
 public class Runner : Enemy
 {
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         entityHealth.OnValueChanged += OnDamaged;
     }
 

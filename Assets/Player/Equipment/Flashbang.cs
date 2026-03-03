@@ -1,8 +1,7 @@
-using InventorySystem;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace InventorySystem
+namespace Player.InventorySystem
 {
     public class Flashbang : Item
     {
@@ -16,7 +15,7 @@ namespace InventorySystem
             ExplodeServerRpc();
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void ExplodeServerRpc()
         {
             Collider[] hits = Physics.OverlapSphere(transform.position, effectRadius, entityLayer, QueryTriggerInteraction.Collide);

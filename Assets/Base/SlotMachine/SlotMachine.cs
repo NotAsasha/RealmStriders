@@ -3,6 +3,7 @@ using UnityEngine.Events;
 using System.Collections.Generic;
 using Unity.Netcode;
 using System.Threading;
+using System.Collections;
 
 public class SlotMachine : Terminal
 {
@@ -12,13 +13,13 @@ public class SlotMachine : Terminal
     public int spinCost;
     public DropTable table;
 
-    private CasinoMonster monster;
-
     public List<NetworkObject> itemsToDrop;
+
+    //Spin animation lenght in seconds.
+    float spinLenght = 1.5f;
 
     private void Start()
     {
-        monster = GetComponent<CasinoMonster>();
         table = GetComponent<DropTable>();
     }
 
@@ -30,10 +31,29 @@ public class SlotMachine : Terminal
             Debug.Log("---SlotMachine: Not enough money.");
             return;
         }
-        Debug.Log("---SlotMachine: Spinned.");
-        GameManager.instance.teamMoney.Value -= spinCost;
-        table.ExecuteAction(table.ChooseDrop());
+
+        SpinClientRpc();
     }
+
+    [ClientRpc]
+    public void SpinClientRpc()
+    {
+        StartCoroutine(SpinAnimation());
+
+        if (IsServer)
+        {
+            Debug.Log("---SlotMachine: Spinned.");
+            GameManager.instance.teamMoney.Value -= spinCost;
+            table.ExecuteAction(table.ChooseDrop());
+        }
+    }
+
+    private IEnumerator SpinAnimation()
+    {
+        yield return new WaitForSeconds(spinLenght);
+    }
+
+   
 
     public void GiveCoins(int amount)
     {
@@ -48,11 +68,10 @@ public class SlotMachine : Terminal
         Debug.Log($"---SlotMachine: Won random item - {itemsToDrop[index].name}!");
 
     }
-
-    public void TurnIntoMonster()
+    [ClientRpc]
+    public void TurnIntoMonsterClientRpc()
     {
-        //StopInteraction();
-        monster.WakeUpClientRpc();
+        if (playerCameraComponent != null) playerCameraComponent.StopInteraction();
         Debug.Log("---SlotMachine: Main prize!");
     }
 }

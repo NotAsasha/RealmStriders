@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Events;
 using Unity.Netcode;
 
 public class BeamDamage : NetworkBehaviour, ICollidable

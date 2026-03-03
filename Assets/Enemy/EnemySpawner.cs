@@ -102,7 +102,7 @@ public class EnemySpawner : NetworkBehaviour
     public bool RandomMapPoint(out Vector3 position)
     {
         Vector3 searchPos;
-        for (int i = 0; i < 20; ++i)
+        for (int i = 0; i < 100; ++i)
         {
             if (!RandomMove.RandomPoint(worldCenter, spawnRadius, out searchPos)) continue;
             Debug.Log($"Tried {searchPos}");

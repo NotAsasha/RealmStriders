@@ -1,6 +1,5 @@
 using Unity.Netcode;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -12,20 +11,24 @@ public abstract class Entity : NetworkBehaviour
     public NetworkVariable<bool> isDead = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public NetworkVariable<float> entityHealth = new(1f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    private Dictionary<EffectType, NetworkVariable<bool>> effects;
+    protected Dictionary<EffectType, NetworkVariable<bool>> effects;
 
 
     #region Initialization
 
-    public override void OnNetworkSpawn()
+    protected virtual void Awake()
     {
         effects = new Dictionary<EffectType, NetworkVariable<bool>>()
         {
-            { EffectType.Freeze, new NetworkVariable<bool>(false) },
-            { EffectType.Water,  new NetworkVariable<bool>(false) },
-            { EffectType.Fire,   new NetworkVariable<bool>(false) }
+            { EffectType.Freeze,     new NetworkVariable<bool>(false) },
+            { EffectType.Water,      new NetworkVariable<bool>(false) },
+            { EffectType.Fire,       new NetworkVariable<bool>(false) },
+            { EffectType.Invincible, new NetworkVariable<bool>(false) }
         };
+    }
 
+    public override void OnNetworkSpawn()
+    {
         isDead.OnValueChanged += OnDeathStateChange;
         effects[EffectType.Freeze].OnValueChanged += OnFreezeStateChange;
     }
@@ -41,6 +44,8 @@ public abstract class Entity : NetworkBehaviour
     public float GetHealth() => entityHealth.Value;
     public void AddHealth(float _health)
     {
+        if (IsEffectActive(EffectType.Invincible)) return;
+
 
         entityHealth.Value += _health;
         if (entityHealth.Value <= 0 && !isDead.Value)
@@ -49,8 +54,7 @@ public abstract class Entity : NetworkBehaviour
             Debug.Log($"---Enemy {name} was killed!");
         }
     }
-
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void TurnIntoSphereServerRpc()
     {
         if (isDead.Value || GetHealth() >= 1) return;
@@ -59,12 +63,17 @@ public abstract class Entity : NetworkBehaviour
         isDead.Value = true;
     }
 
+
     #region Effects
 
+
     Coroutine cor;
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void ApplyEffectServerRpc(EffectType type, float seconds)
     {
+        if (IsEffectActive(EffectType.Invincible)) return;
+
+
         if (IsEffectActive(type) && cor != null)
         {
             StopCoroutine(cor);
@@ -100,5 +109,6 @@ public enum EffectType
 {
     Freeze,
     Water,
-    Fire
+    Fire,
+    Invincible
 }

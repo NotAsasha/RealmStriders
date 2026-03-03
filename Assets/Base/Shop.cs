@@ -21,7 +21,7 @@ public class Shop : NetworkBehaviour
         moneyCounter.text = newV.ToString();
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void BuyItemServerRpc(string _name, int _price)
     {
         if (GameManager.instance.teamMoney.Value < _price) return;

@@ -13,6 +13,7 @@ public class Terminal : NetworkBehaviour, IInteractable
     [SerializeField] AudioSource interactSound;
 
     protected int ownerID = -1;
+    public CameraMovement playerCameraComponent;
 
     #region Interatcion
     private NetworkVariable<bool> _isTaken = new(writePerm: NetworkVariableWritePermission.Server);
@@ -24,6 +25,7 @@ public class Terminal : NetworkBehaviour, IInteractable
 
 
         var camera = _player.GetComponentInChildren<Camera>();
+        playerCameraComponent = camera.gameObject.GetComponent<CameraMovement>();
         if (camera == null) return;
         cameraAnimation = _player.GetComponent<MonoBehaviour>().StartCoroutine(MoveCameraToTerminal(camera));
 
@@ -54,7 +56,7 @@ public class Terminal : NetworkBehaviour, IInteractable
         playerCamera.transform.position = targetPos;
         playerCamera.transform.rotation = targetRot;
 
-        // Камера "прилипла" до терміналу — можеш активувати UI
+        // activate ui
         terminalCanvas.worldCamera = playerCamera;
     }
     public void StopInteraction(GameObject _player)
@@ -62,12 +64,13 @@ public class Terminal : NetworkBehaviour, IInteractable
         SetTakenServerRpc(false);
 
         _player.GetComponent<MonoBehaviour>().StopCoroutine(cameraAnimation);
-        _player.transform.localPosition = _player.GetComponent<CameraMovement>().StartPosition;
+        _player.transform.localPosition = playerCameraComponent.StartPosition;
+        playerCameraComponent = null;
         ownerID = -1;
         if (interactSound != null) interactSound.Stop();
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void SetTakenServerRpc(bool _whatToSet)
     {
         _isTaken.Value = _whatToSet;

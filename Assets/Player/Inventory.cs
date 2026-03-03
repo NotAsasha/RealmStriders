@@ -1,10 +1,9 @@
 using UnityEngine;
 using Unity.Netcode;
 using System;
-using Player;
 using UnityEngine.InputSystem;
 
-namespace InventorySystem
+namespace Player.InventorySystem
 {
     public class Inventory : NetworkBehaviour
     {
@@ -21,12 +20,12 @@ namespace InventorySystem
         // Arrays for items and UI
         private Item[] items;
         private UISlot[] slots;
-        
+
         // Input controls
         private Controls controls;
 
         #region Unity Lifecycle
-        
+
         void Start()
         {
             InitializeInventory();
@@ -47,7 +46,7 @@ namespace InventorySystem
         {
             items = new Item[capacity];
             slots = new UISlot[capacity];
-            
+
             if (Movement.instance?._controls != null)
             {
                 controls = Movement.instance._controls;
@@ -97,7 +96,7 @@ namespace InventorySystem
             }
 
             // Check if target slot is valid and empty
-            if (!IsValidSlot(targetSlot) || items[targetSlot] != null) 
+            if (!IsValidSlot(targetSlot) || items[targetSlot] != null)
                 return false;
 
             if (targetSlot != activeSlotIndex)
@@ -106,13 +105,13 @@ namespace InventorySystem
             items[targetSlot] = takableComponent;
             SetItemParentServerRpc(itemToAdd, gameObject);
             UpdateUI();
-            
+
             return true;
         }
 
         public bool RemoveItem(int slot)
         {
-            if (!IsValidSlot(slot) || items[slot] == null) 
+            if (!IsValidSlot(slot) || items[slot] == null)
                 return false;
 
             items[slot] = null;
@@ -248,8 +247,8 @@ namespace InventorySystem
         private void UpdateUI()
         {
             ValidateUISetup();
-            
-            if (userInterface.childCount == 0) 
+
+            if (userInterface.childCount == 0)
             {
                 CreateUISlots();
             }
@@ -276,7 +275,7 @@ namespace InventorySystem
             {
                 GameObject slotObject = Instantiate(slotPrefab, userInterface);
                 slots[i] = slotObject.GetComponent<UISlot>();
-                
+
                 if (slots[i] == null)
                 {
                     Debug.LogError($"Slot prefab at index {i} doesn't have UISlot component!");
@@ -288,7 +287,7 @@ namespace InventorySystem
 
         #region Network RPCs
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void SetItemActiveServerRpc(NetworkObjectReference objRef, bool isActive)
         {
             if (objRef.TryGet(out NetworkObject networkObject))
@@ -308,7 +307,7 @@ namespace InventorySystem
             objRef.TryGet(out NetworkObject networkObject);
             networkObject.gameObject.SetActive(isActive);
         }
-       [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void SetItemParentServerRpc(NetworkObjectReference objRef, NetworkObjectReference newParentRef)
         {
             if (!objRef.TryGet(out NetworkObject obj))
@@ -342,7 +341,7 @@ namespace InventorySystem
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void DropItemServerRpc(NetworkObjectReference objRef)
         {
             if (!objRef.TryGet(out NetworkObject networkObject))
@@ -354,7 +353,7 @@ namespace InventorySystem
             if (!Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 1f, layer))
                 networkObject.transform.localPosition = handPosition + new Vector3(0, 0, 0.75f);
             networkObject.transform.parent = null;
-            
+
             if (!networkObject.gameObject.activeSelf)
             {
                 networkObject.gameObject.SetActive(true);
@@ -374,7 +373,7 @@ namespace InventorySystem
                 if (objRef.TryGet(out NetworkObject networkObject))
                 {
                     networkObject.transform.parent = null;
-                    
+
                     if (!networkObject.gameObject.activeSelf)
                     {
                         networkObject.gameObject.SetActive(true);

@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 using Unity.Netcode;
 
-namespace InventorySystem
+namespace Player.InventorySystem
 {
     public class Dosimeter : Item
     {

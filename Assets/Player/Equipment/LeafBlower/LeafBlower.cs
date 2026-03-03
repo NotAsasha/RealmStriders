@@ -1,7 +1,6 @@
 using UnityEngine;
-using Player;
 
-namespace InventorySystem
+namespace Player.InventorySystem
 {
     public class LeafBlower : Item
     {

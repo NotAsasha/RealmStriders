@@ -1,8 +1,7 @@
-using InventorySystem;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace InventorySystem
+namespace Player.InventorySystem
 {
     public class Landmine : Item, ICollidable
     {
@@ -46,7 +45,7 @@ namespace InventorySystem
             ExplodeServerRpc();
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void ExplodeServerRpc()
         {
             soundProducer.EmitSoundServerRpc(1);

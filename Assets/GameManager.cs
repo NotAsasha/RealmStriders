@@ -3,11 +3,9 @@ using Unity.Netcode;
 using UnityEngine;
 using Steam;
 using UnityEngine.SceneManagement;
-using UnityEngine.Rendering.Universal;
-using Unity.Networking.Transport;
-using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
+using Player;
 
 public class GameManager : NetworkBehaviour
 {
@@ -99,7 +97,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void OnPlayerDeathServerRpc()
     {
         alivePlayers -= 1;
@@ -113,7 +111,7 @@ public class GameManager : NetworkBehaviour
 
     #region MissionRpc
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void StartMissionServerRpc()
     {
         if (hasStartedMission.Value) return;
@@ -134,7 +132,7 @@ public class GameManager : NetworkBehaviour
         hasStartedMission.Value = true;
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void StopMissionServerRpc() => StartCoroutine(StopMissionClock());
 
     private IEnumerator StopMissionClock()
@@ -160,6 +158,7 @@ public class GameManager : NetworkBehaviour
         {
             //Loose
             Debug.Log("---MissionManager: Game Over, you lost...");
+            Cursor.lockState = CursorLockMode.None;
 
             //TEMP - to main menu
             SteamManager.Instance.Disconnect();

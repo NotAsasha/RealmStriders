@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 using Unity.Netcode;
-using InventorySystem;
+using Player.InventorySystem;
 
 public class SellPoint : NetworkBehaviour
 {
     [SerializeField] private Vector3 boxSize = new Vector3(0.5f, 0.5f, 2);
     [SerializeField] private LayerMask itemLayer;
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void OnSellServerRpc()
     {
         Debug.Log($"---SellPoint: Started selling!");

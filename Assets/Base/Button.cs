@@ -24,7 +24,7 @@ public class Button : NetworkBehaviour, IInteractable
         
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void StartCooldownServerRpc()
     {
         StartCoroutine(Cooldown());

@@ -1,12 +1,9 @@
 using UnityEngine;
 using TMPro;
-using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.UI;
-using Player;
 using Unity.Netcode;
-using Unity.VisualScripting;
 
-namespace InventorySystem
+namespace Player.InventorySystem
 {
     [RequireComponent(typeof(EntityDetector))]
     public class Scanner : Item
@@ -38,7 +35,7 @@ namespace InventorySystem
             SwitchStateServerRpc();
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         private void SwitchStateServerRpc()
         {
             isOn.Value = !isOn.Value;

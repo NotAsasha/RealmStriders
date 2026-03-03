@@ -1,9 +1,8 @@
-using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 
-namespace InventorySystem
+namespace Player.InventorySystem
 {
     public class Item : NetworkBehaviour, IInteractable
     {
@@ -142,7 +141,7 @@ namespace InventorySystem
 
         #region Network RPCs
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         private void TakeServerRpc()
         {
             TakeClientRpc();
@@ -155,7 +154,7 @@ namespace InventorySystem
             isCurrentlyHeld = true;
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         private void DropServerRpc()
         {
             DropClientRpc();
@@ -168,7 +167,7 @@ namespace InventorySystem
             isCurrentlyHeld = false;
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void DestroyItemServerRpc()
         {
             if (NetworkObject != null)

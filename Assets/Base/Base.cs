@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using Unity.Netcode;
 
@@ -101,7 +100,7 @@ public class Base : NetworkBehaviour
 
     #endregion
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void BuyTerminalServerRpc()
     {
         if (isTerminalBought.Value) return;
@@ -113,7 +112,7 @@ public class Base : NetworkBehaviour
         isTerminalBought.Value = true;
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void BuyDetectionServerRpc()
     {
         if (isDetectionBought.Value) return;
@@ -125,7 +124,7 @@ public class Base : NetworkBehaviour
         isDetectionBought.Value = true;
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void BuyBeamServerRpc()
     {
         if (isBeamBought.Value) return;

@@ -29,7 +29,7 @@ public class Radar : Terminal
         control = Movement.instance._controls.UI.Navigate;
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void SpawnBeamServerRpc()
     {
         Vector3 spawnPos = new(crosshair.localPosition.x * mapSizeMultiplier, 100f, crosshair.localPosition.z * mapSizeMultiplier);

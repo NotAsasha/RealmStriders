@@ -6,6 +6,7 @@ using System.Collections;
 using System.Drawing;
 using UnityEngine.Audio;
 
+[RequireComponent(typeof(NavMeshAgent), typeof(EntityDetector))]
 public class Enemy : Entity, ICollidable
 {
     public float damage = 1f;
@@ -25,18 +26,24 @@ public class Enemy : Entity, ICollidable
     protected Rigidbody playerRigidbody;
     protected Collider collider1;
 
-    private bool isLocalFreezed = false;
-
     #region Initialization
 
-    private void Start()
+    protected virtual void Start()
     {
-        animator = GetComponent<Animator>();
-        vision = GetComponent<EntityDetector>();
-        agent = GetComponent<NavMeshAgent>();
-        playerRigidbody = GetComponent<Rigidbody>();
-        collider1 = GetComponent<Collider>();
-        agent.speed = defaultSpeed;
+        if (TryGetComponent(out agent))
+        {
+            agent.speed = defaultSpeed;
+        }
+        else
+        {
+            Debug.LogWarning("No NavMeshAgent, might need to add.");
+        }
+        if (vision == null) TryGetComponent<EntityDetector>(out vision);
+
+        if (playerRigidbody == null) TryGetComponent<Rigidbody>(out playerRigidbody);
+        if (collider1 == null) TryGetComponent<Collider>(out collider1);
+        if (animator == null) TryGetComponent<Animator>(out animator);
+
         ToggleRagdoll(true);
     }
 
@@ -50,11 +57,16 @@ public class Enemy : Entity, ICollidable
         ToggleRagdoll(false);
     }
 
+    override protected void ReviveEntity()
+    {
+        Debug.Log($"---{name}: Reviving myself");
+        ToggleRagdoll(true);
+    }
+
     override protected void OnFreezeStateChange(bool oldV, bool isFreezed)
     {
         animator.speed = isFreezed ? 0 : 1;
         agent.speed = isFreezed ? 0 : defaultSpeed;
-        isLocalFreezed = isFreezed;
     }
 
     private void ToggleRagdoll(bool isActive)
@@ -63,9 +75,8 @@ public class Enemy : Entity, ICollidable
         animator.enabled = isActive;
         vision.enabled = isActive;
         agent.enabled = isActive;
-        //playerRigidbody.isKinematic = isActive;
+        playerRigidbody.isKinematic = isActive;
         collider1.isTrigger = isActive;
-        Debug.Log($"playerRigidbody.isKinematic {playerRigidbody.isKinematic}");
     }
 
     #endregion
@@ -74,7 +85,7 @@ public class Enemy : Entity, ICollidable
 
     public void OnColliderEnter(GameObject collider)
     {
-        if (!IsServer || isDead.Value || isLocalFreezed || !GameManager.instance.hasStartedMission.Value) return;
+        if (!IsServer || isDead.Value || IsEffectActive(EffectType.Freeze) /*|| !GameManager.instance.hasStartedMission.Value*/) return;
         var player = collider.GetComponent<Entity>();
         if (player == null || player.isDead.Value) return;
         if (!overAggresive && collider.GetComponent<Enemy>() != null) return;
@@ -95,7 +106,7 @@ public class Enemy : Entity, ICollidable
     private float nextUpdate;
     void Update()
     {
-        if (!IsServer || isDead.Value || isLocalFreezed) return;
+        if (!IsServer || isDead.Value || IsEffectActive(EffectType.Freeze)) return;
 
         vision.DrawViewState(); //draw vision boundaries
         if (Time.time >= nextUpdate)
@@ -171,6 +182,11 @@ public class Enemy : Entity, ICollidable
     private void PlayStepsSound(float cooldown)
     {
         isSoundReady = false;
+        if (stepSounds.Length <= 0)
+        {
+            Debug.LogWarning($"---Enemy: {name} has no movement sounds.");
+            return;
+        }
         int soundsCount = stepSounds.Length;
         audioSource.resource = stepSounds[Random.Range(0, soundsCount)];
         audioSource.Play();

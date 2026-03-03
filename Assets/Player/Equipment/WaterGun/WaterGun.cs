@@ -1,29 +1,31 @@
 using UnityEngine;
-using Unity.Netcode;
-using InventorySystem;
-using Player;
 
-public class WaterGun : Item
+namespace Player.InventorySystem
 {
-    [SerializeField] LayerMask entityLayer;
-    [SerializeField] float maxDistance = 10f;
-    [SerializeField] private float effectTime = 2f;
-    [SerializeField] ParticleSystem particle;
 
-    override protected void ExecuteItemAction(GameObject player)
+
+    public class WaterGun : Item
     {
-        particle.Play();
-        if (Physics.Raycast(
-                CameraMovement.instance.transform.position,
-                CameraMovement.instance.transform.forward,
-                out RaycastHit hit, maxDistance, entityLayer))
+        [SerializeField] LayerMask entityLayer;
+        [SerializeField] float maxDistance = 10f;
+        [SerializeField] private float effectTime = 2f;
+        [SerializeField] ParticleSystem particle;
+
+        override protected void ExecuteItemAction(GameObject player)
         {
-            if (hit.transform.TryGetComponent<Entity>(out var entity))
+            particle.Play();
+            if (Physics.Raycast(
+                    CameraMovement.instance.transform.position,
+                    CameraMovement.instance.transform.forward,
+                    out RaycastHit hit, maxDistance, entityLayer))
             {
-                entity.ApplyEffectServerRpc(EffectType.Water, effectTime);
-                Debug.Log($"---WaterGun: Shot entity: {entity.name}");
+                if (hit.transform.TryGetComponent<Entity>(out var entity))
+                {
+                    entity.ApplyEffectServerRpc(EffectType.Water, effectTime);
+                    Debug.Log($"---WaterGun: Shot entity: {entity.name}");
+                }
             }
+            else Debug.Log($"---WaterGun: Missed :(");
         }
-        else Debug.Log($"---WaterGun: Missed :(");
     }
 }

@@ -1,10 +1,8 @@
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
-using System.Collections;
-using Player;
 
-namespace InventorySystem
+namespace Player.InventorySystem
 {
     public class Stunner : Item
     {
@@ -61,7 +59,7 @@ namespace InventorySystem
         #endregion
 
         private float readyTime;
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void StartCooldownServerRpc()
         {
             isReady.Value = false;
