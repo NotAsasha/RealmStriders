@@ -1,6 +1,8 @@
+using Player.Equipment;
 using Unity.Netcode;
 using UnityEngine;
-namespace Player
+
+namespace Player.Other
 {
     public class CollisionChecks : NetworkBehaviour
     {

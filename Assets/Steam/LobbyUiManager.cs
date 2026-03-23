@@ -1,22 +1,23 @@
-using FileSystem;
-using Steam;
-using Steamworks;
+using FileSystem.Scripts;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
-namespace Menu
+
+namespace Steam
 {
     public class LobbyUiManager : MonoBehaviour
     {
+        [FormerlySerializedAs("_friendsOnly")]
         [Header("SetUp")]
-        [SerializeField] private Toggle _friendsOnly;
-        private SteamManager _steamManager;
+        [SerializeField] private Toggle friendsOnly;
+        private SteamManager steamManager;
 
         public void CreateLobbyButton()
         {
-            _steamManager = SteamManager.Instance;
-            _steamManager.StartHost(6, _friendsOnly.isOn);
+            steamManager = SteamManager.Instance;
+            steamManager.StartHost(6, friendsOnly.isOn);
             NetworkManager.Singleton.SceneManager.LoadScene("Lobby", LoadSceneMode.Single);
         }
 

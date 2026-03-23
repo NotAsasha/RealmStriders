@@ -2,7 +2,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 
-namespace Player.InventorySystem
+namespace Player.Equipment
 {
     public class Item : NetworkBehaviour, IInteractable
     {

@@ -1,24 +1,22 @@
-using NUnit.Framework.Internal.Filters;
-using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.Rendering;
-
-public class LureMan : Enemy
+namespace Enemy.LureMan
 {
-
-
-
-    protected override void Think()
+    public class LureMan : Enemy
     {
-        //first priority, run
-        if (enemyState == EnemyState.isRunning)
+
+
+
+        protected override void Think()
         {
-            if (agent.remainingDistance > agent.stoppingDistance) return;
-            enemyState = EnemyState.isMoving;
+            //first priority, run
+            if (enemyState == EnemyState.IsRunning)
+            {
+                if (agent.remainingDistance > agent.stoppingDistance) return;
+                enemyState = EnemyState.IsMoving;
+            }
+
+            //second priority, search for player
+            if (ChasePlayer(overAggresive)) return;
         }
 
-        //second priority, search for player
-        if (ChasePlayer(overAggresive)) return;
     }
-
 }

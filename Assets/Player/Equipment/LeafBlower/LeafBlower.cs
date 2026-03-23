@@ -1,6 +1,7 @@
+using Player.Movement;
 using UnityEngine;
 
-namespace Player.InventorySystem
+namespace Player.Equipment.LeafBlower
 {
     public class LeafBlower : Item
     {
@@ -10,12 +11,12 @@ namespace Player.InventorySystem
 
         #region Item Specific Functionality
 
-        override protected void ExecuteItemAction(GameObject player)
+        protected override void ExecuteItemAction(GameObject player)
         {
             particle.Play();
             if (!Physics.Raycast(
-                CameraMovement.instance.transform.position,
-                CameraMovement.instance.transform.forward,
+                CameraMovement.Instance.transform.position,
+                CameraMovement.Instance.transform.forward,
                 out RaycastHit hit, maxDistance, entityLayer)) return;
 
             Entity entity = hit.transform.gameObject.GetComponent<Entity>();

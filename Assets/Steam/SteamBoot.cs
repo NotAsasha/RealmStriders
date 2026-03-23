@@ -1,29 +1,31 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Steamworks;
-using System.Collections;
 
-public class BootstrapManager : MonoBehaviour
+namespace Steam
 {
-    [Header("Наступна сцена")]
-    public string sceneToLoad = "Lobby";
-
-    private void Start()
+    public class BootstrapManager : MonoBehaviour
     {
-        StartCoroutine(LoadSceneAsync());
-    }
+        [Header("Наступна сцена")]
+        public string sceneToLoad = "Lobby";
 
-    private IEnumerator LoadSceneAsync()
-    {
-        // (Опціонально) Затримка — на випадок, якщо треба трохи почекати
-        yield return new WaitForSeconds(1f);
+        private void Start()
+        {
+            StartCoroutine(LoadSceneAsync());
+        }
 
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneToLoad);  
+        private IEnumerator LoadSceneAsync()
+        {
+            // (Опціонально) Затримка — на випадок, якщо треба трохи почекати
+            yield return new WaitForSeconds(1f);
 
-        while (!asyncLoad.isDone)
-        { 
-            // (Опціонально) Можна оновлювати progress-бар: asyncLoad.progress
-            yield return null; 
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneToLoad);  
+
+            while (!asyncLoad.isDone)
+            { 
+                // (Опціонально) Можна оновлювати progress-бар: asyncLoad.progress
+                yield return null; 
+            }
         }
     }
 } 

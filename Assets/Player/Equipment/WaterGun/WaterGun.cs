@@ -1,6 +1,7 @@
+using Player.Movement;
 using UnityEngine;
 
-namespace Player.InventorySystem
+namespace Player.Equipment.WaterGun
 {
 
 
@@ -15,8 +16,8 @@ namespace Player.InventorySystem
         {
             particle.Play();
             if (Physics.Raycast(
-                    CameraMovement.instance.transform.position,
-                    CameraMovement.instance.transform.forward,
+                    CameraMovement.Instance.transform.position,
+                    CameraMovement.Instance.transform.forward,
                     out RaycastHit hit, maxDistance, entityLayer))
             {
                 if (hit.transform.TryGetComponent<Entity>(out var entity))

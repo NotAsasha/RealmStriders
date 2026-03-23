@@ -1,26 +1,28 @@
-using FileSystem;
+using FileSystem.Scripts;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
-namespace Menu
+
+namespace Scenes.Settings
 {
     public class SettingsMenu : MonoBehaviour
     {
-        [SerializeField] private Slider _sensSlider;
+        [FormerlySerializedAs("_sensSlider")] [SerializeField] private Slider sensSlider;
 
         private SettingsFile settingsFile;
-        private GameFileHandler _fileHandler;
+        private GameFileHandler fileHandler;
 
         private void Start()
         {
-            _fileHandler = GameFileHandler.Instance;
-            settingsFile = (SettingsFile)_fileHandler.SearchForFileByName("Settings");
+            fileHandler = GameFileHandler.Instance;
+            settingsFile = (SettingsFile)fileHandler.SearchForFileByName("Settings");
 
-            _sensSlider.value = settingsFile.save._sensValue;
+            sensSlider.value = settingsFile.save.sensValue;
         }
 
         public void UpdateMouseSensativity()
         {
-            settingsFile.save._sensValue = _sensSlider.value;
+            settingsFile.save.sensValue = sensSlider.value;
             settingsFile.Save(false);
         }
 

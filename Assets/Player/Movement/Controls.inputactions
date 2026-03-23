@@ -44,6 +44,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Run",
+                    "type": "Button",
+                    "id": "39cbfe3f-8b6b-4471-8935-2e8b82d1cd36",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Jump",
                     "type": "Button",
                     "id": "cc72e55c-b75d-46fc-a9db-7faa5aeb1d2a",
@@ -80,15 +89,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "MouseWheel",
-                    "type": "PassThrough",
-                    "id": "51cdbe07-1c10-479d-9eb5-db9370e4f3de",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "Drop",
                     "type": "Button",
                     "id": "50f4cf09-e6c1-45ee-a931-72f6c23bac08",
@@ -96,6 +96,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "MouseWheel",
+                    "type": "PassThrough",
+                    "id": "51cdbe07-1c10-479d-9eb5-db9370e4f3de",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "SwitchSlot",
@@ -323,6 +332,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7e4a7a34-5330-42ba-a648-31f1c568122f",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Run",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

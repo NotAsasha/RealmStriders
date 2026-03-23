@@ -1,30 +1,33 @@
-using UnityEngine;
-using TMPro;
 using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.UI;
 
-public class RatingScreen : NetworkBehaviour
+namespace Base.RatingScreen
 {
-    [SerializeField] Slider teamRatingSlider;
-    [SerializeField] Slider minRatingSlider;
-
-    public override void OnNetworkSpawn()
+    // idk why it is NetworkBehaviour, TODO
+    public class RatingScreen : NetworkBehaviour
     {
-        var teamRating = GameManager.instance.teamRating;
-        var looseRating = GameManager.instance.looseRating;
+        [SerializeField] Slider teamRatingSlider;
+        [SerializeField] Slider minRatingSlider;
 
-        teamRating.OnValueChanged += (oldV, newV) =>
+        public override void OnNetworkSpawn()
         {
-            teamRatingSlider.value = newV;
-        };
+            var teamRating = GameManager.Instance.teamRating;
+            var looseRating = GameManager.Instance.looseRating;
 
-        looseRating.OnValueChanged += (oldV, newV) =>
-        {
-            minRatingSlider.value = newV;
-        };
+            teamRating.OnValueChanged += (oldV, newV) =>
+            {
+                teamRatingSlider.value = newV;
+            };
 
-        // Update at the beginning
-        teamRatingSlider.value = teamRating.Value;
-        minRatingSlider.value = looseRating.Value;
+            looseRating.OnValueChanged += (oldV, newV) =>
+            {
+                minRatingSlider.value = newV;
+            };
+
+            // Update at the beginning
+            teamRatingSlider.value = teamRating.Value;
+            minRatingSlider.value = looseRating.Value;
+        }
     }
 }

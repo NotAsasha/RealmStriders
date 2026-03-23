@@ -1,19 +1,22 @@
-using UnityEngine;
-using Unity.Netcode;
 using System.Collections.Generic;
+using Unity.Netcode;
+using UnityEngine;
 
-public class OnlyOnHost : NetworkBehaviour
+namespace Steam
 {
-    public List<Behaviour> componentsToCheck;
-
-
-    public override void OnNetworkSpawn()
+    public class OnlyOnHost : NetworkBehaviour
     {
-        Debug.Log($"IsServer={IsServer}, IsHost={IsHost}, IsOwner={IsOwner}, IsSpawned={NetworkObject.IsSpawned}");
+        public List<Behaviour> componentsToCheck;
 
-        foreach (Behaviour component in componentsToCheck)
+
+        public override void OnNetworkSpawn()
         {
-            component.enabled = IsServer;
+            Debug.Log($"IsServer={IsServer}, IsHost={IsHost}, IsOwner={IsOwner}, IsSpawned={NetworkObject.IsSpawned}");
+
+            foreach (Behaviour component in componentsToCheck)
+            {
+                component.enabled = IsServer;
+            }
         }
     }
 }

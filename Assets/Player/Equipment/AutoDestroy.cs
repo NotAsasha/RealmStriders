@@ -1,13 +1,16 @@
 using System.Collections;
 using UnityEngine;
 
-public class AutoDestroy : MonoBehaviour
+namespace Player.Equipment
 {
-    public IEnumerator DestroyInTime(float _time)
+    public class AutoDestroy : MonoBehaviour
     {
-        Debug.Log($"[AutoDestroy] Will destroy in {_time} seconds");
-        yield return new WaitForSeconds(_time);
-        Debug.Log("[AutoDestroy] Destroying now");
-        Destroy(gameObject);
+        public IEnumerator DestroyInTime(float time)
+        {
+            Debug.Log($"[AutoDestroy] Will destroy in {time} seconds");
+            yield return new WaitForSeconds(time);
+            Debug.Log("[AutoDestroy] Destroying now");
+            Destroy(gameObject);
+        }
     }
 }

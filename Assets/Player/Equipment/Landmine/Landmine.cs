@@ -1,7 +1,8 @@
+using Enemy;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace Player.InventorySystem
+namespace Player.Equipment.Landmine
 {
     public class Landmine : Item, ICollidable
     {
@@ -59,10 +60,10 @@ namespace Player.InventorySystem
             NetworkObject.Despawn(true);
         }
 
-        void ApplyDamage(Collider _collider)
+        void ApplyDamage(Collider collider)
         {
             //Calculate all vectors
-            Vector3 toTarget = _collider.transform.position - transform.position;
+            Vector3 toTarget = collider.transform.position - transform.position;
             Vector3 direction = toTarget.normalized;
             float distanceToTarget = toTarget.magnitude;
 
@@ -70,7 +71,7 @@ namespace Player.InventorySystem
             if (Physics.Raycast(transform.position, direction, out RaycastHit hit, distanceToTarget, wallLayer)) return;
 
             //Apply damage (can depand on distance)
-            var entity = _collider.GetComponent<Entity>();
+            var entity = collider.GetComponent<Entity>();
             // float damageToApply = damage / Mathf.Max(distanceToTarget, 1f);
             entity.AddHealth(-damage);
 
@@ -79,10 +80,10 @@ namespace Player.InventorySystem
 
             if (entity.IsDead())
             {
-                var rigidbody = _collider.GetComponent<Rigidbody>();
+                var rigidbody = collider.GetComponent<Rigidbody>();
                 if (rigidbody != null)
                 {
-                    _collider.GetComponent<Rigidbody>()?.AddForce(direction * 10f);
+                    collider.GetComponent<Rigidbody>()?.AddForce(direction * 10f);
                 }
 
                 Debug.Log("---Landmine: Killed some entity.");

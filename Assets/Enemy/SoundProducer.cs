@@ -1,54 +1,56 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using System.Collections.Generic;
-using static Unity.VisualScripting.Member;
 
-public class SoundProducer : NetworkBehaviour
+namespace Enemy
 {
-    [SerializeField] Transform soundEmitor;
-    [SerializeField] float soundRadius = 20.0f;
-    [SerializeField] LayerMask entityLayer;
-    //[SerializeField] LayerMask wallLayer;
-
-    [SerializeField] AudioSource source;
-    [SerializeField] List<AudioClip> clip;
-    //private void Awake() { }
-
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    public void EmitSoundServerRpc(int soundIndex = 0, bool singleLure = false)
+    public class SoundProducer : NetworkBehaviour
     {
-        if (!soundEmitor) soundEmitor = transform;
+        [SerializeField] Transform soundEmitor;
+        [SerializeField] float soundRadius = 20.0f;
+        [SerializeField] LayerMask entityLayer;
+        //[SerializeField] LayerMask wallLayer;
 
-        source.clip = clip[soundIndex];
-        source.Play();
-        EmitSoundClientRpc();
+        [SerializeField] AudioSource source;
+        [SerializeField] List<AudioClip> clip;
+        //private void Awake() { }
 
-        Collider[] entities = Physics.OverlapSphere(soundEmitor.position, soundRadius, entityLayer);
-        foreach (Collider entity in entities)
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void EmitSoundServerRpc(int soundIndex = 0, bool singleLure = false)
         {
-            if (entity.gameObject == gameObject) continue;
+            if (!soundEmitor) soundEmitor = transform;
 
-            var enemy = entity.GetComponent<Enemy>();
-            if (enemy != null)
+            source.clip = clip[soundIndex];
+            source.Play();
+            EmitSoundClientRpc();
+
+            Collider[] entities = Physics.OverlapSphere(soundEmitor.position, soundRadius, entityLayer);
+            foreach (Collider entity in entities)
             {
-                enemy.Lure(soundEmitor.position);
-                if (singleLure) return;
+                if (entity.gameObject == gameObject) continue;
+
+                var enemy = entity.GetComponent<Enemy>();
+                if (enemy != null)
+                {
+                    enemy.Lure(soundEmitor.position);
+                    if (singleLure) return;
+                }
             }
         }
-    }
 
-    [ClientRpc]
-    private void EmitSoundClientRpc(int soundIndex = 0)
-    {
-        if (IsServer) return;
-        source.clip = clip[soundIndex];
-        source.Play();
-    }
+        [ClientRpc]
+        private void EmitSoundClientRpc(int soundIndex = 0)
+        {
+            if (IsServer) return;
+            source.clip = clip[soundIndex];
+            source.Play();
+        }
 
-    public void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.blueViolet;
-        if (soundEmitor == null || soundRadius == 0) return;
-        Gizmos.DrawWireSphere(soundEmitor.position, soundRadius);
+        public void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.blueViolet;
+            if (soundEmitor == null || soundRadius == 0) return;
+            Gizmos.DrawWireSphere(soundEmitor.position, soundRadius);
+        }
     }
 }

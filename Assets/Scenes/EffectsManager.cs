@@ -1,46 +1,45 @@
 ﻿using UnityEngine;
-using TMPro;
 using UnityEngine.Rendering;
-using Player;
-using Unity.VisualScripting;
 
-public class EffectManager : MonoBehaviour
+namespace Scenes
 {
-    private Volume effects;
-    private AudioSource sound;
-
-    [SerializeField] AudioClip[] ambientSounds;
-
-    float defaultTime;
-
-    private void Start()
+    public class EffectManager : MonoBehaviour
     {
-        effects = GetComponent<Volume>();
-        sound = GetComponent<AudioSource>();
-        defaultTime = GameManager.instance.defaultMissionTime + GameManager.instance.maxTimeSpread;
-       
-        InvokeRepeating(nameof(UpdateEffects), defaultTime / 2, 1f);
-        InvokeRepeating(nameof(PlayEmbientSounds), 5f, 1f);
-    }
+        private Volume effects;
+        private AudioSource sound;
 
-    void UpdateEffects()
-    {
-        effects.weight = GetEffectStrength(GameManager.instance.missionDuration, defaultTime);
-    }
+        [SerializeField] AudioClip[] ambientSounds;
 
-    void PlayEmbientSounds()
-    {
-        if (Random.Range(0, 50) == 1)
+        float defaultTime;
+
+        private void Start()
         {
-            sound.clip = ambientSounds[Random.Range(0, ambientSounds.Length)];
-            sound.Play();
+            effects = GetComponent<Volume>();
+            sound = GetComponent<AudioSource>();
+            defaultTime = GameManager.Instance.defaultMissionTime + GameManager.Instance.maxTimeSpread;
+       
+            InvokeRepeating(nameof(UpdateEffects), defaultTime / 2, 3f);
+            InvokeRepeating(nameof(PlayAmbientSounds), 5f, 1f);
         }
-    }
 
-    float GetEffectStrength(float timeLeft, float totalTime)
-    {
-        // Exponential growth over time
-        float t = 1f - (timeLeft / totalTime);
-        return Mathf.Pow(t, 5f);
+        private void UpdateEffects()
+        {
+            effects.weight = GetEffectStrength(GameManager.Instance.missionDuration, defaultTime);
+        }
+
+        private void PlayAmbientSounds()
+        {
+            if (Random.Range(0, 50) == 1)
+            {
+                sound.clip = ambientSounds[Random.Range(0, ambientSounds.Length)];
+                sound.Play();
+            }
+        }
+
+        private float GetEffectStrength(float timeLeft, float totalTime)
+        {
+            float t = 1f - (timeLeft / totalTime);
+            return Mathf.Pow(t, 5f);
+        }
     }
 }

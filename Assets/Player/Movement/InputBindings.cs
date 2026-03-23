@@ -1,9 +1,10 @@
+using FileSystem.Scripts;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputActionRebindingExtensions;
-using TMPro;
-using FileSystem;
-namespace Player
+
+namespace Player.Movement
 {
     public class InputBindings : MonoBehaviour
     {

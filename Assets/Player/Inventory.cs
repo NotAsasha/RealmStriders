@@ -1,9 +1,12 @@
-using UnityEngine;
-using Unity.Netcode;
 using System;
+using Player.Equipment;
+using Player.Movement;
+using Player.UI;
+using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Player.InventorySystem
+namespace Player
 {
     public class Inventory : NetworkBehaviour
     {
@@ -47,9 +50,9 @@ namespace Player.InventorySystem
             items = new Item[capacity];
             slots = new UISlot[capacity];
 
-            if (Movement.instance?._controls != null)
+            if (PlayerMovement.Instance?.controls != null)
             {
-                controls = Movement.instance._controls;
+                controls = PlayerMovement.Instance.controls;
             }
             else
             {
@@ -129,9 +132,9 @@ namespace Player.InventorySystem
             return IsValidSlot(slot) ? items[slot] : null;
         }
 
-        public void ToggleUI(bool _isActive)
+        public void ToggleUI(bool isActive)
         {
-            userInterface.gameObject.SetActive(_isActive);
+            userInterface.gameObject.SetActive(isActive);
         }
         #endregion
 
@@ -185,7 +188,7 @@ namespace Player.InventorySystem
 
         private bool IsPlayerInInteraction()
         {
-            return Movement.instance != null && Movement.instance.isInInteraction;
+            return PlayerMovement.Instance != null && PlayerMovement.Instance.isInInteraction;
         }
 
         private int FindEmptySlot()

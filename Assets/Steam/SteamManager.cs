@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Steam
 {
@@ -13,7 +14,7 @@ namespace Steam
         public static SteamManager Instance { get; private set; } = null;
 
         private FacepunchTransport transport;
-        public NetworkVariable<int> PlayerCount = new();
+        [FormerlySerializedAs("PlayerCount")] public NetworkVariable<int> playerCount = new();
         public Lobby? CurrentLobby { get; private set; } = null;
 
         public List<Lobby> Lobbies { get; private set; } = new List<Lobby>(capacity: 100);
@@ -91,14 +92,14 @@ namespace Steam
             //SpawnPlayer(id);
             if (NetworkManager.Singleton.StartClient())
                 Debug.Log("---CrewManager: Member has joined!", this);
-            PlayerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+            playerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
         }
         public void SpawnPlayer(SteamId id)
         {
             GameObject player = Instantiate(playerPrefab, new Vector3(0, 1, 0), new Quaternion(0,0,0,0));
-            NetworkObject PlayerNetwork = player.GetComponent<NetworkObject>();
-            ulong PlayerId = PlayerNetwork.OwnerClientId;
-            PlayerNetwork.SpawnAsPlayerObject(PlayerId);
+            NetworkObject playerNetwork = player.GetComponent<NetworkObject>();
+            ulong playerId = playerNetwork.OwnerClientId;
+            playerNetwork.SpawnAsPlayerObject(playerId);
             Debug.Log(player.GetComponent<NetworkObject>().OwnerClientId);
         }
         public void Disconnect()
@@ -120,11 +121,11 @@ namespace Steam
                 Destroy(NetworkManager.Singleton.gameObject);
             }
 
-            if (GameManager.instance != null)
+            if (GameManager.Instance != null)
             {
                 Debug.Log("[SteamManager] Resetting old GameManager");
-                Destroy(GameManager.instance.gameObject);
-                GameManager.instance = null;
+                Destroy(GameManager.Instance.gameObject);
+                GameManager.Instance = null;
             }
         }
 
@@ -187,7 +188,7 @@ namespace Steam
 
         private void OnLobbyMemberJoined(Lobby lobby, Friend friend)
         {
-            PlayerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+            playerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
         }
 
         private void OnLobbyEntered(Lobby lobby)

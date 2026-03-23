@@ -1,3 +1,4 @@
+using Player.Network;
 using Steam;
 using Steamworks;
 using Steamworks.Data;
@@ -5,41 +6,44 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+using Button = Base.Interactables.Button;
 
-public class PlayerCard : MonoBehaviour
+namespace Player.UI
 {
-    public TMP_Text playerName;
-    public Button playerKick;
-    public SteamPlayer linkedPlayer;
-    public Lobby currentLobby;
-
-    public void KickButton()
+    public class PlayerCard : MonoBehaviour
     {
-        if (linkedPlayer == null) return; 
-        KickPlayerServerRpc(currentLobby, linkedPlayer);
+        public TMP_Text playerName;
+        public Button playerKick;
+        public SteamPlayer linkedPlayer;
+        public Lobby currentLobby;
 
-        if (currentLobby.IsOwnedBy(SteamClient.SteamId))
+        public void KickButton()
         {
-            Debug.Log("TO DO!!!!!!!!!!!!!!!!!!!!");
+            if (linkedPlayer == null) return; 
+            KickPlayerServerRpc(currentLobby, linkedPlayer);
+
+            if (currentLobby.IsOwnedBy(SteamClient.SteamId))
+            {
+                Debug.Log("TO DO!!!!!!!!!!!!!!!!!!!!");
+            }
         }
-    }
 
-    [ServerRpc]
-    public void KickPlayerServerRpc(Lobby lobby, SteamPlayer player)
-    {
-        LeaveLobbyClientRpc(lobby, player);
-        if (player.PlayerSteamId != SteamClient.SteamId) return;
+        [ServerRpc]
+        public void KickPlayerServerRpc(Lobby lobby, SteamPlayer player)
+        {
+            LeaveLobbyClientRpc(lobby, player);
+            if (player.playerSteamId != SteamClient.SteamId) return;
 
-        Debug.Log("Kicked yourselfff --- " + player.PlayerName);
-        SteamManager.Instance.Disconnect();
+            Debug.Log("Kicked yourselfff --- " + player.playerName);
+            SteamManager.Instance.Disconnect();
 
-        SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);
-    }
+            SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);
+        }
 
-    [ClientRpc]
-    public void LeaveLobbyClientRpc(Lobby lobby, SteamPlayer player)
-    {
-        Debug.Log("Kicked Player --- " + player.PlayerName);
+        [ClientRpc]
+        public void LeaveLobbyClientRpc(Lobby lobby, SteamPlayer player)
+        {
+            Debug.Log("Kicked Player --- " + player.playerName);
+        }
     }
 }

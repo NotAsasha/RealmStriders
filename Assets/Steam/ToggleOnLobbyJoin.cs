@@ -1,21 +1,26 @@
-using UnityEngine;
 using Unity.Netcode;
-public class ToggleOnLobbyJoin : MonoBehaviour
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace Steam
 {
-    public bool ToggleState = false;
-    void Start()
+    public class ToggleOnLobbyJoin : MonoBehaviour
     {
-        NetworkManager.Singleton.OnClientStarted += Toggle;
+        [FormerlySerializedAs("ToggleState")] public bool toggleState = false;
+        void Start()
+        {
+            NetworkManager.Singleton.OnClientStarted += Toggle;
 
-    }
+        }
 
-    void Toggle()
-    {
-        gameObject.SetActive(false);
-    }
+        void Toggle()
+        {
+            gameObject.SetActive(false);
+        }
 
-    void OnDisable()
-    {
-        NetworkManager.Singleton.OnClientStarted -= Toggle;
+        void OnDisable()
+        {
+            NetworkManager.Singleton.OnClientStarted -= Toggle;
+        }
     }
 }

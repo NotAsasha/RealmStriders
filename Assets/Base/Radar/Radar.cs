@@ -1,67 +1,71 @@
-using JetBrains.Annotations;
-using Player;
 using System.Collections;
+using Player.Movement;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-public class Radar : Terminal
+
+namespace Base.Radar
 {
-    [Header("Settings")]
-    [SerializeField] private float moveSpeed = 2f;
-    [SerializeField] private Vector2 border = new Vector2(5f, 5f);
-
-    [Header("References")]
-    public Camera radarCamera;
-    [SerializeField] private Transform crosshair;
-    [SerializeField] private Transform screen;
-    [SerializeField] private NetworkObject beamPrefab;
-    [SerializeField] private float mapSizeMultiplier = 25.6f;
-
-    private int playerID;
-    InputAction control;
-    NetworkObject beam;
-
-    override public void OnNetworkSpawn()
+    public class Radar : Terminal
     {
-        radarCamera.transform.position = new Vector3(0f, 100f, 0f);
-        radarCamera.transform.eulerAngles = new Vector3(90f, 180, 0f);
-        playerID = (int)Movement.instance.GetComponent<NetworkObject>().OwnerClientId;
-        control = Movement.instance._controls.UI.Navigate;
-    }
+        [Header("Settings")]
+        [SerializeField] private float moveSpeed = 2f;
+        [SerializeField] private Vector2 border = new Vector2(5f, 5f);
 
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    public void SpawnBeamServerRpc()
-    {
-        Vector3 spawnPos = new(crosshair.localPosition.x * mapSizeMultiplier, 100f, crosshair.localPosition.z * mapSizeMultiplier);
+        [Header("References")]
+        public Camera radarCamera;
+        [SerializeField] private Transform crosshair;
+        [SerializeField] private Transform screen;
+        [SerializeField] private NetworkObject beamPrefab;
+        [SerializeField] private float mapSizeMultiplier = 25.6f;
 
-        beam = Instantiate(beamPrefab, spawnPos, Quaternion.identity);
-        beam.Spawn();
-        StartCoroutine(Despawner());
-    }
+        private int playerID;
+        InputAction control;
+        NetworkObject beam;
 
-    private IEnumerator Despawner()
-    {
-        yield return new WaitForSeconds(7f);
-        beam.Despawn();
-    }
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            radarCamera.transform.position = new Vector3(0f, 100f, 0f);
+            radarCamera.transform.eulerAngles = new Vector3(90f, 180, 0f);
+            playerID = (int)PlayerMovement.Instance.GetComponent<NetworkObject>().OwnerClientId;
+            control = PlayerMovement.Instance.controls.UI.Navigate;
+        }
 
-    void Update()
-    {
-        if (!IsTaken() || playerID != ownerID) return;
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void SpawnBeamServerRpc()
+        {
+            Vector3 spawnPos = new(crosshair.localPosition.x * mapSizeMultiplier, 100f, crosshair.localPosition.z * mapSizeMultiplier);
 
-        Vector2 input = control.ReadValue<Vector2>();
+            beam = Instantiate(beamPrefab, spawnPos, Quaternion.identity);
+            beam.Spawn();
+            StartCoroutine(Despawner());
+        }
 
-        // Рух у локальній площині екрана
-        Vector3 move = moveSpeed * Time.deltaTime * new Vector3(input.x, 0f, input.y);
+        private IEnumerator Despawner()
+        {
+            yield return new WaitForSeconds(7f);
+            beam.Despawn();
+        }
 
-        // Оновлення позиції
-        Vector3 newLocalPos = crosshair.localPosition + move;
+        void Update()
+        {
+            if (!IsTaken() || playerID != ownerID) return;
 
-        // Обмеження межами екрана
-        newLocalPos.x = Mathf.Clamp(newLocalPos.x, -border.x, border.x);
-        newLocalPos.z = Mathf.Clamp(newLocalPos.z, -border.y, border.y);
-        newLocalPos.y = 0f;
+            Vector2 input = control.ReadValue<Vector2>();
 
-        crosshair.localPosition = newLocalPos;
+            // Рух у локальній площині екрана
+            Vector3 move = moveSpeed * Time.deltaTime * new Vector3(input.x, 0f, input.y);
+
+            // Оновлення позиції
+            Vector3 newLocalPos = crosshair.localPosition + move;
+
+            // Обмеження межами екрана
+            newLocalPos.x = Mathf.Clamp(newLocalPos.x, -border.x, border.x);
+            newLocalPos.z = Mathf.Clamp(newLocalPos.z, -border.y, border.y);
+            newLocalPos.y = 0f;
+
+            crosshair.localPosition = newLocalPos;
+        }
     }
 }

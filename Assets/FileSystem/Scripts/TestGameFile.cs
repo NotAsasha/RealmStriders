@@ -1,7 +1,7 @@
-using UnityEngine;
 using System;
+using UnityEngine;
 
-namespace FileSystem
+namespace FileSystem.Scripts
 {
     [CreateAssetMenu(fileName = "TestGameFile", menuName = "Not/TestGameFile")]
     public class TestGameFile : GameFile

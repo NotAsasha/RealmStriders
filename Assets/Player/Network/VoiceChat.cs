@@ -1,12 +1,12 @@
-using Steam;
-using Steamworks;
 using System.Collections.Generic;
 using System.IO;
+using Steamworks;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Player.Movement;
 
-namespace Player.Voice
+namespace Player.Network
 {
     public class VoiceChat : NetworkBehaviour
     {
@@ -46,7 +46,7 @@ namespace Player.Voice
             source.loop = true;
             source.Play();
 
-            Movement.instance._controls.Gameplay.Voice.performed += ChangeVoiceRecordState;
+            PlayerMovement.Instance.controls.Gameplay.Voice.performed += ChangeVoiceRecordState;
         }
         private void ChangeVoiceRecordState(InputAction.CallbackContext obj)
         {
@@ -66,9 +66,9 @@ namespace Player.Voice
                 stream.Position = 0;
                 VoiceCommand voice = new()
                 {
-                    VoiceBytes = stream.GetBuffer(),
-                    Compressed = compressedWritten,
-                    UserId = OwnerClientId
+                    voiceBytes = stream.GetBuffer(),
+                    compressed = compressedWritten,
+                    userId = OwnerClientId
                 };
                 voiceQueue.Enqueue(voice);
                 ProcessVoice();
@@ -78,7 +78,7 @@ namespace Player.Voice
         private void ProcessVoice()
         {
             var voice = voiceQueue.Dequeue();
-            CmdVoiceServerRpc(voice.VoiceBytes, voice.Compressed, voice.UserId);
+            CmdVoiceServerRpc(voice.voiceBytes, voice.compressed, voice.userId);
         }
 
         [ServerRpc]
@@ -152,8 +152,8 @@ namespace Player.Voice
 
     public class VoiceCommand
     {
-        public byte[] VoiceBytes;
-        public int Compressed;
-        public ulong UserId;
+        public byte[] voiceBytes;
+        public int compressed;
+        public ulong userId;
     }
 }

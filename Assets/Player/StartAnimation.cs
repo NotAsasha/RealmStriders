@@ -1,17 +1,29 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class StartAnimation : MonoBehaviour
+namespace Player
 {
-    private Camera m_Camera;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class StartAnimation : MonoBehaviour
     {
-        m_Camera = GetComponent<Camera>();
-    }
+        private Camera mCamera;
+        [SerializeField] TextMeshPro text;
+        [SerializeField] Image image;
+        void Start()
+        {
+            StartCoroutine(StartAnim());
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
+
+        private IEnumerator StartAnim()
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        void Update()
+        {
         
+        }
     }
 }

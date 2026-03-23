@@ -1,10 +1,13 @@
 using UnityEngine;
 
-public interface ICollidable
+namespace Player.Equipment
 {
+    public interface ICollidable
+    {
 
-    void OnColliderEnter(GameObject _collider) { return; }
-    void OnColliderExit(GameObject _collider) { return; }
+        void OnColliderEnter(GameObject collider) { return; }
+        void OnColliderExit(GameObject collider) { return; }
 
 
+    }
 }

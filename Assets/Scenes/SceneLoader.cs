@@ -1,17 +1,18 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
-namespace Menu
+namespace Scenes
 {
     public class SceneLoader : MonoBehaviour
     {
-        [SerializeField] private string _sceneToLoad;
-        [SerializeField] private bool _isNetwork;
+        [FormerlySerializedAs("_sceneToLoad")] [SerializeField] private string sceneToLoad;
+        [FormerlySerializedAs("_isNetwork")] [SerializeField] private bool isNetwork;
 
         public void LoadScene()
         {
-            if (_isNetwork) LoadOnlineScene();
+            if (isNetwork) LoadOnlineScene();
             else LoadLocalScene();
         }
 
@@ -20,8 +21,8 @@ namespace Menu
         {
             if (NetworkManager.Singleton.IsServer)
             {
-                SceneManager.LoadScene(_sceneToLoad);
-                NetworkManager.Singleton.SceneManager.LoadScene(_sceneToLoad, LoadSceneMode.Single);
+                SceneManager.LoadScene(sceneToLoad);
+                NetworkManager.Singleton.SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Single);
             }
             else
             {
@@ -31,7 +32,7 @@ namespace Menu
 
         private void LoadLocalScene()
         {
-            SceneManager.LoadScene(_sceneToLoad);
+            SceneManager.LoadScene(sceneToLoad);
         }
     }
 }

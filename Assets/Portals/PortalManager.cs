@@ -1,40 +1,54 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public class PortalManager : MonoBehaviour {
+namespace Portals
+{
+    public class PortalManager : MonoBehaviour {
 
-	public Camera cameraA;
-	public Camera cameraB;
+        [SerializeField] private Camera cameraA;
+        [SerializeField] private Camera cameraB;
 
-	public Material cameraMatA;
-	public Material cameraMatB;
+        [SerializeField] private Material cameraMatA;
+        [SerializeField] private Material cameraMatB;
 
-	public static PortalManager instance;
+        public static PortalManager Instance;
 
-	[SerializeField] GameObject PortalParent;
+        public bool isCameraA = true;
 
-	void Start () {
-		if (instance == null) instance = this;
-		ChangeState(false);
+        [FormerlySerializedAs("PortalParent")] [SerializeField] GameObject portalParent;
 
-        if (cameraA.targetTexture != null)
-		{
-			cameraA.targetTexture.Release();
-		}
-		cameraA.targetTexture = new RenderTexture(Screen.width / 2, Screen.height / 2, 24);
-		cameraMatA.mainTexture = cameraA.targetTexture;
+        void Start () {
+            if (Instance == null) Instance = this;
+            ChangeState(false);
 
-		if (cameraB.targetTexture != null)
-		{
-			cameraB.targetTexture.Release();
-		}
-		cameraB.targetTexture = new RenderTexture(Screen.width / 2, Screen.height / 2, 24);
-		cameraMatB.mainTexture = cameraB.targetTexture;
-	}
+            if (cameraA.targetTexture != null)
+            {
+                cameraA.targetTexture.Release();
+            }
+            cameraA.targetTexture = new RenderTexture(Screen.width / 2, Screen.height / 2, 24);
+            cameraMatA.mainTexture = cameraA.targetTexture;
+
+            if (cameraB.targetTexture != null)
+            {
+                cameraB.targetTexture.Release();
+            }
+            cameraB.targetTexture = new RenderTexture(Screen.width / 2, Screen.height / 2, 24);
+            cameraMatB.mainTexture = cameraB.targetTexture;
+
+            SwitchCameras();
+        }
 	
-	public void ChangeState(bool isStarted)
-	{
-		PortalParent?.SetActive(isStarted);
+        public void ChangeState(bool isStarted)
+        {
+            portalParent?.SetActive(isStarted);
+        }
+
+        public void SwitchCameras()
+        {
+            cameraA.gameObject.SetActive(isCameraA);
+            cameraB.gameObject.SetActive(!isCameraA);
+         
+            isCameraA = !isCameraA;
+        }
     }
 }

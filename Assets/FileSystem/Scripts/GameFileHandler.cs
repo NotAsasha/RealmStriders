@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FileSystem
+namespace FileSystem.Scripts
 {
     public class GameFileHandler : MonoBehaviour
     {

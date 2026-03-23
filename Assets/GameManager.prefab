@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2241395253030877536}
   - component: {fileID: 6244321503512960038}
   - component: {fileID: 2282627832020832903}
+  - component: {fileID: 6474847474882648778}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -45,15 +46,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 284719003
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 1569920599
+  InScenePlacedSourceGlobalObjectIdHash: 1569920599
+  DeferredDespawnTick: 0
+  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &2282627832020832903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66,19 +71,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 524b14257fc7446498a8a17424dbbacb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnPoint: {x: -3, y: -49, z: 5}
+  ShowTopMostFoldoutHeaderGroup: 1
+  spawnPoint: {x: 0, y: -49, z: 0}
+  baseRadius: 20
   defaultMissionTime: 360
   maxTimeSpread: 120
   teamRating:
     m_InternalValue: 3
+  looseRating:
+    m_InternalValue: 0
   teamMoney:
-    m_InternalValue: 500
+    m_InternalValue: 10000
   hasStartedMission:
     m_InternalValue: 0
   missionDuration: 0
-  missionScene:
-    m_Handle: 0
+  missionScene: {}
   missionName: World1
   enemiesCount: 1
-  avarageDanger: 1
+  averageDanger: 1
   activeEnemies: []
+--- !u!114 &6474847474882648778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7820787048139737313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b8689e5529df544c854fe3be3ba91f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  enemiesByDanger:
+  - enemies:
+    - {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
+  - enemies:
+    - {fileID: 5629089953353955407, guid: 88062001baa260540bde711249e9ce11, type: 3}
+  - enemies:
+    - {fileID: 5629089953353955407, guid: 85144f08f69669e42a836c5542f1bd7a, type: 3}
+  - enemies:
+    - {fileID: 5882143472327072591, guid: e6c0a4f410f490144ac8512b4d836c4a, type: 3}
+  - enemies:
+    - {fileID: 8182809179516268396, guid: eaed7f625dff62a439ba4a1380ed7ee2, type: 3}
+  worldCenter: {x: 0, y: 0, z: 0}
+  portalArea: 40
+  spawnRadius: 100

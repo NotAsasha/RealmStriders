@@ -1,29 +1,34 @@
-using FileSystem;
+using FileSystem.Scripts;
+using Player.Equipment;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Player.InventorySystem;
-namespace Player
+using UnityEngine.Serialization;
+
+namespace Player.Movement
 {
     public class CameraMovement : NetworkBehaviour
     {
-        [Header("Set Up")]
+        [Header("Essential")]
         public Transform playerBody;
         public Transform ragdollHead;
         public LayerMask layerMask;
-        [Header("Camera")]
+
+        [Header("Settings")]
         public float mouseSensitivity = 1f;
         public float hitDistance = 2.0f;
-        public Vector3 StartPosition;
+        public Vector3 startPosition;
 
-        private float xRotation = 0f;
+        private float xRotation;
         private IInteractable interactable;
-        private Movement movement;
+        private PlayerMovement movement;
         private Human human;
 
-        public static CameraMovement instance;
+        public static CameraMovement Instance;
+
 
         #region Unity Lifecycle
+
 
         public override void OnNetworkSpawn()
         {
@@ -32,17 +37,24 @@ namespace Player
                 gameObject.SetActive(false);
                 return;
             }
-            SetupSingletone();
 
-            StartPosition = transform.localPosition;
-            movement = Movement.instance;
+            SetupSingleton();
+
+            startPosition = transform.localPosition;
+            movement = PlayerMovement.Instance;
             human = GetComponentInParent<Human>();
             SettingsFile file = (SettingsFile)GameFileHandler.Instance.SearchForFileByName("Settings");
-            mouseSensitivity = file.save._sensValue;
+            mouseSensitivity = file.save.sensValue;
 
             SetupInputHandlers();
             UpdateCursorState();
+
+            if (!playerBody)
+            {
+                Debug.LogError("Player body not assigned to CameraMovement script!");
+            }
         }
+
         public override void OnNetworkDespawn()
         {
             if (!IsOwner)
@@ -50,30 +62,31 @@ namespace Player
                 return;
             }
 
-            ClearupInputHandlers();
+            CleanupInputHandlers();
         }
+
 
         #endregion
 
         #region Initialization
 
-        private void SetupSingletone()
+        private void SetupSingleton()
         {
-            if (instance != null) Destroy(instance);
-            instance = this;
+            if (Instance != null) Destroy(Instance);
+            Instance = this;
         }
 
         private void SetupInputHandlers()
         {
-            Movement.instance._controls.System.Pause.performed += OnPausePerformed;
-            Movement.instance._controls.Gameplay.Interact.performed += OnInteract;
-            human.isDead.OnValueChanged += OnDeathStateCnange;
+            PlayerMovement.Instance.controls.System.Pause.performed += OnPausePerformed;
+            PlayerMovement.Instance.controls.Gameplay.Interact.performed += OnInteract;
+            human.isDead.OnValueChanged += OnDeathStateChange;
         }
-        private void ClearupInputHandlers()
+        private void CleanupInputHandlers()
         {
-            Movement.instance._controls.System.Pause.performed -= OnPausePerformed;
-            Movement.instance._controls.Gameplay.Interact.performed -= OnInteract;
-            human.isDead.OnValueChanged -= OnDeathStateCnange;
+            PlayerMovement.Instance.controls.System.Pause.performed -= OnPausePerformed;
+            PlayerMovement.Instance.controls.Gameplay.Interact.performed -= OnInteract;
+            human.isDead.OnValueChanged -= OnDeathStateChange;
         }
 
         #endregion
@@ -99,11 +112,11 @@ namespace Player
             StartInteraction();
         }
 
-        private void OnDeathStateCnange(bool old, bool _isDead)
+        private void OnDeathStateChange(bool old, bool isDead)
         {
             if (human.isDead.Value)
             {
-                if (Movement.instance.isInInteraction) StopInteraction();
+                if (PlayerMovement.Instance.isInInteraction) StopInteraction();
 
                 if (!ragdollHead) return;
                 transform.parent = ragdollHead;
@@ -112,7 +125,7 @@ namespace Player
             else
             {
                 transform.parent = playerBody;
-                transform.localPosition = StartPosition;
+                transform.localPosition = startPosition;
                 transform.localEulerAngles = Vector3.zero;
             }
         }
@@ -156,22 +169,22 @@ namespace Player
             interactable.StopInteraction(gameObject);
             interactable = null;
             transform.parent = playerBody;
-            transform.localPosition = StartPosition;
+            transform.localPosition = startPosition;
 
             ToggleInteractionUI(false);
         }
 
-        private void ToggleInteractionUI(bool _isInteracting)
+        private void ToggleInteractionUI(bool isInteracting)
         {
-            movement.isInInteraction = _isInteracting;
-            if (_isInteracting)
+            movement.isInInteraction = isInteracting;
+            if (isInteracting)
                 movement.SwitchToInteractionControls();
             else
                 movement.SwitchToGameplayControls();
 
 
             UpdateCursorState();
-            GetComponentInParent<Inventory>().ToggleUI(!_isInteracting);
+            GetComponentInParent<Inventory>().ToggleUI(!isInteracting);
         }
 
         private void UpdateCursorState()
@@ -190,13 +203,13 @@ namespace Player
             if (movement.isPaused || movement.isInInteraction || human.isDead.Value || human.IsEffectActive(EffectType.Freeze)) return;
 
             // Checks if there is a Player Body attached
-            if (playerBody == null)
+            if (!playerBody)
             {
                 Debug.LogError("Player body not assigned to CameraMovement script!");
                 return;
             }
 
-            Vector2 lookInput = Movement.instance._controls.Gameplay.Look.ReadValue<Vector2>();
+            Vector2 lookInput = PlayerMovement.Instance.controls.Gameplay.Look.ReadValue<Vector2>();
             Vector2 smoothLook = Vector2.Lerp(previousLook, lookInput, 0.5f);
             previousLook = smoothLook;
 

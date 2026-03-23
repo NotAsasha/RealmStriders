@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace FileSystem
+namespace FileSystem.Scripts
 {
     public class GameFile : ScriptableObject
     {
@@ -18,19 +19,22 @@ namespace FileSystem
          Load(),Save(),Delete() - directly effects file on a drive.
          DataEncryptDecrypt() - Encrypts given data using key word from "encryptionCodeWord".
         */
+        [FormerlySerializedAs("_fileName")]
         [Header("File Settings")]
         [Tooltip("Displayed name of a file.")]
-        [SerializeField] private string _fileName = "Default";
+        [SerializeField] private string fileName = "Default";
+        [FormerlySerializedAs("_directory")]
         [Tooltip("File directory. Application.persistentDataPath is automatically added before it.")]
-        [SerializeField] private string _directory = "/Default/";
+        [SerializeField] private string directory = "/Default/";
+        [FormerlySerializedAs("_fileExtention")]
         [Tooltip("File extention. Can be anything, it does not matter.")]
-        [SerializeField] private string _fileExtention = ".NotA";
+        [SerializeField] private string fileExtention = ".NotA";
 
-        private const string encryptionCodeWord = "NotTheBestSaveSystem";
+        private const string EncryptionCodeWord = "NotTheBestSaveSystem";
 
-        public string FileName => _fileName;
-        public string FileDirectory => _directory;
-        public string FileExtention => _fileExtention;
+        public string FileName => fileName;
+        public string FileDirectory => directory;
+        public string FileExtention => fileExtention;
         /// <summary>
         /// Returns full file path (WITHOUT Application.persistentDataPath!)  
         /// </summary>
@@ -124,7 +128,7 @@ namespace FileSystem
             string modifiedData = "";
             for (int i = 0; i < data.Length; i++)
             {
-                modifiedData += (char)(data[i] ^ encryptionCodeWord[i % encryptionCodeWord.Length]);
+                modifiedData += (char)(data[i] ^ EncryptionCodeWord[i % EncryptionCodeWord.Length]);
             }
             return modifiedData;
         }

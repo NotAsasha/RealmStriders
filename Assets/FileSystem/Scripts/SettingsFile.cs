@@ -1,7 +1,8 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace FileSystem
+namespace FileSystem.Scripts
 {
     [CreateAssetMenu(fileName = "SettingsFile", menuName = "Not/SettingsFile")]
     public class SettingsFile : GameFile
@@ -30,6 +31,6 @@ namespace FileSystem
     public class SettingsSave
     {
         public string rebinds;
-        public float _sensValue = 100;
+        [FormerlySerializedAs("_sensValue")] public float sensValue = 100;
     }
 }

@@ -2892,6 +2892,8 @@ MonoBehaviour:
   moveDuration: 0.5
   interactSound: {fileID: 0}
   playerCameraComponent: {fileID: 0}
+  isTaken:
+    m_InternalValue: 0
   spinCost: 10
   table: {fileID: 2405124022911735812}
   itemsToDrop: []
@@ -4602,6 +4604,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4316962516686859450}
   - {fileID: 1815107322064509221}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 90}
@@ -4618,13 +4621,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
   GlobalObjectIdHash: 4077620890
-  InScenePlacedSourceGlobalObjectIdHash: 230925123
+  InScenePlacedSourceGlobalObjectIdHash: 4077620890
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
@@ -6347,4 +6350,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 584599388969357591, guid: 17069d7d98e0d5141b8cff4ee59721e5,
     type: 3}
   m_PrefabInstance: {fileID: 7381851175698068929}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8570156053446032739
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 8494507264682673876}
+    m_Modifications:
+    - target: {fileID: 3385984690830650853, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_Name
+      value: ParticteAttractor
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: bdc319b310a3c5544a53d9d7355939c4, type: 3}
+--- !u!4 &4316962516686859450 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
+    type: 3}
+  m_PrefabInstance: {fileID: 8570156053446032739}
   m_PrefabAsset: {fileID: 0}

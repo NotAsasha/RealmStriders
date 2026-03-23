@@ -1,19 +1,24 @@
-using UnityEngine;
+using Player;
+using Player.Equipment;
 using Unity.Netcode;
+using UnityEngine;
 
-public class BeamDamage : NetworkBehaviour, ICollidable
+namespace Base.Radar
 {
-    [SerializeField] private float damage = 2f;
-    public void OnColliderEnter(GameObject collider)
+    public class BeamDamage : NetworkBehaviour, ICollidable
     {
-        if (!IsServer) return;
-
-        if (collider.TryGetComponent<Entity>(out var entity) && !entity.isDead.Value)
+        [SerializeField] private float damage = 2f;
+        public void OnColliderEnter(GameObject collider)
         {
-            Debug.Log($"---Beam: Shot entity: {entity.name}");
+            if (!IsServer) return;
 
-            entity.ApplyEffectServerRpc(EffectType.Water, 5f);
-            entity.AddHealth(-damage);
+            if (collider.TryGetComponent<Entity>(out var entity) && !entity.isDead.Value)
+            {
+                Debug.Log($"---Beam: Shot entity: {entity.name}");
+
+                entity.ApplyEffectServerRpc(EffectType.Water, 5f);
+                entity.AddHealth(-damage);
+            }
         }
     }
 }

@@ -1,12 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UISlot : MonoBehaviour
+namespace Player.UI
 {
-    public void UpdateUI(bool isTaken, bool isSelected)
+    public class UISlot : MonoBehaviour
     {
-        GetComponent<Image>().color =
-            isSelected ? Color.red :
-            isTaken ? Color.darkGray : Color.white;
+        public void UpdateUI(bool isTaken, bool isSelected)
+        {
+            GetComponent<Image>().color =
+                isSelected ? Color.red :
+                isTaken ? Color.darkGray : Color.white;
+        }
     }
 }

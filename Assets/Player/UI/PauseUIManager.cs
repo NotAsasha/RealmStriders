@@ -1,74 +1,77 @@
-using Player;
+using System.Collections.Generic;
+using Player.Movement;
+using Player.Network;
 using Steam;
 using Steamworks;
 using Steamworks.Data;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PauseUIManager : MonoBehaviour
+namespace Player.UI
 {
-    public GameObject pauseMenu;
-    public Transform cardsParent;
-    public GameObject playerCard;
-    void Start()
+    public class PauseUIManager : MonoBehaviour
     {
-        SteamMatchmaking.OnLobbyDataChanged += UpdatePauseUI;
-        Movement.instance._controls.System.Pause.performed += UpdateMenuState;
-    }
+        public GameObject pauseMenu;
+        public Transform cardsParent;
+        public GameObject playerCard;
 
-    private void OnDisable()
-    {
-        SteamMatchmaking.OnLobbyDataChanged -= UpdatePauseUI;
+        private Controls controls;
 
-        Movement.instance._controls.System.Pause.performed -= UpdateMenuState;
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.U)) { UpdatePauseUI(SteamManager.Instance.CurrentLobby.Value); }
-    }
-
-    void UpdateMenuState(InputAction.CallbackContext obj)
-    {
-        if (Movement.instance == null) { Debug.LogError("NO INSTANCE"); }
-        if (Movement.instance.isInInteraction)
+        private void Start()
         {
-            CameraMovement.instance.StopInteraction();
-            return;
+            SteamMatchmaking.OnLobbyDataChanged += UpdatePauseUI;
+            PlayerMovement.Instance.controls.System.Pause.performed += UpdateMenuState;
         }
-        pauseMenu.SetActive(!pauseMenu.activeSelf);
-    }
 
-    void UpdatePauseUI(Lobby lobby)
-    {
-        List<SteamPlayer> playerList = GetLobbyMembers(lobby);
-        Debug.Log("Players count -- " + playerList.Count);
-        DestroyChildren(cardsParent);
-        foreach (SteamPlayer player in playerList)
+        private void OnDisable()
         {
-            var currentCard = Instantiate(playerCard, cardsParent).GetComponent<PlayerCard>();
-            currentCard.linkedPlayer = player;
-            currentCard.playerName.text = player.PlayerName;
+            SteamMatchmaking.OnLobbyDataChanged -= UpdatePauseUI;
+            PlayerMovement.Instance.controls.System.Pause.performed -= UpdateMenuState;
         }
-    }
 
-    public List<SteamPlayer> GetLobbyMembers(Lobby lobby)
-    {
-        List<SteamPlayer> playerList = new();
-        foreach (Friend member in lobby.Members)
+        private void UpdateMenuState(InputAction.CallbackContext obj)
         {
-            Image? playerImage = member.GetSmallAvatarAsync().Result;
-            SteamPlayer player = new(member.Name, member.Id, playerImage, member);
-            playerList.Add(player);
-            Debug.Log(player.PlayerName);
+            if (PlayerMovement.Instance.isInInteraction)
+            {
+                CameraMovement.Instance.StopInteraction();
+                return;
+            }
+            pauseMenu.SetActive(!pauseMenu.activeSelf);
         }
-        return playerList;
-    }
 
-    void DestroyChildren(Transform parent)
-    {
-        foreach (Transform child in parent) Destroy(child.gameObject);
+        private void UpdatePauseUI(Lobby lobby)
+        {
+            // may be inefficient to destroy everything, revise TODO
+            List<SteamPlayer> playerList = GetLobbyMembers(lobby);
+            Debug.Log("Players count -- " + playerList.Count);
+
+            DestroyChildren(cardsParent);
+            foreach (SteamPlayer player in playerList)
+            {
+                var currentCard = Instantiate(playerCard, cardsParent).GetComponent<PlayerCard>();
+                currentCard.linkedPlayer = player;
+                currentCard.playerName.text = player.playerName;
+            }
+        }
+
+        public List<SteamPlayer> GetLobbyMembers(Lobby lobby)
+        {
+            List<SteamPlayer> playerList = new();
+
+            foreach (Friend member in lobby.Members)
+            {
+                // IT HAS AN IMAGEEEEEE, add to the screen! TODO
+                Image? playerImage = member.GetSmallAvatarAsync().Result;
+                SteamPlayer player = new(member.Name, member.Id, playerImage, member);
+                playerList.Add(player);
+                Debug.Log(player.playerName);
+            }
+            return playerList;
+        }
+
+        void DestroyChildren(Transform parent)
+        {
+            foreach (Transform child in parent) Destroy(child.gameObject);
+        }
     }
 }

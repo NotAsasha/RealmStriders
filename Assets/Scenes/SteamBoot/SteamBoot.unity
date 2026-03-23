@@ -119,39 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &92385580 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7820787048139737313, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
-    type: 3}
-  m_PrefabInstance: {fileID: 6598072698000735035}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &92385584
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 92385580}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b8689e5529df544c854fe3be3ba91f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  enemiesByDanger:
-  - enemies:
-    - {fileID: 5629089953353955407, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
-  - enemies:
-    - {fileID: 5629089953353955407, guid: 88062001baa260540bde711249e9ce11, type: 3}
-  - enemies:
-    - {fileID: 5629089953353955407, guid: 85144f08f69669e42a836c5542f1bd7a, type: 3}
-  - enemies:
-    - {fileID: 5882143472327072591, guid: e6c0a4f410f490144ac8512b4d836c4a, type: 3}
-  - enemies:
-    - {fileID: 8182809179516268396, guid: eaed7f625dff62a439ba4a1380ed7ee2, type: 3}
-  worldCenter: {x: 0, y: 0, z: 0}
-  portalArea: 40
-  spawnRadius: 100
 --- !u!1 &938603029
 GameObject:
   m_ObjectHideFlags: 0
@@ -472,50 +439,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2282627832020832903, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2282627832020832903, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
-        type: 3}
-      propertyPath: spawnPoint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2282627832020832903, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
-        type: 3}
-      propertyPath: spawnPoint.y
-      value: -49
-      objectReference: {fileID: 0}
-    - target: {fileID: 2282627832020832903, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
-        type: 3}
-      propertyPath: spawnPoint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2282627832020832903, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
-        type: 3}
-      propertyPath: teamMoney.m_InternalValue
-      value: 500
-      objectReference: {fileID: 0}
-    - target: {fileID: 2282627832020832903, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
-        type: 3}
-      propertyPath: teamRating.m_InternalValue
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 6244321503512960038, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6244321503512960038, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
         type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2289414630
-      objectReference: {fileID: 0}
-    - target: {fileID: 6244321503512960038, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
-        type: 3}
-      propertyPath: InScenePlacedSourceGlobalObjectIdHash
-      value: 1569920599
       objectReference: {fileID: 0}
     - target: {fileID: 7820787048139737313, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
         type: 3}
@@ -525,11 +452,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7820787048139737313, guid: ba8c9fbdbd0abe540b40343a6c52b80b,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 92385584}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ba8c9fbdbd0abe540b40343a6c52b80b, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

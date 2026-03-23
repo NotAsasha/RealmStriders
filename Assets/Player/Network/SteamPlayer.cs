@@ -1,20 +1,20 @@
 using Steamworks;
 using Steamworks.Data;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
-public class SteamPlayer
+namespace Player.Network
 {
-    public string PlayerName;
-    public SteamId PlayerSteamId;
-    public Image? PlayerImage;
-    public Friend Player;
-    public SteamPlayer(string playerName, SteamId playerSteamId, Image? playerImage, Friend player)
+    public class SteamPlayer
     {
-        PlayerName = playerName;
-        PlayerSteamId = playerSteamId;
-        PlayerImage = playerImage;
-        Player = player;
+        public string playerName;
+        public SteamId playerSteamId;
+        public Image? playerImage;
+        public Friend player;
+        public SteamPlayer(string playerName, SteamId playerSteamId, Image? playerImage, Friend player)
+        {
+            this.playerName = playerName;
+            this.playerSteamId = playerSteamId;
+            this.playerImage = playerImage;
+            this.player = player;
+        }
     }
 }

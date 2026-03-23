@@ -1,42 +1,46 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using FileSystem;
-using Unity.Netcode;
+using FileSystem.Scripts;
+using Player.Equipment;
 using TMPro;
-public class PressurePlate : NetworkBehaviour, ICollidable
+using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace Temporary
 {
-    [SerializeField] private string _saveFileName;
-    [SerializeField] private GameObject _pressurePlate;
-    [SerializeField] private TMP_Text _pressesCounter;
-    [SerializeField] private Color _normalColor;
-    [SerializeField] private Color _pressesColor;
-    private GameFileHandler _fileHandler;
-    private TestGameFile testGameFile;
+    public class PressurePlate : NetworkBehaviour, ICollidable
+    {
+        [FormerlySerializedAs("_saveFileName")] [SerializeField] private string saveFileName;
+        [FormerlySerializedAs("_pressurePlate")] [SerializeField] private GameObject pressurePlate;
+        [FormerlySerializedAs("_pressesCounter")] [SerializeField] private TMP_Text pressesCounter;
+        [FormerlySerializedAs("_normalColor")] [SerializeField] private Color normalColor;
+        [FormerlySerializedAs("_pressesColor")] [SerializeField] private Color pressesColor;
+        private GameFileHandler fileHandler;
+        private TestGameFile testGameFile;
 
-    private void Awake()
-    {
-        _fileHandler = GameFileHandler.Instance;
-        testGameFile = (TestGameFile)_fileHandler.SearchForFileByName(_saveFileName);
-        _pressesCounter.text = "Button press count: " + testGameFile.buttonPresses;
-    }
+        private void Awake()
+        {
+            fileHandler = GameFileHandler.Instance;
+            testGameFile = (TestGameFile)fileHandler.SearchForFileByName(saveFileName);
+            pressesCounter.text = "Button press count: " + testGameFile.buttonPresses;
+        }
 
-    public void OnColliderEnter(GameObject collider)
-    {
-        CallButtonPressServerRpc();
-    }
+        public void OnColliderEnter(GameObject collider)
+        {
+            CallButtonPressServerRpc();
+        }
 
-    [ClientRpc]
-    private void UiUpdateClientRPC(int pressesAmount)
-    {
-        _pressesCounter.text = "Button press count: " + pressesAmount;
-    }
-    [ServerRpc]
-    public void CallButtonPressServerRpc()
-    {
-        testGameFile.AddButtonClick();
-        testGameFile.Save(false);
-        UiUpdateClientRPC(testGameFile.buttonPresses);
-      //  _pressesCounter.text = "Button press count: " + testGameFile.buttonPresses;
+        [ClientRpc]
+        private void UiUpdateClientRPC(int pressesAmount)
+        {
+            pressesCounter.text = "Button press count: " + pressesAmount;
+        }
+        [ServerRpc]
+        public void CallButtonPressServerRpc()
+        {
+            testGameFile.AddButtonClick();
+            testGameFile.Save(false);
+            UiUpdateClientRPC(testGameFile.buttonPresses);
+            //  _pressesCounter.text = "Button press count: " + testGameFile.buttonPresses;
+        }
     }
 }

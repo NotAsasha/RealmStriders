@@ -1,4 +1,6 @@
 using UnityEngine;
+using Player.Movement;
+
 namespace Player
 {
 
@@ -20,7 +22,7 @@ namespace Player
         public void ToSpawnPoint()
         {
             characterController.enabled = false;
-            transform.position = GameManager.instance.spawnPoint;
+            transform.position = GameManager.Instance.spawnPoint;
             characterController.enabled = true;
 
         }
@@ -30,7 +32,7 @@ namespace Player
             ToggleRagdoll(true);
             if (IsOwner)
             {
-                GameManager.instance.OnPlayerDeathServerRpc();
+                GameManager.Instance.OnPlayerDeathServerRpc();
             }
         }
         override protected void ReviveEntity()
@@ -49,11 +51,11 @@ namespace Player
         {
             if (IsOwner)
             {
-                Movement.instance.enabled = !isActive;
+                PlayerMovement.Instance.enabled = !isActive;
                 if (isActive)
-                    Movement.instance.SwitchToInteractionControls();
+                    PlayerMovement.Instance.SwitchToInteractionControls();
                 else
-                    Movement.instance.SwitchToGameplayControls();
+                    PlayerMovement.Instance.SwitchToGameplayControls();
             }
             animator.enabled = !isActive;
             characterController.enabled = !isActive;

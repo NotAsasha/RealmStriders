@@ -5,7 +5,9 @@ using Steam;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.Linq;
+using Enemy;
 using Player;
+using Portals;
 
 public class GameManager : NetworkBehaviour
 {
@@ -16,7 +18,7 @@ public class GameManager : NetworkBehaviour
 
     public NetworkVariable<int> teamRating = new(3, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<int> looseRating = new(0, writePerm: NetworkVariableWritePermission.Server);
-    public NetworkVariable<int> teamMoney = new(1000, writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> teamMoney = new(10000, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<bool> hasStartedMission = new(false, writePerm: NetworkVariableWritePermission.Server);
 
     private int alivePlayers;
@@ -28,11 +30,11 @@ public class GameManager : NetworkBehaviour
     public Scene missionScene;
     public string missionName = "World1";
     public int enemiesCount = 1;
-    public float avarageDanger = 1;
+    public float averageDanger = 1;
 
-    public List<Enemy> activeEnemies = new();
+    public List<Enemy.Enemy> activeEnemies = new();
 
-    public static GameManager instance = null;
+    public static GameManager Instance = null;
 
     private EnemySpawner spawner;
 
@@ -63,8 +65,8 @@ public class GameManager : NetworkBehaviour
 
     private void SetupSingletone()
     {
-        if (instance == null)
-            instance = this;
+        if (Instance == null)
+            Instance = this;
         else
         {
             Destroy(gameObject);
@@ -126,7 +128,7 @@ public class GameManager : NetworkBehaviour
         if (SteamManager.Instance.CurrentLobby != null)
             SteamManager.Instance.CurrentLobby.Value.SetJoinable(false);
 
-        LoadWorld(missionName, enemiesCount, avarageDanger);
+        LoadWorld(missionName, enemiesCount, averageDanger);
         StartTimer();
 
         hasStartedMission.Value = true;
@@ -228,40 +230,40 @@ public class GameManager : NetworkBehaviour
     {
         missionDuration = serverDuration;
     }
-    private int CalculateRating(int _current)
+    private int CalculateRating(int current)
     {
         if (alivePlayers <= 0)
         {
-            _current -= 1;
+            current -= 1;
         }
         else
         {
             bool areAllDead = activeEnemies.Any(enemy => enemy.isDead.Value);
             if (areAllDead)
             {
-                _current += 1;
+                current += 1;
             }
         }
         
-        return _current;
+        return current;
     }
 
     private void StartMission()
     {
         //Open Portal
-        PortalManager.instance.ChangeState(true);
+        PortalManager.Instance.ChangeState(true);
     }
 
     private void StopMission()
     {
         //Close portal
-        PortalManager.instance.ChangeState(false);
+        PortalManager.Instance.ChangeState(false);
     }
 
     #region World Manager
 
     private string currentSceneName;
-    public void LoadWorld(string sceneToLoad, int _monsters = 0, float avgDanger = 0)
+    public void LoadWorld(string sceneToLoad, int monsters = 0, float avgDanger = 0)
     {
         if (currentSceneName != null)
         {

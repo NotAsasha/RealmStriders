@@ -1,9 +1,10 @@
-using UnityEngine;
+using Enemy;
 using TMPro;
-using UnityEngine.UI;
 using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.UI;
 
-namespace Player.InventorySystem
+namespace Player.Equipment.Scanner
 {
     [RequireComponent(typeof(EntityDetector))]
     public class Scanner : Item

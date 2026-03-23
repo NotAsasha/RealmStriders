@@ -1,8 +1,12 @@
 using UnityEngine;
-public interface IInteractable
+
+namespace Player.Equipment
 {
-    bool IsSingleUse() => false;
-    bool IsTaken() => false;
-    void Interact(GameObject interactor);
-    void StopInteraction(GameObject interactor);
+    public interface IInteractable
+    {
+        bool IsSingleUse() => false;
+        bool IsTaken() => false;
+        void Interact(GameObject interactor);
+        void StopInteraction(GameObject interactor);
+    }
 }
