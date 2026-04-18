@@ -27,10 +27,14 @@ namespace Player
         // Input controls
         private Controls controls;
 
+        private Human human;
+
         #region Unity Lifecycle
 
         void Start()
         {
+            human = PlayerMovement.Instance.human;
+
             InitializeInventory();
             SetupInputHandlers();
             UpdateUI();
@@ -68,6 +72,8 @@ namespace Player
             controls.Gameplay.SwitchSlot.performed += OnSlotSwitched;
             controls.Gameplay.Use.performed += OnUseItem;
             controls.Gameplay.Drop.performed += OnDropItem;
+
+            human.isDead.OnValueChanged += OnDeathStateChange;
         }
 
         private void CleanupInputHandlers()
@@ -78,6 +84,8 @@ namespace Player
             controls.Gameplay.SwitchSlot.performed -= OnSlotSwitched;
             controls.Gameplay.Use.performed -= OnUseItem;
             controls.Gameplay.Drop.performed -= OnDropItem;
+
+            human.isDead.OnValueChanged -= OnDeathStateChange;
         }
 
         #endregion
@@ -182,6 +190,16 @@ namespace Player
             UpdateUI();
         }
 
+        private void OnDeathStateChange(bool _, bool isDead)
+        {
+            if (!isDead) return;
+            DropEverything();
+        }
+
+
+
+
+
         #endregion
 
         #region Private Helper Methods
@@ -240,6 +258,19 @@ namespace Player
                 SetItemActiveServerRpc(newItem.gameObject, true);
             }
 
+            UpdateUI();
+        }
+
+        private void DropEverything()
+        {
+            for (int i = 0; i < capacity; ++i)
+            {
+                if (items[i] == null) continue;
+                DropItemServerRpc(items[i].gameObject);
+
+                items[i] = null;
+                Debug.Log("Dropped item");
+            }
             UpdateUI();
         }
 

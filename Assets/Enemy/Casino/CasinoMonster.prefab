@@ -2896,6 +2896,31 @@ MonoBehaviour:
     m_InternalValue: 0
   spinCost: 10
   table: {fileID: 2405124022911735812}
+  spinObject: {fileID: 7957139831474463958}
+  movementCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.0000015385449
+      value: 0.000016961247
+      inSlope: 3.384342
+      outSlope: 3.384342
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.02189204
+    - serializedVersion: 3
+      time: 0.9987974
+      value: -0.000024497509
+      inSlope: -3.621384
+      outSlope: -3.621384
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.018382395
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   itemsToDrop: []
 --- !u!114 &2405124022911735812
 MonoBehaviour:
@@ -2955,8 +2980,25 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-    dropChance: 0.1
+    dropChance: 0.3
     luckCoeff: 1
+  - onInteract:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1890820291469601762}
+          m_TargetAssemblyTypeName: SlotMachine, Assembly-CSharp
+          m_MethodName: GiveCoins
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 10
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    dropChance: 0.5
+    luckCoeff: 0
 --- !u!1 &3975968862184668150
 GameObject:
   m_ObjectHideFlags: 0
@@ -4620,7 +4662,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 4077620890
+  GlobalObjectIdHash: 292723514
   InScenePlacedSourceGlobalObjectIdHash: 4077620890
   DeferredDespawnTick: 0
   Ownership: 1
@@ -4792,6 +4834,7 @@ MonoBehaviour:
   stepSoundCooldown: 0.3
   audioSource: {fileID: 0}
   stepSounds: []
+  isStatic: 0
   legSpacing: 3
   legRotation: 48.3
   stepLength: 3

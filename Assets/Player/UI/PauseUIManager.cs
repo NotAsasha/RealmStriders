@@ -1,9 +1,9 @@
-using System.Collections.Generic;
 using Player.Movement;
 using Player.Network;
-using Steam;
 using Steamworks;
 using Steamworks.Data;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -39,32 +39,70 @@ namespace Player.UI
             pauseMenu.SetActive(!pauseMenu.activeSelf);
         }
 
-        private void UpdatePauseUI(Lobby lobby)
-        {
-            // may be inefficient to destroy everything, revise TODO
-            List<SteamPlayer> playerList = GetLobbyMembers(lobby);
-            Debug.Log("Players count -- " + playerList.Count);
+        private List<PlayerCard> playerCards = new();
 
-            DestroyChildren(cardsParent);
+        private async void UpdatePauseUI(Lobby lobby)
+        {
+            List<SteamPlayer> playerList = await GetLobbyMembersAsync(lobby);
+
+            //set each card as inactive
+            foreach (var card in playerCards)
+            {
+                card.isFoundInLobby = false;
+            }
+
+
             foreach (SteamPlayer player in playerList)
             {
-                var currentCard = Instantiate(playerCard, cardsParent).GetComponent<PlayerCard>();
-                currentCard.linkedPlayer = player;
-                currentCard.playerName.text = player.playerName;
+                PlayerCard existingCard = playerCards.Find(c => c.linkedPlayer.playerSteamId == player.playerSteamId);
+
+                if (existingCard != null)
+                {
+                    existingCard.isFoundInLobby = true;
+                    existingCard.playerName.text = player.playerName;
+                }
+                else
+                {
+                    var newCard = Instantiate(playerCard, cardsParent).GetComponent<PlayerCard>();
+                    newCard.linkedPlayer = player;
+                    newCard.playerName.text = player.playerName;
+                    newCard.isFoundInLobby = true;
+
+                    if (player.playerImage.HasValue)
+                    {
+                        var img = player.playerImage.Value;
+                        newCard.playerImage.texture = PlayerCard.ImageFromBytes((int)img.Width, (int)img.Height, img.Data);
+                    }
+
+                    playerCards.Add(newCard);
+                }
+            }
+
+            //delete all inactive
+            for (int i = playerCards.Count - 1; i >= 0; i--)
+            {
+                if (!playerCards[i].isFoundInLobby)
+                {
+                    PlayerCard cardToDestroy = playerCards[i];
+                    playerCards.RemoveAt(i);
+                    Destroy(cardToDestroy.gameObject);
+                }
             }
         }
 
-        public List<SteamPlayer> GetLobbyMembers(Lobby lobby)
+
+
+
+        public async Task<List<SteamPlayer>> GetLobbyMembersAsync(Lobby lobby)
         {
             List<SteamPlayer> playerList = new();
 
-            foreach (Friend member in lobby.Members)
+            foreach (var member in lobby.Members)
             {
-                // IT HAS AN IMAGEEEEEE, add to the screen! TODO
-                Image? playerImage = member.GetSmallAvatarAsync().Result;
-                SteamPlayer player = new(member.Name, member.Id, playerImage, member);
+                var imageTask = await member.GetMediumAvatarAsync();
+
+                SteamPlayer player = new(member.Name, member.Id, imageTask, member);
                 playerList.Add(player);
-                Debug.Log(player.playerName);
             }
             return playerList;
         }

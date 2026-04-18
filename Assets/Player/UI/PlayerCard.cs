@@ -6,16 +6,18 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Button = Base.Interactables.Button;
+using UnityEngine.UI;
 
 namespace Player.UI
 {
     public class PlayerCard : MonoBehaviour
     {
         public TMP_Text playerName;
-        public Button playerKick;
+        public RawImage playerImage;
         public SteamPlayer linkedPlayer;
         public Lobby currentLobby;
+
+        [HideInInspector] public bool isFoundInLobby;
 
         public void KickButton()
         {
@@ -44,6 +46,14 @@ namespace Player.UI
         public void LeaveLobbyClientRpc(Lobby lobby, SteamPlayer player)
         {
             Debug.Log("Kicked Player --- " + player.playerName);
+        }
+
+        public static Texture2D ImageFromBytes(int width, int height, byte[] data)
+        {
+            Texture2D texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            texture.LoadRawTextureData(data);
+            texture.Apply();
+            return texture;
         }
     }
 }

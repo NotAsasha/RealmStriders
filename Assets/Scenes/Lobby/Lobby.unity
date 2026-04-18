@@ -5145,6 +5145,66 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 399965984}
     m_Modifications:
+    - target: {fileID: 1890820291469601762, guid: e6c0a4f410f490144ac8512b4d836c4a,
+        type: 3}
+      propertyPath: movementCurve.m_Curve.Array.data[0].time
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1890820291469601762, guid: e6c0a4f410f490144ac8512b4d836c4a,
+        type: 3}
+      propertyPath: movementCurve.m_Curve.Array.data[1].time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1890820291469601762, guid: e6c0a4f410f490144ac8512b4d836c4a,
+        type: 3}
+      propertyPath: movementCurve.m_Curve.Array.data[0].value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1890820291469601762, guid: e6c0a4f410f490144ac8512b4d836c4a,
+        type: 3}
+      propertyPath: movementCurve.m_Curve.Array.data[1].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1890820291469601762, guid: e6c0a4f410f490144ac8512b4d836c4a,
+        type: 3}
+      propertyPath: movementCurve.m_Curve.Array.data[0].inSlope
+      value: 0.46775857
+      objectReference: {fileID: 0}
+    - target: {fileID: 1890820291469601762, guid: e6c0a4f410f490144ac8512b4d836c4a,
+        type: 3}
+      propertyPath: movementCurve.m_Curve.Array.data[1].inSlope
+      value: -0.1983466
+      objectReference: {fileID: 0}
+    - target: {fileID: 1890820291469601762, guid: e6c0a4f410f490144ac8512b4d836c4a,
+        type: 3}
+      propertyPath: movementCurve.m_Curve.Array.data[0].outSlope
+      value: 0.46775857
+      objectReference: {fileID: 0}
+    - target: {fileID: 1890820291469601762, guid: e6c0a4f410f490144ac8512b4d836c4a,
+        type: 3}
+      propertyPath: movementCurve.m_Curve.Array.data[1].inWeight
+      value: 0.45569623
+      objectReference: {fileID: 0}
+    - target: {fileID: 1890820291469601762, guid: e6c0a4f410f490144ac8512b4d836c4a,
+        type: 3}
+      propertyPath: movementCurve.m_Curve.Array.data[1].outSlope
+      value: -0.1983466
+      objectReference: {fileID: 0}
+    - target: {fileID: 1890820291469601762, guid: e6c0a4f410f490144ac8512b4d836c4a,
+        type: 3}
+      propertyPath: movementCurve.m_Curve.Array.data[0].outWeight
+      value: 0.06904488
+      objectReference: {fileID: 0}
+    - target: {fileID: 1890820291469601762, guid: e6c0a4f410f490144ac8512b4d836c4a,
+        type: 3}
+      propertyPath: movementCurve.m_Curve.Array.data[0].tangentMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1890820291469601762, guid: e6c0a4f410f490144ac8512b4d836c4a,
+        type: 3}
+      propertyPath: movementCurve.m_Curve.Array.data[1].tangentMode
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2405124022911735812, guid: e6c0a4f410f490144ac8512b4d836c4a,
         type: 3}
       propertyPath: drops.Array.data[0].onInteract.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -6617,6 +6677,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1320714665}
+    - target: {fileID: 2475037577307591219, guid: 97cc25990a314734db8b6f0d37af1a96,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 1877
+      objectReference: {fileID: 0}
     - target: {fileID: 2716326335018475578, guid: 97cc25990a314734db8b6f0d37af1a96,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -13434,7 +13499,7 @@ MonoBehaviour:
   cameraB: {fileID: 1905653332}
   cameraMatA: {fileID: 2100000, guid: 5ea2270db3b1cee428dd1792ec79644b, type: 2}
   cameraMatB: {fileID: 2100000, guid: c751b8331ffdf0242a579b22503ea4cb, type: 2}
-  isCameraA: 1
+  isForward: 1
   portalParent: {fileID: 9030004}
 --- !u!1 &1591764796
 GameObject:
@@ -18599,6 +18664,78 @@ Transform:
   - {fileID: 500933176}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2028112271
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2028112274}
+  - component: {fileID: 2028112272}
+  - component: {fileID: 2028112273}
+  m_Layer: 0
+  m_Name: SaveableManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2028112272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2028112271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 4197200957
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &2028112273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2028112271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c8233628638a864cb7be96e34d37107, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkItemsHandler
+  ShowTopMostFoldoutHeaderGroup: 1
+  database: {fileID: 11400000, guid: 1d3681ab68bbf3940a0fdd5c5f403dee, type: 2}
+--- !u!4 &2028112274
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2028112271}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.5912, y: 13.56535, z: -5.29336}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2028498941
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22373,3 +22510,4 @@ SceneRoots:
   - {fileID: 1188416499}
   - {fileID: 1497218296}
   - {fileID: 4467047981919304941}
+  - {fileID: 2028112274}

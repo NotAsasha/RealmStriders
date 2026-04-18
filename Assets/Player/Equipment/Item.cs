@@ -11,6 +11,13 @@ namespace Player.Equipment
         [SerializeField] public int sellPrice = 10;
 
 
+
+        [Header("Save System")]
+        [SerializeField, HideInInspector] private int prefabId;
+        public int PrefabId => prefabId;
+        public void SetPrefabId(int id) => prefabId = id;
+
+
         private Collider itemCollider;
         private Rigidbody itemRigidbody;
         private NetworkTransform itemNetworkTransform;

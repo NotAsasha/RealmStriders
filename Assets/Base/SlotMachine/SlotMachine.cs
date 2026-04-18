@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Base.SlotMachine
 {
@@ -12,6 +15,9 @@ namespace Base.SlotMachine
         // Барабан такий ж як у вулику, анімація  - зупиняється на конкретному rotation
         public int spinCost;
         public DropTable table;
+
+        public Transform spinObject;
+        public AnimationCurve movementCurve;
 
         public List<NetworkObject> itemsToDrop;
 
@@ -32,28 +38,55 @@ namespace Base.SlotMachine
                 return;
             }
 
-            SpinClientRpc();
+            Debug.Log("---SlotMachine: Spin.");
+            GameManager.Instance.teamMoney.Value -= spinCost;
+            int dropID = table.ChooseDrop();
+
+            SpinClientRpc(dropID);
+            table.ExecuteAction(dropID);
         }
 
-        [ClientRpc]
-        public void SpinClientRpc()
-        {
-            StartCoroutine(SpinAnimation());
 
-            if (IsServer)
+        [ClientRpc]
+        public void SpinClientRpc(int dropID)
+        {
+            StartCoroutine(SpinAnimation(dropID));
+        }
+
+        // TERRIBLE, to fix TODO
+        private bool isSpinning = false;
+        private IEnumerator SpinAnimation(int dropID)
+        {
+            endPos = 1800 - 30 * dropID;
+            isSpinning = true;
+
+            yield return new WaitForSeconds(spinLenght);
+        }
+        private float time = 0;
+        private float endPos;
+
+
+        public void Update()
+        {
+            if (!isSpinning) return;
+
+            
+            var startPos = spinObject.localEulerAngles;
+            
+            var endPos2 = spinObject.localEulerAngles;
+            endPos2.y = endPos;
+
+            spinObject.gameObject.transform.localEulerAngles = Vector3.Lerp(startPos, endPos2, movementCurve.Evaluate(time / 5f));
+
+            time += Time.deltaTime;
+            if (time > 5f)
             {
-                Debug.Log("---SlotMachine: Spinned.");
-                GameManager.Instance.teamMoney.Value -= spinCost;
-                table.ExecuteAction(table.ChooseDrop());
+                startPos.y %= 360;
+                time = 0;
+                isSpinning = false;
             }
         }
 
-        private IEnumerator SpinAnimation()
-        {
-            yield return new WaitForSeconds(spinLenght);
-        }
-
-   
 
         public void GiveCoins(int amount)
         {
@@ -64,7 +97,7 @@ namespace Base.SlotMachine
         public void SpawnRandomItem()
         {
             int index = Random.Range(0, itemsToDrop.Count);
-            itemsToDrop[index].InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, GameManager.Instance.spawnPoint);
+            itemsToDrop[index].InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, GameManager.Instance.spawnPoint).Register();
             Debug.Log($"---SlotMachine: Won random item - {itemsToDrop[index].name}!");
 
         }

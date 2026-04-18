@@ -1,3 +1,4 @@
+using Player;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -42,7 +43,7 @@ namespace Portals
                 //if (nma != null) nma.enabled = true;
 
                 objectIsOverlapping = false;
-
+                PortalManager.Instance.CallOnTeleport(objectToTeleport.GetComponent<Human>());
             }
         }
 

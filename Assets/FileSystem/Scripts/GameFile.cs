@@ -27,20 +27,20 @@ namespace FileSystem.Scripts
         [Tooltip("File directory. Application.persistentDataPath is automatically added before it.")]
         [SerializeField] private string directory = "/Default/";
         [FormerlySerializedAs("_fileExtention")]
-        [Tooltip("File extention. Can be anything, it does not matter.")]
-        [SerializeField] private string fileExtention = ".NotA";
+        [Tooltip("File extension. Can be anything, it does not matter.")]
+        [SerializeField] private string fileExtension = ".NotA";
 
         private const string EncryptionCodeWord = "NotTheBestSaveSystem";
 
         public string FileName => fileName;
         public string FileDirectory => directory;
-        public string FileExtention => fileExtention;
+        public string FileExtension => fileExtension;
         /// <summary>
         /// Returns full file path (WITHOUT Application.persistentDataPath!)  
         /// </summary>
         public virtual string GetFullPath()
         {
-            string fullPath = Path.Combine(FileDirectory + FileName + FileExtention);
+            string fullPath = Path.Combine(FileDirectory + FileName + FileExtension);
             return fullPath;
         }
         /// <summary>

@@ -4,6 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
+using UnityEngine.UIElements;
 
 namespace Player.Movement
 {
@@ -42,7 +43,10 @@ namespace Player.Movement
 
             startPosition = transform.localPosition;
             movement = PlayerMovement.Instance;
-            human = GetComponentInParent<Human>();
+
+            //terrible architecture, but hard to remake, TODO ?
+            human = PlayerMovement.Instance.human;
+
             SettingsFile file = (SettingsFile)GameFileHandler.Instance.SearchForFileByName("Settings");
             mouseSensitivity = file.save.sensValue;
 
@@ -128,6 +132,7 @@ namespace Player.Movement
                 transform.localPosition = startPosition;
                 transform.localEulerAngles = Vector3.zero;
             }
+            transform.localScale = new Vector3(1f, 1f, 1f);
         }
 
         #endregion
@@ -155,6 +160,7 @@ namespace Player.Movement
             else
             {
                 transform.parent = hit.collider.gameObject.transform;
+                transform.localScale = new Vector3(1f, 1f, 1f);
             }
         }
 
@@ -170,7 +176,7 @@ namespace Player.Movement
             interactable = null;
             transform.parent = playerBody;
             transform.localPosition = startPosition;
-
+            transform.localScale = new Vector3(1f, 1f, 1f);
             ToggleInteractionUI(false);
         }
 
@@ -189,7 +195,7 @@ namespace Player.Movement
 
         private void UpdateCursorState()
         {
-            Cursor.lockState = (movement.isPaused || movement.isInInteraction)
+            UnityEngine.Cursor.lockState = (movement.isPaused || movement.isInInteraction)
         ? CursorLockMode.None
         : CursorLockMode.Locked;
         }

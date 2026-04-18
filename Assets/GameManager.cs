@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.Linq;
 using Enemy;
+using FileSystem.Scripts;
 using Player;
 using Portals;
 
@@ -21,6 +22,9 @@ public class GameManager : NetworkBehaviour
     public NetworkVariable<int> teamMoney = new(10000, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<bool> hasStartedMission = new(false, writePerm: NetworkVariableWritePermission.Server);
 
+
+    //public List<NetworkObject>
+
     private int alivePlayers;
 
     public float missionDuration;
@@ -34,6 +38,8 @@ public class GameManager : NetworkBehaviour
 
     public List<Enemy.Enemy> activeEnemies = new();
 
+    public SaveFile currentSave;
+
     public static GameManager Instance = null;
 
     private EnemySpawner spawner;
@@ -42,7 +48,7 @@ public class GameManager : NetworkBehaviour
 
     private void Awake()
     {
-        SetupSingletone();
+        SetupSingleton();
         SetupInputHandlers();
         DontDestroyOnLoad(gameObject);
 
@@ -63,7 +69,7 @@ public class GameManager : NetworkBehaviour
 
     #region Initialization
 
-    private void SetupSingletone()
+    private void SetupSingleton()
     {
         if (Instance == null)
             Instance = this;
@@ -147,22 +153,28 @@ public class GameManager : NetworkBehaviour
             yield break;
         }
 
+        //Calculate rating
+        int tempRating = CalculateRating(teamRating.Value);
 
-        //stop the mission
+        KillEnemies();
+
+
+        //stop the mission (turn off the portals)
         hasStartedMission.Value = false;
         yield return new WaitForSeconds(5f);
 
 
-        //Calculate rating
-        teamRating.Value = CalculateRating(teamRating.Value);
+        teamRating.Value = tempRating;
         looseRating.Value += 1;
+
+
         if (teamRating.Value <= looseRating.Value)
         {
             //Loose
             Debug.Log("---MissionManager: Game Over, you lost...");
             Cursor.lockState = CursorLockMode.None;
 
-            //TEMP - to main menu
+            //TEMP - to main menu TODO
             SteamManager.Instance.Disconnect();
             SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);
             yield break;
@@ -213,8 +225,8 @@ public class GameManager : NetworkBehaviour
             var human = player.PlayerObject.gameObject.GetComponent<Human>();
             if (human.isDead.Value) continue;
 
-            float distancetoSpawn = Vector3.Distance(human.transform.position, spawnPoint);
-            if (distancetoSpawn > baseRadius) human.isDead.Value = true;
+            float distanceToSpawn = Vector3.Distance(human.transform.position, spawnPoint);
+            if (distanceToSpawn > baseRadius) human.isDead.Value = true;
         }
     }
 
@@ -251,6 +263,7 @@ public class GameManager : NetworkBehaviour
     private void StartMission()
     {
         //Open Portal
+        PortalManager.Instance.isForward = true;
         PortalManager.Instance.ChangeState(true);
     }
 
@@ -291,6 +304,14 @@ public class GameManager : NetworkBehaviour
     {
         spawner.SpawnEnemies(teamRating.Value, enemiesCount);
         NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded; // відписка
+    }
+
+    private void KillEnemies()
+    {
+        foreach (var enemy in activeEnemies)
+        {
+            enemy.isDead.Value = true;
+        }
     }
 
     public void UnloadWorld()

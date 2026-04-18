@@ -1,8 +1,19 @@
+using System;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Base.BaseUpgrader
 {
+    [Flags]
+    public enum BaseUpgrades : int
+    {
+        None = 0,         // 0000
+        IsTerminalBought = 1 << 0,    // 0001 (1)
+        IsDetectionBought = 1 << 1,    // 0010 (2)
+        IsBeamBought = 1 << 2,    // 0100 (4)
+        IsCasinoBought = 1 << 3,// 1000 (8)
+    }
     public class Base : NetworkBehaviour
     {
         [Header("References")]
@@ -21,16 +32,17 @@ namespace Base.BaseUpgrader
         [SerializeField] private int beamPrice = 400;
         [SerializeField] private int casinoPrice = 300;
 
-        public readonly NetworkVariable<bool> isTerminalBought =
-            new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        public readonly NetworkVariable<bool> isDetectionBought =
-            new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        public readonly NetworkVariable<bool> isBeamBought =
-            new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        public readonly NetworkVariable<bool> isCasinoBought =
-            new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+        public readonly NetworkVariable<int> baseUpgrades = new();
+
+
+        public static Base Instance;
         #region Unity Lifecycle
+
+        private void Awake()
+        {
+            Instance = this;
+        }
 
         public override void OnNetworkSpawn()
         {
@@ -56,61 +68,72 @@ namespace Base.BaseUpgrader
                 Debug.LogError("[Base] radarCamera is missing on Radar.", radar);
             }
 
-            isTerminalBought.OnValueChanged += OnTerminalBoughtChanged;
-            isDetectionBought.OnValueChanged += OnDetectionBoughtChanged;
-            isBeamBought.OnValueChanged += OnBeamBoughtChanged;
-            isCasinoBought.OnValueChanged += OnCasinoBoughtChanged;
+            baseUpgrades.OnValueChanged += OnTerminalBoughtChanged;
+            baseUpgrades.OnValueChanged += OnDetectionBoughtChanged;
+            baseUpgrades.OnValueChanged += OnBeamBoughtChanged;
+            baseUpgrades.OnValueChanged += OnCasinoBoughtChanged;
 
-            OnTerminalBoughtChanged(false, isTerminalBought.Value);
-            OnDetectionBoughtChanged(false, isDetectionBought.Value);
-            OnBeamBoughtChanged(false, isBeamBought.Value);
-            OnCasinoBoughtChanged(false, isCasinoBought.Value);
+            OnTerminalBoughtChanged(0, baseUpgrades.Value);
+            OnDetectionBoughtChanged(0, baseUpgrades.Value);
+            OnBeamBoughtChanged(0, baseUpgrades.Value);
+            OnCasinoBoughtChanged(0, baseUpgrades.Value);
         }
 
         public override void OnNetworkDespawn()
         {
-            isTerminalBought.OnValueChanged -= OnTerminalBoughtChanged;
-            isDetectionBought.OnValueChanged -= OnDetectionBoughtChanged;
-            isBeamBought.OnValueChanged -= OnBeamBoughtChanged;
-            isCasinoBought.OnValueChanged -= OnCasinoBoughtChanged;
+            baseUpgrades.OnValueChanged -= OnTerminalBoughtChanged;
+            baseUpgrades.OnValueChanged -= OnDetectionBoughtChanged;
+            baseUpgrades.OnValueChanged -= OnBeamBoughtChanged;
+            baseUpgrades.OnValueChanged -= OnCasinoBoughtChanged;
         }
 
         #endregion
 
         #region --Handlers--
 
-        private void OnTerminalBoughtChanged(bool _, bool newV)
+        private void OnTerminalBoughtChanged(int _, int current)
         {
-            radarTerminal.gameObject.SetActive(newV);
-            if (newV) radarTerminal.Spawn();
+            bool isBought = (current & (int)BaseUpgrades.IsTerminalBought) != 0;
+
+            radarTerminal.gameObject.SetActive(isBought);
+
+            if (IsServer && isBought && !radarTerminal.IsSpawned)
+            {
+                radarTerminal.Spawn();
+            }
         }
 
-        private void OnBeamBoughtChanged(bool _, bool newV)
+        private void OnBeamBoughtChanged(int _, int current)
         {
-            radarButton.gameObject.SetActive(newV);
-            if (newV) radarButton.Spawn();
+            bool isBought = (current & (int)BaseUpgrades.IsBeamBought) != 0;
+
+            radarButton.gameObject.SetActive(isBought);
+
+            if (IsServer && isBought && !radarButton.IsSpawned)
+            {
+                radarButton.Spawn();
+            }
         }
 
-        private void OnDetectionBoughtChanged(bool _, bool newV)
+        private void OnDetectionBoughtChanged(int _, int current)
         {
             if (!IsClient || !radarCamera) return;
-
             int mask = radarOnlyLayer.value;
 
-            if (newV)
-            {
+            bool isBought = (current & (int)BaseUpgrades.IsDetectionBought) != 0;
+
+            if (isBought)
                 radarCamera.cullingMask |= mask;
-            }
             else
-            {
                 radarCamera.cullingMask &= ~mask;
-            }
         }
 
 
-        private void OnCasinoBoughtChanged(bool _, bool newV)
+        private void OnCasinoBoughtChanged(int _, int current)
         {
-            casinoWall.SetActive(!newV);
+            bool isBought = (current & (int)BaseUpgrades.IsCasinoBought) != 0;
+
+            casinoWall.SetActive(!isBought);
         }
 
         #endregion
@@ -121,58 +144,46 @@ namespace Base.BaseUpgrader
         //
         // NEEDS TO BE REFACTORED, terrible code, TODO
         //
+        // EDIT: now it`s better, but can still be done via dictionary, or whatever
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void BuyTerminalServerRpc()
         {
-            if (isTerminalBought.Value) return;
-            if (GameManager.Instance == null) return;
-
-            if (GameManager.Instance.teamMoney.Value < terminalPrice) return;
-
-            GameManager.Instance.teamMoney.Value -= terminalPrice;
-            isTerminalBought.Value = true;
+            BuyUpgrade(BaseUpgrades.IsTerminalBought, terminalPrice);
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void BuyDetectionServerRpc()
         {
             //buy the previous one
-            if (!isTerminalBought.Value) return;
+            if ((baseUpgrades.Value & (int)BaseUpgrades.IsTerminalBought) == 0) return;
 
-            if (isDetectionBought.Value) return;
-            if (GameManager.Instance == null) return;
-
-            if (GameManager.Instance.teamMoney.Value < detectionPrice) return;
-
-            GameManager.Instance.teamMoney.Value -= detectionPrice;
-            isDetectionBought.Value = true;
+            BuyUpgrade(BaseUpgrades.IsDetectionBought, detectionPrice);
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void BuyBeamServerRpc()
         {
             //buy the previous one
-            if (!isDetectionBought.Value) return;
+            if ((baseUpgrades.Value & (int)BaseUpgrades.IsDetectionBought) == 0) return;
 
-            if (isBeamBought.Value) return;
-            if (GameManager.Instance == null) return;
-
-            if (GameManager.Instance.teamMoney.Value < beamPrice) return;
-
-            GameManager.Instance.teamMoney.Value -= beamPrice;
-            isBeamBought.Value = true;
+            BuyUpgrade(BaseUpgrades.IsBeamBought, beamPrice);
         }
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void BuyCasinoServerRpc()
         {
-            if (isCasinoBought.Value) return;
+            BuyUpgrade(BaseUpgrades.IsCasinoBought, casinoPrice);
+        }
+
+
+        private void BuyUpgrade(BaseUpgrades toBuy, int price)
+        {
+            if ((baseUpgrades.Value & (int)toBuy) != 0) return;
             if (GameManager.Instance == null) return;
+            if (GameManager.Instance.teamMoney.Value < price) return;
 
-            if (GameManager.Instance.teamMoney.Value < casinoPrice) return;
-
-            GameManager.Instance.teamMoney.Value -= casinoPrice;
-            isCasinoBought.Value = true;
+            GameManager.Instance.teamMoney.Value -= price;
+            baseUpgrades.Value |= (int)toBuy;
         }
     }
 }

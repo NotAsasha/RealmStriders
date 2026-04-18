@@ -1,3 +1,4 @@
+using System;
 using FileSystem.Scripts;
 using Unity.Netcode;
 using UnityEngine;
@@ -17,9 +18,23 @@ namespace Steam
         public void CreateLobbyButton()
         {
             steamManager = SteamManager.Instance;
-            steamManager.StartHost(6, friendsOnly.isOn);
+
+            if (steamManager != null)
+            {
+                try
+                {
+                    steamManager.StartHost(6, friendsOnly.isOn);
+                }
+                catch
+                {
+                    throw new Exception("Cannot start the steam lobby");
+                }
+            }
+            
             NetworkManager.Singleton.SceneManager.LoadScene("Lobby", LoadSceneMode.Single);
         }
+
+       
 
         public void DeleteFiles()
         {

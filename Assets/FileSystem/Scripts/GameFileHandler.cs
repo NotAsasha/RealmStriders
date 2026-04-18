@@ -9,7 +9,7 @@ namespace FileSystem.Scripts
         public static GameFileHandler Instance;
 
         /// <summary>
-        /// Loads all avaible files
+        /// Loads all available files
         /// </summary>
         /// 
         private void Awake()

@@ -1,5 +1,8 @@
+using Player;
+using System;
 using UnityEngine;
 using UnityEngine.Serialization;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace Portals
 {
@@ -13,7 +16,9 @@ namespace Portals
 
         public static PortalManager Instance;
 
-        public bool isCameraA = true;
+        public bool isForward = true;
+
+        public event Action<Human, bool> OnTeleport;
 
         [FormerlySerializedAs("PortalParent")] [SerializeField] GameObject portalParent;
 
@@ -45,10 +50,15 @@ namespace Portals
 
         public void SwitchCameras()
         {
-            cameraA.gameObject.SetActive(isCameraA);
-            cameraB.gameObject.SetActive(!isCameraA);
+            cameraA.gameObject.SetActive(isForward);
+            cameraB.gameObject.SetActive(!isForward);
          
-            isCameraA = !isCameraA;
+            isForward = !isForward;
+        }
+
+        public void CallOnTeleport(Human player)
+        {
+            OnTeleport?.Invoke(player, isForward);
         }
     }
 }

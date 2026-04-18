@@ -2057,7 +2057,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2394975766
+  GlobalObjectIdHash: 2454714083
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -2099,6 +2099,7 @@ MonoBehaviour:
   playerCamera: {fileID: 0}
   isPaused: 0
   isInInteraction: 0
+  human: {fileID: 0}
 --- !u!143 &9155629318535776824
 CharacterController:
   m_ObjectHideFlags: 0
@@ -3442,12 +3443,12 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 8990714719565950799, guid: 5a0a0bff741648e47994afb7ad194fe3,
         type: 3}
-      insertIndex: 0
-      addedObject: {fileID: 3536488279945416066}
+      insertIndex: -1
+      addedObject: {fileID: 3314938179243990711}
     - targetCorrespondingSourceObject: {fileID: 8990714719565950799, guid: 5a0a0bff741648e47994afb7ad194fe3,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3314938179243990711}
+      addedObject: {fileID: 3536488279945416066}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5a0a0bff741648e47994afb7ad194fe3, type: 3}
 --- !u!224 &1579320616225002165 stripped

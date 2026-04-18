@@ -29,7 +29,7 @@ namespace Player.Movement
         public Controls controls;
         public bool isPaused;
         public bool isInInteraction;
-
+        public Human human;
 
         private CharacterController player;
         private Vector3 velocity;
@@ -56,6 +56,7 @@ namespace Player.Movement
 
             controls = new();
             player = GetComponent<CharacterController>();
+            human = GetComponent<Human>();
             playerTransform = transform;
             fileHandler = GameFileHandler.Instance;
             playerCamera = GetComponentInChildren<Camera>();
