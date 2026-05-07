@@ -7,6 +7,8 @@ namespace FileSystem.Scripts
     [CreateAssetMenu(fileName = "SettingsFile", menuName = "Not/SettingsFile")]
     public class SettingsFile : GameFile
     {
+        public static event Action OnSettingsChanged;
+
         [Header("SettingsFile Info")]
         public SettingsSave save;
         public override void ProcessData(string inputData)
@@ -21,14 +23,16 @@ namespace FileSystem.Scripts
 
             Debug.Log("InputData:" + inputData + GetFullPath());
             save = JsonUtility.FromJson<SettingsSave>(inputData);
+            OnSettingsChanged?.Invoke();
         }
         public override string GetData()
         {
+            OnSettingsChanged?.Invoke();
             string jsonSave = JsonUtility.ToJson(save); 
             return jsonSave;
         }
-    }
-    [Serializable]
+        }
+        [Serializable]
     public class SettingsSave
     {
         public string rebinds = "";

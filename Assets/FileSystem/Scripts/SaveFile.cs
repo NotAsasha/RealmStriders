@@ -35,34 +35,34 @@ namespace FileSystem.Scripts
                 save = new SaveData
                 {
                     teamRating = GameManager.Instance.teamRating.Value,
-                    looseRating = GameManager.Instance.looseRating.Value,
+                    lossRating = GameManager.Instance.lossRating.Value,
                     teamMoney = GameManager.Instance.teamMoney.Value,
                     objects = NetworkItemsHandler.Instance.GetSaveablesInfo(),
                     baseUpgrades = Base.BaseUpgrader.Base.Instance.baseUpgrades.Value
                 };
             }
             return JsonUtility.ToJson(save);
-        }
+            }
 
 
-        public void LoadGameSave()
-        {
+            public void LoadGameSave()
+            {
             Debug.Log("SaveFile: ---LoadGameSave");
             GameManager.Instance.teamRating.Value = save.teamRating;
-            GameManager.Instance.looseRating.Value = save.looseRating;
+            GameManager.Instance.lossRating.Value = save.lossRating;
             GameManager.Instance.teamMoney.Value = save.teamMoney;
             Base.BaseUpgrader.Base.Instance.baseUpgrades.Value = save.baseUpgrades;
 
             NetworkItemsHandler.Instance.LoadSaveables(save.objects);
-        }
+            }
 
 
 
-        [Serializable]
-        public class SaveData
-        {
+            [Serializable]
+            public class SaveData
+            {
             public int teamRating = 3;
-            public int looseRating;
+            public int lossRating;
             public int teamMoney = 5600;
 
             public List<ObjectEntry> objects = new List<ObjectEntry>();

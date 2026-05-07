@@ -23,6 +23,16 @@ namespace Player.Movement
 
             Load();
             inputAction = actionToBind.action;
+            RefreshText();
+        }
+
+        private void OnEnable()
+        {
+            if (inputAction != null) RefreshText();
+        }
+
+        private void RefreshText()
+        {
             text.text = inputAction.GetBindingDisplayString(0);
         }
 
@@ -66,7 +76,7 @@ namespace Player.Movement
             isRebinding = false;
             inputAction.Enable();
 
-            text.text = inputAction.GetBindingDisplayString(0);
+            RefreshText();
             Save();
         }
 

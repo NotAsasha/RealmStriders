@@ -12,10 +12,10 @@ namespace Player.UI
     public class PauseUIManager : MonoBehaviour
     {
         public GameObject pauseMenu;
+        public GameObject settingsMenu;
         public Transform cardsParent;
         public GameObject playerCard;
-
-        private Controls controls;
+        public ScreenShatterEffect shatterEffect;
 
         private void Start()
         {
@@ -26,7 +26,10 @@ namespace Player.UI
         private void OnDisable()
         {
             SteamMatchmaking.OnLobbyDataChanged -= UpdatePauseUI;
-            PlayerMovement.Instance.controls.System.Pause.performed -= UpdateMenuState;
+            if (PlayerMovement.Instance != null && PlayerMovement.Instance.controls != null)
+            {
+                PlayerMovement.Instance.controls.System.Pause.performed -= UpdateMenuState;
+            }
         }
 
         private void UpdateMenuState(InputAction.CallbackContext obj)
@@ -36,8 +39,41 @@ namespace Player.UI
                 CameraMovement.Instance.StopInteraction();
                 return;
             }
-            pauseMenu.SetActive(!pauseMenu.activeSelf);
-        }
+
+            if (settingsMenu != null && settingsMenu.activeSelf)
+            {
+                ToggleSettings(false);
+                return;
+            }
+
+            bool opening = !pauseMenu.activeSelf;
+            
+            if (opening && shatterEffect != null)
+            {
+                shatterEffect.TriggerEffect(() => {
+                    pauseMenu.SetActive(true);
+                });
+            }
+            else
+            {
+                pauseMenu.SetActive(!pauseMenu.activeSelf);
+                if (!pauseMenu.activeSelf && shatterEffect != null)
+                {
+                    shatterEffect.ResetEffect();
+                }
+            }
+            }
+
+            public void ToggleSettings(bool active)
+            {
+            settingsMenu.SetActive(active);
+            pauseMenu.SetActive(!active);
+            
+            if (!active && !pauseMenu.activeSelf && shatterEffect != null)
+            {
+                shatterEffect.ResetEffect();
+            }
+            }
 
         private List<PlayerCard> playerCards = new();
 

@@ -18,7 +18,7 @@ public class GameManager : NetworkBehaviour
     public int maxTimeSpread = 120;
 
     public NetworkVariable<int> teamRating = new(3, writePerm: NetworkVariableWritePermission.Server);
-    public NetworkVariable<int> looseRating = new(0, writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> lossRating = new(0, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<int> teamMoney = new(10000, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<bool> hasStartedMission = new(false, writePerm: NetworkVariableWritePermission.Server);
 
@@ -56,21 +56,21 @@ public class GameManager : NetworkBehaviour
         InvokeRepeating(nameof(Radiation), 0f, 1f);
 
         QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = 1000;
+        Application.targetFrameRate = 144;
         spawner = GetComponent<EnemySpawner>();
-    }
+        }
 
-    private void OnDisable()
-    {
+        private void OnDisable()
+        {
         CleanupInputHandlers();
-    }
+        }
 
-    #endregion
+        #endregion
 
-    #region Initialization
+        #region Initialization
 
-    private void SetupSingleton()
-    {
+        private void SetupSingleton()
+        {
         if (Instance == null)
             Instance = this;
         else
@@ -78,21 +78,21 @@ public class GameManager : NetworkBehaviour
             Destroy(gameObject);
             return;
         }
-    }
+        }
 
-    private void SetupInputHandlers()
-    {
+        private void SetupInputHandlers()
+        {
         hasStartedMission.OnValueChanged += OnMissionStatusChanged;
-    }
+        }
 
-    private void CleanupInputHandlers()
-    {
+        private void CleanupInputHandlers()
+        {
         hasStartedMission.OnValueChanged -= OnMissionStatusChanged;
-    }
-    #endregion
+        }
+        #endregion
 
-    private void OnMissionStatusChanged(bool oldValue, bool newValue)
-    {
+        private void OnMissionStatusChanged(bool oldValue, bool newValue)
+        {
         if (newValue)
         {
             Debug.Log("---MissionManager: Start Mission.");
@@ -103,11 +103,11 @@ public class GameManager : NetworkBehaviour
             Debug.Log($"---MissionManager: End Mission, Rating before: {teamRating.Value}.");
             StopMission();
         }
-    }
+        }
 
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    public void OnPlayerDeathServerRpc()
-    {
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void OnPlayerDeathServerRpc()
+        {
         alivePlayers -= 1;
         Debug.Log($"---MissionManager: Allive players: {alivePlayers}.");
         if (alivePlayers <= 0)
@@ -115,13 +115,13 @@ public class GameManager : NetworkBehaviour
             Debug.Log("---MissionManager: Everyone died, stopping mission.");
             StopMissionServerRpc();
         }
-    }
+        }
 
-    #region MissionRpc
+        #region MissionRpc
 
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    public void StartMissionServerRpc()
-    {
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void StartMissionServerRpc()
+        {
         if (hasStartedMission.Value) return;
         if (missionName == "") return;
 
@@ -138,13 +138,13 @@ public class GameManager : NetworkBehaviour
         StartTimer();
 
         hasStartedMission.Value = true;
-    }
+        }
 
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    public void StopMissionServerRpc() => StartCoroutine(StopMissionClock());
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void StopMissionServerRpc() => StartCoroutine(StopMissionClock());
 
-    private IEnumerator StopMissionClock()
-    {
+        private IEnumerator StopMissionClock()
+        {
         //revive if died in lobby
         if (!hasStartedMission.Value)
         {
@@ -165,12 +165,12 @@ public class GameManager : NetworkBehaviour
 
 
         teamRating.Value = tempRating;
-        looseRating.Value += 1;
+        lossRating.Value += 1;
 
 
-        if (teamRating.Value <= looseRating.Value)
+        if (teamRating.Value <= lossRating.Value)
         {
-            //Loose
+            //Loss
             Debug.Log("---MissionManager: Game Over, you lost...");
             Cursor.lockState = CursorLockMode.None;
 
@@ -200,12 +200,12 @@ public class GameManager : NetworkBehaviour
         //Resume Lobby Connections
         if (SteamManager.Instance.CurrentLobby != null)
             SteamManager.Instance.CurrentLobby.Value.SetJoinable(true);
-    }
+        }
 
-    #endregion
+        #endregion
 
-    private void RevivePlayers()
-    {
+        private void RevivePlayers()
+        {
         foreach (var player in NetworkManager.Singleton.ConnectedClientsList)
         {
             Debug.Log($"---Mission: Reviving player: {player.ClientId}");
@@ -216,10 +216,10 @@ public class GameManager : NetworkBehaviour
             }
             human.entityHealth.Value = human.dangerLevel;
         }
-    }
+        }
 
-    private void KillOutOfRangePlayers()
-    {
+        private void KillOutOfRangePlayers()
+        {
         foreach (var player in NetworkManager.Singleton.ConnectedClientsList)
         {
             var human = player.PlayerObject.gameObject.GetComponent<Human>();
@@ -228,29 +228,29 @@ public class GameManager : NetworkBehaviour
             float distanceToSpawn = Vector3.Distance(human.transform.position, spawnPoint);
             if (distanceToSpawn > baseRadius) human.isDead.Value = true;
         }
-    }
+        }
 
-    private void StartTimer()
-    {
+        private void StartTimer()
+        {
         missionDuration = Random.Range(defaultMissionTime - maxTimeSpread, defaultMissionTime + maxTimeSpread);
 
         StartTimerClientRpc(missionDuration);
-    }
+        }
 
-    [ClientRpc]
-    private void StartTimerClientRpc(float serverDuration)
-    {
+        [ClientRpc]
+        private void StartTimerClientRpc(float serverDuration)
+        {
         missionDuration = serverDuration;
-    }
-    private int CalculateRating(int current)
-    {
+        }
+        private int CalculateRating(int current)
+        {
         if (alivePlayers <= 0)
         {
             current -= 1;
         }
         else
         {
-            bool areAllDead = activeEnemies.Any(enemy => enemy.isDead.Value);
+            bool areAllDead = activeEnemies.All(enemy => enemy.isDead.Value);
             if (areAllDead)
             {
                 current += 1;
@@ -258,7 +258,7 @@ public class GameManager : NetworkBehaviour
         }
         
         return current;
-    }
+        }
 
     private void StartMission()
     {
@@ -303,7 +303,7 @@ public class GameManager : NetworkBehaviour
     private void OnSceneLoaded(ulong conn, string sceneName, LoadSceneMode mode)
     {
         spawner.SpawnEnemies(teamRating.Value, enemiesCount);
-        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded; // відписка
+        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     }
 
     private void KillEnemies()
@@ -338,9 +338,10 @@ public class GameManager : NetworkBehaviour
 
     private void Radiation()
     {
-        if (!hasStartedMission.Value) return;
+        if (!hasStartedMission.Value || !IsServer) return;
 
-        if ((missionDuration -= 1) <= 0 && IsServer)
+        missionDuration -= 1;
+        if (missionDuration <= 0)
         {
             StopMissionServerRpc();
         }

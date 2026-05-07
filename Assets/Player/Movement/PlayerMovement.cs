@@ -63,15 +63,18 @@ namespace Player.Movement
 
             settingsFile = (SettingsFile)fileHandler.SearchForFileByName("Settings");
             LoadBindings();
+            SettingsFile.OnSettingsChanged += LoadBindings;
+
             controls.System.Enable();
             controls.Gameplay.Enable();
 
             SetupInputHandlers();
-        }
-        public override void OnNetworkDespawn()
-        {
+            }
+            public override void OnNetworkDespawn()
+            {
+            SettingsFile.OnSettingsChanged -= LoadBindings;
             CleanupInputHandlers();
-        }
+            }
 
         #endregion
 
@@ -190,13 +193,12 @@ namespace Player.Movement
 
             //Apply movement
             Vector3 targetMove = move * currentSpeed;
-            Vector3 smoothMove = Vector3.Lerp(previousMove, targetMove, 10f * Time.deltaTime);
-            previousMove = smoothMove;
+            previousMove = Vector3.Lerp(previousMove, targetMove, 15f * Time.deltaTime);
 
 
-            player.Move((smoothMove + velocity) * Time.deltaTime);
+            player.Move((previousMove + velocity) * Time.deltaTime);
             velocity.y += gravity * Time.deltaTime;
-        }
+            }
 
         private bool isSoundReady = true;
         private void PlayStepsSound(float cooldown)
