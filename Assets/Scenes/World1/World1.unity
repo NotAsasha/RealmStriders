@@ -40999,6 +40999,7 @@ GameObject:
   - component: {fileID: 1549125336}
   - component: {fileID: 1549125337}
   - component: {fileID: 1549125338}
+  - component: {fileID: 1549125339}
   m_Layer: 0
   m_Name: Volume
   m_TagString: Untagged
@@ -41071,6 +41072,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e14dd7562445e14d9016043ce33827b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EffectManager
+  defaultEffects: {fileID: 1549125339}
+  timeEffects: {fileID: 1549125334}
   ambientSounds:
   - {fileID: 8300000, guid: b2c428ebfb9fdde4f9be24e547ff5604, type: 3}
   - {fileID: 8300000, guid: b5f22407f2a53e946a886b65e72d459d, type: 3}
@@ -41180,6 +41183,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1549125339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1549125333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 0}
 --- !u!1 &1629776075
 GameObject:
   m_ObjectHideFlags: 0

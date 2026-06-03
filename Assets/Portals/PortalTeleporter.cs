@@ -17,30 +17,36 @@ namespace Portals
         {
             if (!objectIsOverlapping || !objectToTeleport) return;
 
-            Vector3 portalToObject = objectToTeleport.position - transform.position;
-            float dotProduct = Vector3.Dot(transform.up, portalToObject);
+            Transform portalRoot = transform.parent;
+            // Calculate position relative to the portal
+            Vector3 portalToObject = objectToTeleport.position - portalRoot.position;
+            
+            // The portal faces -Z (visual), so its root forward (+Z) points INTO the portal.
+            // Teleport when the player passes through the plane (dot product becomes positive).
+            float dotProduct = Vector3.Dot(portalRoot.forward, portalToObject);
 
-
-            if (dotProduct < 0f)
+            if (dotProduct > 0f)
             {
                 Debug.Log($"---Portal: Teleporting {objectToTeleport.name} to {receiver.name}");
 
-                //Quaternion portalRotationDifference = receiver.rotation * Quaternion.Inverse(transform.rotation);
+                // Calculate rotation difference (180 degree flip to face out of the exit portal)
+                Quaternion portalRotationDifference = receiver.rotation * Quaternion.Euler(0, 180, 0) * Quaternion.Inverse(portalRoot.rotation);
 
                 CharacterController cc = objectToTeleport.GetComponent<CharacterController>();
                 if (cc != null) cc.enabled = false;
 
-                //NavMeshAgent nma = objectToTeleport.GetComponent<NavMeshAgent>();
-                //if (nma != null) nma.enabled = false;
-
-
-                //objectToTeleport.rotation = portalRotationDifference * objectToTeleport.rotation;
+                // Rotate and position the player relative to the exit portal
+                objectToTeleport.rotation = portalRotationDifference * objectToTeleport.rotation;
+                
+                // Switch active cameras via manager
                 PortalManager.Instance.SwitchCameras();
 
-                objectToTeleport.position = receiver.position + /* portalRotationDifference * */ portalToObject;
+                // Flip the offset as well to place the player in front of the exit portal
+                Vector3 localOffset = portalRoot.InverseTransformPoint(objectToTeleport.position);
+                Vector3 mirrorOffset = new Vector3(-localOffset.x, localOffset.y, -localOffset.z);
+                objectToTeleport.position = receiver.TransformPoint(mirrorOffset);
 
                 if (cc != null) cc.enabled = true;
-                //if (nma != null) nma.enabled = true;
 
                 objectIsOverlapping = false;
                 PortalManager.Instance.CallOnTeleport(objectToTeleport.GetComponent<Human>());

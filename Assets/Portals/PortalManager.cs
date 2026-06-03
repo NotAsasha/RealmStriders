@@ -39,8 +39,10 @@ namespace Portals
             cameraB.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
             cameraMatB.mainTexture = cameraB.targetTexture;
 
-            SwitchCameras();
-        }
+            cameraA.gameObject.SetActive(true);
+            cameraB.gameObject.SetActive(true);
+            isForward = true;
+            }
 	
         public void ChangeState(bool isStarted)
         {
@@ -49,9 +51,7 @@ namespace Portals
 
         public void SwitchCameras()
         {
-            cameraA.gameObject.SetActive(isForward);
-            cameraB.gameObject.SetActive(!isForward);
-         
+            // Logic moved to PortalCamera.cs for better performance (visibility-based)
             isForward = !isForward;
         }
 

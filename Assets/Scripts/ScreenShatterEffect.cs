@@ -34,10 +34,10 @@ public class ScreenShatterEffect : MonoBehaviour
         int captureW = screenshot.width;
         int captureH = screenshot.height;
 
-        // 2. Generate Shards BEFORE notifying (so they are ready when menu shows)
+        // 2. Generate Shards FIRST so they are ready to cover the screen
         GenerateSplitShards(captureW, captureH);
 
-        // 3. Notify that capture is done (PauseMenu content becomes active behind shards)
+        // 3. Notify that capture is done (this usually activates the Pause UI behind the shards)
         onCaptured?.Invoke();
 
         // 4. Animate to final positions
@@ -46,7 +46,6 @@ public class ScreenShatterEffect : MonoBehaviour
         {
             elapsed += Time.unscaledDeltaTime;
             float t = Mathf.Clamp01(elapsed / animationDuration);
-            // Smooth opening
             float ease = t * t * (3f - 2f * t); 
 
             foreach (var shard in shards)
@@ -65,9 +64,12 @@ public class ScreenShatterEffect : MonoBehaviour
     private void GenerateSplitShards(int width, int height)
     {
         ClearShards();
+        
+        // Ensure this object is the last sibling so shards are drawn on top of the menu
+        transform.SetAsLastSibling();
 
         float midX = width / 2f;
-        float midY = height / 2f;
+float midY = height / 2f;
 
         // Quadrants: Bottom-Left, Bottom-Right, Top-Right, Top-Left
         // direction: used for targetOffset
@@ -135,11 +137,38 @@ public class ScreenShatterEffect : MonoBehaviour
         shard.SetAllDirty();
 
         var info = shardObj.AddComponent<ShardInfo>();
-        // Move towards corners
-        info.targetOffset = new Vector2(direction.x * width, direction.y * height);
-        info.targetRotation = direction.x * direction.y * 10f;
+        // Increased offset to move shards further out
+        info.targetOffset = direction * 500f; 
+        info.targetRotation = direction.x * direction.y * 15f;
 
         shards.Add(shardObj);
+        }
+
+    public void AnimateBack(System.Action onComplete)
+    {
+        StartCoroutine(ExecuteAnimateBack(onComplete));
+    }
+
+    private IEnumerator ExecuteAnimateBack(System.Action onComplete)
+    {
+        float elapsed = 0;
+        while (elapsed < animationDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = 1f - Mathf.Clamp01(elapsed / animationDuration);
+            float ease = t * t * (3f - 2f * t); 
+
+            foreach (var shard in shards)
+            {
+                if (shard == null) continue;
+                var info = shard.GetComponent<ShardInfo>();
+                shard.transform.localPosition = (Vector3)(info.targetOffset * ease);
+                shard.transform.localRotation = Quaternion.Euler(0, 0, info.targetRotation * ease);
+            }
+            yield return null;
+        }
+
+        onComplete?.Invoke();
     }
 
     public void ResetEffect()

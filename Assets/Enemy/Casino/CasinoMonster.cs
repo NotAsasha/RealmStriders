@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Player;
 using Unity.Netcode;
 using UnityEngine;
@@ -30,9 +32,19 @@ namespace Enemy.Casino
         private Transform[] legsTargets = new Transform[4];
         private Vector3[] currentTargets = new Vector3[4];
 
-    
 
-        private bool isSpawned;
+
+        private bool _isSpawned;
+        private bool isSpawned
+        {
+            get => _isSpawned;
+            set
+            {
+                _isSpawned = value;
+                if (value) OnSpawn?.Invoke();
+            }
+        }
+        public event Action OnSpawn;
 
         protected override void Start()
         {

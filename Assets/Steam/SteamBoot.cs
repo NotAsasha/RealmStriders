@@ -7,7 +7,7 @@ namespace Steam
     public class BootstrapManager : MonoBehaviour
     {
         [Header("Наступна сцена")]
-        public string sceneToLoad = "Lobby";
+        public string sceneToLoad = "Menu";
 
         private void Start()
         {

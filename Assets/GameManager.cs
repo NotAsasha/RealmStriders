@@ -1,14 +1,15 @@
-using System.Collections;
-using Unity.Netcode;
-using UnityEngine;
-using Steam;
-using UnityEngine.SceneManagement;
-using System.Collections.Generic;
-using System.Linq;
 using Enemy;
 using FileSystem.Scripts;
 using Player;
 using Portals;
+using Steam;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.Netcode;
+using UnityEditor.PackageManager;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
 {
@@ -303,7 +304,18 @@ public class GameManager : NetworkBehaviour
     private void OnSceneLoaded(ulong conn, string sceneName, LoadSceneMode mode)
     {
         spawner.SpawnEnemies(teamRating.Value, enemiesCount);
-        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded; // �������
+        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded; // ������� -- ok, comment broke...
+        Scene loadedScene = SceneManager.GetSceneByName(sceneName);
+        if (loadedScene.IsValid())
+        {
+            missionScene = loadedScene;
+
+            // Робимо сцену світу Primary (Active) для цього конкретного гравця
+            SceneManager.SetActiveScene(loadedScene);
+
+            // Оновлюємо скайбокс та параметри освітлення
+            DynamicGI.UpdateEnvironment();
+        }
     }
 
     private void KillEnemies()

@@ -1,4 +1,5 @@
 using Netcode.Transports.Facepunch;
+using Player.Network;
 using Steamworks;
 using Steamworks.Data;
 using System.Collections.Generic;
@@ -168,6 +169,21 @@ namespace Steam
             //request.AddFilter("gametype", "1");
             return request;
         }
+
+        public async Task<List<SteamPlayer>> GetLobbyMembersAsync()
+        {
+            List<SteamPlayer> playerList = new();
+
+            foreach (var member in CurrentLobby.Value.Members)
+            {
+                var imageTask = await member.GetMediumAvatarAsync();
+
+                SteamPlayer player = new(member.Name, member.Id, imageTask, member);
+                playerList.Add(player);
+            }
+            return playerList;
+        }
+
 
         #region Steam Callbacks
 

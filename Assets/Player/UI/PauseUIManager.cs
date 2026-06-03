@@ -1,5 +1,6 @@
 using Player.Movement;
 using Player.Network;
+using Steam;
 using Steamworks;
 using Steamworks.Data;
 using System.Collections.Generic;
@@ -40,46 +41,26 @@ namespace Player.UI
                 return;
             }
 
-            if (settingsMenu != null && settingsMenu.activeSelf)
-            {
-                ToggleSettings(false);
-                return;
-            }
-
             bool opening = !pauseMenu.activeSelf;
-            
-            if (opening && shatterEffect != null)
+
+            if (opening)
             {
-                shatterEffect.TriggerEffect(() => {
-                    pauseMenu.SetActive(true);
-                });
+                if (shatterEffect != null) shatterEffect.TriggerEffect(() => { pauseMenu.SetActive(true); });
+                else pauseMenu.SetActive(true);
             }
             else
             {
-                pauseMenu.SetActive(!pauseMenu.activeSelf);
-                if (!pauseMenu.activeSelf && shatterEffect != null)
-                {
-                    shatterEffect.ResetEffect();
-                }
+                pauseMenu.SetActive(false);
+                if (settingsMenu != null) settingsMenu.SetActive(false);
+                if (shatterEffect != null) shatterEffect.ResetEffect();
             }
-            }
-
-            public void ToggleSettings(bool active)
-            {
-            settingsMenu.SetActive(active);
-            pauseMenu.SetActive(!active);
-            
-            if (!active && !pauseMenu.activeSelf && shatterEffect != null)
-            {
-                shatterEffect.ResetEffect();
-            }
-            }
+        }
 
         private List<PlayerCard> playerCards = new();
 
         private async void UpdatePauseUI(Lobby lobby)
         {
-            List<SteamPlayer> playerList = await GetLobbyMembersAsync(lobby);
+            List<SteamPlayer> playerList = await SteamManager.Instance.GetLobbyMembersAsync();
 
             //set each card as inactive
             foreach (var card in playerCards)
@@ -124,28 +105,6 @@ namespace Player.UI
                     Destroy(cardToDestroy.gameObject);
                 }
             }
-        }
-
-
-
-
-        public async Task<List<SteamPlayer>> GetLobbyMembersAsync(Lobby lobby)
-        {
-            List<SteamPlayer> playerList = new();
-
-            foreach (var member in lobby.Members)
-            {
-                var imageTask = await member.GetMediumAvatarAsync();
-
-                SteamPlayer player = new(member.Name, member.Id, imageTask, member);
-                playerList.Add(player);
-            }
-            return playerList;
-        }
-
-        void DestroyChildren(Transform parent)
-        {
-            foreach (Transform child in parent) Destroy(child.gameObject);
         }
     }
 }
