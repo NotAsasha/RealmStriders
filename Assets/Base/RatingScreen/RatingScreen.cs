@@ -13,21 +13,21 @@ namespace Base.RatingScreen
         public override void OnNetworkSpawn()
         {
             var teamRating = GameManager.Instance.teamRating;
-            var looseRating = GameManager.Instance.looseRating;
+            var lossRating = GameManager.Instance.lossRating;
 
             teamRating.OnValueChanged += (oldV, newV) =>
             {
                 teamRatingSlider.value = newV;
             };
 
-            looseRating.OnValueChanged += (oldV, newV) =>
+            lossRating.OnValueChanged += (oldV, newV) =>
             {
                 minRatingSlider.value = newV;
             };
 
             // Update at the beginning
             teamRatingSlider.value = teamRating.Value;
-            minRatingSlider.value = looseRating.Value;
+            minRatingSlider.value = lossRating.Value;
         }
     }
 }

@@ -9,11 +9,15 @@ using Random = UnityEngine.Random;
 
 namespace Scenes
 {
+    [RequireComponent(typeof(Volume), typeof(AudioSource))]
     public class EffectManager : MonoBehaviour
     {
-        private Volume effects;
-        private AudioSource sound;
+        [SerializeField] Volume defaultEffects;
+        [SerializeField] Volume timeEffects;
+
         [SerializeField] AudioClip[] ambientSounds;
+
+        private AudioSource sound;
 
         private float defaultTime;
         private float playerPresenceWeight = 0f;
@@ -21,16 +25,21 @@ namespace Scenes
 
         private void Start()
         {
-            effects = GetComponent<Volume>();
-            sound = GetComponent<AudioSource>();
-            effects.weight = 0;
+            if (!TryGetComponent<AudioSource>(out sound)) throw new Exception("There is no AudioSource to play.");
+
+            timeEffects.weight = 0;
+            defaultEffects.weight = 0;
 
             defaultTime = GameManager.Instance.defaultMissionTime + GameManager.Instance.maxTimeSpread;
 
             
 
-            InvokeRepeating(nameof(UpdateEffects), 1f, 0.1f); 
-            InvokeRepeating(nameof(PlayAmbientSounds), 5f, 1f);
+            InvokeRepeating(nameof(UpdateEffects), 1f, 0.1f);
+
+            if (ambientSounds.Length > 0)
+            {
+                InvokeRepeating(nameof(PlayAmbientSounds), 5f, 1f);
+            }
         }
 
         private void OnEnable() => PortalManager.Instance.OnTeleport += OnPlayerTeleports;
@@ -40,25 +49,32 @@ namespace Scenes
         {
             float timeStrength = GetEffectStrength(GameManager.Instance.missionDuration, defaultTime);
 
-            effects.weight = timeStrength * playerPresenceWeight;
+
+            if (timeEffects != null)
+            {
+                timeEffects.weight = timeStrength * playerPresenceWeight;
+            }
         }
 
         private void OnPlayerTeleports(Human human, bool isForward)
         {
+            Debug.Log("Effects OnPlayerTeleports");
             if (human.gameObject == PlayerMovement.Instance.gameObject)
             {
-                StartFade(isForward ? 1f : 0f);
+                StartFade(isForward ? 0f : 1f);
             }
         }
 
         private void StartFade(float target)
         {
+            Debug.Log("Effects StartFade");
             if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
             fadeCoroutine = StartCoroutine(FadeRoutine(target));
         }
 
         private IEnumerator FadeRoutine(float target)
         {
+            Debug.Log("FadeRoutine");
             float duration = 1.5f;
             float startValue = playerPresenceWeight;
             float elapsed = 0;
@@ -67,6 +83,10 @@ namespace Scenes
             {
                 elapsed += Time.deltaTime;
                 playerPresenceWeight = Mathf.Lerp(startValue, target, elapsed / duration);
+                Debug.Log(playerPresenceWeight);
+
+
+                defaultEffects.weight = playerPresenceWeight;
                 yield return null;
             }
             playerPresenceWeight = target;

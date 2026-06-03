@@ -46,7 +46,7 @@ namespace Player
         public float GetHealth() => entityHealth.Value;
         public void AddHealth(float health)
         {
-            if (IsEffectActive(EffectType.Invincible)) return;
+            if (!IsServer || IsEffectActive(EffectType.Invincible)) return;
 
 
             entityHealth.Value += health;

@@ -9,6 +9,8 @@ namespace Scenes.Settings
     {
         [FormerlySerializedAs("_sensSlider")] [SerializeField] private Slider sensSlider;
 
+        public UnityEngine.Events.UnityEvent OnClose;
+
         private SettingsFile settingsFile;
         private GameFileHandler fileHandler;
 
@@ -17,15 +19,29 @@ namespace Scenes.Settings
             fileHandler = GameFileHandler.Instance;
             settingsFile = (SettingsFile)fileHandler.SearchForFileByName("Settings");
 
-            sensSlider.value = settingsFile.save.sensValue;
+            Refresh();
         }
 
-        public void UpdateMouseSensativity()
+        private void OnEnable()
+        {
+            Refresh();
+        }
+
+        private void Refresh()
+        {
+            if (settingsFile != null && sensSlider != null)
+                sensSlider.value = settingsFile.save.sensValue;
+        }
+
+        public void UpdateMouseSensitivity()
         {
             settingsFile.save.sensValue = sensSlider.value;
             settingsFile.Save(false);
         }
 
-        
+        public void Close()
+        {
+            OnClose?.Invoke();
+        }
     }
 }

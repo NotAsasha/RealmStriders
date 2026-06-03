@@ -5,6 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Audio;
+using System;
 
 namespace Enemy
 {
@@ -18,15 +19,29 @@ namespace Enemy
 
         public float stepSoundCooldown = 0.3f;
         public AudioSource audioSource;
-        public AudioResource[] stepSounds;
+        public AudioClip[] stepSounds;
 
-        protected EnemyState enemyState = EnemyState.IsMoving;
+
+        private EnemyState _enemyState;
+        protected EnemyState enemyState
+        {
+            get => _enemyState;
+            set
+            {
+                if (_enemyState == value) return;
+
+                _enemyState = value;
+                onStateChanged?.Invoke(_enemyState);
+            }
+        }
+        public event Action<EnemyState> onStateChanged;
+        
 
         protected Animator animator;
         protected EntityDetector vision;
         protected NavMeshAgent agent;
         protected Rigidbody playerRigidbody;
-        protected Collider collider1;
+        protected Collider mainCollider;
 
         #region Initialization
 
@@ -43,7 +58,7 @@ namespace Enemy
             if (vision == null) TryGetComponent<EntityDetector>(out vision);
 
             if (playerRigidbody == null) TryGetComponent<Rigidbody>(out playerRigidbody);
-            if (collider1 == null) TryGetComponent<Collider>(out collider1);
+            if (mainCollider == null) TryGetComponent<Collider>(out mainCollider);
             if (animator == null) TryGetComponent<Animator>(out animator);
 
             ToggleRagdoll(true);
@@ -78,7 +93,7 @@ namespace Enemy
             vision.enabled = isActive;
             agent.enabled = isActive;
             playerRigidbody.isKinematic = isActive;
-            collider1.isTrigger = isActive;
+            mainCollider.isTrigger = isActive;
         }
 
         #endregion
@@ -113,10 +128,10 @@ namespace Enemy
             vision.DrawViewState(); //draw vision boundaries
             if (Time.time >= nextUpdate)
             {
-                nextUpdate = Time.time + 0.3f + Random.Range(0f, 0.1f);
+                nextUpdate = Time.time + 0.3f + UnityEngine.Random.Range(0f, 0.1f);
                 Think();
             }
-            if (isSoundReady && agent.velocity.magnitude > 0.1) PlayStepsSound(stepSoundCooldown);
+            if (agent.velocity.magnitude > 0.1) PlayStepsSound(stepSoundCooldown);
         }
 
         protected virtual void Think()
@@ -133,7 +148,7 @@ namespace Enemy
             if (ChasePlayer(overAggresive)) return;
 
             //third priority, go to the target location
-            if (agent.remainingDistance > agent.stoppingDistance & agent.pathStatus == NavMeshPathStatus.PathComplete) return; //not done with path
+            if (agent.remainingDistance > agent.stoppingDistance && agent.pathStatus == NavMeshPathStatus.PathComplete) return; //not done with path
 
             //forth priority, go somewhere
             Move();
@@ -180,26 +195,20 @@ namespace Enemy
             }
         }
 
-        bool isSoundReady = true;
+        private float nextStepTime;
+
         private void PlayStepsSound(float cooldown)
         {
-            isSoundReady = false;
+            if (Time.time < nextStepTime) return;
             if (stepSounds.Length <= 0)
             {
                 Debug.LogWarning($"---Enemy: {name} has no movement sounds.");
                 return;
             }
-            int soundsCount = stepSounds.Length;
-            audioSource.resource = stepSounds[Random.Range(0, soundsCount)];
-            audioSource.Play();
-            StartCoroutine(SoundTimer(cooldown));
-        }
 
-        private IEnumerator SoundTimer(float cooldown)
-        {
-            yield return new WaitForSeconds(cooldown);
-            isSoundReady = true;
-            audioSource.Stop();
+            nextStepTime = Time.time + cooldown;
+            audioSource.pitch = 1 + UnityEngine.Random.Range(-0.2f, 0.2f);
+            audioSource.PlayOneShot(stepSounds[UnityEngine.Random.Range(0, stepSounds.Length)]);
         }
     }
     public enum EnemyState

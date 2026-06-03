@@ -2,7 +2,6 @@ using Player;
 using System;
 using UnityEngine;
 using UnityEngine.Serialization;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace Portals
 {
@@ -30,18 +29,20 @@ namespace Portals
             {
                 cameraA.targetTexture.Release();
             }
-            cameraA.targetTexture = new RenderTexture(Screen.width / 2, Screen.height / 2, 24);
+            cameraA.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
             cameraMatA.mainTexture = cameraA.targetTexture;
 
             if (cameraB.targetTexture != null)
             {
                 cameraB.targetTexture.Release();
             }
-            cameraB.targetTexture = new RenderTexture(Screen.width / 2, Screen.height / 2, 24);
+            cameraB.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
             cameraMatB.mainTexture = cameraB.targetTexture;
 
-            SwitchCameras();
-        }
+            cameraA.gameObject.SetActive(true);
+            cameraB.gameObject.SetActive(true);
+            isForward = true;
+            }
 	
         public void ChangeState(bool isStarted)
         {
@@ -50,9 +51,7 @@ namespace Portals
 
         public void SwitchCameras()
         {
-            cameraA.gameObject.SetActive(isForward);
-            cameraB.gameObject.SetActive(!isForward);
-         
+            // Logic moved to PortalCamera.cs for better performance (visibility-based)
             isForward = !isForward;
         }
 

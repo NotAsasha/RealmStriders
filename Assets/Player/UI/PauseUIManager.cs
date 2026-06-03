@@ -1,5 +1,6 @@
 using Player.Movement;
 using Player.Network;
+using Steam;
 using Steamworks;
 using Steamworks.Data;
 using System.Collections.Generic;
@@ -12,10 +13,10 @@ namespace Player.UI
     public class PauseUIManager : MonoBehaviour
     {
         public GameObject pauseMenu;
+        public GameObject settingsMenu;
         public Transform cardsParent;
         public GameObject playerCard;
-
-        private Controls controls;
+        public ScreenShatterEffect shatterEffect;
 
         private void Start()
         {
@@ -26,7 +27,10 @@ namespace Player.UI
         private void OnDisable()
         {
             SteamMatchmaking.OnLobbyDataChanged -= UpdatePauseUI;
-            PlayerMovement.Instance.controls.System.Pause.performed -= UpdateMenuState;
+            if (PlayerMovement.Instance != null && PlayerMovement.Instance.controls != null)
+            {
+                PlayerMovement.Instance.controls.System.Pause.performed -= UpdateMenuState;
+            }
         }
 
         private void UpdateMenuState(InputAction.CallbackContext obj)
@@ -36,14 +40,27 @@ namespace Player.UI
                 CameraMovement.Instance.StopInteraction();
                 return;
             }
-            pauseMenu.SetActive(!pauseMenu.activeSelf);
+
+            bool opening = !pauseMenu.activeSelf;
+
+            if (opening)
+            {
+                if (shatterEffect != null) shatterEffect.TriggerEffect(() => { pauseMenu.SetActive(true); });
+                else pauseMenu.SetActive(true);
+            }
+            else
+            {
+                pauseMenu.SetActive(false);
+                if (settingsMenu != null) settingsMenu.SetActive(false);
+                if (shatterEffect != null) shatterEffect.ResetEffect();
+            }
         }
 
         private List<PlayerCard> playerCards = new();
 
         private async void UpdatePauseUI(Lobby lobby)
         {
-            List<SteamPlayer> playerList = await GetLobbyMembersAsync(lobby);
+            List<SteamPlayer> playerList = await SteamManager.Instance.GetLobbyMembersAsync();
 
             //set each card as inactive
             foreach (var card in playerCards)
@@ -88,28 +105,6 @@ namespace Player.UI
                     Destroy(cardToDestroy.gameObject);
                 }
             }
-        }
-
-
-
-
-        public async Task<List<SteamPlayer>> GetLobbyMembersAsync(Lobby lobby)
-        {
-            List<SteamPlayer> playerList = new();
-
-            foreach (var member in lobby.Members)
-            {
-                var imageTask = await member.GetMediumAvatarAsync();
-
-                SteamPlayer player = new(member.Name, member.Id, imageTask, member);
-                playerList.Add(player);
-            }
-            return playerList;
-        }
-
-        void DestroyChildren(Transform parent)
-        {
-            foreach (Transform child in parent) Destroy(child.gameObject);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Player.Movement
 
         [Header("Sounds")]
         public AudioSource audioSource;
-        public AudioResource[] stepSounds;
+        public AudioClip[] stepSounds;
 
         public Camera playerCamera;
 
@@ -63,15 +63,18 @@ namespace Player.Movement
 
             settingsFile = (SettingsFile)fileHandler.SearchForFileByName("Settings");
             LoadBindings();
+            SettingsFile.OnSettingsChanged += LoadBindings;
+
             controls.System.Enable();
             controls.Gameplay.Enable();
 
             SetupInputHandlers();
-        }
-        public override void OnNetworkDespawn()
-        {
+            }
+            public override void OnNetworkDespawn()
+            {
+            SettingsFile.OnSettingsChanged -= LoadBindings;
             CleanupInputHandlers();
-        }
+            }
 
         #endregion
 
@@ -185,34 +188,32 @@ namespace Player.Movement
 
             //Steps sound
             Vector2 horizontalVelocity = new(player.velocity.x, player.velocity.z);
-            if (isSoundReady && player.isGrounded && horizontalVelocity.magnitude > 0.3f) PlayStepsSound(isRunning ? 0.3f : 0.5f);
+            if (player.isGrounded && horizontalVelocity.magnitude > 0.3f) PlayStepsSound(isRunning ? 0.3f : 0.5f);
             
 
             //Apply movement
             Vector3 targetMove = move * currentSpeed;
-            Vector3 smoothMove = Vector3.Lerp(previousMove, targetMove, 10f * Time.deltaTime);
-            previousMove = smoothMove;
+            previousMove = Vector3.Lerp(previousMove, targetMove, 15f * Time.deltaTime);
 
 
-            player.Move((smoothMove + velocity) * Time.deltaTime);
+            player.Move((previousMove + velocity) * Time.deltaTime);
             velocity.y += gravity * Time.deltaTime;
-        }
+            }
 
-        private bool isSoundReady = true;
+        private float nextStepTime;
+
         private void PlayStepsSound(float cooldown)
         {
-            isSoundReady = false;
-            int soundsCount = stepSounds.Length;
-            audioSource.resource = stepSounds[Random.Range(0, soundsCount)];
-            audioSource.Play();
-            StartCoroutine(SoundTimer(cooldown));
-        }
+            if (Time.time < nextStepTime) return;
+            if (stepSounds.Length <= 0)
+            {
+                Debug.LogWarning($"---Player: {name} has no movement sounds.");
+                return;
+            }
 
-        private IEnumerator SoundTimer(float cooldown)
-        {
-            yield return new WaitForSeconds(cooldown);
-            isSoundReady = true;
-            audioSource.Stop();
+            nextStepTime = Time.time + cooldown;
+            audioSource.pitch = 1 + UnityEngine.Random.Range(-0.2f, 0.2f);
+            audioSource.PlayOneShot(stepSounds[UnityEngine.Random.Range(0, stepSounds.Length)]);
         }
     }
 }

@@ -50,24 +50,28 @@ namespace Player.Movement
             SettingsFile file = (SettingsFile)GameFileHandler.Instance.SearchForFileByName("Settings");
             mouseSensitivity = file.save.sensValue;
 
+            SettingsFile.OnSettingsChanged += UpdateSensitivity;
+
             SetupInputHandlers();
             UpdateCursorState();
-
-            if (!playerBody)
-            {
-                Debug.LogError("Player body not assigned to CameraMovement script!");
             }
-        }
 
-        public override void OnNetworkDespawn()
-        {
+            private void UpdateSensitivity()
+            {
+            SettingsFile file = (SettingsFile)GameFileHandler.Instance.SearchForFileByName("Settings");
+            mouseSensitivity = file.save.sensValue;
+            }
+
+            public override void OnNetworkDespawn()
+            {
             if (!IsOwner)
             {
                 return;
             }
 
+            SettingsFile.OnSettingsChanged -= UpdateSensitivity;
             CleanupInputHandlers();
-        }
+            }
 
 
         #endregion
@@ -216,11 +220,10 @@ namespace Player.Movement
             }
 
             Vector2 lookInput = PlayerMovement.Instance.controls.Gameplay.Look.ReadValue<Vector2>();
-            Vector2 smoothLook = Vector2.Lerp(previousLook, lookInput, 0.5f);
-            previousLook = smoothLook;
+            previousLook = Vector2.Lerp(previousLook, lookInput, 20f * Time.deltaTime);
 
-            float mouseX = lookInput.x * mouseSensitivity;
-            float mouseY = lookInput.y * mouseSensitivity;
+            float mouseX = previousLook.x * mouseSensitivity;
+            float mouseY = previousLook.y * mouseSensitivity;
 
             // Rotates the camera and a player body
             xRotation -= mouseY;
