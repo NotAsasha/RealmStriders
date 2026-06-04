@@ -38,7 +38,7 @@ namespace Temporary
         public void CallButtonPressServerRpc()
         {
             testGameFile.AddButtonClick();
-            testGameFile.Save(false);
+            testGameFile.Save();
             UiUpdateClientRPC(testGameFile.buttonPresses);
             //  _pressesCounter.text = "Button press count: " + testGameFile.buttonPresses;
         }

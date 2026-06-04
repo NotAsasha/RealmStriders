@@ -18,7 +18,7 @@ namespace FileSystem.Scripts
             {
                 Debug.LogWarning("---SaveFile: InputData is empty, resetting to default save");
                 save = new();
-                Save(false);
+                Save();
                 return;
             }
 

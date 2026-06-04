@@ -19,16 +19,15 @@ namespace FileSystem.Scripts
          Load(),Save(),Delete() - directly effects file on a drive.
          DataEncryptDecrypt() - Encrypts given data using key word from "encryptionCodeWord".
         */
-        [FormerlySerializedAs("_fileName")]
         [Header("File Settings")]
         [Tooltip("Displayed name of a file.")]
         [SerializeField] private string fileName = "Default";
-        [FormerlySerializedAs("_directory")]
         [Tooltip("File directory. Application.persistentDataPath is automatically added before it.")]
         [SerializeField] private string directory = "/Default/";
-        [FormerlySerializedAs("_fileExtention")]
         [Tooltip("File extension. Can be anything, it does not matter.")]
         [SerializeField] private string fileExtension = ".NotA";
+        [Tooltip("Whether to encrypt output files.")]
+        [SerializeField] private bool useEncryption = false;
 
         private const string EncryptionCodeWord = "NotTheBestSaveSystem";
 
@@ -61,7 +60,7 @@ namespace FileSystem.Scripts
         /// <summary>
         /// Tries to load all data from the file
         /// </summary>
-        public void Load(bool useDecryption)
+        public void Load()
         {
             string filePath = Path.Combine(Application.persistentDataPath + GetFullPath());
             string dirPath = Path.GetDirectoryName(filePath);
@@ -72,7 +71,7 @@ namespace FileSystem.Scripts
                 string dataToLoad = "";
                 using StreamReader reader = new(filePath);
                 dataToLoad = reader.ReadToEnd();
-                if (useDecryption) dataToLoad = DataEncryptDecrypt(dataToLoad);
+                if (useEncryption) dataToLoad = DataEncryptDecrypt(dataToLoad);
                 ProcessData(dataToLoad);
             }
             catch (Exception e)
@@ -83,7 +82,7 @@ namespace FileSystem.Scripts
         /// <summary>
         /// Tries to save some data to the file
         /// </summary>
-        public void Save(bool useEncryption)
+        public void Save()
         {
             string filePath = Path.Combine(Application.persistentDataPath + GetFullPath());
             string dirPath = Path.GetDirectoryName(filePath);

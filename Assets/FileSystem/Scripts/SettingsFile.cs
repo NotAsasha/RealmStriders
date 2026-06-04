@@ -17,7 +17,7 @@ namespace FileSystem.Scripts
             {
                 Debug.LogWarning("InputData is empty, resetting to default save");
                 save = new();
-                Save(false);
+                Save();
                 return;
             }
 
@@ -36,6 +36,6 @@ namespace FileSystem.Scripts
     public class SettingsSave
     {
         public string rebinds = "";
-        [FormerlySerializedAs("_sensValue")] public float sensValue = 0.5f;
+        public float sensValue = 0.5f;
     }
 }

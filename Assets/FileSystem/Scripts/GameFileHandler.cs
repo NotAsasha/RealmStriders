@@ -46,7 +46,7 @@ namespace FileSystem.Scripts
             }
             foreach (GameFile file in filesToLoad)
             {
-                file.Load(false);
+                file.Load();
             }
         }
 
