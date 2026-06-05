@@ -120,9 +120,9 @@ GameObject:
   - component: {fileID: 2706276264817999895}
   - component: {fileID: 8509525971977627619}
   - component: {fileID: 8002736168745895723}
-  - component: {fileID: 6980002636788170861}
+  - component: {fileID: -3017417999146061370}
   m_Layer: 6
-  m_Name: Taser
+  m_Name: BaseMover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1591,7 +1591,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2687716585
+  GlobalObjectIdHash: 3583913049
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1667,7 +1667,7 @@ MonoBehaviour:
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
---- !u!114 &6980002636788170861
+--- !u!114 &-3017417999146061370
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1676,26 +1676,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 5335012707719721587}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aeca2b4e4c904e4899351d7a7d1a5f9, type: 3}
+  m_Script: {fileID: 11500000, guid: ba592db929ab7c14bb24573aa2bdee28, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.Equipment.Taser.BaseMover
   ShowTopMostFoldoutHeaderGroup: 1
   isConsumable: 0
   sellPrice: 10
-  prefabId: 5
+  prefabId: 8
   isCurrentlyHeld: 0
-  entityLayer:
-    serializedVersion: 2
-    m_Bits: 128
   maxDistance: 5
-  cooldown: 10
-  freezeTime: 2
-  danger: {fileID: 4045124531342387241}
-  isReady:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 1
 --- !u!1 &6093537641514080808
 GameObject:
   m_ObjectHideFlags: 0

@@ -26,14 +26,16 @@ public class NetworkItemsHandler : NetworkBehaviour
         {
             if (netObj == null) continue;
 
-            var item = netObj.GetComponent<Player.Equipment.Item>();
+            var item = netObj.GetComponent<INetworkSaveable>();
             if (item == null) continue;
 
             data.Add(new ObjectEntry
             {
                 prefabID = item.PrefabId,
                 position = netObj.transform.position,
-                rotation = netObj.transform.rotation
+                rotation = netObj.transform.rotation,
+                otherInfo = item.GetInfo()
+
             });
         }
 
@@ -48,9 +50,10 @@ public class NetworkItemsHandler : NetworkBehaviour
         {
             var prefab = database.GetPrefab(obj.prefabID);
             var instance = Instantiate(prefab, obj.position, obj.rotation);
+            instance.GetComponent<INetworkSaveable>().ApplyInfo(obj.otherInfo);
 
             instance.Spawn();
-            instance.Register();
+            //instance.Register();
         }
     }
 }
@@ -61,6 +64,7 @@ public class ObjectEntry
     public int prefabID;
     public Vector3 position;
     public Quaternion rotation;
+    public string otherInfo = "";
 }
 
 public static class NetworkObjectExtension

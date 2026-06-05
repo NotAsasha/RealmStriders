@@ -1,85 +1,126 @@
 using System.Collections;
 using Player.Equipment;
 using Player.Movement;
+using Unity.Multiplayer.PlayMode;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace Base
 {
-    public class Terminal : NetworkBehaviour, IInteractable
+    // If terminal is moved and saved, it just creates a copy of it. So need to add a check whether terminal is dublicated. TODO
+    public class Terminal : NetworkBehaviour, IInteractable, IMovable, INetworkSaveable
     {
-        [SerializeField] protected Canvas terminalCanvas;
-        [SerializeField] private Vector3 cameraOffset = new Vector3(-1f, 1.5f, -0.5f);
-        [SerializeField] private Vector3 cameraEulerRotation = new Vector3(10f, 90f, 0f);
-        [SerializeField] private float moveDuration = 0.5f;
+        [Header("Terminal Settings")]
+        public int terminalPrefabID;
 
-        [SerializeField] AudioSource interactSound;
+        [SerializeField] protected Canvas terminalCanvas;
+        [SerializeField] private Transform cameraPoint;
+        [SerializeField] protected AudioSource interactSound;
+
+        [SerializeField, HideInInspector] private int prefabId;
+        public int PrefabId => prefabId;
+        public virtual string GetInfo() => "";
+        public virtual void ApplyInfo(string _) { }
 
         protected int ownerID = -1;
-        public CameraMovement playerCameraComponent;
 
-        #region Interatcion
+        #region Unity LifeCycle
+
+        public override void OnNetworkDespawn()
+        {
+            this.NetworkObject.UnRegister();
+        }
+
+        #endregion
+
+        #region Interaction
         public NetworkVariable<bool> isTaken = new(writePerm: NetworkVariableWritePermission.Server);
 
-        Coroutine cameraAnimation;
+        private GameObject currentPlayer;
+
+        public void SetPrefabId(int id)
+        {
+            prefabId = id;
+        }
+
         public void Interact(GameObject player)
         {
             SetTakenServerRpc(true);
+            currentPlayer = player;
 
-
+            //activate UI
             var camera = player.GetComponentInChildren<Camera>();
-            playerCameraComponent = camera.gameObject.GetComponent<CameraMovement>();
-            if (camera == null) return;
-            cameraAnimation = player.GetComponent<MonoBehaviour>().StartCoroutine(MoveCameraToTerminal(camera));
-
+            if (camera != null)
+            {
+                terminalCanvas.worldCamera = camera;
+            }
 
             ownerID = (int)player.GetComponentInParent<NetworkObject>().OwnerClientId;
             if (interactSound != null) interactSound.Play();
         }
-        private IEnumerator MoveCameraToTerminal(Camera playerCamera)
-        {
-            Vector3 startPos = playerCamera.transform.position;
-            Quaternion startRot = playerCamera.transform.rotation;
 
-            Vector3 targetPos = transform.TransformPoint(cameraOffset);
-            Quaternion targetRot = Quaternion.Euler(transform.eulerAngles + cameraEulerRotation);
-
-            float elapsed = 0f;
-            while (elapsed < moveDuration)
-            {
-                elapsed += Time.deltaTime;
-                float t = Mathf.SmoothStep(0, 1, elapsed / moveDuration);
-
-                playerCamera.transform.position = Vector3.Lerp(startPos, targetPos, t);
-                playerCamera.transform.rotation = Quaternion.Slerp(startRot, targetRot, t);
-
-                yield return null;
-            }
-
-            playerCamera.transform.position = targetPos;
-            playerCamera.transform.rotation = targetRot;
-
-            // activate ui
-            terminalCanvas.worldCamera = playerCamera;
-        }
-        public void StopInteraction(GameObject player)
+        public void StopInteraction()
         {
             SetTakenServerRpc(false);
 
-            player.GetComponent<MonoBehaviour>().StopCoroutine(cameraAnimation);
-            player.transform.localPosition = playerCameraComponent.startPosition;
-            playerCameraComponent = null;
+            if (currentPlayer ==  null)
+            {
+                Debug.LogError("Stopping Interaction, but there is no player");
+            }
+
             ownerID = -1;
             if (interactSound != null) interactSound.Stop();
         }
 
+
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void SetTakenServerRpc(bool whatToSet)
-        {
-            isTaken.Value = whatToSet;
-        }
+        public void SetTakenServerRpc(bool whatToSet) => isTaken.Value = whatToSet;
 
         public bool IsTaken() => isTaken.Value;
+        public Transform GetCameraPoint() => cameraPoint;
+
+        #endregion
+
+        #region Move
+
+        public void Pack()
+        {
+            PackServerRpc();
+        }
+
+        [Rpc(SendTo.Server)]
+        private void PackServerRpc()
+        {
+            DeactivateRpc();
+
+            GameObject cubePrefab = NetworkItemsHandler.Instance.database.cubeItemPrefab;
+
+            GameObject cubeInstance = Instantiate(cubePrefab, GetComponent<Collider>().bounds.center + Vector3.up * 0.5f, Quaternion.identity);
+            cubeInstance.GetComponent<PackedFurnitureItem>().storedPrefabID.Value = this.PrefabId;
+            cubeInstance.GetComponent<NetworkObject>().Spawn();
+
+
+            NetworkObject.Despawn(true);
+        }
+
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void DeactivateRpc()
+        {
+            DeactivateClientRpc();
+            isTaken.Value = false; 
+        }
+
+        [ClientRpc]
+        public void DeactivateClientRpc()
+        {
+            if (currentPlayer != null) currentPlayer.GetComponent<CameraMovement>().StopInteraction();
+            if (interactSound != null) interactSound.Stop();
+            ownerID = -1;
+        }
+
+
+
         #endregion
     }
 }

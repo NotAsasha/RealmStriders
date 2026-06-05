@@ -97,14 +97,14 @@ namespace Base.SlotMachine
         public void SpawnRandomItem()
         {
             int index = Random.Range(0, itemsToDrop.Count);
-            itemsToDrop[index].InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, GameManager.Instance.spawnPoint).Register();
+            itemsToDrop[index].InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, GameManager.Instance.spawnPoint);
             Debug.Log($"---SlotMachine: Won random item - {itemsToDrop[index].name}!");
 
         }
         [ClientRpc]
         public void TurnIntoMonsterClientRpc()
         {
-            if (playerCameraComponent != null) playerCameraComponent.StopInteraction();
+            DeactivateRpc();
             Debug.Log("---SlotMachine: Main prize!");
         }
     }

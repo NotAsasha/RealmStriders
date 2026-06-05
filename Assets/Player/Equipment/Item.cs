@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Player.Equipment
 {
-    public class Item : NetworkBehaviour, IInteractable
+    public class Item : NetworkBehaviour, IInteractable, INetworkSaveable
     {
         [Header("Item Settings")]
         [SerializeField] protected bool isConsumable = false;
@@ -17,6 +17,8 @@ namespace Player.Equipment
         public int PrefabId => prefabId;
         public void SetPrefabId(int id) => prefabId = id;
 
+        public virtual string GetInfo() => "";
+        public virtual void ApplyInfo(string _) {}
 
         private Collider itemCollider;
         private Rigidbody itemRigidbody;
@@ -32,6 +34,17 @@ namespace Player.Equipment
         {
             CacheComponents();
         }
+
+        public override void OnNetworkSpawn()
+        {
+            this.NetworkObject.Register();
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            this.NetworkObject.UnRegister();
+        }
+
         #endregion
 
         #region Component Management
@@ -58,9 +71,9 @@ namespace Player.Equipment
             Take(player);
         }
 
-        public void StopInteraction(GameObject player)
+        public void StopInteraction()
         {
-            Drop(player);
+            Drop();
         }
 
         virtual public void Take(GameObject player)
@@ -88,7 +101,7 @@ namespace Player.Equipment
             }
         }
 
-        virtual public void Drop(GameObject player)
+        virtual public void Drop()
         {
             if (!isCurrentlyHeld)
             {

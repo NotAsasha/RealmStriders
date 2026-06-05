@@ -394,7 +394,7 @@ namespace Player
             }
 
             Item takable = networkObject.GetComponent<Item>();
-            takable?.Drop(gameObject);
+            takable?.Drop();
 
             DropItemClientRpc(objRef);
         }

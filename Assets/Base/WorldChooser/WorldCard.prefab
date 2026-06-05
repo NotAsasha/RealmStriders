@@ -281,7 +281,6 @@ GameObject:
   - component: {fileID: 8754455059302105114}
   - component: {fileID: 7477072542933926840}
   - component: {fileID: 6342007294859714306}
-  - component: {fileID: 9050378700231049714}
   - component: {fileID: 6122967146154448703}
   m_Layer: 10
   m_Name: WorldCard
@@ -351,31 +350,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &9050378700231049714
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3454394698847983652}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1856978160
-  InScenePlacedSourceGlobalObjectIdHash: 2003940608
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 0
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!114 &6122967146154448703
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -388,84 +362,79 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3eaa3db262ca6704dbbd07852663b34f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
   missionNameUI: {fileID: 634827130494301321}
   enemiesCountUI: {fileID: 6408097110031939390}
   averageDangerUI: {fileID: 243613416076206462}
   missionName:
-    m_InternalValue:
-      utf8LengthInBytes: 6
-      bytes:
-        offset0000:
-          byte0000: 87
-          byte0001: 111
-          byte0002: 114
-          byte0003: 108
-          byte0004: 100
-          byte0005: 49
-          byte0006: 0
-          byte0007: 0
-          byte0008: 0
-          byte0009: 0
-          byte0010: 0
-          byte0011: 0
-          byte0012: 0
-          byte0013: 0
-          byte0014: 0
-          byte0015: 0
-        offset0016:
-          byte0000: 0
-          byte0001: 0
-          byte0002: 0
-          byte0003: 0
-          byte0004: 0
-          byte0005: 0
-          byte0006: 0
-          byte0007: 0
-          byte0008: 0
-          byte0009: 0
-          byte0010: 0
-          byte0011: 0
-          byte0012: 0
-          byte0013: 0
-          byte0014: 0
-          byte0015: 0
-        offset0032:
-          byte0000: 0
-          byte0001: 0
-          byte0002: 0
-          byte0003: 0
-          byte0004: 0
-          byte0005: 0
-          byte0006: 0
-          byte0007: 0
-          byte0008: 0
-          byte0009: 0
-          byte0010: 0
-          byte0011: 0
-          byte0012: 0
-          byte0013: 0
-          byte0014: 0
-          byte0015: 0
-        byte0048: 0
-        byte0049: 0
-        byte0050: 0
-        byte0051: 0
-        byte0052: 0
-        byte0053: 0
-        byte0054: 0
-        byte0055: 0
-        byte0056: 0
-        byte0057: 0
-        byte0058: 0
-        byte0059: 0
-        byte0060: 0
-        byte0061: 0
-  enemiesCount:
-    m_InternalValue: 1
-  averageDanger:
-    m_InternalValue: 1
-  parent: {fileID: 0}
+    utf8LengthInBytes: 6
+    bytes:
+      offset0000:
+        byte0000: 87
+        byte0001: 111
+        byte0002: 114
+        byte0003: 108
+        byte0004: 100
+        byte0005: 49
+        byte0006: 0
+        byte0007: 0
+        byte0008: 0
+        byte0009: 0
+        byte0010: 0
+        byte0011: 0
+        byte0012: 0
+        byte0013: 0
+        byte0014: 0
+        byte0015: 0
+      offset0016:
+        byte0000: 0
+        byte0001: 0
+        byte0002: 0
+        byte0003: 0
+        byte0004: 0
+        byte0005: 0
+        byte0006: 0
+        byte0007: 0
+        byte0008: 0
+        byte0009: 0
+        byte0010: 0
+        byte0011: 0
+        byte0012: 0
+        byte0013: 0
+        byte0014: 0
+        byte0015: 0
+      offset0032:
+        byte0000: 0
+        byte0001: 0
+        byte0002: 0
+        byte0003: 0
+        byte0004: 0
+        byte0005: 0
+        byte0006: 0
+        byte0007: 0
+        byte0008: 0
+        byte0009: 0
+        byte0010: 0
+        byte0011: 0
+        byte0012: 0
+        byte0013: 0
+        byte0014: 0
+        byte0015: 0
+      byte0048: 0
+      byte0049: 0
+      byte0050: 0
+      byte0051: 0
+      byte0052: 0
+      byte0053: 0
+      byte0054: 0
+      byte0055: 0
+      byte0056: 0
+      byte0057: 0
+      byte0058: 0
+      byte0059: 0
+      byte0060: 0
+      byte0061: 0
+  enemiesCount: 1
+  averageDanger: 1
 --- !u!1 &4100615972869537037
 GameObject:
   m_ObjectHideFlags: 0

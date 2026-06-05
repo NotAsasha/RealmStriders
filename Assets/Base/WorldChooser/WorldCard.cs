@@ -4,40 +4,29 @@ using UnityEngine;
 using NetString = Unity.Collections.FixedString64Bytes;
 namespace Base.WorldChooser
 {
-    public class WorldCard : NetworkBehaviour
+    public class WorldCard : MonoBehaviour
     {
         [SerializeField] TMP_Text missionNameUI;
         [SerializeField] TMP_Text enemiesCountUI;
         [SerializeField] TMP_Text averageDangerUI;
 
-        public NetworkVariable<NetString> missionName = new("World1");
-        public NetworkVariable<int> enemiesCount = new(1);
-        public NetworkVariable<float> averageDanger = new(1);
+        public NetString missionName = "World1";
+        public int enemiesCount = 1;
+        public float averageDanger = 1;
 
-        public override void OnNetworkSpawn()
+        private void Start()
         {
-            if (missionNameUI == null || enemiesCountUI == null || averageDangerUI == null)
-            {
-                Debug.LogError($"WorldCard on {gameObject.name} has nulls...");
-                return;
-            }
-
-            missionName.OnValueChanged += (oldV, newV) => missionNameUI.text = newV.ToString();
-            enemiesCount.OnValueChanged += (oldV, newV) => enemiesCountUI.text = "Enemy number: " + newV;
-            averageDanger.OnValueChanged += (oldV, newV) => averageDangerUI.text = "Approximate danger: " + newV;
-
             UpdateUI();
         }
-
         private void UpdateUI()
         {
             missionNameUI.text = missionName.Value.ToString();
-            enemiesCountUI.text = "Enemy number: " + enemiesCount.Value;
-            averageDangerUI.text = "Approximate danger: " + averageDanger.Value;
+            enemiesCountUI.text = "Enemy number: " + enemiesCount;
+            averageDangerUI.text = "Approximate danger: " + averageDanger;
         }
         public void SetMission()
         {
-            SetMissionServerRpc(missionName.Value, enemiesCount.Value, averageDanger.Value);
+            SetMissionServerRpc(missionName.Value, enemiesCount, averageDanger);
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]

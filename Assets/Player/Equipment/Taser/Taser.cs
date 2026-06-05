@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Player.Equipment.Taser
 {
-    public class Stunner : Item
+    public class Taser : Item
     {
         [SerializeField] LayerMask entityLayer;
         [SerializeField] float maxDistance = 20f;

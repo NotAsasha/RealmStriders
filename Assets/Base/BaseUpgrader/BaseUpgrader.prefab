@@ -705,8 +705,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2150230554374005238}
-        m_TargetAssemblyTypeName: Base, Assembly-CSharp
+      - m_Target: {fileID: 3387458183286657816}
+        m_TargetAssemblyTypeName: BaseUpgrader, Assembly-CSharp
         m_MethodName: BuyDetectionServerRpc
         m_Mode: 1
         m_Arguments:
@@ -1460,8 +1460,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2150230554374005238}
-        m_TargetAssemblyTypeName: Base, Assembly-CSharp
+      - m_Target: {fileID: 3387458183286657816}
+        m_TargetAssemblyTypeName: BaseUpgrader, Assembly-CSharp
         m_MethodName: BuyBeamServerRpc
         m_Mode: 1
         m_Arguments:
@@ -2154,8 +2154,7 @@ GameObject:
   - component: {fileID: 197419654439911761}
   - component: {fileID: 6660062480593121854}
   - component: {fileID: 5223368813646543573}
-  - component: {fileID: 6504972253507710392}
-  - component: {fileID: 2150230554374005238}
+  - component: {fileID: 3387458183286657816}
   m_Layer: 6
   m_Name: BaseUpgrader
   m_TagString: Untagged
@@ -2177,6 +2176,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4696478714488446848}
+  - {fileID: 7837431273183339094}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1684342071651458196
@@ -2826,7 +2826,7 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &6504972253507710392
+--- !u!114 &3387458183286657816
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2835,37 +2835,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 5833512590392862751}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ebb1acce09eaa44891f4586fc85ba4b, type: 3}
+  m_Script: {fileID: 11500000, guid: 53a2043c84a6b11408048a1c3750f40b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::BaseUpgrader
   ShowTopMostFoldoutHeaderGroup: 1
+  terminalPrefabID: 0
   terminalCanvas: {fileID: 3013050711042986232}
-  cameraOffset: {x: -1, y: 1.5, z: -0.5}
-  cameraEulerRotation: {x: 20, y: 90, z: 0}
-  moveDuration: 0.5
+  cameraPoint: {fileID: 7837431273183339094}
   interactSound: {fileID: 0}
-  playerCameraComponent: {fileID: 0}
+  prefabId: 10
   isTaken:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
---- !u!114 &2150230554374005238
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5833512590392862751}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae1c0e1e2a0c5474c87732ba915d5484, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  radarTerminal: {fileID: 0}
-  radarButton: {fileID: 0}
-  casinoWall: {fileID: 0}
-  radarOnlyLayer:
-    serializedVersion: 2
-    m_Bits: 256
   terminalPrice: 200
   detectionPrice: 300
   beamPrice: 400
@@ -3538,8 +3521,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8018029762623290068}
   m_HandleRect: {fileID: 3915074430159803064}
   m_Direction: 2
-  m_Value: 0.99999595
-  m_Size: 0.55
+  m_Value: 0.9999932
+  m_Size: 0.54999834
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3772,8 +3755,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2150230554374005238}
-        m_TargetAssemblyTypeName: Base, Assembly-CSharp
+      - m_Target: {fileID: 3387458183286657816}
+        m_TargetAssemblyTypeName: BaseUpgrader, Assembly-CSharp
         m_MethodName: BuyTerminalServerRpc
         m_Mode: 1
         m_Arguments:
@@ -4179,8 +4162,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2150230554374005238}
-        m_TargetAssemblyTypeName: Base, Assembly-CSharp
+      - m_Target: {fileID: 3387458183286657816}
+        m_TargetAssemblyTypeName: BaseUpgrader, Assembly-CSharp
         m_MethodName: BuyCasinoServerRpc
         m_Mode: 1
         m_Arguments:
@@ -4671,4 +4654,43 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2906132247959522713, guid: 86727855370c9d54eb22144bc42fd16c,
     type: 3}
   m_PrefabInstance: {fileID: 272600804719851025}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3265583848615429363
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5224805091327604296}
+    m_Modifications:
+    - target: {fileID: 4725834028049540773, guid: 05eaedc280ae23e418bae27f00b3919a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 4725834028049540773, guid: 05eaedc280ae23e418bae27f00b3919a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 4725834028049540773, guid: 05eaedc280ae23e418bae27f00b3919a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7400292557832294690, guid: 05eaedc280ae23e418bae27f00b3919a,
+        type: 3}
+      propertyPath: m_Name
+      value: CameraPoint
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 05eaedc280ae23e418bae27f00b3919a, type: 3}
+--- !u!4 &7837431273183339094 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4725834028049540773, guid: 05eaedc280ae23e418bae27f00b3919a,
+    type: 3}
+  m_PrefabInstance: {fileID: 3265583848615429363}
   m_PrefabAsset: {fileID: 0}

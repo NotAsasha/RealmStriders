@@ -22,7 +22,7 @@ namespace Base.Interactables
             onInteract.Invoke();
         }
 
-        public void StopInteraction(GameObject player)
+        public void StopInteraction()
         {
         
         }

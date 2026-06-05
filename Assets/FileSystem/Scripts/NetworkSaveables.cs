@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.Netcode;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -8,12 +9,22 @@ using UnityEditor;
 [CreateAssetMenu(fileName = "NetworkSaveables", menuName = "Not/NetworkSaveables")]
 public class NetworkSaveables : ScriptableObject
 {
+    [Header("Усі префаби (Предмети та Меблі)")]
     public List<NetworkObject> prefabs;
 
-    public NetworkObject GetPrefab(int id) => prefabs[id];
+    [Header("Системні префаби")]
+    public GameObject cubeItemPrefab;
+
+    public NetworkObject GetPrefab(int id)
+    {
+        if (id >= 0 && id < prefabs.Count)
+            return prefabs[id];
+
+        Debug.LogError($"[NetworkSaveables] Префаб з ID {id} не знайдено!");
+        return null;
+    }
 
 #if UNITY_EDITOR
-    // Викликається при зміні списку в інспекторі
     private void OnValidate()
     {
         if (prefabs == null) return;
@@ -22,12 +33,17 @@ public class NetworkSaveables : ScriptableObject
         {
             if (prefabs[i] == null) continue;
 
-            var item = prefabs[i].GetComponent<Player.Equipment.Item>();
-            if (item != null && item.PrefabId != i)
+            var saveable = prefabs[i].GetComponent<INetworkSaveable>();
+
+            if (saveable != null && saveable.PrefabId != i)
             {
-                item.SetPrefabId(i);
-                // Позначаємо префаб як "брудний", щоб Unity зберегла зміни в файлі
+                saveable.SetPrefabId(i);
                 EditorUtility.SetDirty(prefabs[i]);
+                Debug.Log($"[NetworkSaveables] Оновлено ID для {prefabs[i].name} на {i}");
+            }
+            else if (saveable == null)
+            {
+                Debug.LogWarning($"[NetworkSaveables] Об'єкт {prefabs[i].name} не має компонента, що реалізує INetworkSaveable!");
             }
         }
     }

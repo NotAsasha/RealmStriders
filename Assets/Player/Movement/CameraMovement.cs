@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
+using System.Collections;
 
 namespace Player.Movement
 {
@@ -19,6 +20,10 @@ namespace Player.Movement
         public float mouseSensitivity = 1f;
         public float hitDistance = 2.0f;
         public Vector3 startPosition;
+
+        [Header("Interaction")]
+        public float moveDuration = 0.5f;
+
 
         private float xRotation;
         private IInteractable interactable;
@@ -54,16 +59,16 @@ namespace Player.Movement
 
             SetupInputHandlers();
             UpdateCursorState();
-            }
+        }
 
-            private void UpdateSensitivity()
-            {
+        private void UpdateSensitivity()
+        {
             SettingsFile file = (SettingsFile)GameFileHandler.Instance.SearchForFileByName("Settings");
             mouseSensitivity = file.save.sensValue;
-            }
+        }
 
-            public override void OnNetworkDespawn()
-            {
+        public override void OnNetworkDespawn()
+        {
             if (!IsOwner)
             {
                 return;
@@ -71,7 +76,7 @@ namespace Player.Movement
 
             SettingsFile.OnSettingsChanged -= UpdateSensitivity;
             CleanupInputHandlers();
-            }
+        }
 
 
         #endregion
@@ -110,7 +115,7 @@ namespace Player.Movement
         private void OnInteract(InputAction.CallbackContext obj)
         {
             if (movement.isPaused) return;
-            
+
             if (movement.isInInteraction)
             {
                 StopInteraction();
@@ -143,6 +148,7 @@ namespace Player.Movement
 
         #region Private Helper Methods
 
+        Coroutine cameraAnimation;
         private void StartInteraction()
         {
             //Check for objects in sight
@@ -163,9 +169,30 @@ namespace Player.Movement
             if (isSingleUse) interactable = null;
             else
             {
-                transform.parent = hit.collider.gameObject.transform;
-                transform.localScale = new Vector3(1f, 1f, 1f);
+                cameraAnimation = StartCoroutine(MoveToInteractible(interactable.GetCameraPoint()));
             }
+        }
+
+        private IEnumerator MoveToInteractible(Transform cameraPoint)
+        {
+            Vector3 startPos = transform.position;
+            Quaternion startRot = transform.rotation;
+
+
+            float elapsed = 0f;
+            while (elapsed < moveDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.SmoothStep(0, 1, elapsed / moveDuration);
+
+                transform.position = Vector3.Lerp(startPos, cameraPoint.position, t);
+                transform.rotation = Quaternion.Slerp(startRot, cameraPoint.rotation, t);
+
+                yield return null;
+            }
+
+            transform.position = cameraPoint.position;
+            transform.rotation = cameraPoint.rotation;
         }
 
         public void StopInteraction()
@@ -176,9 +203,10 @@ namespace Player.Movement
                 return;
             }
 
-            interactable.StopInteraction(gameObject);
+            interactable.StopInteraction();
             interactable = null;
-            transform.parent = playerBody;
+            StopCoroutine(cameraAnimation);
+
             transform.localPosition = startPosition;
             transform.localScale = new Vector3(1f, 1f, 1f);
             ToggleInteractionUI(false);

@@ -62,7 +62,7 @@ namespace Player
             if (isDead.Value || GetHealth() >= 1) return;
             var glass = Instantiate(glassCage, transform.position, Quaternion.identity);
             glass.Spawn();
-            glass.Register();
+            //glass.Register();
             isDead.Value = true;
         }
 

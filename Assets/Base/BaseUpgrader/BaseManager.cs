@@ -14,7 +14,7 @@ namespace Base.BaseUpgrader
         IsBeamBought = 1 << 2,    // 0100 (4)
         IsCasinoBought = 1 << 3,// 1000 (8)
     }
-    public class Base : NetworkBehaviour
+    public class BaseManager : NetworkBehaviour
     {
         [Header("References")]
         [SerializeField] private NetworkObject radarTerminal;
@@ -26,22 +26,15 @@ namespace Base.BaseUpgrader
         [SerializeField] private LayerMask radarOnlyLayer; 
         private Camera radarCamera;
 
-        [Header("Prices")]
-        [SerializeField] private int terminalPrice = 200;
-        [SerializeField] private int detectionPrice = 300;
-        [SerializeField] private int beamPrice = 400;
-        [SerializeField] private int casinoPrice = 300;
+        public NetworkVariable<int> baseUpgrades;
 
-
-        public readonly NetworkVariable<int> baseUpgrades = new();
-
-
-        public static Base Instance;
+        public static BaseManager Instance;
         #region Unity Lifecycle
 
         private void Awake()
         {
             Instance = this;
+            baseUpgrades = new();
         }
 
         public override void OnNetworkSpawn()
@@ -137,53 +130,5 @@ namespace Base.BaseUpgrader
         }
 
         #endregion
-
-
-
-
-        //
-        // NEEDS TO BE REFACTORED, terrible code, TODO
-        //
-        // EDIT: now it`s better, but can still be done via dictionary, or whatever
-
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void BuyTerminalServerRpc()
-        {
-            BuyUpgrade(BaseUpgrades.IsTerminalBought, terminalPrice);
-        }
-
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void BuyDetectionServerRpc()
-        {
-            //buy the previous one
-            if ((baseUpgrades.Value & (int)BaseUpgrades.IsTerminalBought) == 0) return;
-
-            BuyUpgrade(BaseUpgrades.IsDetectionBought, detectionPrice);
-        }
-
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void BuyBeamServerRpc()
-        {
-            //buy the previous one
-            if ((baseUpgrades.Value & (int)BaseUpgrades.IsDetectionBought) == 0) return;
-
-            BuyUpgrade(BaseUpgrades.IsBeamBought, beamPrice);
-        }
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void BuyCasinoServerRpc()
-        {
-            BuyUpgrade(BaseUpgrades.IsCasinoBought, casinoPrice);
-        }
-
-
-        private void BuyUpgrade(BaseUpgrades toBuy, int price)
-        {
-            if ((baseUpgrades.Value & (int)toBuy) != 0) return;
-            if (GameManager.Instance == null) return;
-            if (GameManager.Instance.teamMoney.Value < price) return;
-
-            GameManager.Instance.teamMoney.Value -= price;
-            baseUpgrades.Value |= (int)toBuy;
-        }
     }
 }

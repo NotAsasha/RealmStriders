@@ -1,8 +1,9 @@
+using Base;
+using Base.BaseUpgrader;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
-
 namespace FileSystem.Scripts
 {
     [CreateAssetMenu(fileName = "SaveFile", menuName = "Not/SaveFile")]
@@ -38,29 +39,29 @@ namespace FileSystem.Scripts
                     lossRating = GameManager.Instance.lossRating.Value,
                     teamMoney = GameManager.Instance.teamMoney.Value,
                     objects = NetworkItemsHandler.Instance.GetSaveablesInfo(),
-                    baseUpgrades = Base.BaseUpgrader.Base.Instance.baseUpgrades.Value
+                    baseUpgrades = BaseManager.Instance.baseUpgrades.Value
                 };
             }
             return JsonUtility.ToJson(save);
-            }
+        }
 
 
-            public void LoadGameSave()
-            {
+        public void LoadGameSave()
+        {
             Debug.Log("SaveFile: ---LoadGameSave");
             GameManager.Instance.teamRating.Value = save.teamRating;
             GameManager.Instance.lossRating.Value = save.lossRating;
             GameManager.Instance.teamMoney.Value = save.teamMoney;
-            Base.BaseUpgrader.Base.Instance.baseUpgrades.Value = save.baseUpgrades;
+            BaseManager.Instance.baseUpgrades.Value = save.baseUpgrades;
 
             NetworkItemsHandler.Instance.LoadSaveables(save.objects);
-            }
+        }
 
 
 
-            [Serializable]
-            public class SaveData
-            {
+        [Serializable]
+        public class SaveData
+        {
             public int teamRating = 3;
             public int lossRating;
             public int teamMoney = 5600;

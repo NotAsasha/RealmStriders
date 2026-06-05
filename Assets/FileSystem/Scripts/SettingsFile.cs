@@ -28,11 +28,11 @@ namespace FileSystem.Scripts
         public override string GetData()
         {
             OnSettingsChanged?.Invoke();
-            string jsonSave = JsonUtility.ToJson(save); 
+            string jsonSave = JsonUtility.ToJson(save);
             return jsonSave;
         }
-        }
-        [Serializable]
+    }
+    [Serializable]
     public class SettingsSave
     {
         public string rebinds = "";

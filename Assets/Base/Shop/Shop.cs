@@ -21,7 +21,7 @@ namespace Base.Shop
             if (item == null) return;
 
             GameManager.Instance.teamMoney.Value -= price;
-            item.InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, spawnPosition).Register();
+            item.InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, spawnPosition);
             Debug.Log($"---Shop: Item bought: {item.name}");
         }
     }

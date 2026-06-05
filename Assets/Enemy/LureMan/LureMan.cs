@@ -17,6 +17,5 @@ namespace Enemy.LureMan
             //second priority, search for player
             if (ChasePlayer(overAggresive)) return;
         }
-
     }
 }
