@@ -1,25 +1,7 @@
 A game where you hunt down monsters.
 
+Installation:
+- Download Unity(6.3) and just open the project in it
+
 Current ToDo:
-
-InBase:
----Radar, costs extra money, shows whole map, updates every few seconds. ------Done
-//---Sell point (throw items to sell) ------Done
----Minigame, has it`s own panel (Why not :?)
-
-
-Game Cycle:
----Enemy Spawner (should have list of enemies)
----Rating recalculation( if you kill at least one enemy, mission counts as completed, gives 1 rating)
-//---Timer to the end of the mission ------Done
-
-Misc:
----Esc button should end interaction
----Interaction should disable point in the middle (crosshair)
-
-Enemies:
----More enemies
-
-Player:
----More equipment
-//---Dosimeter, to check how much time has left. ------Done
+https://trello.com/b/NutR2f53/reals-striders
