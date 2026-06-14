@@ -9,6 +9,7 @@ namespace Player.Equipment
         [Header("Item Settings")]
         [SerializeField] protected bool isConsumable = false;
         [SerializeField] public int sellPrice = 10;
+        [SerializeField] public AudioClip[] clickSounds;
 
 
 
@@ -127,6 +128,10 @@ namespace Player.Equipment
             Debug.Log($"Using {gameObject.name} by {player.name}");
 
             //Do things
+            if (clickSounds.Length > 0)
+            {
+                audioSource.PlayOneShot(clickSounds[UnityEngine.Random.Range(0, clickSounds.Length)]);
+            }
             ExecuteItemAction(player);
         }
 

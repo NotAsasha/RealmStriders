@@ -39,17 +39,19 @@ namespace Portals
                 else return;
             }
 
+            // TO FIX, CURRENTLY ONLY CAUSESS STUTTERS --- TODO
             // Optimization: Only render if visible or close
-            float distance = Vector3.Distance(playerCamera.position, portal.position);
-            if (portalRenderer != null)
-            {
-                if (!portalRenderer.isVisible && distance > 3f)
-                {
-                    portalCam.enabled = false;
-                    return;
-                }
-                portalCam.enabled = true;
-            }
+
+            //float distance = Vector3.Distance(playerCamera.position, portal.position);
+            //if (portalRenderer != null)
+            //{
+            //    if (!portalRenderer.isVisible && distance > 3f)
+            //    {
+            //        portalCam.enabled = false;
+            //        return;
+            //    }
+            //    portalCam.enabled = true;
+            //}
 
             // Position and rotation logic (Mirror effect)
             Vector3 localPos = portal.InverseTransformPoint(playerCamera.position);

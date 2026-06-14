@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections;
-using Player;
+﻿using Player;
 using Player.Movement;
 using Portals;
+using System;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
@@ -16,6 +17,8 @@ namespace Scenes
         [SerializeField] Volume timeEffects;
 
         [SerializeField] AudioClip[] ambientSounds;
+        [SerializeField] AudioSource[] sceneAudios;
+
 
         private AudioSource sound;
 
@@ -29,6 +32,10 @@ namespace Scenes
 
             timeEffects.weight = 0;
             defaultEffects.weight = 0;
+            foreach (AudioSource source in sceneAudios)
+            {
+                source.volume = 0;
+            }
 
             defaultTime = GameManager.Instance.defaultMissionTime + GameManager.Instance.maxTimeSpread;
 
@@ -87,6 +94,12 @@ namespace Scenes
 
 
                 defaultEffects.weight = playerPresenceWeight;
+
+                foreach (AudioSource source in sceneAudios)
+                {
+                    source.volume = playerPresenceWeight;
+                }
+
                 yield return null;
             }
             playerPresenceWeight = target;
@@ -102,8 +115,7 @@ namespace Scenes
         {
             if (Random.Range(0, 50) == 1)
             {
-                sound.clip = ambientSounds[Random.Range(0, ambientSounds.Length)];
-                sound.Play();
+                sound.PlayOneShot(ambientSounds[Random.Range(0, ambientSounds.Length)]);
             }
         }
     }

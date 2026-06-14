@@ -62,6 +62,26 @@ MonoBehaviour:
   passIndex: 0
   bindDepthStencilAttachment: 0
   m_Version: 1
+--- !u!114 &-3059267487347794777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b00045f12942b46c698459096c89274e, type: 3}
+  m_Name: FullScreenPassRendererFeature
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.FullScreenPassRendererFeature
+  m_Active: 1
+  injectionPoint: 600
+  fetchColorBuffer: 1
+  requirements: 0
+  passMaterial: {fileID: 2100000, guid: d2a5ee550d3bc6c4d91d458dce2668d0, type: 2}
+  passIndex: 0
+  bindDepthStencilAttachment: 0
+  m_Version: 1
 --- !u!114 &-1878332245247344467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -119,7 +139,8 @@ MonoBehaviour:
   - {fileID: -9086479634965029329}
   - {fileID: -4028815731236947983}
   - {fileID: 3673717338684693415}
-  m_RendererFeatureMap: adc0de57c6d2eee52f9e160bea56e681f1b71d2270c516c8a79b7e9174aafb32
+  - {fileID: -3059267487347794777}
+  m_RendererFeatureMap: adc0de57c6d2eee52f9e160bea56e681f1b71d2270c516c8a79b7e9174aafb32a79cbbcf6d4c8bd5
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}

@@ -2,6 +2,7 @@ using Enemy;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.UI;
 
 namespace Player.Equipment.Scanner
@@ -15,17 +16,18 @@ namespace Player.Equipment.Scanner
 
 
         [SerializeField] AudioClip toggleSound;
-        [SerializeField] AudioClip idleSound;
-        [SerializeField] AudioClip activeSound;
+        [SerializeField] AudioClip scanSound;
+        [SerializeField] [MinMax(0f, 1f)] float pitchDiff = 0.2f;
 
 
         NetworkVariable<bool> isOn = new(false, 0, 0);
 
         EntityDetector detector;
-
+        private float basePitch = 1f;
         private void Start()
         {
             detector = GetComponent<EntityDetector>();
+            basePitch = audioSource.pitch;
             isOn.OnValueChanged += SwitchState;
         }
 
@@ -45,8 +47,9 @@ namespace Player.Equipment.Scanner
         private void SwitchState(bool oldV, bool newV)
         {
             if (!newV) danger.text = " ";
-            audioSource.clip = toggleSound;
-            audioSource.Play();
+            audioSource.pitch = basePitch;
+            audioSource.PlayOneShot(toggleSound);
+            audioSource.clip = scanSound;
         }
 
         float cooldown = 1f;
@@ -63,7 +66,7 @@ namespace Player.Equipment.Scanner
 
             GameObject entityObj = detector.EntityInSight(true);
             if (entityObj)
-            {
+            { 
 
                 Entity entity = entityObj.GetComponent<Entity>();
 
@@ -73,7 +76,7 @@ namespace Player.Equipment.Scanner
                 waterIcon.color = entity.IsEffectActive(EffectType.Water) ? Color.white : Color.black;
 
 
-                audioSource.clip = activeSound;
+                audioSource.pitch = basePitch + pitchDiff;
                 cooldown = 0.75f;
                 Debug.Log($"---Scanner: Entity danger: {entity.GetHealth()}");
             }
@@ -83,10 +86,9 @@ namespace Player.Equipment.Scanner
                 waterIcon.color = Color.black;
                 danger.text = "Not Found";
 
-                audioSource.clip = idleSound;
+                audioSource.pitch = basePitch;
                 cooldown = 1f;
             }
-
             audioSource.Play();
 
             // - Particle effects

@@ -16,6 +16,13 @@ namespace Player.Movement
         [SerializeField] private float gravity = Physics.gravity.y;
         [SerializeField] private float jumpHeight = 1f;
 
+        [Header("Fall Damage")]
+        [SerializeField] private bool enableFallDamage = true;
+        [SerializeField] private float safeFallSpeed = 12f;
+        [SerializeField] private float damageMultiplier = 5f;
+        [SerializeField] private float instantKillSpeed = 25f;
+        [SerializeField] private float fallMultiplier = 2.5f;
+
         [Header("Ground Check")]
         public float playerHeight = 1.75f;
         public LayerMask whatIsGround;
@@ -38,6 +45,8 @@ namespace Player.Movement
         private SettingsFile settingsFile;
         private GameFileHandler fileHandler;
         private bool jumpRequested;
+        private float maxFallSpeedThisFlight = 0f;
+
 
         public static PlayerMovement Instance;
 
@@ -69,12 +78,12 @@ namespace Player.Movement
             controls.Gameplay.Enable();
 
             SetupInputHandlers();
-            }
-            public override void OnNetworkDespawn()
-            {
+        }
+        public override void OnNetworkDespawn()
+        {
             SettingsFile.OnSettingsChanged -= LoadBindings;
             CleanupInputHandlers();
-            }
+        }
 
         #endregion
 
@@ -96,7 +105,7 @@ namespace Player.Movement
             {
                 try { controls.LoadBindingOverridesFromJson(rebinds); }
                 catch { Debug.LogWarning("---Movement: Unable to rewrite bindings"); }
-                Debug.Log("---Movement: Bindings loaded!"); 
+                Debug.Log("---Movement: Bindings loaded!");
             }
         }
 
@@ -133,7 +142,7 @@ namespace Player.Movement
                 SwitchToInteractionControls();
             else
             {
-                
+
                 SwitchToGameplayControls();
             }
         }
@@ -165,7 +174,7 @@ namespace Player.Movement
         private Vector3 previousMove;
         private void Update()
         {
-            if (player.isGrounded && velocity.y < 0) velocity.y = 0f;
+            bool wasGrounded = player.isGrounded;
 
 
             InputAction movementControls = controls.Gameplay.Movement;
@@ -174,6 +183,9 @@ namespace Player.Movement
             //Calculate movement direction and speed
             Vector3 move = playerTransform.right * movementControls.ReadValue<Vector3>().x + playerTransform.forward * movementControls.ReadValue<Vector3>().z;
             if (move.magnitude > 1) move.Normalize();
+
+
+            //Jump
             if (jumpRequested && player.isGrounded)
             {
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
@@ -189,7 +201,7 @@ namespace Player.Movement
             //Steps sound
             Vector2 horizontalVelocity = new(player.velocity.x, player.velocity.z);
             if (player.isGrounded && horizontalVelocity.magnitude > 0.3f) PlayStepsSound(isRunning ? 0.3f : 0.5f);
-            
+
 
             //Apply movement
             Vector3 targetMove = move * currentSpeed;
@@ -197,10 +209,49 @@ namespace Player.Movement
 
 
             player.Move((previousMove + velocity) * Time.deltaTime);
-            velocity.y += gravity * Time.deltaTime;
-            }
 
-        private float nextStepTime;
+            //Fall Multiplier
+            if (player.isGrounded)
+            {
+                // Якщо в попередньому кадрі ми падали, а тепер на землі — це момент приземлення
+                if (!wasGrounded)
+                {
+                    if (enableFallDamage && maxFallSpeedThisFlight > safeFallSpeed)
+                    {
+                        ApplyFallDamage(maxFallSpeedThisFlight);
+                    }
+                    // Обов'язково скидаємо пікову швидкість після удару об землю
+                    maxFallSpeedThisFlight = 0f;
+                }
+
+                // Обнуляємо вертикальну швидкість, щоб не накопичувалася, поки стоїмо
+                if (velocity.y < 0) velocity.y = 0f;
+            }
+            else
+            {
+                // Ми в повітрі: фіксуємо максимальну швидкість падіння
+                if (velocity.y < 0)
+                {
+                    float currentFallSpeed = Mathf.Abs(velocity.y);
+                    if (currentFallSpeed > maxFallSpeedThisFlight)
+                    {
+                        maxFallSpeedThisFlight = currentFallSpeed;
+                    }
+                }
+
+                // Застосовуємо гравітацію
+                if (velocity.y < 0)
+                {
+                    velocity.y += gravity * fallMultiplier * Time.deltaTime; // Падаємо швидше
+                }
+                else
+                {
+                    velocity.y += gravity * Time.deltaTime; // Летимо вгору зі звичайною швидкістю
+                }
+            }
+        }
+
+        private float nextStepTime = 0;
 
         private void PlayStepsSound(float cooldown)
         {
@@ -211,9 +262,36 @@ namespace Player.Movement
                 return;
             }
 
-            nextStepTime = Time.time + cooldown;
             audioSource.pitch = 1 + UnityEngine.Random.Range(-0.2f, 0.2f);
             audioSource.PlayOneShot(stepSounds[UnityEngine.Random.Range(0, stepSounds.Length)]);
+            nextStepTime = Time.time + cooldown;
+        }
+
+        private void ApplyFallDamage(float speedAtImpact)
+        {
+            if (human == null) return;
+
+            //insta death
+            if (speedAtImpact >= instantKillSpeed)
+            {
+                Debug.Log($"---Player: Died of fall damage (Speed: {speedAtImpact})");
+
+                human.TakeDamageRpc(100f);
+                return;
+            }
+
+            //default damage
+            float excessSpeed = speedAtImpact - safeFallSpeed;
+
+            // round to not take "15.34" damage
+            float damageToTake = Mathf.Round(excessSpeed * damageMultiplier);
+
+            if (damageToTake > 0)
+            {
+                Debug.Log($"---Player: Took {damageToTake} fall damage! (Speed: {speedAtImpact})");
+
+                human.TakeDamageRpc(damageToTake);
+            }
         }
     }
 }

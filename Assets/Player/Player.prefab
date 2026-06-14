@@ -1335,6 +1335,7 @@ MonoBehaviour:
   mouseSensitivity: 500
   hitDistance: 2
   startPosition: {x: 0, y: 0, z: 0}
+  moveDuration: 0.5
 --- !u!114 &8231992225741517602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2191,6 +2192,11 @@ MonoBehaviour:
   runSpeed: 7.5
   gravity: -9.81
   jumpHeight: 1
+  enableFallDamage: 1
+  safeFallSpeed: 20
+  damageMultiplier: 0.1
+  instantKillSpeed: 30
+  fallMultiplier: 2
   playerHeight: 1.1
   whatIsGround:
     serializedVersion: 2

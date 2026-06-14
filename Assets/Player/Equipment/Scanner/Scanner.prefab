@@ -748,7 +748,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 705305142
+  GlobalObjectIdHash: 2142583341
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -839,14 +839,17 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   isConsumable: 0
   sellPrice: 10
+  clickSounds:
+  - {fileID: 8300000, guid: 66a89853be2501b4ab1ecd91a44e09b8, type: 3}
+  - {fileID: 8300000, guid: 2328c988986a795439f0d8292a9855bb, type: 3}
   prefabId: 4
   isCurrentlyHeld: 0
   danger: {fileID: 9184728869457863943}
   freezeIcon: {fileID: 2395553522066407884}
   waterIcon: {fileID: 2317312297045710062}
-  toggleSound: {fileID: 8300000, guid: 4e684485730c2ad46a338044040de163, type: 3}
-  idleSound: {fileID: 8300000, guid: a0ee49a039dc3f0468dae03695158c29, type: 3}
-  activeSound: {fileID: 8300000, guid: e64eac18257a7004f944ef3c91520d1b, type: 3}
+  toggleSound: {fileID: 8300000, guid: 387fb346b74d73d439abc062514729d3, type: 3}
+  scanSound: {fileID: 8300000, guid: a0ee49a039dc3f0468dae03695158c29, type: 3}
+  pitchDiff: 0.2
 --- !u!114 &504126285951057253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -881,8 +884,8 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.507
-  m_Pitch: 0.78
+  m_Volume: 0.457
+  m_Pitch: 0.56
   Loop: 0
   Mute: 0
   Spatialize: 0

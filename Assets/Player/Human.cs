@@ -1,5 +1,6 @@
 using UnityEngine;
 using Player.Movement;
+using Unity.Netcode;
 
 namespace Player
 {
@@ -25,6 +26,12 @@ namespace Player
             transform.position = GameManager.Instance.spawnPoint;
             characterController.enabled = true;
 
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+        public void TakeDamageRpc(float damage)
+        {
+            AddHealth(-damage);
         }
 
         override protected void KillEntity()
