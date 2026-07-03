@@ -219,18 +219,6 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    private void KillOutOfRangePlayers()
-    {
-        foreach (var player in NetworkManager.Singleton.ConnectedClientsList)
-        {
-            var human = player.PlayerObject.gameObject.GetComponent<Human>();
-            if (human.isDead.Value) continue;
-
-            float distanceToSpawn = Vector3.Distance(human.transform.position, spawnPoint);
-            if (distanceToSpawn > baseRadius) human.isDead.Value = true;
-        }
-    }
-
     private void StartTimer()
     {
         missionDuration = Random.Range(defaultMissionTime - maxTimeSpread, defaultMissionTime + maxTimeSpread);
@@ -247,7 +235,7 @@ public class GameManager : NetworkBehaviour
     {
         if (alivePlayers <= 0)
         {
-            current -= 1;
+            // current -= 1; nah, it becomes too hard. TODO - idk, come up with smth
         }
         else
         {
@@ -323,6 +311,18 @@ public class GameManager : NetworkBehaviour
         foreach (var enemy in activeEnemies)
         {
             enemy.isDead.Value = true;
+        }
+    }
+
+    private void KillOutOfRangePlayers()
+    {
+        foreach (var player in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            var human = player.PlayerObject.gameObject.GetComponent<Human>();
+            if (human.isDead.Value) continue;
+
+            float distanceToSpawn = Vector3.Distance(human.transform.position, spawnPoint);
+            if (distanceToSpawn > baseRadius) human.isDead.Value = true;
         }
     }
 

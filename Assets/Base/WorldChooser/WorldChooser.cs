@@ -11,6 +11,8 @@ namespace Base.WorldChooser
         [SerializeField] private Transform parent;
         [SerializeField] private GameObject prefab;
 
+        [SerializeField] private string[] availableWorlds;
+
         private void Start()
         {
             NetworkManager.OnClientStarted += UpdateUI;
@@ -44,7 +46,7 @@ namespace Base.WorldChooser
                 //TODO: Make better calculation for missions.
                 //maybe based on current team rating(+-one star)
                 //or create three missions with different difficulties(easy, normal, hard)
-                var missionName = (NetString)$"World{i + 1}";
+                var missionName = (NetString)availableWorlds[Random.Range(0, availableWorlds.Length)];
                 var enemiesCount = EnemySpawner.RandomEnemiesNumber(GameManager.Instance.teamRating.Value + i - 1);
                 var averageDanger = Random.Range(1, 5);
 

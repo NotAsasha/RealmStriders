@@ -42,26 +42,6 @@ MonoBehaviour:
       restoreCamera: 1
       offset: {x: 0, y: 0, z: 0, w: 0}
       cameraFieldOfView: 60
---- !u!114 &-4028815731236947983
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b00045f12942b46c698459096c89274e, type: 3}
-  m_Name: FullScreenPassRendererFeature
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.FullScreenPassRendererFeature
-  m_Active: 0
-  injectionPoint: 550
-  fetchColorBuffer: 1
-  requirements: 0
-  passMaterial: {fileID: 2100000, guid: 074d91ed750e7c14aa0cefa66373ae0c, type: 2}
-  passIndex: 0
-  bindDepthStencilAttachment: 0
-  m_Version: 1
 --- !u!114 &-3059267487347794777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,10 +117,10 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: -1878332245247344467}
   - {fileID: -9086479634965029329}
-  - {fileID: -4028815731236947983}
-  - {fileID: 3673717338684693415}
   - {fileID: -3059267487347794777}
-  m_RendererFeatureMap: adc0de57c6d2eee52f9e160bea56e681f1b71d2270c516c8a79b7e9174aafb32a79cbbcf6d4c8bd5
+  - {fileID: 2159265312676568109}
+  - {fileID: 3673717338684693415}
+  m_RendererFeatureMap: adc0de57c6d2eee52f9e160bea56e681a79cbbcf6d4c8bd52ddce8915c40f71da79b7e9174aafb32
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -169,6 +149,20 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
+--- !u!114 &2159265312676568109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9f651dea0612ac4a93bd48e9cbe0727, type: 3}
+  m_Name: VolumetricFogRenderFeature
+  m_EditorClassIdentifier: Assembly-CSharp::VolumetricFogRenderFeature
+  m_Active: 1
+  material: {fileID: 2100000, guid: 2240ce04a8ece87409a677e47317ba8f, type: 2}
 --- !u!114 &3673717338684693415
 MonoBehaviour:
   m_ObjectHideFlags: 0

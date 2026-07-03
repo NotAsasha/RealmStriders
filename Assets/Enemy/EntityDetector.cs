@@ -1,4 +1,6 @@
 using Player;
+using Player.Movement;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Enemy
@@ -17,29 +19,57 @@ namespace Enemy
             halfAngle = viewAngle * 0.5f;
         }
 
+        private Collider[] nearbyEntities = new Collider[20];
         public GameObject EntityInSight(bool chaseEnemies = false)
         {
             Vector3 eyePosition = transform.position + eyeLocalPosition;
-            Collider[] nearbyEntities = Physics.OverlapSphere(eyePosition, viewDistance, playerLayer);
+            int numColliders = Physics.OverlapSphereNonAlloc(eyePosition, viewDistance, nearbyEntities, playerLayer);
 
-            foreach (Collider entityColl in nearbyEntities)
+            for (int i = 0; i < numColliders; i++)
             {
-                if (entityColl.gameObject == gameObject) continue;
-                Vector3 direction = entityColl.transform.position - transform.position;
+                if (nearbyEntities[i].gameObject == gameObject) continue;
+                Vector3 direction = nearbyEntities[i].transform.position - transform.position;
                 if (Vector3.Angle(direction, transform.forward) <= halfAngle)
                 {
                     // if entity is behind a wall
                     if (Physics.Raycast(eyePosition, direction, direction.magnitude, wallLayer)) continue;
 
                     //if is dead
-                    var entity = entityColl.GetComponent<Entity>();
+                    var entity = nearbyEntities[i].GetComponent<Entity>();
                     if (entity == null || entity.isDead.Value) continue;
 
                     //if is enemy
-                    if (!chaseEnemies && entityColl.GetComponent<Enemy>() != null) continue;
+                    if (!chaseEnemies && nearbyEntities[i].GetComponent<Enemy>() != null) continue;
 
-                    return entityColl.gameObject;
+                    return nearbyEntities[i].gameObject;
                 
+                }
+            }
+            return null;
+        }
+
+        public GameObject EntityInHearing()
+        {
+            var clients = NetworkManager.Singleton.ConnectedClientsList;
+
+            for (int i = 0; i < clients.Count; i++)
+            {
+                var client = clients[i];
+
+                if (client.PlayerObject == null) continue;
+
+                if (client.PlayerObject.TryGetComponent(out PlayerMovement playerMov))
+                {
+                    // ignore if silent
+                    if (playerMov.human.isDead.Value || playerMov.currentNoiseRadius.Value <= 0.1f) continue;
+
+                    float distanceToPlayer = Vector3.Distance(transform.position, playerMov.transform.position);
+
+                    // ignore if far
+                    if (distanceToPlayer <= playerMov.currentNoiseRadius.Value)
+                    {
+                        return playerMov.gameObject;
+                    }
                 }
             }
             return null;

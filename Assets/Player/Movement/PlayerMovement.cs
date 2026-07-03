@@ -23,6 +23,10 @@ namespace Player.Movement
         [SerializeField] private float instantKillSpeed = 25f;
         [SerializeField] private float fallMultiplier = 2.5f;
 
+        [Header("Stealth & Noise")]
+        public float walkNoiseRadius = 7f;
+        public float runNoiseRadius = 15f;
+
         [Header("Ground Check")]
         public float playerHeight = 1.75f;
         public LayerMask whatIsGround;
@@ -49,6 +53,12 @@ namespace Player.Movement
 
 
         public static PlayerMovement Instance;
+
+        public NetworkVariable<float> currentNoiseRadius = new NetworkVariable<float>(
+            0f,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Owner
+        );
 
 
         #region Unity Lifecycle
@@ -175,8 +185,6 @@ namespace Player.Movement
         private void Update()
         {
             bool wasGrounded = player.isGrounded;
-
-
             InputAction movementControls = controls.Gameplay.Movement;
 
 
@@ -200,14 +208,23 @@ namespace Player.Movement
 
             //Steps sound
             Vector2 horizontalVelocity = new(player.velocity.x, player.velocity.z);
-            if (player.isGrounded && horizontalVelocity.magnitude > 0.3f) PlayStepsSound(isRunning ? 0.3f : 0.5f);
+            float targetNoise = 0f;
 
+
+            if (player.isGrounded && horizontalVelocity.magnitude > 0.3f)
+            {
+                PlayStepsSound(isRunning ? 0.3f : 0.5f);
+                targetNoise = isRunning ? runNoiseRadius : walkNoiseRadius;
+            }
+
+            if (currentNoiseRadius.Value != targetNoise)
+            {
+                currentNoiseRadius.Value = targetNoise;
+            }
 
             //Apply movement
             Vector3 targetMove = move * currentSpeed;
             previousMove = Vector3.Lerp(previousMove, targetMove, 15f * Time.deltaTime);
-
-
             player.Move((previousMove + velocity) * Time.deltaTime);
 
             //Fall Multiplier

@@ -128,7 +128,7 @@ namespace Player.Equipment
             Debug.Log($"Using {gameObject.name} by {player.name}");
 
             //Do things
-            if (clickSounds.Length > 0)
+            if (clickSounds.Length > 0 && audioSource != null)
             {
                 audioSource.PlayOneShot(clickSounds[UnityEngine.Random.Range(0, clickSounds.Length)]);
             }

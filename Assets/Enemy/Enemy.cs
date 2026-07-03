@@ -121,17 +121,30 @@ namespace Enemy
         #endregion
 
         private float nextUpdate;
+        private Vector3 lastPosition; 
+
         void Update()
         {
-            if (!IsServer || isDead.Value || IsEffectActive(EffectType.Freeze)) return;
+            if (isDead.Value || IsEffectActive(EffectType.Freeze)) return;
 
-            vision.DrawViewState(); //draw vision boundaries
-            if (Time.time >= nextUpdate)
+            if (IsServer)
             {
-                nextUpdate = Time.time + 0.3f + UnityEngine.Random.Range(0f, 0.1f);
-                Think();
+                vision.DrawViewState();
+                if (Time.time >= nextUpdate)
+                {
+                    nextUpdate = Time.time + 0.3f + UnityEngine.Random.Range(0f, 0.1f);
+                    Think();
+                }
             }
-            if (agent.velocity.magnitude > 0.1) PlayStepsSound(stepSoundCooldown);
+
+            //for sound
+            float currentSpeed = (transform.position - lastPosition).magnitude / Time.deltaTime;
+            lastPosition = transform.position;
+
+            if (currentSpeed > 0.1f)
+            {
+                PlayStepsSound(stepSoundCooldown);
+            }
         }
 
         protected virtual void Think()

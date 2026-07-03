@@ -22,6 +22,10 @@ Shader "Tutorial/VolumetricFog"
 
         Pass
         {
+            ZWrite Off
+            ZTest Always
+            Cull Off
+
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment frag

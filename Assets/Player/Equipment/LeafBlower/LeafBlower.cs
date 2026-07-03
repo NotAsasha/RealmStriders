@@ -20,7 +20,9 @@ namespace Player.Equipment.LeafBlower
                 out RaycastHit hit, maxDistance, entityLayer)) return;
 
             Entity entity = hit.transform.gameObject.GetComponent<Entity>();
-            if (entity.GetHealth() < 1f && !entity.isDead.Value)
+
+            float entityHealth = entity.GetHealth() - (entity.IsEffectActive(EffectType.Weak) ? 1f : 0f);
+            if (entityHealth < 1f && !entity.isDead.Value)
             {
                 entity.TurnIntoSphereServerRpc();
             }
