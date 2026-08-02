@@ -55,7 +55,7 @@ namespace Player
         #endregion
 
         public bool IsDead() => isDead.Value;
-        public float GetHealth() => entityHealth.Value;
+        public float GetHealth() => entityHealth.Value - (IsEffectActive(EffectType.Weak)? 1f : 0f);
 
         public void AddHealth(float health)
         {
@@ -89,7 +89,7 @@ namespace Player
 
         public void ApplyEffect(EffectType type, float seconds)
         {
-            if (!IsServer) return;
+            if (!IsServer || isDead.Value) return;
 
             if (IsEffectActive(EffectType.Invincible) && type != EffectType.Invincible) return;
 

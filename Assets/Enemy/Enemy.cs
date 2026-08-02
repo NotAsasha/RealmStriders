@@ -175,7 +175,7 @@ namespace Enemy
 
         protected virtual bool ChasePlayer(bool countEnemies = false)
         {
-            var player = vision.EntityInSight(countEnemies);
+            var player = vision.EntityInSight(countEnemies) ?? vision.EntityInHearing();
             if (player != null)
             {
                 Vector3 target = player.transform.position;

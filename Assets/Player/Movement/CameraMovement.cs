@@ -16,6 +16,9 @@ namespace Player.Movement
         public Transform ragdollHead;
         public LayerMask layerMask;
 
+        [Header("Spectator References")]
+        [SerializeField] private SpectatorController spectatorController;
+
         [Header("Settings")]
         public float mouseSensitivity = 1f;
         public float hitDistance = 2.0f;
@@ -23,7 +26,6 @@ namespace Player.Movement
 
         [Header("Interaction")]
         public float moveDuration = 0.5f;
-
 
         private float xRotation;
         private IInteractable interactable;
@@ -134,9 +136,16 @@ namespace Player.Movement
                 if (!ragdollHead) return;
                 transform.parent = ragdollHead;
                 transform.localPosition = Vector3.zero;
+
+                // НОВЕ: Запускаємо перехід у режим глядача через 3 секунди після падіння
+                StartCoroutine(TransitionToSpectator(3.0f));
             }
             else
             {
+                // Якщо гравця воскресили (наприклад, дефібрилятором)
+                if (spectatorController) spectatorController.StopSpectating();
+                this.enabled = true; // Вмикаємо назад FPS камеру
+
                 transform.parent = playerBody;
                 transform.localPosition = startPosition;
                 transform.localEulerAngles = Vector3.zero;
@@ -230,6 +239,20 @@ namespace Player.Movement
             UnityEngine.Cursor.lockState = (movement.isPaused || movement.isInInteraction)
         ? CursorLockMode.None
         : CursorLockMode.Locked;
+        }
+
+        private IEnumerator TransitionToSpectator(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            // Вимикаємо керування головою від першої особи
+            this.enabled = false;
+
+            // Вмикаємо менеджер спостереження
+            if (spectatorController != null)
+            {
+                spectatorController.StartSpectating(this.transform);
+            }
         }
 
         #endregion

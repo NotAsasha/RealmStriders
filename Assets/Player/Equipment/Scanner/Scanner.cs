@@ -28,6 +28,7 @@ namespace Player.Equipment.Scanner
         {
             detector = GetComponent<EntityDetector>();
             basePitch = audioSource.pitch;
+            
             isOn.OnValueChanged += SwitchState;
         }
 
@@ -66,15 +67,12 @@ namespace Player.Equipment.Scanner
 
             GameObject entityObj = detector.EntityInSight(true);
             if (entityObj)
-            { 
-
+            {
                 Entity entity = entityObj.GetComponent<Entity>();
 
                 danger.text = entity.GetHealth().ToString();
-
                 freezeIcon.color = entity.IsEffectActive(EffectType.Freeze) ? Color.white : Color.black;
                 waterIcon.color = entity.IsEffectActive(EffectType.Water) ? Color.white : Color.black;
-
 
                 audioSource.pitch = basePitch + pitchDiff;
                 cooldown = 0.75f;

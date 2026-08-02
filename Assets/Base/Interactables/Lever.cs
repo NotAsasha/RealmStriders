@@ -43,7 +43,7 @@ namespace Base.Interactables
         private void OnMissionStateChanged(bool oldValue, bool newValue)
         {
             //Debug.LogError($"OnMissionStateChanged, newValue = {newValue}");
-            GetComponent<Renderer>().material.color = newValue ? Color.gray : Color.white; 
+            //GetComponent<Renderer>().material.color = newValue ? Color.gray : Color.white; 
         }
     }
 }

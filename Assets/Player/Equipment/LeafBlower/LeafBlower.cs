@@ -21,8 +21,7 @@ namespace Player.Equipment.LeafBlower
 
             Entity entity = hit.transform.gameObject.GetComponent<Entity>();
 
-            float entityHealth = entity.GetHealth() - (entity.IsEffectActive(EffectType.Weak) ? 1f : 0f);
-            if (entityHealth < 1f && !entity.isDead.Value)
+            if (entity.GetHealth() < 1f && !entity.isDead.Value)
             {
                 entity.TurnIntoSphereServerRpc();
             }

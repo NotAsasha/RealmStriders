@@ -1,30 +1,31 @@
-using Player.Movement;
+using Enemy;
 using UnityEngine;
 
 namespace Player.Equipment.WaterGun
 {
-
-
+    [RequireComponent(typeof(EntityDetector))]
     public class WaterGun : Item
     {
-        [SerializeField] LayerMask entityLayer;
-        [SerializeField] float maxDistance = 10f;
         [SerializeField] private float effectTime = 2f;
         [SerializeField] ParticleSystem particle;
+
+        EntityDetector detector;
+
+        private void Awake()
+        {
+            detector = GetComponent<EntityDetector>();
+        }
 
         override protected void ExecuteItemAction(GameObject player)
         {
             particle.Play();
-            if (Physics.Raycast(
-                    CameraMovement.Instance.transform.position,
-                    CameraMovement.Instance.transform.forward,
-                    out RaycastHit hit, maxDistance, entityLayer))
+
+            GameObject entityObj = detector.EntityInSight(true);
+            if (entityObj)
             {
-                if (hit.transform.TryGetComponent<Entity>(out var entity))
-                {
-                    entity.ApplyEffectServerRpc(EffectType.Water, effectTime);
-                    Debug.Log($"---WaterGun: Shot entity: {entity.name}");
-                }
+                Entity entity = entityObj.GetComponent<Entity>();
+                entity.ApplyEffectServerRpc(EffectType.Water, effectTime);
+                Debug.Log($"---WaterGun: Shot entity: {entityObj.name}");
             }
             else Debug.Log($"---WaterGun: Missed :(");
         }

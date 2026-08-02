@@ -5174,7 +5174,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -6466,7 +6466,7 @@ MonoBehaviour:
   lowestSubdivLevelOverride: 0
   highestSubdivLevelOverride: 3
   overridesSubdivLevels: 0
-  mightNeedRebaking: 1
+  mightNeedRebaking: 0
   cachedTransform:
     e00: 1
     e01: 0
@@ -6495,7 +6495,7 @@ Transform:
   m_GameObject: {fileID: 644167942}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 4.677786, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7210,7 +7210,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: b15fb570b05edce4682b45ae876f9ab3, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 8996015c0986bee4eae1784f1b0a6248, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &712917135
 Transform:
@@ -7257,7 +7257,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 1
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 6fc4f309a7c36dd4ea1806d26420a61b, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: b74a7ef48a0d6d043a178ebd33604aaa, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1 &807759581
 GameObject:
@@ -7567,7 +7567,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a83d2f7ae04ab6f4f99b0d85377be998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.ProbeVolumePerSceneData
-  serializedBakingSet: {fileID: 11400000, guid: fa2624a48ad62af44b38a7b250c5517f,
+  serializedBakingSet: {fileID: 11400000, guid: 1ba38d54087fbd64390876789389f772,
     type: 2}
   sceneGUID: b310fb3c13024ed4e8f681f33a500508
   obsoleteAsset: {fileID: 0}

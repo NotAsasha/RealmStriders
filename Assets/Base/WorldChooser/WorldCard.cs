@@ -1,7 +1,7 @@
 using TMPro;
-using Unity.Netcode;
 using UnityEngine;
 using NetString = Unity.Collections.FixedString64Bytes;
+
 namespace Base.WorldChooser
 {
     public class WorldCard : MonoBehaviour
@@ -10,34 +10,42 @@ namespace Base.WorldChooser
         [SerializeField] TMP_Text enemiesCountUI;
         [SerializeField] TMP_Text averageDangerUI;
 
-        public NetString missionName = "World1";
-        public int enemiesCount = 1;
-        public float averageDanger = 1;
+        private WorldChooser worldChooser;
+
+        private NetString missionName = "World1";
+        private int enemiesCount = 1;
+        private float averageDanger = 1;
 
         private void Start()
         {
             UpdateUI();
         }
+
         private void UpdateUI()
         {
             missionNameUI.text = missionName.Value.ToString();
             enemiesCountUI.text = "Enemy number: " + enemiesCount;
             averageDangerUI.text = "Approximate danger: " + averageDanger;
         }
-        public void SetMission()
+
+        public void Setup(WorldChooser _parent, NetString _missionName, int _enemiesCount, float _averageDanger)
         {
-            SetMissionServerRpc(missionName.Value, enemiesCount, averageDanger);
+            worldChooser = _parent;
+            missionName = _missionName;
+            enemiesCount = _enemiesCount;
+            averageDanger = _averageDanger;
         }
 
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void SetMissionServerRpc(NetString missionName, int enemiesCount, float averageDanger)
+        public void SetMission()
         {
-            if (GameManager.Instance.hasStartedMission.Value) return;
-            Debug.Log("ChangeGlobalMissionServerRpc");
-
-            GameManager.Instance.missionName = missionName.ToString();
-            GameManager.Instance.enemiesCount = enemiesCount;
-            GameManager.Instance.averageDanger = averageDanger;
+            if (worldChooser != null)
+            {
+                worldChooser.SetMissionServerRpc(missionName, enemiesCount, averageDanger);
+            }
+            else
+            {
+                Debug.LogError("WorldChooser.Instance не знайдено на сцені!");
+            }
         }
     }
 }

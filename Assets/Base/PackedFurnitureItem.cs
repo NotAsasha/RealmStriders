@@ -93,7 +93,7 @@ namespace Base
                 currentPreview.transform.rotation = hit.transform.rotation;
 
                 // Обертання: можна додати поворот на коліщатко миші
-                // currentPreview.transform.rotation = ... 
+                currentPreview.transform.eulerAngles = new Vector3(0f, transform.eulerAngles.y - 90f, 0f);
             }
             else
             {

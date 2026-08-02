@@ -165,9 +165,10 @@ public class GameManager : NetworkBehaviour
 
 
         teamRating.Value = tempRating;
-        lossRating.Value += 1;
 
+        // lossRating.Value += 1; // nah, it becomes too hard. TODO - idk, come up with smth
 
+        // DEPRECATED
         if (teamRating.Value <= lossRating.Value)
         {
             //Loss
@@ -187,11 +188,13 @@ public class GameManager : NetworkBehaviour
             KillOutOfRangePlayers();
         }
 
+        DestroyOutOfRangeItems();
 
         //unload world
         UnloadWorld();
 
-        //missionName = ""; ---- Mission stays the same, can be changed on world chooser;
+
+        missionName = ""; // ---- Mission stays the same, can be changed on world chooser; -- UPD: nah, changed
 
 
         //revive
@@ -233,9 +236,9 @@ public class GameManager : NetworkBehaviour
     }
     private int CalculateRating(int current)
     {
-        if (alivePlayers <= 0)
+        if (alivePlayers <= 0 && current > 0)
         {
-            // current -= 1; nah, it becomes too hard. TODO - idk, come up with smth
+            current -= 1;
         }
         else
         {
@@ -298,10 +301,10 @@ public class GameManager : NetworkBehaviour
         {
             missionScene = loadedScene;
 
-            // Робимо сцену світу Primary (Active) для цього конкретного гравця
+            // local primary scene
             SceneManager.SetActiveScene(loadedScene);
 
-            // Оновлюємо скайбокс та параметри освітлення
+            // update skybox
             DynamicGI.UpdateEnvironment();
         }
     }
@@ -325,7 +328,17 @@ public class GameManager : NetworkBehaviour
             if (distanceToSpawn > baseRadius) human.isDead.Value = true;
         }
     }
+    private void DestroyOutOfRangeItems()
+    {
+        var toDelete = NetworkItemsHandler.Instance.activeSaveables
+        .Where(item => Vector3.Distance(item.transform.position, spawnPoint) > baseRadius)
+        .ToList();
 
+        foreach (var item in toDelete)
+        {
+            item.Despawn();
+        }
+    }
     public void UnloadWorld()
     {
         if (currentSceneName == null)
@@ -357,5 +370,18 @@ public class GameManager : NetworkBehaviour
         {
             StopMissionServerRpc();
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Color transparentColor = Color.blueViolet;
+        transparentColor.a = 0.15f;
+        Gizmos.color = transparentColor;
+        Gizmos.DrawSphere(spawnPoint, baseRadius);
+
+        Color wireColor = Color.blueViolet;
+        wireColor.a = 0.7f;
+        Gizmos.color = wireColor;
+        Gizmos.DrawWireSphere(spawnPoint, baseRadius);
     }
 }

@@ -9,12 +9,12 @@ namespace Enemy
     {
         [SerializeField] private EnemyPool[] enemiesByDanger;
 
-        [SerializeField] Vector3 worldCenter = new(0f,50f,0f);
+        [SerializeField] Vector3 worldCenter = new(0f,0f,0f);
         [SerializeField] float portalArea = 30f;
 
-        [SerializeField] float spawnRadius = 10f;
+        [SerializeField] float spawnRadius = 100f;
 
-        private Vector3 portalPos = new(3f, 50f, 0f);
+        [SerializeField] Vector3 portalPos = new(3f, 0f, 0f);
 
         //void Start()
         //{
@@ -99,13 +99,14 @@ namespace Enemy
             return weights.Length - 1;
         }
 
+        // CRITICAL: enemies can possibly choose to spawn inside player base... TODO
         public bool RandomMapPoint(out Vector3 position)
         {
             Vector3 searchPos;
             for (int i = 0; i < 100; ++i)
             {
                 if (!RandomMove.RandomPoint(worldCenter, spawnRadius, out searchPos)) continue;
-                Debug.Log($"Tried {searchPos}");
+                Debug.Log($"---EnemySpawner: Tried {searchPos}");
 
                 if (Vector3.Distance(searchPos, portalPos) > portalArea)
                 {
@@ -114,7 +115,7 @@ namespace Enemy
                 }
             }
             position = worldCenter;
-            Debug.Log($"Nooo {position}");
+            Debug.LogError($"---EnemySpawner: Nooo location found...");
             return false;
         }
 
@@ -147,6 +148,8 @@ namespace Enemy
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(worldCenter, portalArea);
+            Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(worldCenter, spawnRadius);
         }
 

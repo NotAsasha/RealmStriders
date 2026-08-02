@@ -68,14 +68,5 @@ namespace Player
             characterController.enabled = !isActive;
             Debug.Log($"---Human: Toggled ragdoll: {isActive}");
         }
-
-        private void Update()
-        {
-            if (characterController.enabled)
-            {
-                animator.speed = characterController.velocity.magnitude / 4;
-            }
-        }
     }
-
 }

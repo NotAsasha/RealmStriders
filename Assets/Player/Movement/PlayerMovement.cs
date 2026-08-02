@@ -42,6 +42,10 @@ namespace Player.Movement
         public bool isInInteraction;
         public Human human;
 
+        public Vector3 CurrentInputMove => controls.Gameplay.Movement.ReadValue<Vector3>();
+        public bool IsRunning => controls.Gameplay.Run.IsPressed();
+        public bool IsGrounded => player.isGrounded;
+
         private CharacterController player;
         private Vector3 velocity;
         private float currentSpeed;
@@ -63,6 +67,13 @@ namespace Player.Movement
 
         #region Unity Lifecycle
 
+        private void Awake()
+        {
+            player = GetComponent<CharacterController>();
+            human = GetComponent<Human>();
+            playerTransform = transform;
+            playerCamera = GetComponentInChildren<Camera>();
+        }
 
         public override void OnNetworkSpawn()
         {
@@ -74,11 +85,7 @@ namespace Player.Movement
             SetupSingleton();
 
             controls = new();
-            player = GetComponent<CharacterController>();
-            human = GetComponent<Human>();
-            playerTransform = transform;
             fileHandler = GameFileHandler.Instance;
-            playerCamera = GetComponentInChildren<Camera>();
 
             settingsFile = (SettingsFile)fileHandler.SearchForFileByName("Settings");
             LoadBindings();
@@ -184,6 +191,8 @@ namespace Player.Movement
         private Vector3 previousMove;
         private void Update()
         {
+            if (!player.enabled) return;
+
             bool wasGrounded = player.isGrounded;
             InputAction movementControls = controls.Gameplay.Movement;
 

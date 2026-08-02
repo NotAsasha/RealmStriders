@@ -3,6 +3,7 @@ using Player.Movement;
 using Player.UI;
 using System;
 using Unity.Netcode;
+using Unity.Netcode.Components; // Додано для доступу до NetworkTransform
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.InputSystem;
@@ -26,23 +27,26 @@ namespace Player
         [Header("Current State")]
         [SerializeField] private int activeSlotIndex;
 
-        // bool - isHoldingSmth
+        public readonly NetworkVariable<bool> isHoldingItem = new NetworkVariable<bool>(
+            false,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Owner
+        );
+
         public event Action<bool> itemChanged;
 
-        // Arrays for items and UI
         private Item[] items;
         private UISlot[] slots;
-
-        // Input controls
         private Controls controls;
-
         private Human human;
+        private PlayerMovement playerMovement;
 
         #region Unity Lifecycle
 
         void Start()
         {
-            human = PlayerMovement.Instance.human;
+            human = GetComponent<Human>();
+            playerMovement = GetComponent<PlayerMovement>();
 
             InitializeInventory();
             SetupInputHandlers();
@@ -63,19 +67,19 @@ namespace Player
             items = new Item[capacity];
             slots = new UISlot[capacity];
 
-            if (PlayerMovement.Instance?.controls != null)
+            if (playerMovement != null && playerMovement.controls != null)
             {
-                controls = PlayerMovement.Instance.controls;
+                controls = playerMovement.controls;
             }
             else
             {
-                Debug.LogError("Movement controls not found!");
+                Debug.LogError("Movement controls not found on this player object!");
             }
         }
 
         private void SetupInputHandlers()
         {
-            if (controls == null) return;
+            if (controls == null || human == null) return;
 
             controls.Gameplay.MouseWheel.performed += OnMouseWheelChanged;
             controls.Gameplay.SwitchSlot.performed += OnSlotSwitched;
@@ -87,7 +91,7 @@ namespace Player
 
         private void CleanupInputHandlers()
         {
-            if (controls == null) return;
+            if (controls == null || human == null) return;
 
             controls.Gameplay.MouseWheel.performed -= OnMouseWheelChanged;
             controls.Gameplay.SwitchSlot.performed -= OnSlotSwitched;
@@ -108,20 +112,24 @@ namespace Player
             Item takableComponent = itemToAdd.GetComponent<Item>();
             if (takableComponent == null) return false;
 
-            // If no slot specified, find first empty slot
             if (targetSlot == -1)
             {
                 targetSlot = FindEmptySlot();
-                if (targetSlot == -1) return false; // Inventory full
+                if (targetSlot == -1) return false;
             }
 
-            // Check if target slot is valid and empty
             if (!IsValidSlot(targetSlot) || items[targetSlot] != null)
                 return false;
 
             if (targetSlot != activeSlotIndex)
+            {
                 SetItemActiveServerRpc(itemToAdd, false);
-            else itemChanged?.Invoke(true);
+            }
+            else
+            {
+                if (IsOwner) isHoldingItem.Value = true;
+                itemChanged?.Invoke(true);
+            }
 
             items[targetSlot] = takableComponent;
             SetItemParentServerRpc(itemToAdd, gameObject);
@@ -136,6 +144,13 @@ namespace Player
                 return false;
 
             items[slot] = null;
+
+            if (slot == activeSlotIndex)
+            {
+                if (IsOwner) isHoldingItem.Value = false;
+                itemChanged?.Invoke(false);
+            }
+
             UpdateUI();
             return true;
         }
@@ -152,8 +167,12 @@ namespace Player
 
         public void ToggleUI(bool isActive)
         {
-            userInterface.gameObject.SetActive(isActive);
+            if (userInterface != null)
+            {
+                userInterface.gameObject.SetActive(isActive);
+            }
         }
+
         #endregion
 
         #region Input Handling
@@ -187,6 +206,7 @@ namespace Player
             Item activeItem = GetActiveItem();
             if (activeItem != null && activeItem.IsConsumable())
                 RemoveItem(activeSlotIndex);
+
             activeItem?.Use(gameObject);
         }
 
@@ -196,6 +216,8 @@ namespace Player
             if (itemToDrop == null) return;
 
             items[activeSlotIndex] = null;
+            if (IsOwner) isHoldingItem.Value = false;
+
             DropItemServerRpc(itemToDrop.gameObject);
             UpdateUI();
         }
@@ -206,17 +228,13 @@ namespace Player
             DropEverything();
         }
 
-
-
-
-
         #endregion
 
         #region Private Helper Methods
 
         private bool IsPlayerInInteraction()
         {
-            return PlayerMovement.Instance != null && PlayerMovement.Instance.isInInteraction;
+            return playerMovement != null && playerMovement.isInInteraction;
         }
 
         private int FindEmptySlot()
@@ -240,7 +258,6 @@ namespace Player
             int direction = scrollValue > 0 ? -1 : 1;
             int newIndex = activeSlotIndex + direction;
 
-            // Wrap around if out of bounds
             if (newIndex >= capacity) newIndex = 0;
             else if (newIndex < 0) newIndex = capacity - 1;
 
@@ -249,25 +266,27 @@ namespace Player
 
         private void ChangeActiveSlot(int newSlotIndex)
         {
-            if (newSlotIndex > capacity + 1) throw new ArgumentOutOfRangeException();
+            if (newSlotIndex >= capacity) throw new ArgumentOutOfRangeException();
 
-            // Deactivate current item
             Item currentItem = GetActiveItem();
             if (currentItem != null)
             {
                 SetItemActiveServerRpc(currentItem.gameObject, false);
-                itemChanged?.Invoke(false);
             }
 
-            // Change active slot
             activeSlotIndex = newSlotIndex;
 
-            // Activate new item
             Item newItem = GetActiveItem();
             if (newItem != null)
             {
                 SetItemActiveServerRpc(newItem.gameObject, true);
+                if (IsOwner) isHoldingItem.Value = true;
                 itemChanged?.Invoke(true);
+            }
+            else
+            {
+                if (IsOwner) isHoldingItem.Value = false;
+                itemChanged?.Invoke(false);
             }
             UpdateUI();
         }
@@ -278,10 +297,9 @@ namespace Player
             {
                 if (items[i] == null) continue;
                 DropItemServerRpc(items[i].gameObject);
-
                 items[i] = null;
-                Debug.Log("Dropped item");
             }
+            if (IsOwner) isHoldingItem.Value = false;
             UpdateUI();
         }
 
@@ -330,7 +348,16 @@ namespace Player
 
         #endregion
 
-        #region Network RPCs
+        #region Network RPCs and Item Parenting
+
+        private void ToggleNetworkTransform(GameObject item, bool isEnabled)
+        {
+            // Вимикаємо або вмикаємо NetworkTransform, щоб він не конфліктував із локальним рендер-аттачем
+            if (item.TryGetComponent<NetworkTransform>(out var netTransform))
+            {
+                netTransform.enabled = isEnabled;
+            }
+        }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void SetItemActiveServerRpc(NetworkObjectReference objRef, bool isActive)
@@ -340,36 +367,28 @@ namespace Player
                 networkObject.gameObject.SetActive(isActive);
                 SetItemActiveClientRpc(objRef, isActive);
             }
-            else
-            {
-                Debug.LogWarning("Failed to get network object for SetItemActive");
-            }
         }
+
         [ClientRpc]
         public void SetItemActiveClientRpc(NetworkObjectReference objRef, bool isActive)
         {
             if (IsServer) return;
-            objRef.TryGet(out NetworkObject networkObject);
-            networkObject.gameObject.SetActive(isActive);
+            if (objRef.TryGet(out NetworkObject networkObject))
+            {
+                networkObject.gameObject.SetActive(isActive);
+            }
         }
+
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void SetItemParentServerRpc(NetworkObjectReference objRef, NetworkObjectReference newParentRef)
         {
-            if (!objRef.TryGet(out NetworkObject obj))
-            {
-                Debug.LogWarning("Failed to get item object for SetItemParent");
+            if (!objRef.TryGet(out NetworkObject obj) || !newParentRef.TryGet(out NetworkObject newParent))
                 return;
-            }
-
-            if (!newParentRef.TryGet(out NetworkObject newParent))
-            {
-                Debug.LogWarning("Failed to get parent object for SetItemParent");
-                return;
-            }
 
             obj.TrySetParent(newParent.transform);
-            obj.transform.localPosition = handAnchor.localPosition;
-            obj.transform.localRotation = Quaternion.identity;
+
+            // Вимикаємо синхронізацію координат у мережі, поки предмет у руках
+            ToggleNetworkTransform(obj.gameObject, false);
             ApplyParentConstraint(obj.gameObject, handAnchor);
 
             SetItemParentClientRpc(objRef, newParentRef);
@@ -382,69 +401,26 @@ namespace Player
             if (objRef.TryGet(out NetworkObject obj) && newParentRef.TryGet(out NetworkObject newParent))
             {
                 obj.TrySetParent(newParent.transform);
-                obj.transform.localPosition = handAnchor.localPosition;
-                obj.transform.localRotation = Quaternion.identity;
+
+                ToggleNetworkTransform(obj.gameObject, false);
                 ApplyParentConstraint(obj.gameObject, handAnchor);
-            }
-        }
-
-        private void ApplyParentConstraint(GameObject item, Transform anchor)
-        {
-            // Шукаємо компонент або додаємо новий
-            ParentConstraint constraint = item.GetComponent<ParentConstraint>();
-            if (constraint == null)
-            {
-                constraint = item.AddComponent<ParentConstraint>();
-            }
-
-            // Очищаємо старі зв'язки, якщо вони були (важливо для пулу об'єктів)
-            while (constraint.sourceCount > 0)
-            {
-                constraint.RemoveSource(0);
-            }
-
-            // Створюємо нове посилання на наш WeaponAnchor
-            ConstraintSource source = new ConstraintSource();
-            source.sourceTransform = anchor;
-            source.weight = 1f;
-
-            constraint.AddSource(source);
-
-            // Встановлюємо нульові зміщення, щоб предмет став РІВНО в координати якоря
-            constraint.SetTranslationOffset(0, Vector3.zero);
-            constraint.SetRotationOffset(0, Vector3.zero);
-
-            // Вмикаємо констрейнт
-            constraint.constraintActive = true;
-        }
-        private void RemoveParentConstraint(GameObject item)
-        {
-            ParentConstraint constraint = item.GetComponent<ParentConstraint>();
-            if (constraint == null)
-            {
-                constraint = item.AddComponent<ParentConstraint>();
-            }
-
-            // Очищаємо старі зв'язки, якщо вони були (важливо для пулу об'єктів)
-            while (constraint.sourceCount > 0)
-            {
-                constraint.RemoveSource(0);
             }
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void DropItemServerRpc(NetworkObjectReference objRef)
         {
-            if (!objRef.TryGet(out NetworkObject networkObject))
-            {
-                Debug.LogWarning("Failed to get network object for DropItem");
-                return;
-            }
+            if (!objRef.TryGet(out NetworkObject networkObject)) return;
 
             if (!Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 1f, layer))
-                networkObject.transform.localPosition = handAnchor.localPosition + new Vector3(0, 0, 0.75f); //wtf even is that 0.75f
+                networkObject.transform.localPosition = handAnchor.localPosition + new Vector3(0, 0, 0.75f);
+
             networkObject.TryRemoveParent();
             RemoveParentConstraint(networkObject.gameObject);
+
+            // Повертаємо мережеву синхронізацію предмету, коли він лежить на землі
+            ToggleNetworkTransform(networkObject.gameObject, true);
+
             if (!networkObject.gameObject.activeSelf)
             {
                 networkObject.gameObject.SetActive(true);
@@ -452,57 +428,69 @@ namespace Player
 
             Item takable = networkObject.GetComponent<Item>();
             takable?.Drop();
-            itemChanged?.Invoke(false);
+
             DropItemClientRpc(objRef);
         }
 
         [ClientRpc]
         private void DropItemClientRpc(NetworkObjectReference objRef)
         {
-            if (!IsServer)
+            if (IsServer) return;
+            if (objRef.TryGet(out NetworkObject networkObject))
             {
-                if (objRef.TryGet(out NetworkObject networkObject))
+                networkObject.TryRemoveParent();
+                RemoveParentConstraint(networkObject.gameObject);
+
+                ToggleNetworkTransform(networkObject.gameObject, true);
+
+                if (!networkObject.gameObject.activeSelf)
                 {
-                    networkObject.TryRemoveParent();
-                    RemoveParentConstraint(networkObject.gameObject);
-                    if (!networkObject.gameObject.activeSelf)
-                    {
-                        networkObject.gameObject.SetActive(true);
-                    }
-                    itemChanged?.Invoke(false);
+                    networkObject.gameObject.SetActive(true);
                 }
             }
         }
 
-        [ServerRpc]
-        public void DeparentObjectServerRpc(NetworkObjectReference objectRef)
+        private void ApplyParentConstraint(GameObject item, Transform anchor)
         {
-            if (objectRef.TryGet(out NetworkObject networkObject))
+            ParentConstraint constraint = item.GetComponent<ParentConstraint>();
+            if (constraint == null)
             {
-                networkObject.TryRemoveParent();
+                constraint = item.AddComponent<ParentConstraint>();
             }
-            else
+
+            while (constraint.sourceCount > 0)
             {
-                Debug.LogWarning("Failed to get network object for Deparent");
+                constraint.RemoveSource(0);
             }
+
+            ConstraintSource source = new ConstraintSource { sourceTransform = anchor, weight = 1f };
+            constraint.AddSource(source);
+
+            constraint.SetTranslationOffset(0, Vector3.zero);
+            constraint.SetRotationOffset(0, Vector3.zero);
+
+            constraint.constraintActive = true;
+        }
+
+        private void RemoveParentConstraint(GameObject item)
+        {
+            ParentConstraint constraint = item.GetComponent<ParentConstraint>();
+            if (constraint == null) return;
+
+            while (constraint.sourceCount > 0)
+            {
+                constraint.RemoveSource(0);
+            }
+            constraint.constraintActive = false;
         }
 
         #endregion
 
-        #region Debug and Utilities
-
-        public void DebugInventoryState()
-        {
-            Debug.Log($"Inventory State - Active Slot: {activeSlotIndex}");
-            for (int i = 0; i < capacity; i++)
-            {
-                string itemName = items[i]?.gameObject.name ?? "Empty";
-                Debug.Log($"Slot {i}: {itemName}");
-            }
-        }
+        #region Utilities
 
         public void OnDrawGizmosSelected()
         {
+            if (handAnchor == null) return;
             Gizmos.color = Color.blueViolet;
             Gizmos.DrawSphere(transform.position + handAnchor.localPosition, 0.1f);
         }

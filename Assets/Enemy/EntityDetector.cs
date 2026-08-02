@@ -71,6 +71,10 @@ namespace Enemy
                         return playerMov.gameObject;
                     }
                 }
+                else
+                {
+                    Debug.LogError("No PlayerMovement in player.. somehow");
+                }
             }
             return null;
         }

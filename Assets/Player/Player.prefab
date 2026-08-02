@@ -1369,6 +1369,7 @@ GameObject:
   - component: {fileID: 7821530433008171447}
   - component: {fileID: 6014704158171311374}
   - component: {fileID: 8231992225741517602}
+  - component: {fileID: 5935903473039807011}
   m_Layer: 7
   m_Name: Camera
   m_TagString: MainCamera
@@ -1470,6 +1471,7 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 64
+  spectatorController: {fileID: 5935903473039807011}
   mouseSensitivity: 500
   hitDistance: 2
   startPosition: {x: 0, y: 0, z: 0}
@@ -1518,6 +1520,22 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &5935903473039807011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3186685686920028311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffdcd77b16b74fa4ea201ffaafb3d0ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.Movement.SpectatorController
+  ShowTopMostFoldoutHeaderGroup: 1
+  followSmoothness: 10
+  mouseSensitivity: 2
+  distanceFromPlayer: 3
 --- !u!1 &3512777154750557659
 GameObject:
   m_ObjectHideFlags: 0
@@ -2189,6 +2207,7 @@ GameObject:
   - component: {fileID: 3368691097065394660}
   - component: {fileID: 4410894310409502313}
   - component: {fileID: 1900321479787732170}
+  - component: {fileID: 3971763082489559414}
   m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
@@ -2315,9 +2334,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0438dd9cc2be15641b787d518bebd1e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
+  ShowTopMostFoldoutHeaderGroup: 1
+  animator: {fileID: 5017923243239964587}
+  characterController: {fileID: 9155629318535776824}
   handWeight: {fileID: 2601586620473009399}
   inventory: {fileID: 686128325295018672}
   handAnimationSpeed: 10
+  speedModifier: 0.25
+--- !u!114 &3971763082489559414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5824246910663156757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e511aef81f02e408af84a926a5fb2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHeadSync
+  ShowTopMostFoldoutHeaderGroup: 1
+  headBone: {fileID: 6193048333720268308}
+  cameraTransform: {fileID: 8896019179699647101}
+  smoothSpeed: 15
 --- !u!1 &6222078028103688546
 GameObject:
   m_ObjectHideFlags: 0
@@ -2436,7 +2475,6 @@ GameObject:
   - component: {fileID: 7142264790690856648}
   - component: {fileID: 5017923243239964587}
   - component: {fileID: 2694365610372396719}
-  - component: {fileID: 3731346005507350902}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -2474,7 +2512,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2454714083
+  GlobalObjectIdHash: 2394975766
   InScenePlacedSourceGlobalObjectIdHash: 2394975766
   DeferredDespawnTick: 0
   Ownership: 1
@@ -2509,6 +2547,8 @@ MonoBehaviour:
   damageMultiplier: 0.1
   instantKillSpeed: 30
   fallMultiplier: 2
+  walkNoiseRadius: 7
+  runNoiseRadius: 15
   playerHeight: 1.1
   whatIsGround:
     serializedVersion: 2
@@ -2522,6 +2562,11 @@ MonoBehaviour:
   isPaused: 0
   isInInteraction: 0
   human: {fileID: 0}
+  currentNoiseRadius:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
 --- !u!143 &9155629318535776824
 CharacterController:
   m_ObjectHideFlags: 0
@@ -2560,7 +2605,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  NetworkTransformExpanded: 0
+  NetworkTransformExpanded: 1
   AutoOwnerAuthorityTickOffset: 1
   PositionInterpolationType: 0
   RotationInterpolationType: 0
@@ -2764,7 +2809,7 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 1
-  characterController: {fileID: 0}
+  characterController: {fileID: 9155629318535776824}
 --- !u!95 &5017923243239964587
 Animator:
   serializedVersion: 7
@@ -2776,7 +2821,7 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: c16c8cfa806901e4a892771447b5bed9, type: 3}
   m_Controller: {fileID: 9100000, guid: 05852f2bbd51efb4784d9801ef0a72d1, type: 2}
-  m_CullingMode: 1
+  m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
@@ -2801,28 +2846,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkAnimatorExpanded: 0
-  AuthorityMode: 0
+  AuthorityMode: 1
   m_Animator: {fileID: 5017923243239964587}
   TransitionStateInfoList: []
   AnimatorParameterEntries:
     ParameterEntries: []
   AnimatorParametersExpanded: 0
---- !u!114 &3731346005507350902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6525882219545758579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95e511aef81f02e408af84a926a5fb2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerHeadSync
-  ShowTopMostFoldoutHeaderGroup: 1
-  headBone: {fileID: 6193048333720268308}
-  cameraTransform: {fileID: 8896019179699647101}
-  smoothSpeed: 15
 --- !u!1 &6536011491286402701
 GameObject:
   m_ObjectHideFlags: 0

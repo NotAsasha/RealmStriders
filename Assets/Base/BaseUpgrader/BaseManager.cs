@@ -26,7 +26,11 @@ namespace Base.BaseUpgrader
         [SerializeField] private LayerMask radarOnlyLayer; 
         private Camera radarCamera;
 
-        public NetworkVariable<int> baseUpgrades;
+        public NetworkVariable<int> baseUpgrades = new NetworkVariable<int>(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Owner
+        );
 
         public static BaseManager Instance;
         #region Unity Lifecycle

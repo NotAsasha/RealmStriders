@@ -30,7 +30,7 @@ public class PlayerHeadSync : NetworkBehaviour
         if (IsOwner && cameraTransform != null)
         {
             //idk if it has to be here
-            //if (PlayerMovement.Instance.isInInteraction || PlayerMovement.Instance.isPaused) return;
+            if (PlayerMovement.Instance.isInInteraction || PlayerMovement.Instance.isPaused) return;
 
             float pitch = cameraTransform.localEulerAngles.x;
 

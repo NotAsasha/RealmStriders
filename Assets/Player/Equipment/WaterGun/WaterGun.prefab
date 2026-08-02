@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 867064873855153524}
   - component: {fileID: 2450138135381219544}
   - component: {fileID: 6177050138636514505}
+  - component: {fileID: 7363303375655861719}
   m_Layer: 6
   m_Name: WaterGun
   m_TagString: Untagged
@@ -1609,14 +1610,32 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   isConsumable: 0
   sellPrice: 10
+  clickSounds: []
   prefabId: 6
   isCurrentlyHeld: 0
-  entityLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  maxDistance: 10
   effectTime: 2
   particle: {fileID: 5121519851595716548}
+--- !u!114 &7363303375655861719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027748834022641332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21fe3cdabba635b4e9826381049b971d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EntityDetector
+  eyeLocalPosition: {x: 0, y: 1, z: 0}
+  viewDistance: 20
+  viewAngle: 60
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 65
 --- !u!1 &6722913279849283884
 GameObject:
   m_ObjectHideFlags: 0

@@ -73,16 +73,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   spawnPoint: {x: 0, y: -49, z: 0}
-  baseRadius: 20
+  baseRadius: 25
   defaultMissionTime: 360
   maxTimeSpread: 120
   teamRating:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
     m_InternalValue: 3
-  looseRating:
+  lossRating:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
   teamMoney:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
     m_InternalValue: 10000
   hasStartedMission:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
   missionDuration: 0
   missionScene: {}

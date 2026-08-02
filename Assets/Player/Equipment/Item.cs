@@ -209,7 +209,7 @@ namespace Player.Equipment
         {
             itemCollider.enabled = isPhysicsEnabled;
             itemRigidbody.isKinematic = !isPhysicsEnabled;
-            itemNetworkTransform.enabled = isPhysicsEnabled;
+            //itemNetworkTransform.enabled = isPhysicsEnabled;
             itemNetworkRigidbody.enabled = isPhysicsEnabled;
         }
 

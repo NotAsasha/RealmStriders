@@ -7,11 +7,14 @@ namespace Base.Shop
     {
         [SerializeField] private TMP_Text textOutput;
 
-        private void Start()
+        private void OnEnable()
         {
-            //causes error, fix --- TODO
             GameManager.Instance.teamMoney.OnValueChanged += UpdateUI;
-            textOutput.text = GameManager.Instance.teamMoney.Value.ToString();
+            UpdateUI(0, GameManager.Instance.teamMoney.Value);
+        }
+        private void OnDisable()
+        {
+            GameManager.Instance.teamMoney.OnValueChanged -= UpdateUI;
         }
 
         private void UpdateUI(int _, int money)
