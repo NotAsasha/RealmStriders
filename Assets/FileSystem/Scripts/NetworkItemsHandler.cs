@@ -71,11 +71,19 @@ public static class NetworkObjectExtension
 {
     public static void Register(this NetworkObject obj)
     {
+        if (NetworkItemsHandler.Instance == null)
+        {
+            Debug.LogWarning($"---NetworkObjectExtension: Trying to Register {obj.name}, but no NetworkItemsHandler.Instance exists.");
+        }
         NetworkItemsHandler.Instance.activeSaveables.Add(obj);
     }
 
     public static void UnRegister(this NetworkObject obj)
     {
+        if (NetworkItemsHandler.Instance == null)
+        {
+            Debug.LogWarning($"---NetworkObjectExtension: Trying to UnRegister {obj.name}, but no NetworkItemsHandler.Instance exists.");
+        }
         NetworkItemsHandler.Instance.activeSaveables.Remove(obj);
     }
 }

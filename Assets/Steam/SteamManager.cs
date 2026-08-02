@@ -15,11 +15,12 @@ namespace Steam
         public static SteamManager Instance { get; private set; } = null;
 
         private FacepunchTransport transport;
-        [FormerlySerializedAs("PlayerCount")] public NetworkVariable<int> playerCount = new();
+        public NetworkVariable<int> playerCount = new();
         public Lobby? CurrentLobby { get; private set; } = null;
 
         public List<Lobby> Lobbies { get; private set; } = new List<Lobby>(capacity: 100);
         public GameObject playerPrefab;
+
         private void Awake()
         {
             if (Instance == null)
@@ -35,11 +36,10 @@ namespace Steam
 
         private void Start()
         {
-
 #if UNITY_EDITOR
             Debug.unityLogger.logEnabled = true;
 #else
-		Debug.unityLogger.logEnabled = Debug.isDebugBuild;
+            Debug.unityLogger.logEnabled = Debug.isDebugBuild;
 #endif
 
             transport = NetworkManager.Singleton.GetComponent<FacepunchTransport>();
@@ -51,7 +51,8 @@ namespace Steam
             SteamMatchmaking.OnLobbyInvite += OnLobbyInvite;
             SteamFriends.OnGameLobbyJoinRequested += OnGameLobbyJoinRequested;
         }
-            private void OnDestroy()
+
+        private void OnDestroy()
         {
             SteamMatchmaking.OnLobbyCreated -= OnLobbyCreated;
             SteamMatchmaking.OnLobbyEntered -= OnLobbyEntered;
@@ -72,41 +73,45 @@ namespace Steam
 
         public async void StartHost(uint maxMembers, bool isFriendsOnly)
         {
-            Debug.Log($"---CrewManager: You have created a team!");
+            Debug.Log($"---CrewManager: Creating host...");
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
 
             NetworkManager.Singleton.StartHost();
-            //SpawnPlayer(SteamClient.SteamId);
+
             CurrentLobby = await SteamMatchmaking.CreateLobbyAsync((int)maxMembers);
-            if (!isFriendsOnly) CurrentLobby?.SetPublic();
+            if (CurrentLobby.HasValue)
+            {
+                if (!isFriendsOnly) CurrentLobby.Value.SetPublic();
+                else CurrentLobby.Value.SetFriendsOnly();
+                
+                CurrentLobby.Value.SetJoinable(true);
+            }
         }
-        public void StartClient(SteamId id)
+
+        public void StartClient(SteamId hostSteamId)
         {
+            // Захист від повторного запуску
+            if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer) return;
+
             NetworkManager.Singleton.OnClientConnectedCallback += ClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnected;
-            transport.targetSteamId = id;
+            
+            transport.targetSteamId = hostSteamId;
 
-            Debug.Log($"---CrewManager: Joining team hosted by {transport.targetSteamId}", this);
-           
-            //SpawnPlayer(id);
+            Debug.Log($"---CrewManager: Joining host with SteamID: {transport.targetSteamId}", this);
+            
             if (NetworkManager.Singleton.StartClient())
-                Debug.Log("---CrewManager: Member has joined!", this);
-            playerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+                Debug.Log("---CrewManager: StartClient initiated successfully!", this);
         }
-        public void SpawnPlayer(SteamId id)
-        {
-            GameObject player = Instantiate(playerPrefab, new Vector3(0, 1, 0), new Quaternion(0,0,0,0));
-            NetworkObject playerNetwork = player.GetComponent<NetworkObject>();
-            ulong playerId = playerNetwork.OwnerClientId;
-            playerNetwork.SpawnAsPlayerObject(playerId);
-            Debug.Log(player.GetComponent<NetworkObject>().OwnerClientId);
-        }
+
         public void Disconnect()
         {
             Debug.Log($"---CrewManager: Left team.");
             CurrentLobby?.Leave();
+            CurrentLobby = null;
+
             if (NetworkManager.Singleton == null)
                 return;
 
@@ -134,6 +139,7 @@ namespace Steam
         {
             CurrentLobby = await SteamMatchmaking.JoinLobbyAsync(id);
         }
+
         public async Task<bool> RefreshLobbies(int maxResults = 20)
         {
             try
@@ -141,9 +147,9 @@ namespace Steam
                 Lobbies.Clear();
 
                 var lobbies = await SteamMatchmaking.LobbyList
-                        .FilterDistanceClose()
-                .WithMaxResults(maxResults)
-                .RequestAsync();
+                    .FilterDistanceClose()
+                    .WithMaxResults(maxResults)
+                    .RequestAsync();
 
                 if (lobbies != null)
                 {
@@ -161,15 +167,6 @@ namespace Steam
             }
         }
 
-        private Steamworks.ServerList.Internet GetInternetRequest()
-        {
-            var request = new Steamworks.ServerList.Internet();
-            //request.AddFilter("secure", "1");
-            //request.AddFilter("and", "1");
-            //request.AddFilter("gametype", "1");
-            return request;
-        }
-
         public async Task<List<SteamPlayer>> GetLobbyMembersAsync()
         {
             List<SteamPlayer> playerList = new();
@@ -184,37 +181,46 @@ namespace Steam
             return playerList;
         }
 
-
         #region Steam Callbacks
 
-        private void OnGameLobbyJoinRequested(Lobby lobby, SteamId id)
+        private async void OnGameLobbyJoinRequested(Lobby lobby, SteamId friendId)
         {
-            bool isSame = lobby.Owner.Id.Equals(id);
+            Debug.Log($"---CrewManager: Join requested to lobby of {lobby.Owner.Name} ({lobby.Owner.Id})");
 
-            Debug.Log($"Owner: {lobby.Owner}");
-            Debug.Log($"Id: {id}");
-            Debug.Log($"IsSame: {isSame}", this);
+            CurrentLobby = await SteamMatchmaking.JoinLobbyAsync(lobby.Id);
 
-            StartClient(id);
+            if (!CurrentLobby.HasValue)
+            {
+                Debug.LogError("---CrewManager: Failed to join Steam lobby!");
+                return;
+            }
+
+            StartClient(CurrentLobby.Value.Owner.Id);
         }
 
-        private void OnLobbyInvite(Friend friend, Lobby lobby) => Debug.Log($"You got a invite from {friend.Name}", this);
+        private void OnLobbyInvite(Friend friend, Lobby lobby) => Debug.Log($"You got an invite from {friend.Name}", this);
 
         private void OnLobbyMemberLeave(Lobby lobby, Friend friend) { }
 
         private void OnLobbyMemberJoined(Lobby lobby, Friend friend)
         {
-            playerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+            if (NetworkManager.Singleton.IsServer)
+            {
+                playerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+            }
         }
 
         private void OnLobbyEntered(Lobby lobby)
         {   
-            Debug.Log($"You have entered in lobby, clientId={NetworkManager.Singleton.LocalClientId}", this);
+            Debug.Log($"Entered Steam lobby {lobby.Id}. Am I host? {NetworkManager.Singleton.IsHost}", this);
 
-            if (NetworkManager.Singleton.IsHost)
-                return;
             CurrentLobby = lobby;
-            StartClient(lobby.Owner.Id);
+
+            // Якщо ми не хост (підключаємося як клієнт через оверлей або списку лобі)
+            if (!NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsClient)
+            {
+                StartClient(lobby.Owner.Id);
+            }
         }
 
         private void OnLobbyCreated(Result result, Lobby lobby)
@@ -225,11 +231,10 @@ namespace Steam
                 return;
             }
 
-            lobby.SetFriendsOnly(); // Set to friends only!
-            lobby.SetData("name", "Random Cool Lobby");
+            lobby.SetFriendsOnly();
+            lobby.SetData("name", "Realm Striders Lobby");
             lobby.SetJoinable(true);
-            Debug.Log(lobby.Id);
-            Debug.Log("Lobby has been created!");
+            Debug.Log($"Lobby created with ID: {lobby.Id}");
         }
 
         #endregion
@@ -248,9 +253,23 @@ namespace Steam
 
         private void OnServerStarted() { }
 
-        private void OnClientConnectedCallback(ulong clientId) => Debug.Log($"Client connected, clientId={clientId}", this);
+        private void OnClientConnectedCallback(ulong clientId) 
+        {
+            Debug.Log($"Client connected to host, clientId={clientId}", this);
+            if (NetworkManager.Singleton.IsServer)
+            {
+                playerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+            }
+        }
 
-        private void OnClientDisconnectCallback(ulong clientId) => Debug.Log($"Client disconnected, clientId={clientId}", this);
+        private void OnClientDisconnectCallback(ulong clientId) 
+        {
+            Debug.Log($"Client disconnected from host, clientId={clientId}", this);
+            if (NetworkManager.Singleton.IsServer)
+            {
+                playerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+            }
+        }
 
         #endregion
     }
