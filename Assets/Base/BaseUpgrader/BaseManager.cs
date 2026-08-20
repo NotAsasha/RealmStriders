@@ -1,6 +1,5 @@
 using System;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Base.BaseUpgrader
@@ -13,12 +12,15 @@ namespace Base.BaseUpgrader
         IsDetectionBought = 1 << 1,    // 0010 (2)
         IsBeamBought = 1 << 2,    // 0100 (4)
         IsCasinoBought = 1 << 3,// 1000 (8)
+        IsShieldBought = 1 << 4, // 10000 (16)
     }
+
     public class BaseManager : NetworkBehaviour
     {
         [Header("References")]
         [SerializeField] private NetworkObject radarTerminal;
         [SerializeField] private NetworkObject radarButton;
+        [SerializeField] private NetworkObject shieldButton;
         [SerializeField] private GameObject casinoWall;
 
         [Header("Camera & Layers")]
@@ -48,6 +50,10 @@ namespace Base.BaseUpgrader
             {
                 Debug.LogWarning("[Base] radarButton is not assigned.", this);
             }
+            if (!shieldButton)
+            {
+                Debug.LogWarning("[Base] shieldButton is not assigned.", this);
+            }
 
             var radar = radarTerminal.GetComponent<Radar.Radar>();
             if (!radar)
@@ -65,11 +71,13 @@ namespace Base.BaseUpgrader
             baseUpgrades.OnValueChanged += OnDetectionBoughtChanged;
             baseUpgrades.OnValueChanged += OnBeamBoughtChanged;
             baseUpgrades.OnValueChanged += OnCasinoBoughtChanged;
+            baseUpgrades.OnValueChanged += OnShieldBoughtChanged;
 
             OnTerminalBoughtChanged(0, baseUpgrades.Value);
             OnDetectionBoughtChanged(0, baseUpgrades.Value);
             OnBeamBoughtChanged(0, baseUpgrades.Value);
             OnCasinoBoughtChanged(0, baseUpgrades.Value);
+            OnShieldBoughtChanged(0, baseUpgrades.Value);
         }
 
         public override void OnNetworkDespawn()
@@ -78,6 +86,8 @@ namespace Base.BaseUpgrader
             baseUpgrades.OnValueChanged -= OnDetectionBoughtChanged;
             baseUpgrades.OnValueChanged -= OnBeamBoughtChanged;
             baseUpgrades.OnValueChanged -= OnCasinoBoughtChanged;
+            baseUpgrades.OnValueChanged -= OnShieldBoughtChanged;
+
         }
 
         #endregion
@@ -127,6 +137,18 @@ namespace Base.BaseUpgrader
             bool isBought = (current & (int)BaseUpgrades.IsCasinoBought) != 0;
 
             casinoWall.SetActive(!isBought);
+        }
+
+        private void OnShieldBoughtChanged(int _, int current)
+        {
+            bool isBought = (current & (int)BaseUpgrades.IsShieldBought) != 0;
+
+            shieldButton.gameObject.SetActive(isBought);
+
+            if (IsServer && isBought && !shieldButton.IsSpawned)
+            {
+                shieldButton.Spawn();
+            }
         }
 
         #endregion

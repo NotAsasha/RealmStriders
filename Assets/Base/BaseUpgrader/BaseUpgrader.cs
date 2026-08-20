@@ -1,6 +1,5 @@
 using Base;
 using Base.BaseUpgrader;
-using System.Runtime.InteropServices;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -11,6 +10,7 @@ public class BaseUpgrader : Terminal
     [SerializeField] private int detectionPrice = 300;
     [SerializeField] private int beamPrice = 400;
     [SerializeField] private int casinoPrice = 300;
+    [SerializeField] private int shieldPrice = 750;
 
     private BaseManager baseObj;
 
@@ -19,8 +19,6 @@ public class BaseUpgrader : Terminal
         baseObj = BaseManager.Instance;
     }
 
-
-    //
     // NEEDS TO BE REFACTORED, terrible code, TODO -- fixed
     //
     // EDIT: now it`s better, but can still be done via dictionary, or whatever
@@ -49,10 +47,17 @@ public class BaseUpgrader : Terminal
 
         BuyUpgrade(BaseUpgrades.IsBeamBought, beamPrice);
     }
+
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void BuyCasinoServerRpc()
     {
         BuyUpgrade(BaseUpgrades.IsCasinoBought, casinoPrice);
+    }
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    public void BuyShieldServerRpc()
+    {
+        BuyUpgrade(BaseUpgrades.IsShieldBought, shieldPrice);
     }
 
     private void BuyUpgrade(BaseUpgrades toBuy, int price)
