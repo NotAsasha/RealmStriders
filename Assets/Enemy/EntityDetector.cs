@@ -75,13 +75,14 @@ namespace Enemy
             return null;
         }
 
-        public void DrawViewState()
+        public void OnDrawGizmosSelected()
         {
             Vector3 eyePosition = transform.position + eyeLocalPosition;
             Vector3 left = eyePosition + Quaternion.Euler(new Vector3(0, viewAngle / 2f, 0)) * (transform.forward * viewDistance);
             Vector3 right = eyePosition + Quaternion.Euler(-new Vector3(0, viewAngle / 2f, 0)) * (transform.forward * viewDistance);
-            Debug.DrawLine(eyePosition, left, Color.yellow);
-            Debug.DrawLine(eyePosition, right, Color.yellow);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(eyePosition, left);
+            Gizmos.DrawLine(eyePosition, right);
         }
     }
 }

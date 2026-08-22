@@ -57,7 +57,6 @@ namespace Player.Equipment.Scanner
         private void Update()
         {
             if (!isOn.Value) return;
-            detector.DrawViewState();
 
             //peep once per second
             currTime += Time.deltaTime;

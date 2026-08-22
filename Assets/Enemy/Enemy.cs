@@ -16,6 +16,7 @@ namespace Enemy
         public bool overAggresive = false;
         public float moveRange = 10f;
         public float defaultSpeed = 5f;
+        public float thinkCooldown = 0.3f;
 
         public float stepSoundCooldown = 0.3f;
         public AudioSource audioSource;
@@ -23,10 +24,10 @@ namespace Enemy
 
 
         private EnemyState _enemyState;
-        protected EnemyState enemyState
+        public EnemyState enemyState
         {
             get => _enemyState;
-            set
+            protected set
             {
                 if (_enemyState == value) return;
 
@@ -121,18 +122,17 @@ namespace Enemy
         #endregion
 
         private float nextUpdate;
-        private Vector3 lastPosition; 
+        private Vector3 lastPosition;
 
-        void Update()
+        protected virtual void Update()
         {
             if (isDead.Value || IsEffectActive(EffectType.Freeze)) return;
 
             if (IsServer)
             {
-                vision.DrawViewState();
                 if (Time.time >= nextUpdate)
                 {
-                    nextUpdate = Time.time + 0.3f + UnityEngine.Random.Range(0f, 0.1f);
+                    nextUpdate = Time.time + thinkCooldown + UnityEngine.Random.Range(0f, 0.1f);
                     Think();
                 }
             }
