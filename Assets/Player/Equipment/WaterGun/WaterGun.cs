@@ -11,7 +11,7 @@ namespace Player.Equipment.WaterGun
 
         EntityDetector detector;
 
-        private void Awake()
+        private void Start()
         {
             detector = GetComponent<EntityDetector>();
         }

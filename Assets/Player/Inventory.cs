@@ -128,11 +128,12 @@ namespace Player
             else
             {
                 if (IsOwner) isHoldingItem.Value = true;
-                itemChanged?.Invoke(true);
             }
 
             items[targetSlot] = takableComponent;
             SetItemParentServerRpc(itemToAdd, gameObject);
+
+            itemChanged?.Invoke(true);
             UpdateUI();
 
             return true;
@@ -428,7 +429,7 @@ namespace Player
 
             Item takable = networkObject.GetComponent<Item>();
             takable?.Drop();
-
+            itemChanged?.Invoke(false);
             DropItemClientRpc(objRef);
         }
 
@@ -436,6 +437,7 @@ namespace Player
         private void DropItemClientRpc(NetworkObjectReference objRef)
         {
             if (IsServer) return;
+            itemChanged?.Invoke(false);
             if (objRef.TryGet(out NetworkObject networkObject))
             {
                 networkObject.TryRemoveParent();

@@ -49,7 +49,7 @@ public class EnemySounds : MonoBehaviour
         }
     }
 
-    private void PlayIdleSound()
+    public void PlayIdleSound()
     {
         if (idleSounds.Length == 0)
         {

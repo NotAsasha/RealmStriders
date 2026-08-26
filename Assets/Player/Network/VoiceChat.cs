@@ -1,159 +1,184 @@
-using System.Collections.Generic;
+using System;
 using System.IO;
 using Steamworks;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Player.Movement;
+using Player.Equipment;
 
 namespace Player.Network
 {
     public class VoiceChat : NetworkBehaviour
     {
-        [SerializeField]
-        private AudioSource source;
+        [Header("Audio Settings")]
+        [Tooltip("3D AudioSource на голові персонажа (живий голос гравця поруч)")]
+        [SerializeField] private AudioSource proximityAudioSource;
 
-        [Header("Keybinds")]
+        private MemoryStream voiceInputStream;
+        private MemoryStream voiceOutputStream;
 
-        private MemoryStream output;
-        private MemoryStream stream;
+        private int sampleRate;
+        private VoiceAudioBuffer proximityBuffer;
 
-        private int optimalRate;
-        private int clipBufferSize;
-        private float[] clipBuffer;
-        private Queue<VoiceCommand> voiceQueue = new();
-
-        private int playbackBuffer;
-        private int dataPosition;
-        private int dataReceived;
-
-        private void Start()
+        public override void OnNetworkSpawn()
         {
+            sampleRate = (int)SteamUser.OptimalSampleRate;
+            if (sampleRate <= 0) sampleRate = 24000;
+
+            voiceInputStream = new MemoryStream();
+            voiceOutputStream = new MemoryStream();
+
             if (!IsOwner)
             {
-                enabled = false;
-                return;
+                // Створюємо буфер із пре-буферизацією ~80 мс
+                proximityBuffer = new VoiceAudioBuffer(sampleRate, bufferSeconds: 2.5f, prebufferSeconds: 0.08f);
+                SetupProximityAudio();
             }
-
-            optimalRate = (int)SteamUser.OptimalSampleRate;
-            clipBufferSize = optimalRate * 5;
-            clipBuffer = new float[clipBufferSize];
-            stream = new MemoryStream();
-            output = new MemoryStream();
-
-            // Create the AudioClip with the specified settings
-            source.clip = AudioClip.Create("VoiceData", clipBufferSize, 1, optimalRate, true, OnAudioRead, null);
-            source.loop = true;
-            source.Play();
-
-            PlayerMovement.Instance.controls.Gameplay.Voice.performed += ChangeVoiceRecordState;
+            else
+            {
+                BindInput();
+            }
         }
-        private void ChangeVoiceRecordState(InputAction.CallbackContext obj)
+
+        private void SetupProximityAudio()
         {
-            SteamUser.VoiceRecord = !SteamUser.VoiceRecord;
+            if (proximityAudioSource != null)
+            {
+                proximityAudioSource.clip = AudioClip.Create("Voice_Proximity", sampleRate, 1, sampleRate, true, OnAudioRead);
+                proximityAudioSource.loop = true;
+                proximityAudioSource.spatialBlend = 1.0f;
+                proximityAudioSource.rolloffMode = AudioRolloffMode.Linear;
+                proximityAudioSource.minDistance = 2f;
+                proximityAudioSource.maxDistance = 18f;
+                proximityAudioSource.Play();
+            }
         }
+
+        private void BindInput()
+        {
+            if (PlayerMovement.Instance != null && PlayerMovement.Instance.controls != null)
+            {
+                var voiceAction = PlayerMovement.Instance.controls.Gameplay.Voice;
+                voiceAction.started += OnVoiceStarted;
+                voiceAction.canceled += OnVoiceCanceled;
+            }
+        }
+
+        private void OnVoiceStarted(InputAction.CallbackContext ctx) => SteamUser.VoiceRecord = true;
+        private void OnVoiceCanceled(InputAction.CallbackContext ctx) => SteamUser.VoiceRecord = false;
+
         private void Update()
         {
+            if (!IsOwner) return;
             ListenForVoice();
         }
+
         private void ListenForVoice()
         {
             if (!Application.isFocused || !SteamClient.IsValid) return;
-            if (SteamUser.HasVoiceData)
+
+            // Вичитуємо всі накопичені аудіо-пакети зі Steam
+            while (SteamUser.HasVoiceData)
             {
-                Debug.LogError("HasVoiceData");
-                int compressedWritten = SteamUser.ReadVoiceData(stream);
-                stream.Position = 0;
-                VoiceCommand voice = new()
+                voiceInputStream.SetLength(0);
+                int compressedBytesWritten = SteamUser.ReadVoiceData(voiceInputStream);
+
+                if (compressedBytesWritten > 0)
                 {
-                    voiceBytes = stream.GetBuffer(),
-                    compressed = compressedWritten,
-                    userId = OwnerClientId
-                };
-                voiceQueue.Enqueue(voice);
-                ProcessVoice();
-            }
-        }
+                    byte[] dataToSend = new byte[compressedBytesWritten];
+                    Array.Copy(voiceInputStream.GetBuffer(), dataToSend, compressedBytesWritten);
 
-        private void ProcessVoice()
-        {
-            var voice = voiceQueue.Dequeue();
-            CmdVoiceServerRpc(voice.voiceBytes, voice.compressed, voice.userId);
-        }
-
-        [ServerRpc]
-        private void CmdVoiceServerRpc(byte[] compressed, int bytesWritten, ulong userId)
-        {
-            VoiceDataClientRpc(compressed, bytesWritten, userId);
-        }
-
-        [ClientRpc]
-        private void VoiceDataClientRpc(byte[] compressed, int bytesWritten, ulong senderId)
-        {
-            //Debug.Log(senderId + "is Sendler ID and " + OwnerClientId + "is Owner client ID");
-            if (senderId == OwnerClientId) return;
-
-            // Clear the input stream
-            output.SetLength(0);
-
-            // Decompress the voice data
-            int uncompressedWritten = SteamUser.DecompressVoice(new MemoryStream(compressed), bytesWritten, output);
-
-            // Reset the output stream position
-            output.Position = 0;
-
-            // Get the uncompressed data buffer
-            byte[] outputBuffer = output.GetBuffer();
-
-            // Write the decompressed voice data to the AudioClip buffer
-            WriteToClip(outputBuffer, uncompressedWritten);
-        }
-
-        private void OnAudioRead(float[] data)
-        {
-            for (int i = 0; i < data.Length; ++i)
-            {
-                // Start with silence
-                data[i] = 0;
-
-                // If there is data to play
-                if (playbackBuffer > 0)
-                {
-                    // Set the current data position
-                    dataPosition = (dataPosition + 1) % clipBufferSize;
-
-                    // Set the audio data
-                    data[i] = clipBuffer[dataPosition];
-
-                    // Decrease the playback buffer
-                    playbackBuffer--;
+                    bool isTransmittingRadio = WalkieTalkie.IsLocalPlayerHoldingActiveRadio();
+                    SendVoiceServerRpc(dataToSend, compressedBytesWritten, isTransmittingRadio);
                 }
             }
         }
 
-        private void WriteToClip(byte[] uncompressed, int size)
+        // Прибрали Delivery = RpcDelivery.Unreliable! Тепер Netcode сам фрагментує будь-які розміри без OverflowException
+        [Rpc(SendTo.Server)]
+        private void SendVoiceServerRpc(byte[] compressedData, int length, bool isRadio, RpcParams rpcParams = default)
         {
-            for (int i = 0; i < size; i += 2)
+            ulong senderClientId = rpcParams.Receive.SenderClientId;
+            ReceiveVoiceClientRpc(compressedData, length, isRadio, senderClientId);
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void ReceiveVoiceClientRpc(byte[] compressedData, int length, bool isRadio, ulong senderClientId)
+        {
+            bool isMyOwnVoice = (senderClientId == NetworkManager.Singleton.LocalClientId);
+
+            // Отримуємо налаштовану користувачем гучність для цього конкретного гравця
+            float playerVolume = VoiceVolumeManager.GetVolume(senderClientId);
+
+            // Якщо гравець вимкнув звук цього учасника на 0% — пропускаємо декомпресію (економія CPU)
+            if (!isMyOwnVoice && playerVolume <= 0.001f) return;
+
+            voiceOutputStream.SetLength(0);
+
+            using (var memoryStream = new MemoryStream(compressedData, 0, length))
             {
-                // Convert the short data to float
-                float converted = (short)(uncompressed[i] | uncompressed[i + 1] << 8) / 32767.0f;
+                int uncompressedWritten = SteamUser.DecompressVoice(memoryStream, length, voiceOutputStream);
 
-                // Write the converted data to the clip buffer
-                clipBuffer[dataReceived] = converted;
+                if (uncompressedWritten <= 0) return;
 
-                // Move to the next position in the clip buffer
-                dataReceived = (dataReceived + 1) % clipBufferSize;
+                byte[] rawBuffer = voiceOutputStream.GetBuffer();
 
-                // Increase the playback buffer
-                playbackBuffer++;
+                // 1. Просторовий голос від тіла гравця
+                if (!isMyOwnVoice && proximityBuffer != null)
+                {
+                    proximityBuffer.WriteData(rawBuffer, uncompressedWritten, playerVolume);
+                }
+
+                // 2. Трансляція через рації
+                if (isRadio)
+                {
+                    foreach (var radio in WalkieTalkie.AllRadios)
+                    {
+                        if (radio != null && radio.isOn.Value)
+                        {
+                            if (isMyOwnVoice && radio.IsOwner && radio.isCurrentlyHeld)
+                            {
+                                continue;
+                            }
+
+                            // Передаємо персональну гучність того, хто говорить у рацію
+                            radio.WriteVoiceData(rawBuffer, uncompressedWritten, playerVolume);
+                        }
+                    }
+                }
             }
         }
-    }
 
-    public class VoiceCommand
-    {
-        public byte[] voiceBytes;
-        public int compressed;
-        public ulong userId;
+        private void OnAudioRead(float[] data)
+        {
+            if (proximityBuffer != null)
+            {
+                proximityBuffer.ReadData(data);
+            }
+            else
+            {
+                Array.Clear(data, 0, data.Length);
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (IsOwner && PlayerMovement.Instance != null && PlayerMovement.Instance.controls != null)
+            {
+                var voiceAction = PlayerMovement.Instance.controls.Gameplay.Voice;
+                voiceAction.started -= OnVoiceStarted;
+                voiceAction.canceled -= OnVoiceCanceled;
+            }
+
+            SteamUser.VoiceRecord = false;
+            base.OnNetworkDespawn();
+        }
+
+        public override void OnDestroy()
+        {
+            voiceInputStream?.Dispose();
+            voiceOutputStream?.Dispose();
+        }
     }
 }

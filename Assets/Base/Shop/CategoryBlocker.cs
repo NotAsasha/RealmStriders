@@ -1,18 +1,16 @@
 using UnityEngine;
-using UnityEngine.Rendering.UI;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Image))]
+[RequireComponent(typeof(Button))]
 public class CategoryBlocker : MonoBehaviour
 {
     [SerializeField] private int requiredRating;
-    private Image image;
-
+    private Button button;
     private void Awake()
     {
-        if (!TryGetComponent(out image))
+        if (!TryGetComponent(out button))
         {
-            Debug.LogError("---CategoryBlocker: No Image component found");
+            Debug.LogError("---CategoryBlocker: No Button component found");
         }
     }
 
@@ -29,6 +27,6 @@ public class CategoryBlocker : MonoBehaviour
 
     private void UpdateUI(int _, int val)
     {
-        image.enabled = !(val >= requiredRating);
+        button.interactable = val >= requiredRating;
     }
 }

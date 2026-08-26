@@ -1,37 +1,36 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Base.SlotMachine
 {
     public class SlotMachine : Terminal
     {
-        // Has a chance to turn into a monster
-        // Has a chance to hit jackpot -- 1000shag
-        // Барабан такий ж як у вулику, анімація  - зупиняється на конкретному rotation
-        public int spinCost;
+        [Header("Slot Settings")]
+        public int spinCost = 100;
+        public float spinLength = 1.5f;
+        public int fullSpins = 5;
+        public float sectorAngle = 30f; 
+
+        [Header("References")]
         public DropTable table;
-
         public Transform spinObject;
-        public AnimationCurve movementCurve;
-
+        public AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
         public List<NetworkObject> itemsToDrop;
 
-        //Spin animation lenght in seconds.
-        float spinLenght = 1.5f;
+        private readonly NetworkVariable<bool> isSpinning = new(false);
 
         private void Start()
         {
-            table = GetComponent<DropTable>();
+            if (table == null) table = GetComponent<DropTable>();
         }
 
-        [ServerRpc]
-        public void SpinServerRpc()
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void SpinRpc()
         {
+            if (isSpinning.Value) return;
+
             if (GameManager.Instance.teamMoney.Value < spinCost)
             {
                 Debug.Log("---SlotMachine: Not enough money.");
@@ -40,72 +39,92 @@ namespace Base.SlotMachine
 
             Debug.Log("---SlotMachine: Spin.");
             GameManager.Instance.teamMoney.Value -= spinCost;
+            isSpinning.Value = true;
+
             int dropID = table.ChooseDrop();
 
-            SpinClientRpc(dropID);
-            table.ExecuteAction(dropID);
+            SpinAnimationRpc(dropID);
         }
 
-
-        [ClientRpc]
-        public void SpinClientRpc(int dropID)
+        [Rpc(SendTo.Everyone)]
+        private void SpinAnimationRpc(int dropID)
         {
-            StartCoroutine(SpinAnimation(dropID));
+            StartCoroutine(SpinRoutine(dropID));
         }
 
-        // TERRIBLE, to fix TODO
-        private bool isSpinning = false;
-        private IEnumerator SpinAnimation(int dropID)
+        private IEnumerator SpinRoutine(int dropID)
         {
-            endPos = 1800 - 30 * dropID;
-            isSpinning = true;
+            float elapsedTime = 0f;
 
-            yield return new WaitForSeconds(spinLenght);
-        }
-        private float time = 0;
-        private float endPos;
+            // 1. Отримуємо поточний початковий кут Y
+            float startAngleY = spinObject.localEulerAngles.y;
 
+            // 2. Приводимо початковий кут до діапазону 0..360
+            float currentNormalizedY = startAngleY % 360f;
+            if (currentNormalizedY < 0) currentNormalizedY += 360f;
 
-        public void Update()
-        {
-            if (!isSpinning) return;
+            // 3. Обчислюємо точний абсолютний кут для сектора dropID
+            // (Залежно від напрямку обертання вашої моделі: 360 - sectorAngle * dropID)
+            float targetSectorAngle = (360f - (sectorAngle * dropID)) % 360f;
+            if (targetSectorAngle < 0) targetSectorAngle += 360f;
 
-            
-            var startPos = spinObject.localEulerAngles;
-            
-            var endPos2 = spinObject.localEulerAngles;
-            endPos2.y = endPos;
+            // 4. Обчислюємо різницю (скільки градусів треба докрутити вперед від поточного стану)
+            float forwardDelta = (targetSectorAngle - currentNormalizedY + 360f) % 360f;
 
-            spinObject.gameObject.transform.localEulerAngles = Vector3.Lerp(startPos, endPos2, movementCurve.Evaluate(time / 5f));
+            // 5. Загальний кінцевий кут = поточний кут + повні оберти + докручування до точного сектора
+            float totalTargetAngleY = startAngleY + (360f * fullSpins) + forwardDelta;
 
-            time += Time.deltaTime;
-            if (time > 5f)
+            while (elapsedTime < spinLength)
             {
-                startPos.y %= 360;
-                time = 0;
-                isSpinning = false;
+                elapsedTime += Time.deltaTime;
+                float progress = Mathf.Clamp01(elapsedTime / spinLength);
+                float curveValue = movementCurve.Evaluate(progress);
+
+                float currentAngleY = Mathf.Lerp(startAngleY, totalTargetAngleY, curveValue);
+
+                spinObject.localRotation = Quaternion.Euler(0f, currentAngleY, 0f);
+
+                yield return null;
+            }
+
+            spinObject.localRotation = Quaternion.Euler(0f, totalTargetAngleY % 360f, 0f);
+
+            if (IsServer)
+            {
+                table.ExecuteAction(dropID);
+                isSpinning.Value = false;
             }
         }
 
-
         public void GiveCoins(int amount)
         {
+            if (!IsServer) return;
             Debug.Log($"---SlotMachine: Won {amount} coins.");
             GameManager.Instance.teamMoney.Value += amount;
         }
 
         public void SpawnRandomItem()
         {
-            int index = Random.Range(0, itemsToDrop.Count);
-            itemsToDrop[index].InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, GameManager.Instance.spawnPoint);
-            Debug.Log($"---SlotMachine: Won random item - {itemsToDrop[index].name}!");
+            if (!IsServer) return;
 
+            if (itemsToDrop == null || itemsToDrop.Count == 0) return;
+
+            int index = Random.Range(0, itemsToDrop.Count);
+            NetworkObject prefab = itemsToDrop[index];
+
+            Vector3 spawnPoint = GameManager.Instance.spawnPoint;
+
+            NetworkObject spawnedItem = Instantiate(prefab, spawnPoint, Quaternion.identity);
+            spawnedItem.Spawn();
+
+            Debug.Log($"---SlotMachine: Won random item - {spawnedItem.name}!");
         }
-        [ClientRpc]
-        public void TurnIntoMonsterClientRpc()
+
+        [Rpc(SendTo.Everyone)]
+        public void TurnIntoMonsterRpc()
         {
             DeactivateRpc();
-            Debug.Log("---SlotMachine: Main prize!");
+            Debug.Log("---SlotMachine: Main prize - MIMIC!");
         }
     }
 }

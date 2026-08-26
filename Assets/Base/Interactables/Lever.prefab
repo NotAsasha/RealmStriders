@@ -247,6 +247,7 @@ GameObject:
   - component: {fileID: 3480144542223059622}
   - component: {fileID: 1468237414458762737}
   - component: {fileID: 3223675965559005379}
+  - component: {fileID: 5296007956339478373}
   m_Layer: 6
   m_Name: Lever
   m_TagString: Untagged
@@ -311,6 +312,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   cooldown: 5
+  anim: {fileID: 5296007956339478373}
 --- !u!114 &1468237414458762737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -355,6 +357,28 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.275, y: 0.5, z: 0.175}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &5296007956339478373
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4950199021809964656}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 51b3db8d8f6d1cc48947eb83643178c5, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &2944146531867632152
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -497,10 +521,20 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: ec30c1232a618b94688993b2316b893f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: -5568371526223589888, guid: ec30c1232a618b94688993b2316b893f,
         type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -5568371526223589888, guid: ec30c1232a618b94688993b2316b893f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: ec30c1232a618b94688993b2316b893f,
         type: 3}
@@ -512,10 +546,20 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ec30c1232a618b94688993b2316b893f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 6203264432929249339, guid: ec30c1232a618b94688993b2316b893f,
         type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6203264432929249339, guid: ec30c1232a618b94688993b2316b893f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

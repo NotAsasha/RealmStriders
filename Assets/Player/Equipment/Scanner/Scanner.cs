@@ -19,7 +19,6 @@ namespace Player.Equipment.Scanner
         [SerializeField] AudioClip scanSound;
         [SerializeField] [MinMax(0f, 1f)] float pitchDiff = 0.2f;
 
-
         NetworkVariable<bool> isOn = new(false, 0, 0);
 
         EntityDetector detector;
@@ -58,7 +57,6 @@ namespace Player.Equipment.Scanner
         private void Update()
         {
             if (!isOn.Value) return;
-            detector.DrawViewState();
 
             //peep once per second
             currTime += Time.deltaTime;

@@ -7,8 +7,14 @@ namespace Base.Interactables
     public class Lever : NetworkBehaviour
     {
         [SerializeField] private float cooldown = 0f;
+        [SerializeField] private Animator anim;
 
         private bool isReady = true;
+
+        private void Awake()
+        {
+            anim = GetComponent<Animator>();
+        }
 
         public void SwitchMissionState()
         {
@@ -29,7 +35,7 @@ namespace Base.Interactables
 
         // Tut bug, new players will not have the color updated on join, NetworkVariables synchronize after the OnNetworkSpawn call
         // wrodi fixed
-        protected override void OnNetworkPostSpawn()
+        public override void OnNetworkSpawn()
         {
             GameManager.Instance.hasStartedMission.OnValueChanged += OnMissionStateChanged;
         }
@@ -42,6 +48,7 @@ namespace Base.Interactables
 
         private void OnMissionStateChanged(bool oldValue, bool newValue)
         {
+            anim.SetBool("IsOn", newValue);
             //Debug.LogError($"OnMissionStateChanged, newValue = {newValue}");
             //GetComponent<Renderer>().material.color = newValue ? Color.gray : Color.white; 
         }
