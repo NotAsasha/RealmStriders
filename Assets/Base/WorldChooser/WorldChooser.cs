@@ -1,6 +1,8 @@
 using Enemy;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 using NetString = Unity.Collections.FixedString64Bytes;
 
 namespace Base.WorldChooser
@@ -30,18 +32,19 @@ namespace Base.WorldChooser
     {
         public int missionNumber = 3;
 
-        [SerializeField] private Transform parent;
-        [SerializeField] private GameObject prefab;
+        [SerializeField] private Transform cardParent;
+        [SerializeField] private GameObject cardPrefab;
+        [SerializeField] private TMP_Text currentMissionText;
+        [SerializeField] private AudioSource audioSource;
 
         [SerializeField] private string[] availableWorlds;
 
         private NetworkList<MissionData> availableMissions;
 
-
-
         private void Awake()
         {
             availableMissions = new NetworkList<MissionData>();
+            audioSource = GetComponent<AudioSource>();
         }
 
         public override void OnNetworkSpawn()
@@ -85,13 +88,16 @@ namespace Base.WorldChooser
 
         private void ReactToMissionState(bool oldV, bool isStarted)
         {
-            parent.gameObject.SetActive(!isStarted);
+            cardParent.gameObject.SetActive(!isStarted);
             if (!isStarted) UpdateUI();
         }
 
         private void UpdateUI()
         {
             ClearUI();
+
+            currentMissionText.text = "NONE";
+            currentMissionText.color = Color.red;
 
             foreach (var mission in availableMissions)
             {
@@ -120,16 +126,16 @@ namespace Base.WorldChooser
 
         private void CreateCardLocal(NetString missionName, int enemiesCount, float averageDanger)
         {
-            var temp = Instantiate(prefab, parent);
+            var temp = Instantiate(cardPrefab, cardParent);
             WorldCard card = temp.GetComponent<WorldCard>();
             card.Setup(this, missionName, enemiesCount, averageDanger);
         }
 
         private void ClearUI()
         {
-            for (int i = parent.childCount - 1; i >= 0; i--)
+            for (int i = cardParent.childCount - 1; i >= 0; i--)
             {
-                Destroy(parent.GetChild(i).gameObject);
+                Destroy(cardParent.GetChild(i).gameObject);
             }
         }
 
@@ -138,15 +144,20 @@ namespace Base.WorldChooser
         {
             if (GameManager.Instance.hasStartedMission.Value) return;
 
-            // Тепер цей лог з'явиться ТІЛЬКИ на Сервері (Хості)
             Debug.Log($"[SERVER] Клієнт вибрав місію: {missionName}");
 
             GameManager.Instance.missionName = missionName.ToString();
             GameManager.Instance.enemiesCount = enemiesCount;
             GameManager.Instance.averageDanger = averageDanger;
 
-            // Якщо потрібно сповістити інші клієнти про те, яка місія зараз обрана, 
-            // GameManager має синхронізувати ці змінні (наприклад, через NetworkVariable або ClientRpc)
+            SetMissionClientRpc(missionName);
+        }
+        [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+        public void SetMissionClientRpc(NetString missionName)
+        {
+            currentMissionText.text = missionName.ToString();
+            currentMissionText.color = Color.green;
+            audioSource.Play();
         }
     }
 }

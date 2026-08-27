@@ -9,7 +9,7 @@ using System;
 
 namespace Enemy
 {
-    [RequireComponent(typeof(NavMeshAgent), typeof(EntityDetector))]
+    [RequireComponent(typeof(NavMeshAgent))]
     public class Enemy : Entity, ICollidable
     {
         public float damage = 1f;

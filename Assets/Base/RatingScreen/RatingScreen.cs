@@ -4,30 +4,38 @@ using UnityEngine.UI;
 
 namespace Base.RatingScreen
 {
-    // idk why it is NetworkBehaviour, TODO
-    public class RatingScreen : NetworkBehaviour
+    public class RatingScreen : MonoBehaviour
     {
-        [SerializeField] Slider teamRatingSlider;
-        [SerializeField] Slider minRatingSlider;
+        private const int MaxPointsPerStar = 3;
 
-        public override void OnNetworkSpawn()
+        [SerializeField] private Sprite[] starTextures; // 0 = пуста, 1 = 1/3, 2 = 2/3, 3 = повна
+        [SerializeField] private Image[] stars;
+
+        private void OnEnable()
         {
-            var teamRating = GameManager.Instance.teamRating;
-            var lossRating = GameManager.Instance.lossRating;
+            GameManager.Instance.teamRating.OnValueChanged += UpdateCounter;
+            UpdateCounter(0, GameManager.Instance.teamRating.Value);
+        }
 
-            teamRating.OnValueChanged += (oldV, newV) =>
+        private void OnDisable()
+        {
+            if (GameManager.Instance != null)
             {
-                teamRatingSlider.value = newV;
-            };
+                GameManager.Instance.teamRating.OnValueChanged -= UpdateCounter;
+            }
+        }
 
-            lossRating.OnValueChanged += (oldV, newV) =>
+        private void UpdateCounter(int _, int rating)
+        {
+            int currentRating = rating;
+
+            for (int i = 0; i < stars.Length; i++)
             {
-                minRatingSlider.value = newV;
-            };
-
-            // Update at the beginning
-            teamRatingSlider.value = teamRating.Value;
-            minRatingSlider.value = lossRating.Value;
+                int starState = Mathf.Clamp(currentRating, 0, MaxPointsPerStar);
+                
+                stars[i].sprite = starTextures[starState];
+                currentRating -= MaxPointsPerStar;
+            }
         }
     }
 }

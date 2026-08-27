@@ -34090,7 +34090,6 @@ GameObject:
   - component: {fileID: 386711583038415671}
   - component: {fileID: 4771708525256896814}
   - component: {fileID: 1026246498666105520}
-  - component: {fileID: 886011145148508480}
   - component: {fileID: 7490328760025007987}
   - component: {fileID: -6363728834847499910}
   - component: {fileID: 3530490715161901336}
@@ -34166,7 +34165,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3317558451
+  GlobalObjectIdHash: 3248624841
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -34207,7 +34206,7 @@ NavMeshAgent:
   m_Speed: 6
   m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 160
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -34262,27 +34261,6 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &886011145148508480
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5629089953353955407}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21fe3cdabba635b4e9826381049b971d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eyeLocalPosition: {x: 0, y: 1, z: 0}
-  viewDistance: 20
-  viewAngle: 160
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 65
 --- !u!114 &7490328760025007987
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34320,6 +34298,11 @@ MonoBehaviour:
   - {fileID: 8300000, guid: e64eac18257a7004f944ef3c91520d1b, type: 3}
   - {fileID: 8300000, guid: 5f7ce3e3e3fb9d14c8945e531026aa76, type: 3}
   eye: {fileID: 2629601999828691812}
+  rotationSpeed: 4
+  minLookInterval: 0.5
+  maxLookInterval: 1.5
+  forwardLookDistance: 5
+  eyeDetector: {fileID: 5766294847752624853}
   eyeTarget:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -34875,6 +34858,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8118337226126447555}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4151dea3afcc94c44a26a9105b279364,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3608962091591729771}
+    - targetCorrespondingSourceObject: {fileID: 2499900675981040021, guid: 4151dea3afcc94c44a26a9105b279364,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5766294847752624853}
   m_SourcePrefab: {fileID: 100100000, guid: 4151dea3afcc94c44a26a9105b279364, type: 3}
 --- !u!4 &535104113442319038 stripped
 Transform:
@@ -34966,6 +34957,33 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 8996788994066755954}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6803370614689491175 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2499900675981040021, guid: 4151dea3afcc94c44a26a9105b279364,
+    type: 3}
+  m_PrefabInstance: {fileID: 8996788994066755954}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5766294847752624853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6803370614689491175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21fe3cdabba635b4e9826381049b971d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EntityDetector
+  eyeLocalPosition: {x: 0, y: 0, z: 0}
+  viewDistance: 30
+  viewAngle: 120
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!4 &7442895716536759597 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -7236869174330588065, guid: 4151dea3afcc94c44a26a9105b279364,
@@ -35051,6 +35069,22 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3608962091591729771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077885694727621667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4080696bcb6698744a3a5ddf1eee41c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimation
+  enemy: {fileID: 7490328760025007987}
+  animator: {fileID: 8118337226126447555}
+  speedModifier: 0.25
+  stopThreshold: 0.05
 --- !u!4 &8886088672529831577 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 4151dea3afcc94c44a26a9105b279364,

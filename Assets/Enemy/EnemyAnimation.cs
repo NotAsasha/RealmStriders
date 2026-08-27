@@ -1,46 +1,41 @@
 using UnityEngine;
 using Enemy;
-using UnityEngine.AI;
 
 public class EnemyAnimation : MonoBehaviour
 {
-    public Enemy.Enemy enemy;
+    [SerializeField] private Enemy.Enemy enemy;
+    [SerializeField] private Animator animator;
+    [SerializeField] private float speedModifier = 0.25f;
+    [SerializeField] private float stopThreshold = 0.05f;
+
+    private Vector3 lastPosition;
 
     private void Awake()
     {
-        if (TryGetComponent<Animator>(out Animator animator))
+        if (animator == null) animator = GetComponent<Animator>();
+        if (enemy == null) enemy = GetComponentInParent<Enemy.Enemy>();
+        lastPosition = transform.position;
+    }
+
+    private void Update()
+    {
+        if (animator == null) return;
+
+        float distance = Vector3.Distance(transform.position, lastPosition);
+        float speed = distance / Time.deltaTime;
+        lastPosition = transform.position;
+
+        if (speed < stopThreshold)
         {
-            enemy.onStateChanged += (state) => UpdateAnimation(animator, state);
+            // Зупиняємо анімацію повністю, якщо ворог вперся в стіну чи зупинився
+            animator.speed = 0f;
+            animator.SetBool("IsMoving", false);
         }
         else
         {
-            Debug.LogWarning("No Animator component found on GrabarAnimation.");
-        }
-    }
-
-    private void UpdateAnimation(Animator animator, EnemyState state)
-    {
-        switch (state)
-        {
-            case EnemyState.IsMoving:
-                animator.SetBool("IsMoving", true);
-                animator.SetBool("IsChasingPlayer", false);
-                break;
-            case EnemyState.IsChasingPlayer:
-                animator.SetBool("IsMoving", false);
-                animator.SetBool("IsChasingPlayer", true);
-                break;
-            default:
-                animator.SetBool("IsMoving", false);
-                animator.SetBool("IsChasingPlayer", false);
-                break;
-        }
-    }
-    private void OnDestroy()
-    {
-        if (enemy != null)
-        {
-            enemy.onStateChanged -= (state) => UpdateAnimation(GetComponent<Animator>(), state);
+            // Швидкість програвання анімації синхронна зі швидкістю переміщення
+            animator.speed = Mathf.Lerp(animator.speed, speed * speedModifier, Time.deltaTime * 10f);
+            animator.SetBool("IsMoving", true);
         }
     }
 }
