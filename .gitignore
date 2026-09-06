@@ -9,7 +9,16 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
-/WorldMaterialsFree/
+# Textures asset
+/[Ww]orld[Mm]aterialsFree/
+/[Aa]ssets/[Ww]orld[Mm]aterialsFree/
+# Unity Lightmaps & Adaptive Probe Volumes
+/[Aa]ssets/**/*[Ll]ightmap*
+/[Aa]ssets/**/*[Ll]ighting[Dd]ata.asset
+/[Aa]ssets/**/*.CellData.bytes
+/[Aa]ssets/**/*.CellOptionalData.bytes
+/[Aa]ssets/**/*.CellSupportData.bytes
+/[Aa]ssets/**/ProbeVolume*
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
