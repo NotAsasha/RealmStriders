@@ -207,7 +207,7 @@ namespace Player.Equipment
 
         private void SetPhysicsState(bool isPhysicsEnabled)
         {
-            itemCollider.enabled = isPhysicsEnabled;
+            //itemCollider.enabled = isPhysicsEnabled;
             itemRigidbody.isKinematic = !isPhysicsEnabled;
             //itemNetworkTransform.enabled = isPhysicsEnabled;
             itemNetworkRigidbody.enabled = isPhysicsEnabled;

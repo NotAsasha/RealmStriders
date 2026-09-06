@@ -74,6 +74,7 @@ public static class NetworkObjectExtension
         if (NetworkItemsHandler.Instance == null)
         {
             Debug.LogWarning($"---NetworkObjectExtension: Trying to Register {obj.name}, but no NetworkItemsHandler.Instance exists.");
+            return;
         }
         NetworkItemsHandler.Instance.activeSaveables.Add(obj);
     }
@@ -83,6 +84,7 @@ public static class NetworkObjectExtension
         if (NetworkItemsHandler.Instance == null)
         {
             Debug.LogWarning($"---NetworkObjectExtension: Trying to UnRegister {obj.name}, but no NetworkItemsHandler.Instance exists.");
+            return;
         }
         NetworkItemsHandler.Instance.activeSaveables.Remove(obj);
     }

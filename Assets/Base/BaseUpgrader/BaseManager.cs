@@ -7,12 +7,13 @@ namespace Base.BaseUpgrader
     [Flags]
     public enum BaseUpgrades : int
     {
-        None = 0,         // 0000
-        IsTerminalBought = 1 << 0,    // 0001 (1)
-        IsDetectionBought = 1 << 1,    // 0010 (2)
-        IsBeamBought = 1 << 2,    // 0100 (4)
-        IsCasinoBought = 1 << 3,// 1000 (8)
-        IsShieldBought = 1 << 4, // 10000 (16)
+        None = 0,         // 00000000
+        IsTerminalBought = 1 << 0,    // 00000001 (1)
+        IsDetectionBought = 1 << 1,    // 00000010 (2)
+        IsBeamBought = 1 << 2,    // 00000100 (4)
+        IsCasinoBought = 1 << 3,// 00001000 (8)
+        IsShieldBought = 1 << 4, // 00010000 (16)
+        IsChargerBought = 1 << 5, // 00100000 (32)
     }
 
     public class BaseManager : NetworkBehaviour
@@ -22,6 +23,7 @@ namespace Base.BaseUpgrader
         [SerializeField] private NetworkObject radarButton;
         [SerializeField] private NetworkObject shieldButton;
         [SerializeField] private GameObject casinoWall;
+        [SerializeField] private NetworkObject charger;
 
         [Header("Camera & Layers")]
         [Tooltip("Layer for detecting enemies.")]
@@ -58,6 +60,10 @@ namespace Base.BaseUpgrader
             {
                 Debug.LogWarning("[Base] shieldButton is not assigned.", this);
             }
+            if (!charger)
+            {
+                Debug.LogWarning("[Base] charger is not assigned.", this);
+            }
 
             var radar = radarTerminal.GetComponent<Radar.Radar>();
             if (!radar)
@@ -76,12 +82,14 @@ namespace Base.BaseUpgrader
             baseUpgrades.OnValueChanged += OnBeamBoughtChanged;
             baseUpgrades.OnValueChanged += OnCasinoBoughtChanged;
             baseUpgrades.OnValueChanged += OnShieldBoughtChanged;
+            baseUpgrades.OnValueChanged += OnChargerBoughtChanged;
 
             OnTerminalBoughtChanged(0, baseUpgrades.Value);
             OnDetectionBoughtChanged(0, baseUpgrades.Value);
             OnBeamBoughtChanged(0, baseUpgrades.Value);
             OnCasinoBoughtChanged(0, baseUpgrades.Value);
             OnShieldBoughtChanged(0, baseUpgrades.Value);
+            OnChargerBoughtChanged(0, baseUpgrades.Value);
         }
 
         public override void OnNetworkDespawn()
@@ -91,7 +99,7 @@ namespace Base.BaseUpgrader
             baseUpgrades.OnValueChanged -= OnBeamBoughtChanged;
             baseUpgrades.OnValueChanged -= OnCasinoBoughtChanged;
             baseUpgrades.OnValueChanged -= OnShieldBoughtChanged;
-
+            baseUpgrades.OnValueChanged -= OnChargerBoughtChanged;
         }
 
         #endregion
@@ -152,6 +160,18 @@ namespace Base.BaseUpgrader
             if (IsServer && isBought && !shieldButton.IsSpawned)
             {
                 shieldButton.Spawn();
+            }
+        }
+
+        private void OnChargerBoughtChanged(int _, int current)
+        {
+            bool isBought = (current & (int)BaseUpgrades.IsChargerBought) != 0;
+
+            charger.gameObject.SetActive(isBought);
+
+            if (IsServer && isBought && !charger.IsSpawned)
+            {
+                charger.Spawn();
             }
         }
 

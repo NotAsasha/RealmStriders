@@ -11,6 +11,7 @@ public class BaseUpgrader : Terminal
     [SerializeField] private int beamPrice = 400;
     [SerializeField] private int casinoPrice = 300;
     [SerializeField] private int shieldPrice = 750;
+    [SerializeField] private int chargerPrice = 250;
 
     private BaseManager baseObj;
 
@@ -58,6 +59,12 @@ public class BaseUpgrader : Terminal
     public void BuyShieldServerRpc()
     {
         BuyUpgrade(BaseUpgrades.IsShieldBought, shieldPrice);
+    }
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    public void BuyChargerServerRpc()
+    {
+        BuyUpgrade(BaseUpgrades.IsChargerBought, chargerPrice);
     }
 
     private void BuyUpgrade(BaseUpgrades toBuy, int price)
