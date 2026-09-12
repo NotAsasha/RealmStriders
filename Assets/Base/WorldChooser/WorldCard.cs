@@ -1,39 +1,40 @@
 using TMPro;
+using Unity.Collections;
 using UnityEngine;
-using NetString = Unity.Collections.FixedString64Bytes;
 
 namespace Base.WorldChooser
 {
     public class WorldCard : MonoBehaviour
     {
-        [SerializeField] TMP_Text missionNameUI;
-        [SerializeField] TMP_Text enemiesCountUI;
-        [SerializeField] TMP_Text averageDangerUI;
+        [SerializeField] private TMP_Text missionNameUI;
+        [SerializeField] private TMP_Text enemiesCountUI;
+        [SerializeField] private TMP_Text averageDangerUI;
 
         private WorldChooser worldChooser;
+        private FixedString64Bytes missionName;
+        private int enemiesCount;
+        private float averageDanger;
 
-        private NetString missionName = "World1";
-        private int enemiesCount = 1;
-        private float averageDanger = 1;
-
-        private void Start()
+        public void Setup(WorldChooser parent, FixedString64Bytes targetMissionName, int targetEnemiesCount, float targetAverageDanger)
         {
+            worldChooser = parent;
+            missionName = targetMissionName;
+            enemiesCount = targetEnemiesCount;
+            averageDanger = targetAverageDanger;
+
             UpdateUI();
         }
 
         private void UpdateUI()
         {
-            missionNameUI.text = missionName.Value.ToString();
-            enemiesCountUI.text = "Enemy number: " + enemiesCount;
-            averageDangerUI.text = "Approximate danger: " + averageDanger;
-        }
+            if (missionNameUI != null)
+                missionNameUI.text = missionName.ToString();
 
-        public void Setup(WorldChooser _parent, NetString _missionName, int _enemiesCount, float _averageDanger)
-        {
-            worldChooser = _parent;
-            missionName = _missionName;
-            enemiesCount = _enemiesCount;
-            averageDanger = _averageDanger;
+            if (enemiesCountUI != null)
+                enemiesCountUI.text = $"Enemies: {enemiesCount}";
+
+            if (averageDangerUI != null)
+                averageDangerUI.text = $"Danger: {averageDanger:F1}";
         }
 
         public void SetMission()
@@ -44,7 +45,7 @@ namespace Base.WorldChooser
             }
             else
             {
-                Debug.LogError("WorldChooser.Instance не знайдено на сцені!");
+                Debug.LogError("[WorldCard] Reference to WorldChooser is null.");
             }
         }
     }

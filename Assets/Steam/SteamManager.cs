@@ -2,36 +2,57 @@ using Netcode.Transports.Facepunch;
 using Player.Network;
 using Steamworks;
 using Steamworks.Data;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Steam
 {
     public class SteamManager : MonoBehaviour
     {
-        public static SteamManager Instance { get; private set; } = null;
+        public static SteamManager Instance { get; private set; }
 
-        private FacepunchTransport transport;
-        public NetworkVariable<int> playerCount = new();
-        public Lobby? CurrentLobby { get; private set; } = null;
+        public Lobby? CurrentLobby { get; private set; }
+        public List<Lobby> Lobbies { get; private set; } = new(100);
 
-        public List<Lobby> Lobbies { get; private set; } = new List<Lobby>(capacity: 100);
-        public GameObject playerPrefab;
+        private FacepunchTransport cachedTransport;
+
+        private FacepunchTransport Transport
+        {
+            get
+            {
+                if (cachedTransport != null) return cachedTransport;
+
+                if (NetworkManager.Singleton != null)
+                {
+                    cachedTransport = NetworkManager.Singleton.NetworkConfig.NetworkTransport as FacepunchTransport
+                                      ?? NetworkManager.Singleton.GetComponent<FacepunchTransport>();
+                }
+
+                if (cachedTransport == null)
+                {
+                    cachedTransport = FindFirstObjectByType<FacepunchTransport>();
+                }
+
+                return cachedTransport;
+            }
+        }
+
+        public int CurrentLobbyMemberCount => CurrentLobby?.MemberCount ?? 0;
 
         private void Awake()
         {
             if (Instance == null)
+            {
                 Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
             else
             {
                 Destroy(gameObject);
-                return;
             }
-
-            DontDestroyOnLoad(gameObject);
         }
 
         private void Start()
@@ -41,9 +62,6 @@ namespace Steam
 #else
             Debug.unityLogger.logEnabled = Debug.isDebugBuild;
 #endif
-
-            transport = NetworkManager.Singleton.GetComponent<FacepunchTransport>();
-
             SteamMatchmaking.OnLobbyCreated += OnLobbyCreated;
             SteamMatchmaking.OnLobbyEntered += OnLobbyEntered;
             SteamMatchmaking.OnLobbyMemberJoined += OnLobbyMemberJoined;
@@ -61,59 +79,84 @@ namespace Steam
             SteamMatchmaking.OnLobbyInvite -= OnLobbyInvite;
             SteamFriends.OnGameLobbyJoinRequested -= OnGameLobbyJoinRequested;
 
-            if (NetworkManager.Singleton == null)
-                return;
-
-            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnectedCallback;
-            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
-            NetworkManager.Singleton.OnServerStarted -= OnServerStarted;
+            UnsubscribeNetworkEvents();
         }
 
         private void OnApplicationQuit() => Disconnect();
 
         public async void StartHost(uint maxMembers, bool isFriendsOnly)
         {
-            Debug.Log($"---CrewManager: Creating host...");
+            if (NetworkManager.Singleton == null)
+            {
+                Debug.LogError("[SteamManager] NetworkManager.Singleton is null!");
+                return;
+            }
+
+            Debug.Log("[SteamManager] Initializing host...");
+
+            UnsubscribeNetworkEvents();
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
 
-            NetworkManager.Singleton.StartHost();
+            if (!NetworkManager.Singleton.StartHost())
+            {
+                Debug.LogError("[SteamManager] Failed to start Netcode Host!");
+                return;
+            }
 
+            // Створення лобі в Steam. Після успіху Steam сам викличе OnLobbyEntered
             CurrentLobby = await SteamMatchmaking.CreateLobbyAsync((int)maxMembers);
             if (CurrentLobby.HasValue)
             {
                 if (!isFriendsOnly) CurrentLobby.Value.SetPublic();
                 else CurrentLobby.Value.SetFriendsOnly();
-                
+
                 CurrentLobby.Value.SetJoinable(true);
+                CurrentLobby.Value.SetData("name", "Realm Striders Session");
             }
         }
 
         public void StartClient(SteamId hostSteamId)
         {
-            // Захист від повторного запуску
-            if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer) return;
+            if (NetworkManager.Singleton == null)
+            {
+                Debug.LogError("[SteamManager] NetworkManager.Singleton is null!");
+                return;
+            }
 
+            if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer)
+            {
+                Debug.LogWarning("[SteamManager] Network session is already running.");
+                return;
+            }
+
+            if (Transport == null)
+            {
+                Debug.LogError("[SteamManager] FacepunchTransport not found!");
+                return;
+            }
+
+            UnsubscribeNetworkEvents();
             NetworkManager.Singleton.OnClientConnectedCallback += ClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnected;
-            
-            transport.targetSteamId = hostSteamId;
 
-            Debug.Log($"---CrewManager: Joining host with SteamID: {transport.targetSteamId}", this);
-            
-            if (NetworkManager.Singleton.StartClient())
-                Debug.Log("---CrewManager: StartClient initiated successfully!", this);
+            // Приведення SteamId до ulong для сумісності з FacepunchTransport
+            Transport.targetSteamId = (ulong)hostSteamId;
+
+            Debug.Log($"[SteamManager] Attempting StartClient connecting to SteamID: {hostSteamId}");
+
+            if (!NetworkManager.Singleton.StartClient())
+            {
+                Debug.LogError("[SteamManager] NetworkManager.StartClient() returned false!");
+            }
         }
 
         public void Disconnect()
         {
-            Debug.Log($"---CrewManager: Left team.");
+            Debug.Log("[SteamManager] Leaving current lobby and stopping network.");
             CurrentLobby?.Leave();
             CurrentLobby = null;
-
-            if (NetworkManager.Singleton == null)
-                return;
 
             ResetNetwork();
         }
@@ -122,20 +165,35 @@ namespace Steam
         {
             if (NetworkManager.Singleton != null)
             {
-                Debug.Log("[SteamManager] Resetting old NetworkManager");
-                NetworkManager.Singleton.Shutdown();
-                Destroy(NetworkManager.Singleton.gameObject);
+                UnsubscribeNetworkEvents();
+
+                if (NetworkManager.Singleton.IsListening)
+                {
+                    NetworkManager.Singleton.Shutdown();
+                }
             }
+
+            cachedTransport = null;
 
             if (GameManager.Instance != null)
             {
-                Debug.Log("[SteamManager] Resetting old GameManager");
                 Destroy(GameManager.Instance.gameObject);
                 GameManager.Instance = null;
             }
         }
 
-        public async void TryConnectLobby(uint id)
+        private void UnsubscribeNetworkEvents()
+        {
+            if (NetworkManager.Singleton == null) return;
+
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnectedCallback;
+            NetworkManager.Singleton.OnClientConnectedCallback -= ClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
+            NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnected;
+            NetworkManager.Singleton.OnServerStarted -= OnServerStarted;
+        }
+
+        public async void TryConnectLobby(SteamId id)
         {
             CurrentLobby = await SteamMatchmaking.JoinLobbyAsync(id);
         }
@@ -146,22 +204,20 @@ namespace Steam
             {
                 Lobbies.Clear();
 
-                var lobbies = await SteamMatchmaking.LobbyList
+                var foundLobbies = await SteamMatchmaking.LobbyList
                     .FilterDistanceClose()
                     .WithMaxResults(maxResults)
                     .RequestAsync();
 
-                if (lobbies != null)
+                if (foundLobbies != null)
                 {
-                    for (int i = 0; i < lobbies.Length; i++)
-                        Lobbies.Add(lobbies[i]);
+                    Lobbies.AddRange(foundLobbies);
                 }
 
                 return true;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                Debug.Log("Error fetching lobbies", this);
                 Debug.LogException(ex, this);
                 return false;
             }
@@ -170,105 +226,93 @@ namespace Steam
         public async Task<List<SteamPlayer>> GetLobbyMembersAsync()
         {
             List<SteamPlayer> playerList = new();
+            if (!CurrentLobby.HasValue) return playerList;
 
             foreach (var member in CurrentLobby.Value.Members)
             {
                 var imageTask = await member.GetMediumAvatarAsync();
-
-                SteamPlayer player = new(member.Name, member.Id, imageTask, member);
-                playerList.Add(player);
+                playerList.Add(new SteamPlayer(member.Name, member.Id, imageTask, member));
             }
+
             return playerList;
         }
 
         #region Steam Callbacks
 
+        // Запит на підключення через інвайт/оверлей Steam
         private async void OnGameLobbyJoinRequested(Lobby lobby, SteamId friendId)
         {
-            Debug.Log($"---CrewManager: Join requested to lobby of {lobby.Owner.Name} ({lobby.Owner.Id})");
+            Debug.Log($"[SteamManager] Lobby join requested for ID: {lobby.Id}");
 
+            // Надійний спосіб Facepunch: приєднуємося через статичний метод Matchmaking
             CurrentLobby = await SteamMatchmaking.JoinLobbyAsync(lobby.Id);
-
             if (!CurrentLobby.HasValue)
             {
-                Debug.LogError("---CrewManager: Failed to join Steam lobby!");
+                Debug.LogError("[SteamManager] Failed to join requested Steam lobby!");
+            }
+        }
+
+        // Автоматично викликається Steam після успішного входу в лобі
+        private void OnLobbyEntered(Lobby lobby)
+        {
+            CurrentLobby = lobby;
+            Debug.Log($"[SteamManager] Entered lobby {lobby.Id}. Owner: {lobby.Owner.Id}");
+
+            // Безпечна перевірка: чи ми є творцем лобі в Steam
+            if (lobby.Owner.Id == SteamClient.SteamId)
+            {
+                Debug.Log("[SteamManager] We are the lobby owner. Skipping client start.");
                 return;
             }
 
-            StartClient(CurrentLobby.Value.Owner.Id);
+            StartClient(lobby.Owner.Id);
         }
 
-        private void OnLobbyInvite(Friend friend, Lobby lobby) => Debug.Log($"You got an invite from {friend.Name}", this);
+        private void OnLobbyInvite(Friend friend, Lobby lobby)
+        {
+            Debug.Log($"[SteamManager] Invite received from {friend.Name}");
+        }
 
         private void OnLobbyMemberLeave(Lobby lobby, Friend friend) { }
 
-        private void OnLobbyMemberJoined(Lobby lobby, Friend friend)
-        {
-            if (NetworkManager.Singleton.IsServer)
-            {
-                playerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
-            }
-        }
-
-        private void OnLobbyEntered(Lobby lobby)
-        {   
-            Debug.Log($"Entered Steam lobby {lobby.Id}. Am I host? {NetworkManager.Singleton.IsHost}", this);
-
-            CurrentLobby = lobby;
-
-            // Якщо ми не хост (підключаємося як клієнт через оверлей або списку лобі)
-            if (!NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsClient)
-            {
-                StartClient(lobby.Owner.Id);
-            }
-        }
+        private void OnLobbyMemberJoined(Lobby lobby, Friend friend) { }
 
         private void OnLobbyCreated(Result result, Lobby lobby)
         {
             if (result != Result.OK)
             {
-                Debug.LogError($"Lobby couldn't be created!, {result}", this);
-                return;
+                Debug.LogError($"[SteamManager] Lobby creation failed: {result}");
             }
-
-            lobby.SetFriendsOnly();
-            lobby.SetData("name", "Realm Striders Lobby");
-            lobby.SetJoinable(true);
-            Debug.Log($"Lobby created with ID: {lobby.Id}");
         }
 
         #endregion
 
-        #region Network Callbacks
+        #region Netcode Callbacks
 
-        private void ClientConnected(ulong clientId) => Debug.Log($"I'm connected, clientId={clientId}");
+        private void ClientConnected(ulong clientId)
+        {
+            Debug.Log($"[SteamManager] Local client connected to server! ClientId: {clientId}");
+        }
 
         private void ClientDisconnected(ulong clientId)
         {
-            Debug.Log($"I'm disconnected, clientId={clientId}");
-
-            NetworkManager.Singleton.OnClientDisconnectCallback -= ClientDisconnected;
-            NetworkManager.Singleton.OnClientConnectedCallback -= ClientConnected;
+            Debug.LogWarning($"[SteamManager] Local client disconnected! ClientId: {clientId}");
+            UnsubscribeNetworkEvents();
         }
 
-        private void OnServerStarted() { }
-
-        private void OnClientConnectedCallback(ulong clientId) 
+        private void OnServerStarted()
         {
-            Debug.Log($"Client connected to host, clientId={clientId}", this);
-            if (NetworkManager.Singleton.IsServer)
-            {
-                playerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
-            }
+            Debug.Log("[SteamManager] Server started successfully.");
         }
 
-        private void OnClientDisconnectCallback(ulong clientId) 
+        private void OnClientConnectedCallback(ulong clientId)
         {
-            Debug.Log($"Client disconnected from host, clientId={clientId}", this);
-            if (NetworkManager.Singleton.IsServer)
-            {
-                playerCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
-            }
+            Debug.Log($"[SteamManager] Remote client connected to host. ClientId: {clientId}");
+        }
+
+        private void OnClientDisconnectCallback(ulong clientId)
+        {
+            Debug.Log($"[SteamManager] Remote client disconnected from host. ClientId: {clientId}");
         }
 
         #endregion

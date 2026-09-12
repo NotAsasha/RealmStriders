@@ -22,8 +22,8 @@ public class Grabar : Enemy.Enemy
 
     protected override void Awake()
     {
-        base.Awake();
         if (eyeDetector != null) vision = eyeDetector;
+        base.Awake();
     }
 
     public override void OnNetworkSpawn()

@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Player;
 using Unity.Netcode;
 using UnityEngine;
@@ -46,10 +45,10 @@ namespace Enemy.Casino
         }
         public event Action OnSpawn;
 
-        protected override void Start()
+        protected override void Awake()
         {
             animator = casinoAnimator;
-            base.Start();
+            base.Awake();
             animator.speed = 0f;
             //rig.weight = 0f;
 
@@ -64,11 +63,18 @@ namespace Enemy.Casino
         {
             if (IsServer && isStatic)
             {
-                effects[EffectType.Freeze].Value = true;
+                effects[EffectType.Asleep].Value = true;
                 effects[EffectType.Invincible].Value = true;
             }
         
         }
+
+        protected override void Update()
+        {
+            if (IsEffectActive(EffectType.Asleep)) return;
+            base.Update();
+        }
+
 
         [ClientRpc]
         public void WakeUpClientRpc()
@@ -105,7 +111,7 @@ namespace Enemy.Casino
 
             if (IsServer)
             {
-                effects[EffectType.Freeze].Value = false;
+                effects[EffectType.Asleep].Value = false;
                 effects[EffectType.Invincible].Value = false;
             }
         }
@@ -114,7 +120,7 @@ namespace Enemy.Casino
 
         private void LateUpdate()
         {
-            if (isDead.Value || IsEffectActive(EffectType.Freeze)) return;
+            if (isDead.Value || IsEffectActive(EffectType.Asleep)) return;
             UpdateLegPosition();
             UpdateBodyPosition();
         }

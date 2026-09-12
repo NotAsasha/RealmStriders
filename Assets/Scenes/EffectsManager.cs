@@ -65,7 +65,7 @@ namespace Scenes
 
         private void OnPlayerTeleports(Human human, bool isForward)
         {
-            Debug.Log("Effects OnPlayerTeleports");
+            //Debug.Log("Effects OnPlayerTeleports");
             if (human.gameObject == PlayerMovement.Instance.gameObject)
             {
                 StartFade(isForward ? 0f : 1f);
@@ -74,14 +74,14 @@ namespace Scenes
 
         private void StartFade(float target)
         {
-            Debug.Log("Effects StartFade");
+            //Debug.Log("Effects StartFade");
             if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
             fadeCoroutine = StartCoroutine(FadeRoutine(target));
         }
 
         private IEnumerator FadeRoutine(float target)
         {
-            Debug.Log("FadeRoutine");
+            //Debug.Log("FadeRoutine");
             float duration = 1.5f;
             float startValue = playerPresenceWeight;
             float elapsed = 0;
@@ -90,7 +90,7 @@ namespace Scenes
             {
                 elapsed += Time.deltaTime;
                 playerPresenceWeight = Mathf.Lerp(startValue, target, elapsed / duration);
-                Debug.Log(playerPresenceWeight);
+                //Debug.Log(playerPresenceWeight);
 
 
                 defaultEffects.weight = playerPresenceWeight;

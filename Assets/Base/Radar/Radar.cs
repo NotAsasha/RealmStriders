@@ -27,7 +27,11 @@ namespace Base.Radar
         {
             base.OnNetworkSpawn();
             radarCamera.transform.position = new Vector3(0f, 100f, 0f);
-            radarCamera.transform.eulerAngles = new Vector3(90f, 180, 0f);
+            radarCamera.transform.eulerAngles = new Vector3(90f, 0f, 0f);
+            
+        }
+        public void Start()
+        {
             playerID = (int)PlayerMovement.Instance.GetComponent<NetworkObject>().OwnerClientId;
             control = PlayerMovement.Instance.controls.UI.Navigate;
         }

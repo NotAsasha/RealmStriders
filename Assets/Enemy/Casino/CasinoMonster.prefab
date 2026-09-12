@@ -36941,7 +36941,7 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -38868,7 +38868,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
   UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 1
+  AutoUpdateKinematicState: 0
   AutoSetKinematicOnDespawn: 1
 --- !u!195 &8040414687176581611
 NavMeshAgent:
@@ -38942,6 +38942,7 @@ MonoBehaviour:
   overAggresive: 0
   moveRange: 20
   defaultSpeed: 5
+  thinkCooldown: 0.3
   stepSoundCooldown: 0.3
   audioSource: {fileID: 3436696204227681505}
   stepSounds:
@@ -38975,7 +38976,7 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0

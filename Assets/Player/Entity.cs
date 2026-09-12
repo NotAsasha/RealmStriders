@@ -18,6 +18,7 @@ namespace Player
         private readonly NetworkVariable<bool> isFireNet = new(false);
         private readonly NetworkVariable<bool> isInvincibleNet = new(false);
         private readonly NetworkVariable<bool> isWeakNet = new(false);
+        private readonly NetworkVariable<bool> isAsleepNet = new(false);
 
         protected Dictionary<EffectType, NetworkVariable<bool>> effects;
 
@@ -33,7 +34,8 @@ namespace Player
                 { EffectType.Water,      isWaterNet },
                 { EffectType.Fire,       isFireNet },
                 { EffectType.Invincible, isInvincibleNet },
-                { EffectType.Weak, isWeakNet }
+                { EffectType.Weak, isWeakNet },
+                { EffectType.Asleep, isAsleepNet }
             };
         }
 
@@ -136,6 +138,7 @@ namespace Player
         Water,
         Fire,
         Invincible,
-        Weak
+        Weak,
+        Asleep
     }
 }

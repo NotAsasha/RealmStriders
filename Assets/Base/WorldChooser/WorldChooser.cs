@@ -1,15 +1,14 @@
 using Enemy;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UI;
-using NetString = Unity.Collections.FixedString64Bytes;
 
 namespace Base.WorldChooser
 {
     public struct MissionData : INetworkSerializable, System.IEquatable<MissionData>
     {
-        public NetString missionName;
+        public FixedString64Bytes missionName;
         public int enemiesCount;
         public float averageDanger;
 
@@ -22,59 +21,66 @@ namespace Base.WorldChooser
 
         public bool Equals(MissionData other)
         {
-            return missionName == other.missionName &&
+            return missionName.Equals(other.missionName) &&
                    enemiesCount == other.enemiesCount &&
-                   averageDanger == other.averageDanger;
+                   Mathf.Approximately(averageDanger, other.averageDanger);
         }
     }
 
     public class WorldChooser : NetworkBehaviour
     {
-        public int missionNumber = 3;
+        [Header("Settings")]
+        [SerializeField] private int missionNumber = 3;
+        [SerializeField] private string[] availableWorlds;
 
+        [Header("UI References")]
         [SerializeField] private Transform cardParent;
         [SerializeField] private GameObject cardPrefab;
         [SerializeField] private TMP_Text currentMissionText;
         [SerializeField] private AudioSource audioSource;
 
-        [SerializeField] private string[] availableWorlds;
-
         private NetworkList<MissionData> availableMissions;
+
+        private readonly NetworkVariable<FixedString64Bytes> selectedMissionName = new(
+            default,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server);
 
         private void Awake()
         {
             availableMissions = new NetworkList<MissionData>();
-            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null) TryGetComponent(out audioSource);
         }
 
         public override void OnNetworkSpawn()
         {
             availableMissions.OnListChanged += OnMissionsListChanged;
+            selectedMissionName.OnValueChanged += OnSelectedMissionChanged;
 
-            GameManager.Instance.hasStartedMission.OnValueChanged += ReactToMissionState;
-
-            ReactToMissionState(false, GameManager.Instance.hasStartedMission.Value);
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.hasStartedMission.OnValueChanged += ReactToMissionState;
+                ReactToMissionState(false, GameManager.Instance.hasStartedMission.Value);
+            }
 
             if (IsServer)
             {
-                if (availableMissions.Count == 0)
+                if (IsServer)
                 {
-                    GenerateMissions(missionNumber);
-                }
-                else
-                {
-                    UpdateUI();
+                    // a bit scary.. TODO
+                    GameManager.Instance.teamRating.OnValueChanged += (int _, int __) => GenerateMissions(missionNumber);
                 }
             }
-            else
-            {
-                UpdateUI();
-            }
+
+            UpdateSelectedMissionUI(selectedMissionName.Value);
+            RebuildCardsUI();
         }
 
         public override void OnNetworkDespawn()
         {
             availableMissions.OnListChanged -= OnMissionsListChanged;
+            selectedMissionName.OnValueChanged -= OnSelectedMissionChanged;
+
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.hasStartedMission.OnValueChanged -= ReactToMissionState;
@@ -83,52 +89,61 @@ namespace Base.WorldChooser
 
         private void OnMissionsListChanged(NetworkListEvent<MissionData> changeEvent)
         {
-            UpdateUI();
+            RebuildCardsUI();
         }
 
-        private void ReactToMissionState(bool oldV, bool isStarted)
+        private void OnSelectedMissionChanged(FixedString64Bytes previousValue, FixedString64Bytes newValue)
+        {
+            UpdateSelectedMissionUI(newValue);
+            if (audioSource != null && !newValue.IsEmpty)
+            {
+                audioSource.Play();
+            }
+        }
+
+        private void ReactToMissionState(bool oldState, bool isStarted)
         {
             cardParent.gameObject.SetActive(!isStarted);
-            if (!isStarted) UpdateUI();
+
+            if (IsServer && oldState && !isStarted)
+            {
+                selectedMissionName.Value = default;
+                GenerateMissions(missionNumber);
+            }
+
+            if (!isStarted)
+            {
+                RebuildCardsUI();
+            }
         }
 
-        private void UpdateUI()
+        private void UpdateSelectedMissionUI(FixedString64Bytes missionName)
+        {
+            if (missionName.IsEmpty)
+            {
+                currentMissionText.text = "NONE";
+                currentMissionText.color = Color.red;
+            }
+            else
+            {
+                currentMissionText.text = missionName.ToString();
+                currentMissionText.color = Color.green;
+            }
+        }
+
+        private void RebuildCardsUI()
         {
             ClearUI();
 
-            currentMissionText.text = "NONE";
-            currentMissionText.color = Color.red;
-
-            foreach (var mission in availableMissions)
+            for (int i = 0; i < availableMissions.Count; i++)
             {
-                CreateCardLocal(mission.missionName, mission.enemiesCount, mission.averageDanger);
-            }
-        }
-
-        private void GenerateMissions(int capacity)
-        {
-            availableMissions.Clear();
-
-            for (int i = 0; i < capacity; i++)
-            {
-                var missionName = (NetString)availableWorlds[Random.Range(0, availableWorlds.Length)];
-                var enemiesCount = EnemySpawner.RandomEnemiesNumber(GameManager.Instance.teamRating.Value + i - 1);
-                var averageDanger = Random.Range(1, 5);
-
-                availableMissions.Add(new MissionData
+                var mission = availableMissions[i];
+                var cardObj = Instantiate(cardPrefab, cardParent);
+                if (cardObj.TryGetComponent<WorldCard>(out var card))
                 {
-                    missionName = missionName,
-                    enemiesCount = enemiesCount,
-                    averageDanger = averageDanger
-                });
+                    card.Setup(this, mission.missionName, mission.enemiesCount, mission.averageDanger);
+                }
             }
-        }
-
-        private void CreateCardLocal(NetString missionName, int enemiesCount, float averageDanger)
-        {
-            var temp = Instantiate(cardPrefab, cardParent);
-            WorldCard card = temp.GetComponent<WorldCard>();
-            card.Setup(this, missionName, enemiesCount, averageDanger);
         }
 
         private void ClearUI()
@@ -139,25 +154,45 @@ namespace Base.WorldChooser
             }
         }
 
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void SetMissionServerRpc(NetString missionName, int enemiesCount, float averageDanger)
+        private void GenerateMissions(int capacity)
         {
-            if (GameManager.Instance.hasStartedMission.Value) return;
+            if (availableWorlds == null || availableWorlds.Length == 0)
+            {
+                Debug.LogError("[WorldChooser] availableWorlds is empty!");
+                return;
+            }
 
-            Debug.Log($"[SERVER] Клієнт вибрав місію: {missionName}");
+            availableMissions.Clear();
+
+            int currentRating = GameManager.Instance != null ? GameManager.Instance.teamRating.Value : 1;
+
+            for (int i = 0; i < capacity; i++)
+            {
+                var missionName = new FixedString64Bytes(availableWorlds[Random.Range(0, availableWorlds.Length)]);
+
+                int difficultyStep = Mathf.Max(0, currentRating + i - 1);
+                int enemiesCount = EnemySpawner.RandomEnemiesNumber(difficultyStep);
+                float averageDanger = Random.Range(1f, 5f);
+
+                availableMissions.Add(new MissionData
+                {
+                    missionName = missionName,
+                    enemiesCount = enemiesCount,
+                    averageDanger = averageDanger
+                });
+            }
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void SetMissionServerRpc(FixedString64Bytes missionName, int enemiesCount, float averageDanger)
+        {
+            if (GameManager.Instance == null || GameManager.Instance.hasStartedMission.Value) return;
 
             GameManager.Instance.missionName = missionName.ToString();
             GameManager.Instance.enemiesCount = enemiesCount;
             GameManager.Instance.averageDanger = averageDanger;
 
-            SetMissionClientRpc(missionName);
-        }
-        [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-        public void SetMissionClientRpc(NetString missionName)
-        {
-            currentMissionText.text = missionName.ToString();
-            currentMissionText.color = Color.green;
-            audioSource.Play();
+            selectedMissionName.Value = missionName;
         }
     }
 }

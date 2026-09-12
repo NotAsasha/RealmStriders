@@ -29,13 +29,13 @@ public class EnemyAnimation : MonoBehaviour
         {
             // Зупиняємо анімацію повністю, якщо ворог вперся в стіну чи зупинився
             animator.speed = 0f;
-            animator.SetBool("IsMoving", false);
+            //animator.SetBool("IsMoving", false);
         }
         else
         {
             // Швидкість програвання анімації синхронна зі швидкістю переміщення
             animator.speed = Mathf.Lerp(animator.speed, speed * speedModifier, Time.deltaTime * 10f);
-            animator.SetBool("IsMoving", true);
+            //animator.SetBool("IsMoving", true);
         }
     }
 }

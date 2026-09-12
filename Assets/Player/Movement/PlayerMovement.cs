@@ -82,7 +82,7 @@ namespace Player.Movement
                 enabled = false;
                 return;
             }
-            SetupSingleton();
+            
 
             controls = new();
             fileHandler = GameFileHandler.Instance;
@@ -94,6 +94,7 @@ namespace Player.Movement
             controls.System.Enable();
             controls.Gameplay.Enable();
 
+            SetupSingleton();
             SetupInputHandlers();
         }
         public override void OnNetworkDespawn()

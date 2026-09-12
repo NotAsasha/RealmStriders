@@ -19,7 +19,7 @@ public class Charger : NetworkBehaviour
     [SerializeField] private ParticleSystem targetParticles;
     [SerializeField] private AudioSource chargeSound;
 
-    // Мережеве посилання на поточний заряджуваний об'єкт
+    // Мережеве посилання на цільовий об'єкт
     private readonly NetworkVariable<NetworkObjectReference> currentTargetNetRef = new(
         default,
         NetworkVariableReadPermission.Everyone,
@@ -29,7 +29,7 @@ public class Charger : NetworkBehaviour
     private readonly Collider[] nearbyItems = new Collider[20];
     private float tickTimer = 0f;
 
-    // Кешовані локальні посилання для клієнтського рендеру
+    // Кеш для локального візуалу
     private Transform clientTargetTransform;
 
     private void Awake()
@@ -53,7 +53,7 @@ public class Charger : NetworkBehaviour
 
     private void Update()
     {
-        // 1. Логіка заряду працює суворо на сервері
+        // 1. Серверна логіка нарахування заряду
         if (IsServer)
         {
             tickTimer += Time.deltaTime;
@@ -64,7 +64,13 @@ public class Charger : NetworkBehaviour
             }
         }
 
-        // 2. Оновлення візуалу працює локально на кожному клієнті
+        // 2. Безперервна перевірка посилання на клієнті (страховка від мережевої затримки)
+        if (clientTargetTransform == null && currentTargetNetRef.Value.NetworkObjectId != 0)
+        {
+            ResolveTargetTransform(currentTargetNetRef.Value);
+        }
+
+        // 3. Рендер ефектів
         UpdateVisuals();
     }
 
@@ -76,7 +82,6 @@ public class Charger : NetworkBehaviour
         {
             targetItem.ModifyCharge(chargePerTick);
 
-            // Якщо предмет зарядився — скидаємо ціль
             if (targetItem.IsFullyCharged)
             {
                 currentTargetNetRef.Value = default;
@@ -110,9 +115,11 @@ public class Charger : NetworkBehaviour
             if (item == null || item.IsFullyCharged) continue;
 
             if (!col.TryGetComponent<NetworkObject>(out var netObj))
+            {
                 netObj = col.GetComponentInParent<NetworkObject>();
+            }
 
-            if (netObj == null) continue;
+            if (netObj == null || !netObj.IsSpawned) continue;
 
             Vector3 targetPos = col.bounds.center;
             Vector3 direction = targetPos - originPos;
@@ -152,22 +159,24 @@ public class Charger : NetworkBehaviour
 
     private void UpdateVisuals()
     {
-        bool isCharging = clientTargetTransform != null;
+        bool isCharging = clientTargetTransform != null && currentTargetNetRef.Value.NetworkObjectId != 0;
 
+        // Керування LineRenderer
         if (lineRenderer != null)
         {
             if (isCharging)
             {
-                lineRenderer.enabled = true;
+                if (!lineRenderer.enabled) lineRenderer.enabled = true;
                 lineRenderer.SetPosition(0, beamOrigin.position);
                 lineRenderer.SetPosition(1, clientTargetTransform.position);
             }
-            else
+            else if (lineRenderer.enabled)
             {
                 lineRenderer.enabled = false;
             }
         }
 
+        // Керування частками
         if (targetParticles != null)
         {
             if (isCharging)
@@ -181,6 +190,7 @@ public class Charger : NetworkBehaviour
             }
         }
 
+        // Керування аудіо
         if (chargeSound != null)
         {
             if (isCharging && !chargeSound.isPlaying) chargeSound.Play();

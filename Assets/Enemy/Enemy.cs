@@ -46,23 +46,28 @@ namespace Enemy
 
         #region Initialization
 
+        protected override void Awake()
+        {
+            base.Awake(); // Ініціалізує effects Dictionary в Entity
+
+            if (agent == null) TryGetComponent(out agent);
+            if (vision == null) TryGetComponent(out vision);
+            if (playerRigidbody == null) playerRigidbody = GetComponentInChildren<Rigidbody>();
+            if (mainCollider == null) mainCollider = GetComponentInChildren<Collider>();
+            if (animator == null) animator = GetComponentInChildren<Animator>();
+
+            ToggleRagdoll(true);
+        }
         protected virtual void Start()
         {
-            if (TryGetComponent(out agent))
+            if (agent != null)
             {
                 agent.speed = defaultSpeed;
             }
             else
             {
-                Debug.LogWarning("No NavMeshAgent, might need to add.");
+                Debug.LogWarning($"[{name}] No NavMeshAgent found.");
             }
-            if (vision == null) TryGetComponent<EntityDetector>(out vision);
-
-            if (playerRigidbody == null) TryGetComponent<Rigidbody>(out playerRigidbody);
-            if (mainCollider == null) TryGetComponent<Collider>(out mainCollider);
-            if (animator == null) TryGetComponent<Animator>(out animator);
-
-            ToggleRagdoll(true);
         }
 
         #endregion
@@ -90,11 +95,11 @@ namespace Enemy
         private void ToggleRagdoll(bool isActive)
         {
             Debug.Log($"ToggleRagdoll, is entity alive - {isActive}");
-            animator.enabled = isActive;
-            vision.enabled = isActive;
-            agent.enabled = isActive;
-            playerRigidbody.isKinematic = isActive;
-            mainCollider.isTrigger = isActive;
+            if (animator != null) animator.enabled = isActive;
+            if (vision != null) vision.enabled = isActive;
+            if (agent != null) agent.enabled = isActive;
+            if (playerRigidbody != null) playerRigidbody.isKinematic = isActive;
+            if (mainCollider != null) mainCollider.isTrigger = isActive;
         }
 
         #endregion
@@ -103,7 +108,7 @@ namespace Enemy
 
         public void OnColliderEnter(GameObject collider)
         {
-            if (!IsServer || isDead.Value || IsEffectActive(EffectType.Freeze) /*|| !GameManager.instance.hasStartedMission.Value*/) return;
+            if (!IsServer || isDead.Value || IsEffectActive(EffectType.Freeze) || IsEffectActive(EffectType.Asleep) /*|| !GameManager.instance.hasStartedMission.Value*/) return;
             var player = collider.GetComponent<Entity>();
             if (player == null || player.isDead.Value) return;
             if (!overAggresive && collider.GetComponent<Enemy>() != null) return;

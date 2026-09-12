@@ -22,6 +22,8 @@ namespace Enemy
         private Collider[] nearbyEntities = new Collider[20];
         public GameObject EntityInSight(bool chaseEnemies = false)
         {
+            if (viewAngle == 0 || viewDistance == 0) return null;
+
             Vector3 eyePosition = transform.position + eyeLocalPosition;
             int numColliders = Physics.OverlapSphereNonAlloc(eyePosition, viewDistance, nearbyEntities, playerLayer);
 

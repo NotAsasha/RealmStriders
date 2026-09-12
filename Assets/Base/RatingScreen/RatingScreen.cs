@@ -13,8 +13,16 @@ namespace Base.RatingScreen
 
         private void OnEnable()
         {
+            if (GameManager.Instance == null) return;
+
             GameManager.Instance.teamRating.OnValueChanged += UpdateCounter;
-            UpdateCounter(0, GameManager.Instance.teamRating.Value);
+
+            RefreshUI();
+        }
+
+        private void Start()
+        {
+            RefreshUI();
         }
 
         private void OnDisable()
@@ -25,6 +33,14 @@ namespace Base.RatingScreen
             }
         }
 
+        private void RefreshUI()
+        {
+            if (GameManager.Instance != null)
+            {
+                UpdateCounter(0, GameManager.Instance.teamRating.Value);
+            }
+        }
+
         private void UpdateCounter(int _, int rating)
         {
             int currentRating = rating;
@@ -32,7 +48,6 @@ namespace Base.RatingScreen
             for (int i = 0; i < stars.Length; i++)
             {
                 int starState = Mathf.Clamp(currentRating, 0, MaxPointsPerStar);
-                
                 stars[i].sprite = starTextures[starState];
                 currentRating -= MaxPointsPerStar;
             }

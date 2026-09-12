@@ -34093,7 +34093,7 @@ GameObject:
   - component: {fileID: 4771708525256896814}
   - component: {fileID: 1026246498666105520}
   - component: {fileID: 886011145148508480}
-  - component: {fileID: 1923507448804592558}
+  - component: {fileID: 6036963752928671945}
   - component: {fileID: -6363728834847499910}
   - component: {fileID: 3530490715161901336}
   - component: {fileID: 5891541450350644583}
@@ -34277,13 +34277,13 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.75
-  m_Speed: 6
-  m_Acceleration: 8
+  m_Speed: 20
+  m_Acceleration: 10
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 360
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 3
   m_BaseOffset: 1
@@ -34356,7 +34356,7 @@ MonoBehaviour:
   wallLayer:
     serializedVersion: 2
     m_Bits: 65
---- !u!114 &1923507448804592558
+--- !u!114 &6036963752928671945
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -34365,11 +34365,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5629089953353955407}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5aec305521103d4496d255c6f12eaaa, type: 3}
+  m_Script: {fileID: 11500000, guid: 8941765ec0b928e44a97e4aeeccdce79, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.Runner.Runner
   ShowTopMostFoldoutHeaderGroup: 1
-  dangerLevel: 2.5
+  dangerLevel: 2
   glassCage: {fileID: 707610815179461094, guid: de46285eca51e2d4c9e0994d3b25a964,
     type: 3}
   isDead:
@@ -34381,15 +34381,17 @@ MonoBehaviour:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 2.5
+    m_InternalValue: 2
   damage: 1
-  overAggresive: 1
-  moveRange: 10
-  defaultSpeed: 6
+  overAggresive: 0
+  moveRange: 30
+  defaultSpeed: 10
+  thinkCooldown: 0.3
   stepSoundCooldown: 0.2
   audioSource: {fileID: -44859057082312483}
   stepSounds:
   - {fileID: 8300000, guid: e64eac18257a7004f944ef3c91520d1b, type: 3}
+  - {fileID: 8300000, guid: 8107dc939c211fe4c8069d6a30846cc1, type: 3}
   - {fileID: 8300000, guid: 5f7ce3e3e3fb9d14c8945e531026aa76, type: 3}
 --- !u!114 &-6363728834847499910
 MonoBehaviour:
