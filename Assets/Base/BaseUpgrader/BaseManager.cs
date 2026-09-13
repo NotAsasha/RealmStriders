@@ -25,6 +25,9 @@ namespace Base.BaseUpgrader
         [SerializeField] private GameObject casinoWall;
         [SerializeField] private NetworkObject charger;
 
+        [Header("Power Grid")]
+        [SerializeField] private PowerGrid powerGrid;
+
         [Header("Camera & Layers")]
         [Tooltip("Layer for detecting enemies.")]
         [SerializeField] private LayerMask radarOnlyLayer; 
@@ -37,11 +40,17 @@ namespace Base.BaseUpgrader
         );
 
         public static BaseManager Instance;
+
+        public PowerGrid PowerGrid => powerGrid;
         #region Unity Lifecycle
 
         private void Awake()
         {
             Instance = this;
+            if (!powerGrid)
+            {
+                powerGrid = GetComponent<PowerGrid>();
+            }
             baseUpgrades = new();
         }
 
@@ -63,6 +72,11 @@ namespace Base.BaseUpgrader
             if (!charger)
             {
                 Debug.LogWarning("[Base] charger is not assigned.", this);
+            }
+
+            if (!powerGrid)
+            {
+                Debug.LogWarning("[Base] powerGrid is not assigned or found on this object.", this);
             }
 
             var radar = radarTerminal.GetComponent<Radar.Radar>();

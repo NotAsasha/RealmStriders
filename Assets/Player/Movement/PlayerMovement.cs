@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using FileSystem.Scripts;
 using Unity.Netcode;
@@ -40,6 +41,7 @@ namespace Player.Movement
         public Controls controls;
         public bool isPaused;
         public bool isInInteraction;
+        public Action<bool> onInteractionStateChanged;
         public Human human;
 
         public Vector3 CurrentInputMove => controls.Gameplay.Movement.ReadValue<Vector3>();

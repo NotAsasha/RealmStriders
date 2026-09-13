@@ -1,8 +1,9 @@
+using Base.BaseUpgrader;
 using Player.Equipment;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Charger : NetworkBehaviour
+public class Charger : NetworkBehaviour, IPowerConsumer
 {
     [Header("Charge Settings")]
     [SerializeField] private float chargeDistance = 5.0f;
@@ -31,6 +32,12 @@ public class Charger : NetworkBehaviour
 
     // Кеш для локального візуалу
     private Transform clientTargetTransform;
+    private PowerGrid powerGrid;
+    private bool isPowered = true;
+
+    public int PowerDemand => currentTargetNetRef.Value.NetworkObjectId == 0 ? 0 : (int)(chargePerTick / chargeInterval); // Power demand based on charging activity
+    public int Priority => 20;
+    public bool IsPowered => isPowered;
 
     private void Awake()
     {
@@ -41,12 +48,15 @@ public class Charger : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        powerGrid = BaseManager.Instance != null ? BaseManager.Instance.PowerGrid : null;
+        powerGrid?.RegisterConsumer(this);
         currentTargetNetRef.OnValueChanged += OnTargetChanged;
         ResolveTargetTransform(currentTargetNetRef.Value);
     }
 
     public override void OnNetworkDespawn()
     {
+        powerGrid?.UnregisterConsumer(this);
         currentTargetNetRef.OnValueChanged -= OnTargetChanged;
         base.OnNetworkDespawn();
     }
@@ -76,6 +86,12 @@ public class Charger : NetworkBehaviour
 
     private void ServerProcessCharging()
     {
+        if (!isPowered)
+        {
+            currentTargetNetRef.Value = default;
+            return;
+        }
+
         IChargeable targetItem = GetBestChargeableTarget(out NetworkObject targetNetObj);
 
         if (targetItem != null && targetNetObj != null)
@@ -159,7 +175,7 @@ public class Charger : NetworkBehaviour
 
     private void UpdateVisuals()
     {
-        bool isCharging = clientTargetTransform != null && currentTargetNetRef.Value.NetworkObjectId != 0;
+        bool isCharging = isPowered && clientTargetTransform != null && currentTargetNetRef.Value.NetworkObjectId != 0;
 
         // Керування LineRenderer
         if (lineRenderer != null)
@@ -195,6 +211,22 @@ public class Charger : NetworkBehaviour
         {
             if (isCharging && !chargeSound.isPlaying) chargeSound.Play();
             else if (!isCharging && chargeSound.isPlaying) chargeSound.Stop();
+        }
+    }
+
+    public void OnPowerStateChanged(bool powered)
+    {
+        isPowered = powered;
+
+        if (!powered)
+        {
+            if (IsServer) currentTargetNetRef.Value = default;
+            clientTargetTransform = null;
+            tickTimer = 0f;
+
+            if (lineRenderer != null) lineRenderer.enabled = false;
+            if (targetParticles != null) targetParticles.Stop();
+            if (chargeSound != null) chargeSound.Stop();
         }
     }
 

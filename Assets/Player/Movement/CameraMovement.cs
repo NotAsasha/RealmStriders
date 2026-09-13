@@ -224,6 +224,7 @@ namespace Player.Movement
         private void ToggleInteractionUI(bool isInteracting)
         {
             movement.isInInteraction = isInteracting;
+            movement.onInteractionStateChanged?.Invoke(isInteracting);
             if (isInteracting)
                 movement.SwitchToInteractionControls();
             else
