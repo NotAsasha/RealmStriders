@@ -31,6 +31,7 @@ namespace Player.Movement
         private IInteractable interactable;
         private PlayerMovement movement;
         private Human human;
+        private Coroutine spectatorTransition;
 
         public static CameraMovement Instance;
 
@@ -138,11 +139,17 @@ namespace Player.Movement
                 transform.localPosition = Vector3.zero;
 
                 // НОВЕ: Запускаємо перехід у режим глядача через 3 секунди після падіння
-                StartCoroutine(TransitionToSpectator(3.0f));
+                if (spectatorTransition != null) StopCoroutine(spectatorTransition);
+                spectatorTransition = StartCoroutine(TransitionToSpectator(3.0f));
             }
             else
             {
                 // Якщо гравця воскресили (наприклад, дефібрилятором)
+                if (spectatorTransition != null)
+                {
+                    StopCoroutine(spectatorTransition);
+                    spectatorTransition = null;
+                }
                 if (spectatorController) spectatorController.StopSpectating();
                 this.enabled = true; // Вмикаємо назад FPS камеру
 
@@ -245,6 +252,9 @@ namespace Player.Movement
         private IEnumerator TransitionToSpectator(float delay)
         {
             yield return new WaitForSeconds(delay);
+            spectatorTransition = null;
+
+            if (!human.isDead.Value) yield break;
 
             // Вимикаємо керування головою від першої особи
             this.enabled = false;

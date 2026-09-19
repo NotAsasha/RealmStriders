@@ -34,7 +34,7 @@ namespace Player.Equipment.Landmine
         {
             if (isCurrentlyHeld) return;
             indicator.material.color = Color.green;
-            Debug.Log("---Landmine: Collided with something!");
+            Debug.Log($"---Landmine: Collided with {collider.name}!");
             isTriggered = true;
             soundProducer.EmitSoundServerRpc(0);
         }
@@ -71,7 +71,11 @@ namespace Player.Equipment.Landmine
             if (Physics.Raycast(transform.position, direction, out RaycastHit hit, distanceToTarget, wallLayer)) return;
 
             //Apply damage (can depand on distance)
-            var entity = collider.GetComponent<Entity>();
+            Entity entity = collider.GetComponentInParent<Entity>();
+            if (entity == null)
+            {
+                return;
+            }
             // float damageToApply = damage / Mathf.Max(distanceToTarget, 1f);
             entity.AddHealth(-damage);
 

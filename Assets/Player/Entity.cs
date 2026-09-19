@@ -75,7 +75,7 @@ namespace Player
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void TurnIntoSphereServerRpc()
         {
-            if (isDead.Value || GetHealth() >= 1) return;
+            if (isDead.Value) return;
             var glass = Instantiate(glassCage, transform.position, Quaternion.identity);
             glass.Spawn();
             isDead.Value = true;

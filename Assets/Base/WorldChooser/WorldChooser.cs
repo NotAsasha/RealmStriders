@@ -65,11 +65,9 @@ namespace Base.WorldChooser
 
             if (IsServer)
             {
-                if (IsServer)
-                {
-                    // a bit scary.. TODO
-                    GameManager.Instance.teamRating.OnValueChanged += (int _, int __) => GenerateMissions(missionNumber);
-                }
+                // a bit scary.. TODO
+                GameManager.Instance.teamRating.OnValueChanged += (int _, int __) => GenerateMissions(missionNumber);
+                GenerateMissions(missionNumber);
             }
 
             UpdateSelectedMissionUI(selectedMissionName.Value);

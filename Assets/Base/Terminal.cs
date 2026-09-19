@@ -7,7 +7,6 @@ using UnityEngine;
 
 namespace Base
 {
-    // If terminal is moved and saved, it just creates a copy of it. So need to add a check whether terminal is dublicated. TODO
     public class Terminal : NetworkBehaviour, IInteractable, IMovable, INetworkSaveable
     {
         [Header("Terminal Settings")]
@@ -25,6 +24,11 @@ namespace Base
         protected int ownerID = -1;
 
         #region Unity LifeCycle
+
+        public override void OnNetworkSpawn()
+        {
+            this.NetworkObject.Register();
+        }
 
         public override void OnNetworkDespawn()
         {

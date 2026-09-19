@@ -95,6 +95,14 @@ namespace Base.BaseUpgrader
             UpdateOverloadState(CurrentChargePercent.Value < 0f); // Check
         }
 
+        public void RestoreChargeServer(float chargePercent)
+        {
+            if (!IsServer) return;
+
+            CurrentChargePercent.Value = Mathf.Clamp(chargePercent, minimumChargePercent, 100f);
+            UpdateOverloadState(CurrentChargePercent.Value < 0f);
+        }
+
         private float CalculateConsumersDrainRate()
         {
             float drainRate = 0f;

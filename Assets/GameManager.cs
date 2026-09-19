@@ -43,6 +43,7 @@ public class GameManager : NetworkBehaviour
     public static GameManager Instance = null;
 
     private EnemySpawner spawner;
+    private Coroutine stopMissionRoutine;
 
     #region Unity Lifecycle
 
@@ -141,7 +142,11 @@ public class GameManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    public void StopMissionServerRpc() => StartCoroutine(StopMissionClock());
+    public void StopMissionServerRpc()
+    {
+        if (stopMissionRoutine != null) return;
+        stopMissionRoutine = StartCoroutine(StopMissionClock());
+    }
 
     private IEnumerator StopMissionClock()
     {
@@ -150,6 +155,7 @@ public class GameManager : NetworkBehaviour
         {
             yield return new WaitForSeconds(5f);
             RevivePlayers();
+            stopMissionRoutine = null;
             yield break;
         }
 
@@ -178,6 +184,7 @@ public class GameManager : NetworkBehaviour
             //TEMP - to main menu.  --- TODO
             SteamManager.Instance.Disconnect();
             SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);
+            stopMissionRoutine = null;
             yield break;
         }
 
@@ -204,6 +211,8 @@ public class GameManager : NetworkBehaviour
         //Resume Lobby Connections
         if (SteamManager.Instance.CurrentLobby != null)
             SteamManager.Instance.CurrentLobby.Value.SetJoinable(true);
+
+        stopMissionRoutine = null;
     }
 
     #endregion

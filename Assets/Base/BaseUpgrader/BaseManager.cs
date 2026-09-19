@@ -183,7 +183,7 @@ namespace Base.BaseUpgrader
 
             charger.gameObject.SetActive(isBought);
 
-            if (IsServer && isBought && !charger.IsSpawned)
+            if (IsServer && isBought && !charger.IsSpawned && charger.IsSceneObject != true)
             {
                 charger.Spawn();
             }

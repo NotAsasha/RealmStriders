@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Player;
 using Steamworks;
 using Unity.Netcode;
 using UnityEngine;
@@ -25,8 +26,7 @@ namespace Player.Equipment
         [SerializeField] private AudioClip turnOffClip;
 
         [Header("Visual Feedback")]
-        [SerializeField] private Light powerLed;
-        [SerializeField] private GameObject screenEmissiveObject;
+        [SerializeField] private Material indicator;
 
         private int sampleRate;
         private VoiceAudioBuffer radioBuffer;
@@ -88,8 +88,14 @@ namespace Player.Equipment
 
         private void UpdateVisualsAndAudioState(bool active, bool playSound)
         {
-            if (powerLed != null) powerLed.enabled = active;
-            if (screenEmissiveObject != null) screenEmissiveObject.SetActive(active);
+            if (active)
+            {
+                indicator.color = Color.green;
+            }
+            else 
+            {
+                indicator.color = Color.red;
+            }
 
             if (playSound && audioSource != null)
             {
@@ -128,12 +134,12 @@ namespace Player.Equipment
 
         public static bool IsLocalPlayerHoldingActiveRadio()
         {
-            foreach (var radio in AllRadios)
-            {
-                if (radio.IsOwner && radio.CanTransmit())
-                    return true;
-            }
-            return false;
+            NetworkClient localClient = NetworkManager.Singleton?.LocalClient;
+            NetworkObject localPlayer = localClient?.PlayerObject;
+            if (localPlayer == null) return false;
+
+            Inventory inventory = localPlayer.GetComponent<Inventory>();
+            return inventory?.GetActiveItem() is WalkieTalkie radio && radio.CanTransmit();
         }
 
         public override string GetInfo() => isOn.Value.ToString();

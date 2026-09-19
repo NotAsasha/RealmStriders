@@ -9,6 +9,8 @@ namespace FileSystem.Scripts
     [CreateAssetMenu(fileName = "SaveFile", menuName = "Not/SaveFile")]
     public class SaveFile : GameFile
     {
+        private const int CurrentSaveFormatVersion = 1;
+
         [Header("SaveFile Info")] public SaveData save;
 
         public override void ProcessData(string inputData)
@@ -35,11 +37,15 @@ namespace FileSystem.Scripts
             {
                 save = new SaveData
                 {
+                    formatVersion = CurrentSaveFormatVersion,
                     teamRating = GameManager.Instance.teamRating.Value,
                     lossRating = GameManager.Instance.lossRating.Value,
                     teamMoney = GameManager.Instance.teamMoney.Value,
                     objects = NetworkItemsHandler.Instance.GetSaveablesInfo(),
-                    baseUpgrades = BaseManager.Instance.baseUpgrades.Value
+                    baseUpgrades = BaseManager.Instance.baseUpgrades.Value,
+                    baseChargePercent = BaseManager.Instance.PowerGrid != null
+                        ? BaseManager.Instance.PowerGrid.CurrentChargePercent.Value
+                        : 100f
                 };
             }
             return JsonUtility.ToJson(save);
@@ -53,8 +59,9 @@ namespace FileSystem.Scripts
             GameManager.Instance.lossRating.Value = save.lossRating;
             GameManager.Instance.teamMoney.Value = save.teamMoney;
             BaseManager.Instance.baseUpgrades.Value = save.baseUpgrades;
+            BaseManager.Instance.PowerGrid?.RestoreChargeServer(save.baseChargePercent);
 
-            NetworkItemsHandler.Instance.LoadSaveables(save.objects);
+            NetworkItemsHandler.Instance.LoadSaveables(save.objects, save.formatVersion < CurrentSaveFormatVersion);
         }
 
 
@@ -62,6 +69,7 @@ namespace FileSystem.Scripts
         [Serializable]
         public class SaveData
         {
+            public int formatVersion;
             public int teamRating = 3;
             public int lossRating;
             public int teamMoney = 5600;
@@ -69,6 +77,7 @@ namespace FileSystem.Scripts
             public List<ObjectEntry> objects = new List<ObjectEntry>();
 
             public int baseUpgrades;
+            public float baseChargePercent = 100f;
         }
     }
 }
