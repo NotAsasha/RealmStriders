@@ -33,15 +33,17 @@ namespace Base.BaseUpgrader
         [SerializeField] private LayerMask radarOnlyLayer; 
         private Camera radarCamera;
 
-        public NetworkVariable<int> baseUpgrades = new NetworkVariable<int>(
+        // Server-only write: тільки сервер змінює стан апгрейдів
+        public readonly NetworkVariable<int> baseUpgrades = new NetworkVariable<int>(
             0,
             NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Owner
+            NetworkVariableWritePermission.Server
         );
 
         public static BaseManager Instance;
 
         public PowerGrid PowerGrid => powerGrid;
+
         #region Unity Lifecycle
 
         private void Awake()
@@ -51,7 +53,22 @@ namespace Base.BaseUpgrader
             {
                 powerGrid = GetComponent<PowerGrid>();
             }
-            baseUpgrades = new();
+
+            // NGO вимагає, щоб GameObjects з NetworkObject/NetworkBehaviour були активними при завантаженні сцени,
+            // інакше NGO виключає їх зі спавну та синхронізації (NetworkBehaviour.IsSpawned залишається false,
+            // що викликає NullReferenceException при виклику RPC).
+            // Тому ми тримаємо самі GameObjects активними, а видимість та взаємодію керуємо через
+            // увімкнення/вимкнення Renderers, Colliders, Canvases та Lights.
+            if (radarTerminal) radarTerminal.gameObject.SetActive(true);
+            if (radarButton) radarButton.gameObject.SetActive(true);
+            if (shieldButton) shieldButton.gameObject.SetActive(true);
+            if (charger) charger.gameObject.SetActive(true);
+
+            // Початково приховуємо візуал та колайдери до перевірки збереження/покупки
+            SetUpgradeActive(radarTerminal, false);
+            SetUpgradeActive(radarButton, false);
+            SetUpgradeActive(shieldButton, false);
+            SetUpgradeActive(charger, false);
         }
 
         public override void OnNetworkSpawn()
@@ -98,6 +115,7 @@ namespace Base.BaseUpgrader
             baseUpgrades.OnValueChanged += OnShieldBoughtChanged;
             baseUpgrades.OnValueChanged += OnChargerBoughtChanged;
 
+            // Застосовуємо поточний стан (важливо для пізно підключених клієнтів)
             OnTerminalBoughtChanged(0, baseUpgrades.Value);
             OnDetectionBoughtChanged(0, baseUpgrades.Value);
             OnBeamBoughtChanged(0, baseUpgrades.Value);
@@ -120,28 +138,40 @@ namespace Base.BaseUpgrader
 
         #region --Handlers--
 
+        private void SetUpgradeActive(NetworkObject netObj, bool active)
+        {
+            if (netObj == null) return;
+
+            // Не вимикаємо сам GameObject, щоб не ламати життєвий цикл NetworkBehaviour у NGO.
+            // Замість цього вимикаємо візуалізацію та колізії/інтерактивність.
+            foreach (var r in netObj.GetComponentsInChildren<Renderer>(true))
+            {
+                r.enabled = active;
+            }
+            foreach (var c in netObj.GetComponentsInChildren<Collider>(true))
+            {
+                c.enabled = active;
+            }
+            foreach (var canvas in netObj.GetComponentsInChildren<Canvas>(true))
+            {
+                canvas.enabled = active;
+            }
+            foreach (var light in netObj.GetComponentsInChildren<Light>(true))
+            {
+                light.enabled = active;
+            }
+        }
+
         private void OnTerminalBoughtChanged(int _, int current)
         {
             bool isBought = (current & (int)BaseUpgrades.IsTerminalBought) != 0;
-
-            radarTerminal.gameObject.SetActive(isBought);
-
-            if (IsServer && isBought && !radarTerminal.IsSpawned)
-            {
-                radarTerminal.Spawn();
-            }
+            SetUpgradeActive(radarTerminal, isBought);
         }
 
         private void OnBeamBoughtChanged(int _, int current)
         {
             bool isBought = (current & (int)BaseUpgrades.IsBeamBought) != 0;
-
-            radarButton.gameObject.SetActive(isBought);
-
-            if (IsServer && isBought && !radarButton.IsSpawned)
-            {
-                radarButton.Spawn();
-            }
+            SetUpgradeActive(radarButton, isBought);
         }
 
         private void OnDetectionBoughtChanged(int _, int current)
@@ -157,36 +187,23 @@ namespace Base.BaseUpgrader
                 radarCamera.cullingMask &= ~mask;
         }
 
-
         private void OnCasinoBoughtChanged(int _, int current)
         {
             bool isBought = (current & (int)BaseUpgrades.IsCasinoBought) != 0;
-
-            casinoWall.SetActive(!isBought);
+            // Звичайний GameObject (не NetworkObject) — SetActive на всіх OK
+            if (casinoWall) casinoWall.SetActive(!isBought);
         }
 
         private void OnShieldBoughtChanged(int _, int current)
         {
             bool isBought = (current & (int)BaseUpgrades.IsShieldBought) != 0;
-
-            shieldButton.gameObject.SetActive(isBought);
-
-            if (IsServer && isBought && !shieldButton.IsSpawned)
-            {
-                shieldButton.Spawn();
-            }
+            SetUpgradeActive(shieldButton, isBought);
         }
 
         private void OnChargerBoughtChanged(int _, int current)
         {
             bool isBought = (current & (int)BaseUpgrades.IsChargerBought) != 0;
-
-            charger.gameObject.SetActive(isBought);
-
-            if (IsServer && isBought && !charger.IsSpawned && charger.IsSceneObject != true)
-            {
-                charger.Spawn();
-            }
+            SetUpgradeActive(charger, isBought);
         }
 
         #endregion

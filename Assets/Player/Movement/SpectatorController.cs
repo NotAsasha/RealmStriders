@@ -79,7 +79,6 @@ namespace Player.Movement
                 int terminalCounter = 1;
                 foreach (var netObj in NetworkItemsHandler.Instance.activeSaveables)
                 {
-                    Debug.LogError($"не Знайшовсє {netObj.name}");
                     // Захист від "знищених", але ще не прибраних з пам'яті C++ об'єктів у HashSet
                     if (netObj == null) continue;
 
@@ -97,7 +96,6 @@ namespace Player.Movement
                                 Type = SpectatorTargetType.Terminal,
                                 DisplayName = $"Термінал / Камера #{terminalCounter++}"
                             });
-                            Debug.LogError($"Знайшовсє {netObj.name}");
                         }
                     }
                 }

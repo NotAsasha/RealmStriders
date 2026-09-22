@@ -19,12 +19,12 @@ public class EnemySounds : MonoBehaviour
         source = GetComponent<AudioSource>();
     }
 
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
         enemy.onStateChanged += PlaySound;
         enemy.isDead.OnValueChanged += PlayDeathSound;
     }
-    private void OnDisable()
+    protected virtual void OnDisable()
     {
         enemy.onStateChanged -= PlaySound;
         enemy.isDead.OnValueChanged -= PlayDeathSound;

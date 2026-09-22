@@ -30,4 +30,13 @@ public class CategoryBlocker : MonoBehaviour
     {
         button.interactable = val >= requiredRating;
     }
+
+    /// <summary>
+    /// Called by CategorySwitch to force-refresh interactable state,
+    /// bypassing OnValueChanged callback ordering issues.
+    /// </summary>
+    public void Refresh(int currentRating)
+    {
+        button.interactable = currentRating >= requiredRating;
+    }
 }

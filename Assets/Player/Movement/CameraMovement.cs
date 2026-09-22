@@ -32,6 +32,7 @@ namespace Player.Movement
         private PlayerMovement movement;
         private Human human;
         private Coroutine spectatorTransition;
+        private bool inputHandlersRegistered;
 
         public static CameraMovement Instance;
 
@@ -94,15 +95,24 @@ namespace Player.Movement
 
         private void SetupInputHandlers()
         {
+            if (PlayerMovement.Instance == null || PlayerMovement.Instance.controls == null || human == null) return;
             PlayerMovement.Instance.controls.System.Pause.performed += OnPausePerformed;
             PlayerMovement.Instance.controls.Gameplay.Interact.performed += OnInteract;
             human.isDead.OnValueChanged += OnDeathStateChange;
+            inputHandlersRegistered = true;
         }
         private void CleanupInputHandlers()
         {
-            PlayerMovement.Instance.controls.System.Pause.performed -= OnPausePerformed;
-            PlayerMovement.Instance.controls.Gameplay.Interact.performed -= OnInteract;
-            human.isDead.OnValueChanged -= OnDeathStateChange;
+            if (!inputHandlersRegistered) return;
+
+            if (movement != null && movement.controls != null)
+            {
+                movement.controls.System.Pause.performed -= OnPausePerformed;
+                movement.controls.Gameplay.Interact.performed -= OnInteract;
+            }
+
+            if (human != null) human.isDead.OnValueChanged -= OnDeathStateChange;
+            inputHandlersRegistered = false;
         }
 
         #endregion
@@ -111,12 +121,13 @@ namespace Player.Movement
 
         private void OnPausePerformed(InputAction.CallbackContext obj)
         {
-            if (movement.isInInteraction) return;
+            if (movement == null || !movement.IsSpawned || movement.isInInteraction) return;
             UpdateCursorState();
         }
 
         private void OnInteract(InputAction.CallbackContext obj)
         {
+            if (movement == null || !movement.IsSpawned || human == null || human.isDead.Value) return;
             if (movement.isPaused) return;
 
             if (movement.isInInteraction)
@@ -132,7 +143,7 @@ namespace Player.Movement
         {
             if (human.isDead.Value)
             {
-                if (PlayerMovement.Instance.isInInteraction) StopInteraction();
+                if (movement != null && movement.isInInteraction) StopInteraction();
 
                 if (!ragdollHead) return;
                 transform.parent = ragdollHead;
@@ -167,9 +178,12 @@ namespace Player.Movement
         Coroutine cameraAnimation;
         private void StartInteraction()
         {
+            if (movement == null || human == null || human.isDead.Value) return;
+
             //Check for objects in sight
             if (!Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, hitDistance, layerMask)) return;
-            interactable = hit.collider.GetComponent<IInteractable>();
+            interactable = hit.collider.GetComponentInParent<IInteractable>();
+            if (interactable == null) return;
 
             if (interactable.IsTaken())
             {
@@ -185,7 +199,14 @@ namespace Player.Movement
             if (isSingleUse) interactable = null;
             else
             {
-                cameraAnimation = StartCoroutine(MoveToInteractible(interactable.GetCameraPoint()));
+                Transform cameraPoint = interactable.GetCameraPoint();
+                if (cameraPoint == null)
+                {
+                    StopInteraction();
+                    return;
+                }
+
+                cameraAnimation = StartCoroutine(MoveToInteractible(cameraPoint));
             }
         }
 
@@ -215,13 +236,14 @@ namespace Player.Movement
         {
             if (interactable == null)
             {
-                Debug.LogError("---Camera: Trying to stop interacting with null.");
+                ToggleInteractionUI(false);
                 return;
             }
 
             interactable.StopInteraction();
             interactable = null;
-            StopCoroutine(cameraAnimation);
+            if (cameraAnimation != null) StopCoroutine(cameraAnimation);
+            cameraAnimation = null;
 
             transform.localPosition = startPosition;
             transform.localScale = new Vector3(1f, 1f, 1f);
@@ -230,6 +252,7 @@ namespace Player.Movement
 
         private void ToggleInteractionUI(bool isInteracting)
         {
+            if (movement == null) return;
             movement.isInInteraction = isInteracting;
             movement.onInteractionStateChanged?.Invoke(isInteracting);
             if (isInteracting)
@@ -239,11 +262,12 @@ namespace Player.Movement
 
 
             UpdateCursorState();
-            GetComponentInParent<Inventory>().ToggleUI(!isInteracting);
+            GetComponentInParent<Inventory>()?.ToggleUI(!isInteracting);
         }
 
         private void UpdateCursorState()
         {
+            if (movement == null) return;
             UnityEngine.Cursor.lockState = (movement.isPaused || movement.isInInteraction)
         ? CursorLockMode.None
         : CursorLockMode.Locked;
@@ -272,6 +296,7 @@ namespace Player.Movement
 
         void Update()
         {
+            if (movement == null || human == null || movement.controls == null) return;
             if (movement.isPaused || movement.isInInteraction || human.isDead.Value || human.IsEffectActive(EffectType.Freeze)) return;
 
             // Checks if there is a Player Body attached

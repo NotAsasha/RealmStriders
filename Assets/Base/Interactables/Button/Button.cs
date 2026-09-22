@@ -40,11 +40,19 @@ namespace Base.Interactables
 
         public void Interact(GameObject player)
         {
+            if (!IsSpawned || !isReady.Value) return;
+
+            InteractServerRpc();
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        private void InteractServerRpc()
+        {
             if (!isReady.Value) return;
 
             if (cooldown > 0f)
             {
-                StartCooldownServerRpc();
+                StartCooldown();
             }
 
             onInteract.Invoke();
@@ -58,6 +66,12 @@ namespace Base.Interactables
         public void StartCooldownServerRpc()
         {
             if (!isReady.Value) return;
+            StartCooldown();
+        }
+
+        private void StartCooldown()
+        {
+            if (!IsServer || !isReady.Value) return;
             StartCoroutine(Cooldown());
         }
 

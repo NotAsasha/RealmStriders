@@ -33,12 +33,9 @@ namespace Enemy
                 var pool = enemiesByDanger[danger - 1].enemies;
                 if (pool.Length == 0) continue;
             
-                RandomMapPoint(out var position);
+                if (!RandomMapPoint(out var position)) continue;
                 var prefab = pool[Random.Range(0, pool.Length)];
-                var enemyObj = Instantiate(prefab,
-                    position + Vector3.up * 1.5f,
-                    Quaternion.identity
-                );
+                var enemyObj = Instantiate(prefab, position, Quaternion.identity);
                 SceneManager.MoveGameObjectToScene(enemyObj, GameManager.Instance.missionScene);
                 var enemy = enemyObj.GetComponent<NetworkObject>();
                 enemy.Spawn(true); 
@@ -103,10 +100,12 @@ namespace Enemy
         public bool RandomMapPoint(out Vector3 position)
         {
             Vector3 searchPos;
-            for (int i = 0; i < 100; ++i)
+            for (int i = 0; i < 200; ++i)
             {
                 if (!RandomMove.RandomPoint(worldCenter, spawnRadius, out searchPos)) continue;
                 Debug.Log($"---EnemySpawner: Tried {searchPos}");
+
+                if (searchPos.y < -30f) continue;
 
                 if (Vector3.Distance(searchPos, portalPos) > portalArea)
                 {

@@ -19,6 +19,7 @@ namespace Player
         [SerializeField] private GameObject slotPrefab;
         [Tooltip("Parent bone to hold an item")]
         [SerializeField] private Transform handAnchor;
+        public Transform HandAnchor => handAnchor;
 
         [Header("Configuration")]
         public int capacity = 4;
@@ -452,7 +453,7 @@ namespace Player
             }
         }
 
-        private void ApplyParentConstraint(GameObject item, Transform anchor)
+        public void ApplyParentConstraint(GameObject item, Transform anchor)
         {
             ParentConstraint constraint = item.GetComponent<ParentConstraint>();
             if (constraint == null)
@@ -468,8 +469,16 @@ namespace Player
             ConstraintSource source = new ConstraintSource { sourceTransform = anchor, weight = 1f };
             constraint.AddSource(source);
 
-            constraint.SetTranslationOffset(0, Vector3.zero);
-            constraint.SetRotationOffset(0, Vector3.zero);
+            Vector3 transOffset = Vector3.zero;
+            Vector3 rotOffset = Vector3.zero;
+
+            if (item.TryGetComponent<Item>(out var itemComp))
+            {
+                (transOffset, rotOffset) = itemComp.GetGripOffsets();
+            }
+
+            constraint.SetTranslationOffset(0, transOffset);
+            constraint.SetRotationOffset(0, rotOffset);
 
             constraint.constraintActive = true;
         }

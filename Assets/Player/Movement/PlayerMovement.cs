@@ -101,7 +101,7 @@ namespace Player.Movement
         }
         public override void OnNetworkDespawn()
         {
-            SettingsFile.OnSettingsChanged -= LoadBindings;
+            if (settingsFile != null) SettingsFile.OnSettingsChanged -= LoadBindings;
             CleanupInputHandlers();
         }
 
@@ -131,14 +131,21 @@ namespace Player.Movement
 
         private void SetupInputHandlers()
         {
+            if (controls == null) return;
             controls.Gameplay.Jump.performed += OnJump;
             controls.System.Pause.performed += OnPause;
         }
 
         private void CleanupInputHandlers()
         {
-            controls.Gameplay.Jump.performed -= OnJump;
-            controls.System.Pause.performed -= OnPause;
+            if (controls != null)
+            {
+                controls.Gameplay.Jump.performed -= OnJump;
+                controls.System.Pause.performed -= OnPause;
+                controls.Disable();
+            }
+
+            controls = null;
         }
 
         #endregion
@@ -176,12 +183,14 @@ namespace Player.Movement
 
         public void SwitchToGameplayControls()
         {
+            if (controls == null) return;
             controls.Gameplay.Enable();
             controls.UI.Disable();
         }
 
         public void SwitchToInteractionControls()
         {
+            if (controls == null) return;
             controls.Gameplay.Disable();
             controls.Gameplay.Interact.Enable();
             controls.UI.Enable();

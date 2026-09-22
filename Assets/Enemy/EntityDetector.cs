@@ -10,6 +10,7 @@ namespace Enemy
         [SerializeField] Vector3 eyeLocalPosition = new(0,1,0);
         [SerializeField] float viewDistance = 20.0f;
         [SerializeField] float viewAngle = 60f;
+        [SerializeField, Min(0f)] float verticalPadding = 1.5f;
         [SerializeField] LayerMask playerLayer;
         [SerializeField] LayerMask wallLayer;
 
@@ -25,25 +26,38 @@ namespace Enemy
             if (viewAngle == 0 || viewDistance == 0) return null;
 
             Vector3 eyePosition = transform.position + eyeLocalPosition;
-            int numColliders = Physics.OverlapSphereNonAlloc(eyePosition, viewDistance, nearbyEntities, playerLayer);
+            int numColliders = Physics.OverlapCapsuleNonAlloc(
+                eyePosition - Vector3.up * verticalPadding,
+                eyePosition + Vector3.up * verticalPadding,
+                viewDistance,
+                nearbyEntities,
+                playerLayer,
+                QueryTriggerInteraction.Collide);
 
             for (int i = 0; i < numColliders; i++)
             {
-                if (nearbyEntities[i].gameObject == gameObject) continue;
-                Vector3 direction = nearbyEntities[i].transform.position - transform.position;
+                var collider = nearbyEntities[i];
+                if (collider == null) continue;
+
+                // Entity colliders commonly live on child bones, so resolve the networked root.
+                var entity = collider.GetComponentInParent<Entity>();
+                if (entity == null || entity.gameObject == gameObject || !entity.isActiveAndEnabled) continue;
+
+                Vector3 targetPosition = collider.ClosestPoint(eyePosition);
+                Vector3 direction = targetPosition - eyePosition;
+                if (direction.sqrMagnitude <= Mathf.Epsilon) continue;
                 if (Vector3.Angle(direction, transform.forward) <= halfAngle)
                 {
                     // if entity is behind a wall
                     if (Physics.Raycast(eyePosition, direction, direction.magnitude, wallLayer)) continue;
 
                     //if is dead
-                    var entity = nearbyEntities[i].GetComponent<Entity>();
-                    if (entity == null || entity.isDead.Value) continue;
+                    if (entity.isDead.Value) continue;
 
                     //if is enemy
-                    if (!chaseEnemies && nearbyEntities[i].GetComponent<Enemy>() != null) continue;
+                    if (!chaseEnemies && entity.GetComponent<Enemy>() != null) continue;
 
-                    return nearbyEntities[i].gameObject;
+                    return entity.gameObject;
                 
                 }
             }

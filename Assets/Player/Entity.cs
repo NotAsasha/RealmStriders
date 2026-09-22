@@ -9,6 +9,10 @@ namespace Player
     {
         public float dangerLevel = 1f;
         [SerializeField] private NetworkObject glassCage;
+        [Header("Capture sequence")]
+        [SerializeField, Min(0.1f)] private float captureSequenceDuration = 0.85f;
+        [SerializeField, Min(0f)] private float captureLift = 1.1f;
+        [SerializeField] private CaptureTransformationController captureTransformation;
 
         public NetworkVariable<bool> isDead = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<float> entityHealth = new(1f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -19,15 +23,27 @@ namespace Player
         private readonly NetworkVariable<bool> isInvincibleNet = new(false);
         private readonly NetworkVariable<bool> isWeakNet = new(false);
         private readonly NetworkVariable<bool> isAsleepNet = new(false);
+        private readonly NetworkVariable<bool> isCapturingNet = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         protected Dictionary<EffectType, NetworkVariable<bool>> effects;
 
         private Dictionary<EffectType, Coroutine> activeCoroutines = new();
 
+        public bool IsBeingCaptured => isCapturingNet.Value;
+
         #region Initialization
 
         protected virtual void Awake()
         {
+            if (captureTransformation == null)
+            {
+                captureTransformation = GetComponent<CaptureTransformationController>();
+                if (captureTransformation == null)
+                {
+                    captureTransformation = gameObject.AddComponent<CaptureTransformationController>();
+                }
+            }
+
             effects = new Dictionary<EffectType, NetworkVariable<bool>>()
             {
                 { EffectType.Freeze,     isFrozenNet },
@@ -62,6 +78,7 @@ namespace Player
         public void AddHealth(float health)
         {
             if (!IsServer) return;
+            if (IsBeingCaptured) return;
             if (health < 0 && IsEffectActive(EffectType.Invincible)) return;
 
             entityHealth.Value += health;
@@ -72,13 +89,59 @@ namespace Player
             }
         }
 
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void TurnIntoSphereServerRpc()
+        /// <summary>
+        /// Starts the server-authoritative capture sequence. The visual work is performed by
+        /// clients after <see cref="PlayCaptureSequenceRpc"/>; this coroutine only schedules
+        /// the final network state change and, for enemies, the network spawn/despawn.
+        /// </summary>
+        public bool TryCaptureServer()
         {
-            if (isDead.Value) return;
-            var glass = Instantiate(glassCage, transform.position, Quaternion.identity);
+            if (!IsServer || !IsSpawned || isDead.Value || IsBeingCaptured)
+            {
+                return false;
+            }
+
+            if (this is not Human && glassCage == null)
+            {
+                return false;
+            }
+
+            isCapturingNet.Value = true;
+            BeginCaptureLockServer();
+
+            Vector3 collapsePoint = transform.position + Vector3.up * captureLift;
+            double serverStartTime = NetworkManager.ServerTime.Time;
+            PlayCaptureSequenceRpc(collapsePoint, serverStartTime);
+            StartCoroutine(FinalizeCaptureAfterDelay(collapsePoint));
+            return true;
+        }
+
+        private IEnumerator FinalizeCaptureAfterDelay(Vector3 collapsePoint)
+        {
+            yield return new WaitForSecondsRealtime(captureSequenceDuration);
+
+            if (!IsServer || !IsSpawned || !IsBeingCaptured) yield break;
+
+            if (this is Human)
+            {
+                isDead.Value = true;
+                isCapturingNet.Value = false;
+                yield break;
+            }
+
+            var glass = Instantiate(glassCage, collapsePoint, Quaternion.identity);
             glass.Spawn();
+
+            // Keep existing death-dependent systems consistent until this entity is removed.
             isDead.Value = true;
+            OnCaptureFinalizedServer();
+            NetworkObject.Despawn(true);
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void PlayCaptureSequenceRpc(Vector3 collapsePoint, double serverStartTime)
+        {
+            captureTransformation?.Play(collapsePoint, serverStartTime, captureSequenceDuration);
         }
 
         #region Effects
@@ -91,7 +154,7 @@ namespace Player
 
         public void ApplyEffect(EffectType type, float seconds)
         {
-            if (!IsServer || isDead.Value) return;
+            if (!IsServer || isDead.Value || IsBeingCaptured) return;
 
             if (IsEffectActive(EffectType.Invincible) && type != EffectType.Invincible) return;
 
@@ -127,6 +190,8 @@ namespace Player
 
         virtual protected void OnFreezeStateChange(bool oldV, bool newV) { }
         virtual protected void OnWeakStateChange(bool oldV, bool newV) { }
+        protected virtual void BeginCaptureLockServer() { }
+        protected virtual void OnCaptureFinalizedServer() { }
 
         virtual protected void KillEntity() { }
         virtual protected void ReviveEntity() { }

@@ -135,16 +135,24 @@ namespace Player.Network
                 {
                     foreach (var radio in WalkieTalkie.AllRadios)
                     {
-                        if (radio != null && radio.isOn.Value)
-                        {
-                            if (isMyOwnVoice && radio.IsOwner && radio.isCurrentlyHeld)
-                            {
-                                continue;
-                            }
+                        if (radio == null || !radio.isOn.Value) continue;
 
-                            // Передаємо персональну гучність того, хто говорить у рацію
-                            radio.WriteVoiceData(rawBuffer, uncompressedWritten, playerVolume);
+                        // Пропускаємо лише ту конкретну рацію, яку тримає сам відправник,
+                        // щоб не відтворювати луну власного голосу назад у себе.
+                        // Не можна використовувати radio.IsOwner — він вказує на NetworkObject-власника
+                        // (сервер/хост), а не на гравця, що тримає рацію, через що хост
+                        // некоректно пропускав би запис у всі рації.
+                        if (isMyOwnVoice && radio.isCurrentlyHeld && radio.IsOwner)
+                        {
+                            // IsOwner тут означає: ця рація спаунена локально (тобто ми — власник NetworkObject).
+                            // Для хоста IsOwner завжди true на його об'єктах, тому додаткова перевірка:
+                            // пропускаємо тільки якщо рація reально в руках і ми — локальний відправник.
+                            ulong localId = NetworkManager.Singleton.LocalClientId;
+                            if (senderClientId == localId)
+                                continue;
                         }
+
+                        radio.WriteVoiceData(rawBuffer, uncompressedWritten, playerVolume);
                     }
                 }
             }

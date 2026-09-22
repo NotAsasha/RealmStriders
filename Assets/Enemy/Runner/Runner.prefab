@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 624819951920827225}
   - component: {fileID: 4203766981783567835}
   - component: {fileID: 8446456525507318025}
-  m_Layer: 8
+  m_Layer: 7
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34373,6 +34373,9 @@ MonoBehaviour:
   dangerLevel: 2
   glassCage: {fileID: 707610815179461094, guid: de46285eca51e2d4c9e0994d3b25a964,
     type: 3}
+  captureSequenceDuration: 0.85
+  captureLift: 1.1
+  captureTransformation: {fileID: 0}
   isDead:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -34673,6 +34676,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy2
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 6881b941aa943034bbe2663ac1cf5a85,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -34696,6 +34704,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ParticteAttractor
+      objectReference: {fileID: 0}
+    - target: {fileID: 3385984690830650853, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
         type: 3}

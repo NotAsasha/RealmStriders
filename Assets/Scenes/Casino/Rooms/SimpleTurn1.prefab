@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 8413002581038712769}
   - component: {fileID: 4666529199006928929}
   - component: {fileID: 8904239557652941263}
+  - component: {fileID: 1365389787617781963}
   m_Layer: 0
   m_Name: simpleTurn
   m_TagString: Untagged
@@ -125,3 +126,25 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &1365389787617781963
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6364468280890117746}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -462981019419857548, guid: b041d02cb146c6c4bbd7014b9227d05c, type: 3}

@@ -8,6 +8,8 @@ namespace Base.Shop
     public class Shop : NetworkBehaviour
     {
         [SerializeField] Vector3 spawnPosition;
+        [SerializeField] AudioSource TubeAudio;
+        [SerializeField] ParticleSystem TubeParticle;
         
         [SerializeField] List<ItemCard> cards;
 
@@ -21,8 +23,16 @@ namespace Base.Shop
             if (item == null) return;
 
             GameManager.Instance.teamMoney.Value -= price;
+            PlaySpawnSoundRpc();
             item.InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, spawnPosition);
             Debug.Log($"---Shop: Item bought: {item.name}");
+        }
+
+        [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
+        private void PlaySpawnSoundRpc()
+        {
+            TubeAudio.Play();
+            TubeParticle.Play();
         }
     }
 }

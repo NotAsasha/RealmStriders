@@ -71,9 +71,8 @@ public class NetworkItemsHandler : NetworkBehaviour
             if (prefab == null) continue;
 
             var instance = Instantiate(prefab, obj.position, obj.rotation);
-            RestoreSaveable(instance, obj);
-
             instance.Spawn();
+            RestoreSaveable(instance, obj);
         }
     }
 

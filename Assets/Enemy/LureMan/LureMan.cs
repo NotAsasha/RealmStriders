@@ -25,7 +25,7 @@ namespace Enemy.LureMan
 
         private bool isAwakened;
 
-        protected override void Start()
+        protected void Start()
         {
             if (ballerinaAnimator != null)
             {
@@ -33,7 +33,6 @@ namespace Enemy.LureMan
                 animator.enabled = false;
             }
 
-            base.Start();
 
             if (musicSource != null)
             {

@@ -134,10 +134,12 @@ namespace Player.Equipment.LeafBlower
 
             if (targetIsValid && currentHoldTime >= currentRequiredHoldTime)
             {
-                currentTarget.TurnIntoSphereServerRpc();
-                PlayCaptureSuccessSoundRpc();
-                isOn.Value = false;
-                ResetCaptureProgress();
+                if (currentTarget.TryCaptureServer())
+                {
+                    PlayCaptureSuccessSoundRpc();
+                    isOn.Value = false;
+                    ResetCaptureProgress();
+                }
             }
 
             CaptureProgressNormalized.Value = currentRequiredHoldTime > 0f

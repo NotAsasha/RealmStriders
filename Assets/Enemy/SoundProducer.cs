@@ -29,7 +29,7 @@ namespace Enemy
             {
                 if (entity.gameObject == gameObject) continue;
 
-                var enemy = entity.GetComponent<Enemy>();
+                var enemy = entity.GetComponentInParent<Enemy>();
                 if (enemy != null)
                 {
                     enemy.Lure(soundEmitor.position);

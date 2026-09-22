@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
+using UnityEngine.Animations;
 
 namespace Player.Equipment
 {
@@ -11,7 +12,25 @@ namespace Player.Equipment
         [SerializeField] public int sellPrice = 10;
         [SerializeField] public AudioClip[] clickSounds;
 
+        [Header("Grip Settings")]
+        [Tooltip("Optional child transform defining where the hand holds this item")]
+        [SerializeField] public Transform gripPoint;
+        [Tooltip("Position offset applied to handAnchor if gripPoint is not assigned")]
+        [SerializeField] public Vector3 gripPositionOffset;
+        [Tooltip("Rotation offset (Euler angles) applied to handAnchor if gripPoint is not assigned")]
+        [SerializeField] public Vector3 gripRotationOffset;
 
+        public (Vector3 translationOffset, Vector3 rotationOffset) GetGripOffsets()
+        {
+            if (gripPoint != null)
+            {
+                Quaternion invRot = Quaternion.Inverse(gripPoint.localRotation);
+                Vector3 rot = invRot.eulerAngles;
+                Vector3 trans = -(invRot * gripPoint.localPosition);
+                return (trans, rot);
+            }
+            return (gripPositionOffset, gripRotationOffset);
+        }
 
         [Header("Save System")]
         [SerializeField, HideInInspector] private int prefabId;
@@ -39,11 +58,68 @@ namespace Player.Equipment
         public override void OnNetworkSpawn()
         {
             this.NetworkObject.Register();
+            CheckLateJoinParent();
         }
 
         public override void OnNetworkDespawn()
         {
             this.NetworkObject.UnRegister();
+        }
+
+        public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
+        {
+            base.OnNetworkObjectParentChanged(parentNetworkObject);
+
+            if (parentNetworkObject != null && parentNetworkObject.TryGetComponent<Inventory>(out var inventory))
+            {
+                AttachToPlayer(inventory);
+            }
+            else if (parentNetworkObject == null)
+            {
+                DetachFromPlayer();
+            }
+        }
+
+        private void CheckLateJoinParent()
+        {
+            if (transform.parent != null && transform.parent.TryGetComponent<Inventory>(out var inventory))
+            {
+                AttachToPlayer(inventory);
+            }
+        }
+
+        private void AttachToPlayer(Inventory inventory)
+        {
+            isCurrentlyHeld = true;
+            SetPhysicsState(false);
+
+            if (itemNetworkTransform != null)
+            {
+                itemNetworkTransform.enabled = false;
+            }
+
+            if (inventory.HandAnchor != null)
+            {
+                inventory.ApplyParentConstraint(gameObject, inventory.HandAnchor);
+            }
+        }
+
+        private void DetachFromPlayer()
+        {
+            isCurrentlyHeld = false;
+            SetPhysicsState(true);
+
+            if (itemNetworkTransform != null)
+            {
+                itemNetworkTransform.enabled = true;
+            }
+
+            ParentConstraint constraint = GetComponent<ParentConstraint>();
+            if (constraint != null)
+            {
+                while (constraint.sourceCount > 0) constraint.RemoveSource(0);
+                constraint.constraintActive = false;
+            }
         }
 
         #endregion

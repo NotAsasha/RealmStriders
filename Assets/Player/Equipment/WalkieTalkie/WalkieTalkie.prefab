@@ -130,8 +130,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 0
   AutoOwnerAuthorityTickOffset: 1
-  PositionInterpolationType: 0
-  RotationInterpolationType: 0
+  PositionInterpolationType: 1
+  RotationInterpolationType: 1
   ScaleInterpolationType: 0
   PositionLerpSmoothing: 1
   PositionMaxInterpolationTime: 0.1
@@ -194,6 +194,9 @@ MonoBehaviour:
   isConsumable: 0
   sellPrice: 10
   clickSounds: []
+  gripPoint: {fileID: 0}
+  gripPositionOffset: {x: 0, y: 0, z: 0}
+  gripRotationOffset: {x: 0, y: 0, z: 0}
   prefabId: 17
   isCurrentlyHeld: 0
   isOn:
@@ -204,7 +207,7 @@ MonoBehaviour:
   speakerSource: {fileID: 5737772644998410239}
   turnOnClip: {fileID: 8300000, guid: 387fb346b74d73d439abc062514729d3, type: 3}
   turnOffClip: {fileID: 0}
-  indicator: {fileID: 2100000, guid: 99e664e6e15273e47bac8b8f301e27f7, type: 2}
+  indicatorRenderer: {fileID: 5178603964109303888}
 --- !u!82 &5737772644998410239
 AudioSource:
   m_ObjectHideFlags: 0
@@ -225,7 +228,7 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1
+  DopplerLevel: 0
   MinDistance: 0.1
   MaxDistance: 20
   Pan2D: 0
@@ -434,6 +437,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b1d76a72d1332ad4a8f0bfad3cf64b98, type: 3}
+--- !u!23 &5178603964109303888 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1129496810705857465, guid: b1d76a72d1332ad4a8f0bfad3cf64b98,
+    type: 3}
+  m_PrefabInstance: {fileID: 5220480672885709801}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5762468965378456578 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b1d76a72d1332ad4a8f0bfad3cf64b98,

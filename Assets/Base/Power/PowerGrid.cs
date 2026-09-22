@@ -138,6 +138,14 @@ namespace Base.BaseUpgrader
         private void OnGridOverloadedChanged(bool _, bool isOverloaded)
         {
             OnOverloadStateChanged?.Invoke(isOverloaded);
+            for (int i = 0; i < consumers.Count; i++)
+            {
+                IPowerConsumer consumer = consumers[i];
+                if (consumer != null)
+                {
+                    SetConsumerPowerState(consumer, !isOverloaded);
+                }
+            }
         }
 
         private static void SetConsumerPowerState(IPowerConsumer consumer, bool isPowered)

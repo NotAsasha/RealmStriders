@@ -61,6 +61,8 @@ namespace Enemy.Casino
 
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
+
             if (IsServer && isStatic)
             {
                 effects[EffectType.Asleep].Value = true;
@@ -120,7 +122,7 @@ namespace Enemy.Casino
 
         private void LateUpdate()
         {
-            if (isDead.Value || IsEffectActive(EffectType.Asleep)) return;
+            if (isDead.Value || IsBeingCaptured || IsEffectActive(EffectType.Asleep)) return;
             UpdateLegPosition();
             UpdateBodyPosition();
         }

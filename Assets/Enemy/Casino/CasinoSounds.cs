@@ -5,13 +5,15 @@ public class CasinoSounds : EnemySounds
 {
     public AudioClip spawnSound;
 
-    private void OnEnable()
+    protected override void OnEnable()
     {
+        base.OnEnable();
         (enemy as CasinoMonster).OnSpawn += PlaySpawnSound;
     }
-    private void OnDisable()
+    protected override void OnDisable()
     {
         (enemy as CasinoMonster).OnSpawn -= PlaySpawnSound;
+        base.OnDisable();
     }
     public void PlaySpawnSound()
     {

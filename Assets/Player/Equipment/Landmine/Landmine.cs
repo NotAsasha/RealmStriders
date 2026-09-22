@@ -28,7 +28,7 @@ namespace Player.Equipment.Landmine
             ExplodeServerRpc();
         }
 
-        public bool IsTaken() { return isTriggered; }
+        public bool IsTaken() { return isCurrentlyHeld || isTriggered; }
 
         public void OnColliderEnter(GameObject collider)
         {

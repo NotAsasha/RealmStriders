@@ -46,27 +46,34 @@ namespace Enemy
 
         #region Initialization
 
-        protected override void Awake()
-        {
-            base.Awake(); // Ініціалізує effects Dictionary в Entity
-
-            if (agent == null) TryGetComponent(out agent);
-            if (vision == null) TryGetComponent(out vision);
-            if (playerRigidbody == null) playerRigidbody = GetComponentInChildren<Rigidbody>();
-            if (mainCollider == null) mainCollider = GetComponentInChildren<Collider>();
-            if (animator == null) animator = GetComponentInChildren<Animator>();
-
-            ToggleRagdoll(true);
-        }
         protected virtual void Start()
         {
-            if (agent != null)
+            if (TryGetComponent(out agent))
             {
                 agent.speed = defaultSpeed;
             }
             else
             {
-                Debug.LogWarning($"[{name}] No NavMeshAgent found.");
+                Debug.LogWarning("No NavMeshAgent, might need to add.");
+            }
+            if (vision == null) TryGetComponent<EntityDetector>(out vision);
+
+            if (playerRigidbody == null) TryGetComponent<Rigidbody>(out playerRigidbody);
+            if (mainCollider == null) TryGetComponent<Collider>(out mainCollider);
+            if (animator == null) TryGetComponent<Animator>(out animator);
+
+            ToggleRagdoll(true);
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            // Only the server runs NavMesh movement; clients receive the authoritative transform.
+            if (agent != null)
+            {
+                agent.enabled = IsServer && !isDead.Value;
+                if (IsServer) agent.speed = defaultSpeed;
             }
         }
 
@@ -88,8 +95,29 @@ namespace Enemy
 
         protected override void OnFreezeStateChange(bool oldV, bool isFreezed)
         {
-            animator.speed = isFreezed ? 0 : 1;
-            agent.speed = isFreezed ? 0 : defaultSpeed;
+            if (animator != null) animator.speed = isFreezed ? 0 : 1;
+            if (agent != null) agent.speed = isFreezed ? 0 : defaultSpeed;
+        }
+
+        protected override void BeginCaptureLockServer()
+        {
+            if (agent != null)
+            {
+                if (agent.isOnNavMesh) agent.ResetPath();
+                agent.enabled = false;
+            }
+
+            if (vision != null) vision.enabled = false;
+            if (playerRigidbody != null) playerRigidbody.isKinematic = true;
+            if (mainCollider != null) mainCollider.enabled = false;
+        }
+
+        protected override void OnCaptureFinalizedServer()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.activeEnemies.Remove(this);
+            }
         }
 
         private void ToggleRagdoll(bool isActive)
@@ -97,7 +125,7 @@ namespace Enemy
             Debug.Log($"ToggleRagdoll, is entity alive - {isActive}");
             if (animator != null) animator.enabled = isActive;
             if (vision != null) vision.enabled = isActive;
-            if (agent != null) agent.enabled = isActive;
+            if (agent != null) agent.enabled = isActive && IsServer;
             if (playerRigidbody != null) playerRigidbody.isKinematic = isActive;
             if (mainCollider != null) mainCollider.isTrigger = isActive;
         }
@@ -108,10 +136,10 @@ namespace Enemy
 
         public void OnColliderEnter(GameObject collider)
         {
-            if (!IsServer || isDead.Value || IsEffectActive(EffectType.Freeze) || IsEffectActive(EffectType.Asleep) /*|| !GameManager.instance.hasStartedMission.Value*/) return;
-            var player = collider.GetComponent<Entity>();
+            if (!IsServer || isDead.Value || IsBeingCaptured || IsEffectActive(EffectType.Freeze) || IsEffectActive(EffectType.Asleep) /*|| !GameManager.instance.hasStartedMission.Value*/) return;
+            var player = collider.GetComponentInParent<Entity>();
             if (player == null || player.isDead.Value) return;
-            if (!overAggresive && collider.GetComponent<Enemy>() != null) return;
+            if (!overAggresive && collider.GetComponentInParent<Enemy>() != null) return;
 
             BiteClientRpc(collider);
             player.AddHealth(-damage);
@@ -131,7 +159,7 @@ namespace Enemy
 
         protected virtual void Update()
         {
-            if (isDead.Value || IsEffectActive(EffectType.Freeze)) return;
+            if (isDead.Value || IsBeingCaptured || IsEffectActive(EffectType.Freeze)) return;
 
             if (IsServer)
             {

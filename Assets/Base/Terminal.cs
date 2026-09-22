@@ -27,18 +27,25 @@ namespace Base
 
         public override void OnNetworkSpawn()
         {
-            this.NetworkObject.Register();
+            if (NetworkObject == null) return;
+            NetworkObject.Register();
         }
 
         public override void OnNetworkDespawn()
         {
-            this.NetworkObject.UnRegister();
+            ReleaseCurrentPlayer();
+            if (NetworkObject != null) NetworkObject.UnRegister();
         }
 
         #endregion
 
         #region Interaction
         public NetworkVariable<bool> isTaken = new(writePerm: NetworkVariableWritePermission.Server);
+        public NetworkVariable<ulong> currentInteractingClientId = new(
+            ulong.MaxValue,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
 
         private GameObject currentPlayer;
 
@@ -49,36 +56,74 @@ namespace Base
 
         public void Interact(GameObject player)
         {
+            if (!IsSpawned || !IsClient || player == null) return;
+
+            var networkObject = player.GetComponentInParent<NetworkObject>();
+            var playerMovement = player.GetComponentInParent<PlayerMovement>();
+            if (networkObject == null || !networkObject.IsSpawned || playerMovement == null ||
+                !playerMovement.IsOwner || playerMovement.human == null ||
+                playerMovement.human.isDead.Value || isTaken.Value)
+            {
+                return;
+            }
+
             SetTakenServerRpc(true);
             currentPlayer = player;
 
+            playerMovement.human.isDead.OnValueChanged -= OnPlayerDeathStateChanged;
+            playerMovement.human.isDead.OnValueChanged += OnPlayerDeathStateChanged;
+
             //activate UI
             var camera = player.GetComponentInChildren<Camera>();
-            if (camera != null)
+            if (camera != null && terminalCanvas != null)
             {
                 terminalCanvas.worldCamera = camera;
             }
 
-            ownerID = (int)player.GetComponentInParent<NetworkObject>().OwnerClientId;
+            ownerID = (int)networkObject.OwnerClientId;
             if (interactSound != null) interactSound.Play();
         }
 
         public void StopInteraction()
         {
-            SetTakenServerRpc(false);
+            ReleaseCurrentPlayer();
+        }
 
-            if (currentPlayer ==  null)
+        private void OnPlayerDeathStateChanged(bool _, bool isDead)
+        {
+            if (isDead) ReleaseCurrentPlayer();
+        }
+
+        private void ReleaseCurrentPlayer()
+        {
+            var playerMovement = currentPlayer != null ? currentPlayer.GetComponentInParent<PlayerMovement>() : null;
+            if (playerMovement != null && playerMovement.human != null)
             {
-                Debug.LogError("Stopping Interaction, but there is no player");
+                playerMovement.human.isDead.OnValueChanged -= OnPlayerDeathStateChanged;
             }
 
+            if (IsSpawned && IsServer)
+            {
+                isTaken.Value = false;
+                currentInteractingClientId.Value = ulong.MaxValue;
+            }
+            else if (IsSpawned && IsClient)
+            {
+                SetTakenServerRpc(false);
+            }
+            currentPlayer = null;
             ownerID = -1;
+            if (terminalCanvas != null) terminalCanvas.worldCamera = null;
             if (interactSound != null) interactSound.Stop();
         }
 
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void SetTakenServerRpc(bool whatToSet) => isTaken.Value = whatToSet;
+        public void SetTakenServerRpc(bool whatToSet, RpcParams rpcParams = default)
+        {
+            isTaken.Value = whatToSet;
+            currentInteractingClientId.Value = whatToSet ? rpcParams.Receive.SenderClientId : ulong.MaxValue;
+        }
 
         public bool IsTaken() => isTaken.Value;
         public Transform GetCameraPoint() => cameraPoint;
