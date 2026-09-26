@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Base.Alarm;
 using Player;
 using Unity.Netcode;
 using UnityEngine;
@@ -115,9 +116,32 @@ namespace Enemy.Casino
             {
                 effects[EffectType.Asleep].Value = false;
                 effects[EffectType.Invincible].Value = false;
+
+                // Notify alarm system — this monster is now active and may be inside the base
+                BaseAlarmManager.Instance?.NotifyCasinoMonsterWoke(this);
             }
         }
 
+        protected override void KillEntity()
+        {
+            base.KillEntity();
+
+            // Static (in-base) CasinoMonster is not tracked by GameManager.activeEnemies,
+            // so nobody will Despawn/Destroy it — we have to do it ourselves.
+            if (isStatic && IsServer)
+            {
+                StartCoroutine(DespawnAfterDelay());
+            }
+        }
+
+        private IEnumerator DespawnAfterDelay()
+        {
+            // Brief pause so all clients receive isDead=true before the object disappears.
+            yield return new WaitForSeconds(1.5f);
+
+            if (!IsSpawned) yield break;
+            NetworkObject.Despawn(true);
+        }
 
 
         private void LateUpdate()

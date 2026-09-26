@@ -208,6 +208,7 @@ MonoBehaviour:
   turnOnClip: {fileID: 8300000, guid: 387fb346b74d73d439abc062514729d3, type: 3}
   turnOffClip: {fileID: 0}
   indicatorRenderer: {fileID: 5178603964109303888}
+  indicatorMaterialIndex: 1
 --- !u!82 &5737772644998410239
 AudioSource:
   m_ObjectHideFlags: 0
@@ -432,6 +433,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: walkie
       objectReference: {fileID: 0}
+    - target: {fileID: 1129496810705857465, guid: b1d76a72d1332ad4a8f0bfad3cf64b98,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 99e664e6e15273e47bac8b8f301e27f7, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

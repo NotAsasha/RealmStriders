@@ -28,8 +28,6 @@ namespace Player.Equipment
         [Header("Visual Feedback")]
         [SerializeField] private Renderer indicatorRenderer;
 
-        // Instance матеріал — ізольований від shared asset, не впливає на інші рації
-        private Material _indicatorInstance;
 
         private int sampleRate;
         private VoiceAudioBuffer radioBuffer;
@@ -41,11 +39,11 @@ namespace Player.Equipment
             base.OnNetworkSpawn();
             AllRadios.Add(this);
 
-            // Отримуємо instance матеріал — Unity автоматично клонує shared asset
-            if (indicatorRenderer != null)
-                _indicatorInstance = indicatorRenderer.material;
-
-            InitAudioBuffer();
+            try { InitAudioBuffer(); }
+            catch (Exception ex)
+            {
+                Debug.LogError(ex);
+            }
 
             isOn.OnValueChanged += OnPowerStateChanged;
             UpdateVisualsAndAudioState(isOn.Value, playSound: false);
@@ -56,9 +54,6 @@ namespace Player.Equipment
             AllRadios.Remove(this);
             isOn.OnValueChanged -= OnPowerStateChanged;
 
-            // Звільняємо клонований instance матеріал (Unity не прибирає його автоматично)
-            if (_indicatorInstance != null)
-                Destroy(_indicatorInstance);
 
             base.OnNetworkDespawn();
         }
@@ -100,8 +95,7 @@ namespace Player.Equipment
 
         private void UpdateVisualsAndAudioState(bool active, bool playSound)
         {
-            if (_indicatorInstance != null)
-                _indicatorInstance.color = active ? Color.green : Color.red;
+            indicatorRenderer.material.color = active ? Color.green : Color.red;
 
             if (playSound && audioSource != null)
             {

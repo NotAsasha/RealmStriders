@@ -2,8 +2,9 @@ namespace Enemy.Runner
 {
     public class Runner : Enemy
     {
-        protected void Start()
+        protected override void Start()
         {
+            base.Start();
             entityHealth.OnValueChanged += OnDamaged;
         }
 

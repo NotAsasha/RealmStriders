@@ -455,7 +455,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2003781745
+  GlobalObjectIdHash: 959338214
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -549,6 +549,9 @@ MonoBehaviour:
   clickSounds:
   - {fileID: 8300000, guid: 66a89853be2501b4ab1ecd91a44e09b8, type: 3}
   - {fileID: 8300000, guid: 2328c988986a795439f0d8292a9855bb, type: 3}
+  gripPoint: {fileID: 0}
+  gripPositionOffset: {x: 0, y: 0, z: 0}
+  gripRotationOffset: {x: 0, y: 0, z: 0}
   prefabId: 3
   isCurrentlyHeld: 0
   particle: {fileID: 271574717427928921}
@@ -691,6 +694,7 @@ MonoBehaviour:
   eyeLocalPosition: {x: 0, y: 0, z: 0}
   viewDistance: 10
   viewAngle: 45
+  verticalPadding: 1.5
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -5653,9 +5657,9 @@ Light:
   serializedVersion: 12
   m_Type: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 5
-  m_Range: 15
-  m_SpotAngle: 16.396946
+  m_Intensity: 7
+  m_Range: 20
+  m_SpotAngle: 44.365696
   m_InnerSpotAngle: 0
   m_CookieSize2D: {x: 0.5, y: 0.5}
   m_Shadows:

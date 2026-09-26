@@ -1,6 +1,7 @@
 using UnityEngine;
 using Enemy;
 using Unity.Netcode;
+using Player;
 
 public class Grabar : Enemy.Enemy
 {
@@ -68,11 +69,21 @@ public class Grabar : Enemy.Enemy
             }
             enemyState = EnemyState.IsChasingPlayer;
 
+            if (agent != null && !IsEffectActive(EffectType.Freeze))
+            {
+                agent.speed = chaseSpeed;
+            }
+
             // Якщо бачить гравця — фокусується суворо на ньому
             eyeTarget.Value = target;
         }
         else
         {
+            if (agent != null && !IsEffectActive(EffectType.Freeze) && enemyState != EnemyState.IsRunning)
+            {
+                agent.speed = defaultSpeed;
+            }
+
             // Якщо ворог не бачить гравця — оглядається довкола
             if (IsServer)
             {

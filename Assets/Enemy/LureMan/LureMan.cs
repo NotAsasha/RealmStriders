@@ -25,8 +25,10 @@ namespace Enemy.LureMan
 
         private bool isAwakened;
 
-        protected void Start()
+        protected override void Start()
         {
+            base.Start();
+
             if (ballerinaAnimator != null)
             {
                 animator = ballerinaAnimator;

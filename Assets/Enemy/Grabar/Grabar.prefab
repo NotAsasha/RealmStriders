@@ -34098,6 +34098,7 @@ GameObject:
   - component: {fileID: -44859057082312483}
   - component: {fileID: -4771866877653863931}
   - component: {fileID: 7623451754018295720}
+  - component: {fileID: 5384637944660122631}
   m_Layer: 7
   m_Name: Grabar
   m_TagString: Untagged
@@ -34280,7 +34281,7 @@ MonoBehaviour:
     type: 3}
   captureSequenceDuration: 0.85
   captureLift: 1.1
-  captureTransformation: {fileID: 0}
+  captureTransformation: {fileID: 7623451754018295720}
   isDead:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -34295,12 +34296,21 @@ MonoBehaviour:
   overAggresive: 0
   moveRange: 30
   defaultSpeed: 8
+  chaseSpeed: 10
   thinkCooldown: 0.3
   stepSoundCooldown: 0.2
+  chaseStepSoundCooldown: 0.15
+  stepSoundRadius: 20
   audioSource: {fileID: -44859057082312483}
   stepSounds:
-  - {fileID: 8300000, guid: e64eac18257a7004f944ef3c91520d1b, type: 3}
-  - {fileID: 8300000, guid: 5f7ce3e3e3fb9d14c8945e531026aa76, type: 3}
+  - {fileID: 8300000, guid: 3f1fbf32b0af1b040a19b4ac24233c55, type: 3}
+  - {fileID: 8300000, guid: 87cfdf0ee0fd5f44c931c8b13d3fc4a2, type: 3}
+  - {fileID: 8300000, guid: 5252169ce707ae9489b9c4b58a0d575e, type: 3}
+  netEnemyState:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 3
   eye: {fileID: 2629601999828691812}
   rotationSpeed: 4
   minLookInterval: 0.5
@@ -34415,7 +34425,7 @@ AudioSource:
   MinDistance: 1
   MaxDistance: 20
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 2
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -34423,10 +34433,19 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
+      time: 0.05
       value: 1
-      inSlope: 0
-      outSlope: 0
+      inSlope: -1.2891135
+      outSlope: -1.2891135
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.4307522
+    - serializedVersion: 3
+      time: 0.31733343
+      value: 0.30664527
+      inSlope: -1.0526316
+      outSlope: -1.0526316
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
@@ -34434,12 +34453,12 @@ AudioSource:
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: 0
-      outSlope: 0
+      inSlope: -0.49977863
+      outSlope: -0.49977863
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
+      inWeight: 0.16312304
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
@@ -34538,6 +34557,29 @@ MonoBehaviour:
   effectRadius: 3
   vacuumVolume: 2
   energyColor: {r: 1, g: 0.19999999, b: 0.23132361, a: 1}
+--- !u!114 &5384637944660122631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5629089953353955407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6890fa83d072185469b73ccb500fe0f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySounds
+  enemy: {fileID: 7490328760025007987}
+  idleSounds:
+  - {fileID: 8300000, guid: 74996c1f6666e2649ac9d37450fcffed, type: 3}
+  angrySounds:
+  - {fileID: 8300000, guid: 46d2cd02bfdd4fb478f3e48f497ead47, type: 3}
+  deathSound: {fileID: 8300000, guid: 46d2cd02bfdd4fb478f3e48f497ead47, type: 3}
+  jumpscareSound: {fileID: 8300000, guid: 46d2cd02bfdd4fb478f3e48f497ead47, type: 3}
+  idleRadius: 20
+  angryRadius: 40
+  deathRadius: 50
+  jumpscareRadius: 40
 --- !u!1001 &1058044943015720574
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35161,6 +35203,7 @@ MonoBehaviour:
   eyeLocalPosition: {x: 0, y: 0, z: 0}
   viewDistance: 30
   viewAngle: 120
+  verticalPadding: 1.5
   playerLayer:
     serializedVersion: 2
     m_Bits: 128

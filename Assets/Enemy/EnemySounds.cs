@@ -12,25 +12,46 @@ public class EnemySounds : MonoBehaviour
     public AudioClip deathSound;
     public AudioClip jumpscareSound;
 
+    [Header("Sound Radii")]
+    public float idleRadius = 15f;
+    public float angryRadius = 25f;
+    public float deathRadius = 30f;
+    public float jumpscareRadius = 40f;
+
     protected AudioSource source;
 
     private void Awake()
     {
         source = GetComponent<AudioSource>();
+        if (enemy == null) enemy = GetComponent<Enemy.Enemy>();
     }
 
     protected virtual void OnEnable()
     {
-        enemy.onStateChanged += PlaySound;
-        enemy.isDead.OnValueChanged += PlayDeathSound;
+        if (enemy != null)
+        {
+            enemy.onStateChanged += PlaySound;
+            enemy.isDead.OnValueChanged += PlayDeathSound;
+        }
     }
     protected virtual void OnDisable()
     {
-        enemy.onStateChanged -= PlaySound;
-        enemy.isDead.OnValueChanged -= PlayDeathSound;
+        if (enemy != null)
+        {
+            enemy.onStateChanged -= PlaySound;
+            enemy.isDead.OnValueChanged -= PlayDeathSound;
+        }
     }
 
-    private void PlaySound(EnemyState state)
+    public void SetRadius(float radius)
+    {
+        if (source != null && radius > 0f)
+        {
+            source.maxDistance = radius;
+        }
+    }
+
+    protected virtual void PlaySound(EnemyState state)
     {
         switch (state)
         {
@@ -49,36 +70,38 @@ public class EnemySounds : MonoBehaviour
         }
     }
 
-    public void PlayIdleSound()
+    public virtual void PlayIdleSound()
     {
-        if (idleSounds.Length == 0)
+        if (idleSounds == null || idleSounds.Length == 0)
         {
             Debug.LogWarning("Entity has no idleSounds");
             return;
         }
 
-        source.clip = idleSounds[Random.Range(0, idleSounds.Length)];
-        source.Play();
+        SetRadius(idleRadius);
+        source.PlayOneShot(idleSounds[Random.Range(0, idleSounds.Length)]);
     }
-    private void PlayAngrySound()
+
+    public virtual void PlayAngrySound()
     {
-        if (angrySounds.Length == 0)
+        if (angrySounds == null || angrySounds.Length == 0)
         {
             Debug.LogWarning("Entity has no angrySounds");
             return;
         }
 
-        source.clip = angrySounds[Random.Range(0, angrySounds.Length)];
-        source.Play();
+        SetRadius(angryRadius);
+        source.PlayOneShot(angrySounds[Random.Range(0, angrySounds.Length)]);
     }
 
-    public void PlayJumpscareSound()
+    public virtual void PlayJumpscareSound()
     {
-        source.clip = jumpscareSound;
-        source.Play();
+        if (jumpscareSound == null) return;
+        SetRadius(jumpscareRadius);
+        source.PlayOneShot(jumpscareSound);
     }
 
-    private void PlayDeathSound(bool _, bool isDead)
+    protected virtual void PlayDeathSound(bool _, bool isDead)
     {
         //If revived, be angry
         if (!isDead)
@@ -87,7 +110,8 @@ public class EnemySounds : MonoBehaviour
             return;
         }
 
-        source.clip = deathSound;
-        source.Play();
+        if (deathSound == null) return;
+        SetRadius(deathRadius);
+        source.PlayOneShot(deathSound); 
     }
 }
