@@ -92,6 +92,15 @@ public class Charger : NetworkBehaviour, IPowerConsumer
             return;
         }
 
+        // Do nothing until the upgrade has been purchased
+        if (BaseManager.Instance == null) return;
+        bool isChargerBought = (BaseManager.Instance.baseUpgrades.Value & (int)BaseUpgrades.IsChargerBought) != 0;
+        if (!isChargerBought)
+        {
+            currentTargetNetRef.Value = default;
+            return;
+        }
+
         IChargeable targetItem = GetBestChargeableTarget(out NetworkObject targetNetObj);
 
         if (targetItem != null && targetNetObj != null)

@@ -1,4 +1,5 @@
 using Enemy;
+using Player;
 using Player.Movement;
 using Unity.Netcode;
 using UnityEngine;
@@ -178,16 +179,21 @@ namespace Player.Equipment.LeafBlower
             if (detectedTarget != currentTarget)
             {
                 ResetCaptureProgress();
-                currentRequiredHoldTime = CalculateRequiredHoldTime(detectedTarget);
             }
 
             currentTarget = detectedTarget;
+            // Recalculate every tick so weakness stacks (Subwoofer/Beam/Landmine/Taser+Water) are reflected mid-capture.
+            currentRequiredHoldTime = CalculateRequiredHoldTime(detectedTarget);
             targetIsValid = true;
         }
 
         private float CalculateRequiredHoldTime(Entity target)
         {
             int stars = Mathf.RoundToInt(target.dangerLevel);
+
+            // Each weakness stack (Subwoofer, Beam, Landmine, Taser+Water) reduces effective stars by 1.
+            stars = Mathf.Max(0, stars - target.GetWeakStacks());
+
             return baseCaptureTime * Mathf.Pow(starTimeMultiplier, Mathf.Max(0, stars - 1));
         }
 

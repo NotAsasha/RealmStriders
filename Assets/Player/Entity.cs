@@ -21,12 +21,20 @@ namespace Player
         private readonly NetworkVariable<bool> isWaterNet = new(false);
         private readonly NetworkVariable<bool> isFireNet = new(false);
         private readonly NetworkVariable<bool> isInvincibleNet = new(false);
-        private readonly NetworkVariable<bool> isWeakNet = new(false);
         private readonly NetworkVariable<bool> isAsleepNet = new(false);
         private readonly NetworkVariable<bool> isCapturingNet = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+        // Each stack represents one level of weakness applied by a different tool.
+        // Stacks are independent: each has its own duration coroutine.
+        public readonly NetworkVariable<int> weakStacks = new(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server);
+
         protected Dictionary<EffectType, NetworkVariable<bool>> effects;
 
+        // Tracks one active coroutine per weakness slot (tool source).
+        private readonly Dictionary<int, Coroutine> weakStackCoroutines = new();
         private Dictionary<EffectType, Coroutine> activeCoroutines = new();
 
         public bool IsBeingCaptured => isCapturingNet.Value;
@@ -50,8 +58,7 @@ namespace Player
                 { EffectType.Water,      isWaterNet },
                 { EffectType.Fire,       isFireNet },
                 { EffectType.Invincible, isInvincibleNet },
-                { EffectType.Weak, isWeakNet },
-                { EffectType.Asleep, isAsleepNet }
+                { EffectType.Asleep,     isAsleepNet }
             };
         }
 
@@ -59,21 +66,22 @@ namespace Player
         {
             isDead.OnValueChanged += OnDeathStateChange;
             effects[EffectType.Freeze].OnValueChanged += OnFreezeStateChange;
-            effects[EffectType.Weak].OnValueChanged += OnWeakStateChange;
+            weakStacks.OnValueChanged += OnWeakStacksChanged;
         }
 
         public override void OnNetworkDespawn()
         {
             isDead.OnValueChanged -= OnDeathStateChange;
             effects[EffectType.Freeze].OnValueChanged -= OnFreezeStateChange;
-            effects[EffectType.Weak].OnValueChanged -= OnWeakStateChange;
-
+            weakStacks.OnValueChanged -= OnWeakStacksChanged;
         }
 
         #endregion
 
         public bool IsDead() => isDead.Value;
-        public float GetHealth() => entityHealth.Value - (IsEffectActive(EffectType.Weak)? 1f : 0f);
+
+        /// <summary>Returns the entity's effective danger level, reduced by active weakness stacks.</summary>
+        public float GetHealth() => entityHealth.Value - weakStacks.Value;
 
         public void AddHealth(float health)
         {
@@ -144,6 +152,7 @@ namespace Player
             captureTransformation?.Play(collapsePoint, serverStartTime, captureSequenceDuration);
         }
 
+
         #region Effects
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
@@ -180,6 +189,46 @@ namespace Player
 
         public bool IsEffectActive(EffectType type) => effects[type].Value;
 
+        // ----- Weakness stacking -----
+
+        /// <summary>
+        /// Adds <paramref name="stacks"/> weakness levels for <paramref name="duration"/> seconds.
+        /// Each slot is identified by a key so the same source refreshes rather than double-stacks.
+        /// </summary>
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void ApplyWeakStackServerRpc(int stacks, float duration, int slot)
+        {
+            ApplyWeakStack(stacks, duration, slot);
+        }
+
+        public void ApplyWeakStack(int stacks, float duration, int slot)
+        {
+            if (!IsServer || isDead.Value || IsBeingCaptured) return;
+            if (IsEffectActive(EffectType.Invincible)) return;
+
+            // Refresh: cancel existing timer for this slot before starting a new one.
+            if (weakStackCoroutines.TryGetValue(slot, out Coroutine existing))
+            {
+                if (existing != null) StopCoroutine(existing);
+                weakStackCoroutines.Remove(slot);
+            }
+
+            weakStackCoroutines[slot] = StartCoroutine(WeakStackTimer(stacks, duration, slot));
+        }
+
+        private IEnumerator WeakStackTimer(int stacks, float duration, int slot)
+        {
+            weakStacks.Value += stacks;
+
+            yield return new WaitForSeconds(duration);
+
+            weakStacks.Value = Mathf.Max(0, weakStacks.Value - stacks);
+            weakStackCoroutines.Remove(slot);
+        }
+
+        /// <summary>Returns how many weakness levels are currently active on this entity.</summary>
+        public int GetWeakStacks() => weakStacks.Value;
+
         #endregion
 
         protected void OnDeathStateChange(bool oldValue, bool isDead)
@@ -189,7 +238,7 @@ namespace Player
         }
 
         virtual protected void OnFreezeStateChange(bool oldV, bool newV) { }
-        virtual protected void OnWeakStateChange(bool oldV, bool newV) { }
+        virtual protected void OnWeakStacksChanged(int oldV, int newV) { }
         protected virtual void BeginCaptureLockServer() { }
         protected virtual void OnCaptureFinalizedServer() { }
 
@@ -203,7 +252,6 @@ namespace Player
         Water,
         Fire,
         Invincible,
-        Weak,
         Asleep
     }
 }

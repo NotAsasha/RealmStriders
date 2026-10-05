@@ -11,6 +11,7 @@ namespace Player.Equipment.Taser
         [SerializeField] private float maxDistance = 20f;
         [SerializeField] private float cooldown = 0.5f;
         [SerializeField] private float freezeTime = 2f;
+        [SerializeField] private float comboWeakDuration = 6f;
         [SerializeField] private int shotCost = 20;
         [SerializeField] private int maxCharge = 100;
 
@@ -107,9 +108,10 @@ namespace Player.Equipment.Taser
                     ((IChargeable)this).ModifyCharge(-shotCost);
                     entity.ApplyEffectServerRpc(EffectType.Freeze, freezeTime);
 
+                    // Combo: Taser + Water = weakness stack (slot 3).
                     if (entity.IsEffectActive(EffectType.Water))
                     {
-                        entity.AddHealth(-0.5f);
+                        entity.ApplyWeakStack(1, comboWeakDuration, slot: 3);
                     }
 
                     // Транслюємо ефекти іншим клієнтам, виключаючи відправника

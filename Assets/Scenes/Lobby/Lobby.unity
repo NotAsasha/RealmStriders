@@ -1285,7 +1285,9 @@ MonoBehaviour:
   checkInterval: 1
   alarmAudioSource: {fileID: 201240882}
   alarmLoopClip: {fileID: 8300000, guid: 79102180ad2b0734b99b6853948e81bc, type: 3}
-  alarmEndClip: {fileID: 0}
+  alarmEndClip: {fileID: 8300000, guid: 83e0f13b9ff832846ac2496a627bf1de, type: 3}
+  pitchMin: 1
+  pitchMax: 1.6
   alarmLights:
   - {fileID: 1847444042}
   - {fileID: 1752439759}
@@ -3199,6 +3201,11 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
+    - target: {fileID: 8472747813162184923, guid: 1f3d2050e39d7034d9b9c90bf263004e,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: f59c35c6d0088e94ca83a4ebc1113270, type: 2}
     - target: {fileID: 8494434767294085391, guid: 1f3d2050e39d7034d9b9c90bf263004e,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -6357,7 +6364,7 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: cf3da56f55dc78845aa9ee532679ca9a, type: 2}
+      objectReference: {fileID: 2100000, guid: f59c35c6d0088e94ca83a4ebc1113270, type: 2}
     - target: {fileID: 2786534777698132407, guid: c31f220cbd56a8845b115434dd7f0a7a,
         type: 3}
       propertyPath: 'm_Materials.Array.data[2]'

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 624819951920827225}
   - component: {fileID: 4203766981783567835}
   - component: {fileID: 8446456525507318025}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34351,6 +34351,7 @@ MonoBehaviour:
   eyeLocalPosition: {x: 0, y: 1, z: 0}
   viewDistance: 20
   viewAngle: 120
+  verticalPadding: 1.5
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -34390,13 +34391,21 @@ MonoBehaviour:
   overAggresive: 0
   moveRange: 30
   defaultSpeed: 10
+  chaseSpeed: 8
   thinkCooldown: 0.3
   stepSoundCooldown: 0.2
+  chaseStepSoundCooldown: 0.18
+  stepSoundRadius: 15
   audioSource: {fileID: -44859057082312483}
   stepSounds:
   - {fileID: 8300000, guid: e64eac18257a7004f944ef3c91520d1b, type: 3}
   - {fileID: 8300000, guid: 8107dc939c211fe4c8069d6a30846cc1, type: 3}
   - {fileID: 8300000, guid: 5f7ce3e3e3fb9d14c8945e531026aa76, type: 3}
+  netEnemyState:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 3
 --- !u!114 &-6363728834847499910
 MonoBehaviour:
   m_ObjectHideFlags: 0

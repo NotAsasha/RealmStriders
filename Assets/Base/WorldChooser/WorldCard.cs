@@ -12,20 +12,15 @@ namespace Base.WorldChooser
 
         private WorldChooser worldChooser;
         private FixedString64Bytes missionName;
-        private int enemiesCount;
-        private float averageDanger;
 
         public void Setup(WorldChooser parent, FixedString64Bytes targetMissionName, int targetEnemiesCount, float targetAverageDanger)
         {
             worldChooser = parent;
             missionName = targetMissionName;
-            enemiesCount = targetEnemiesCount;
-            averageDanger = targetAverageDanger;
-
-            UpdateUI();
+            UpdateUI(targetEnemiesCount, targetAverageDanger);
         }
 
-        private void UpdateUI()
+        private void UpdateUI(int enemiesCount, float averageDanger)
         {
             if (missionNameUI != null)
                 missionNameUI.text = missionName.ToString();
@@ -41,7 +36,8 @@ namespace Base.WorldChooser
         {
             if (worldChooser != null)
             {
-                worldChooser.SetMissionServerRpc(missionName, enemiesCount, averageDanger);
+                // Only the mission name is sent — the server resolves dangerLevels itself.
+                worldChooser.SetMissionServerRpc(missionName);
             }
             else
             {

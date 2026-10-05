@@ -33,8 +33,16 @@ namespace Player.Movement
         // Для орбітальної камери навколо гравців
         private float orbitX, orbitY;
 
+        public override void OnNetworkSpawn()
+        {
+            // Non-owners never run spectator logic for this player object.
+            if (!IsOwner) enabled = false;
+        }
+
         public void StartSpectating(Transform cameraTransform)
         {
+            if (!IsOwner) return;
+
             camTransform = cameraTransform;
             camTransform.parent = null; // Відв'язуємо від регдолу!
             isSpectating = true;
@@ -46,6 +54,8 @@ namespace Player.Movement
 
         public void StopSpectating()
         {
+            if (!IsOwner) return;
+
             isSpectating = false;
             this.enabled = false;
         }

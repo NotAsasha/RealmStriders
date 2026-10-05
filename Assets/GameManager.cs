@@ -6,6 +6,7 @@ using Steam;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -33,8 +34,8 @@ public class GameManager : NetworkBehaviour
 
     public Scene missionScene;
     public string missionName = "World1";
-    public int enemiesCount = 1;
-    public float averageDanger = 1;
+    // Pre-rolled danger tier per enemy, set when the team selects a mission.
+    public FixedList32Bytes<int> dangerLevels;
 
     public List<Enemy.Enemy> activeEnemies = new();
 
@@ -135,7 +136,7 @@ public class GameManager : NetworkBehaviour
         if (SteamManager.Instance.CurrentLobby != null)
             SteamManager.Instance.CurrentLobby.Value.SetJoinable(false);
 
-        LoadWorld(missionName, enemiesCount, averageDanger);
+        LoadWorld(missionName);
         StartTimer();
 
         hasStartedMission.Value = true;
@@ -166,8 +167,9 @@ public class GameManager : NetworkBehaviour
 
 
         //stop the mission (turn off the portals)
+        missionName = ""; // ---- Mission stays the same, can be changed on world chooser; -- UPD: nah, changed
         hasStartedMission.Value = false;
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(3f);
 
 
         teamRating.Value = tempRating;
@@ -199,9 +201,6 @@ public class GameManager : NetworkBehaviour
 
         //unload world
         UnloadWorld();
-
-
-        missionName = ""; // ---- Mission stays the same, can be changed on world chooser; -- UPD: nah, changed
 
 
         //revive
@@ -277,7 +276,7 @@ public class GameManager : NetworkBehaviour
     #region World Manager
 
     private string currentSceneName;
-    public void LoadWorld(string sceneToLoad, int monsters = 0, float avgDanger = 0)
+    public void LoadWorld(string sceneToLoad)
     {
         if (currentSceneName != null)
         {
@@ -297,17 +296,16 @@ public class GameManager : NetworkBehaviour
         missionScene = sceneToUnload;
 
         //Enemies
-
         NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
     }
 
     private void OnSceneLoaded(ulong conn, string sceneName, LoadSceneMode mode)
     {
-        spawner.SpawnEnemies(teamRating.Value, enemiesCount);
+        spawner.SpawnEnemies(dangerLevels);
         NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded; // ������� -- ok, comment broke...
         Scene loadedScene = SceneManager.GetSceneByName(sceneName);
         if (loadedScene.IsValid())
-        {
+        { 
             missionScene = loadedScene;
 
             // local primary scene

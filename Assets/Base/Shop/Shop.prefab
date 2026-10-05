@@ -1413,7 +1413,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1318881762
+  GlobalObjectIdHash: 2003940608
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1449,6 +1449,11 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  currentInteractingClientId:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 18446744073709551615
 --- !u!114 &9124823254289067035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9280,7 +9285,8 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: cf3da56f55dc78845aa9ee532679ca9a, type: 2}
+      objectReference: {fileID: -6922793697723135513, guid: cd27c776d3161e4439f174fc2cc9ded8,
+        type: 3}
     - target: {fileID: -516098083770646512, guid: cd27c776d3161e4439f174fc2cc9ded8,
         type: 3}
       propertyPath: m_Layer
@@ -9315,7 +9321,8 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: a5f3265eb027f0e41af7b62f064343df, type: 2}
+      objectReference: {fileID: -6478536213147159724, guid: cd27c776d3161e4439f174fc2cc9ded8,
+        type: 3}
     - target: {fileID: 8416272007918961125, guid: cd27c776d3161e4439f174fc2cc9ded8,
         type: 3}
       propertyPath: m_Layer

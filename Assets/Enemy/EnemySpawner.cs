@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,24 +22,25 @@ namespace Enemy
         //    TestDistribution();
         //}
 
-        public void SpawnEnemies(int teamRating, int enemiesNumber)
+        // Spawns enemies from a pre-rolled danger list generated at mission-selection time.
+        public void SpawnEnemies(FixedList32Bytes<int> dangerLevels)
         {
-
             if (!IsServer) return;
 
-            List<int> dangers = CalculateDangers(teamRating, enemiesNumber);
-
-            foreach (int danger in dangers)
+            for (int i = 0; i < dangerLevels.Length; i++)
             {
+                int danger = dangerLevels[i];
+                if (danger < 1 || danger > enemiesByDanger.Length) continue;
+
                 var pool = enemiesByDanger[danger - 1].enemies;
                 if (pool.Length == 0) continue;
-            
+
                 if (!RandomMapPoint(out var position)) continue;
                 var prefab = pool[Random.Range(0, pool.Length)];
                 var enemyObj = Instantiate(prefab, position, Quaternion.identity);
                 SceneManager.MoveGameObjectToScene(enemyObj, GameManager.Instance.missionScene);
                 var enemy = enemyObj.GetComponent<NetworkObject>();
-                enemy.Spawn(true); 
+                enemy.Spawn(true);
                 GameManager.Instance.activeEnemies.Add(enemy.GetComponent<Enemy>());
             }
         }
@@ -53,7 +55,7 @@ namespace Enemy
             return Random.Range(minCount, maxCount + 1);
         }
 
-        public List<int> CalculateDangers(int teamRating, int enemiesNumber)
+        public static List<int> CalculateDangers(int teamRating, int enemiesNumber)
         {
             int maxDanger = teamRating > 8 ? 5 : teamRating > 5 ? 4 : 3;
             float[] weights = new float[maxDanger];
@@ -85,7 +87,7 @@ namespace Enemy
             //Random float within sum range
             float rand = Random.value * sum;
 
-            //Search where on range it landed by subtracting every weight 
+            //Search where on range it landed by subtracting every weight
             for (int i = 0; i < weights.Length; ++i)
             {
                 if (rand < weights[i]) return i;

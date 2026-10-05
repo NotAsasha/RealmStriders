@@ -9,21 +9,56 @@ namespace Base.WorldChooser
     public struct MissionData : INetworkSerializable, System.IEquatable<MissionData>
     {
         public FixedString64Bytes missionName;
-        public int enemiesCount;
-        public float averageDanger;
+        // Pre-rolled danger tier for each enemy (1-5). Max 8 enemies (FixedList32Bytes<int> = 8x4 bytes).
+        public FixedList32Bytes<int> dangerLevels;
+
+        public int EnemiesCount => dangerLevels.Length;
+
+        public float AverageDanger
+        {
+            get
+            {
+                if (dangerLevels.Length == 0) return 0f;
+                float sum = 0f;
+                for (int i = 0; i < dangerLevels.Length; i++) sum += dangerLevels[i];
+                return sum / dangerLevels.Length;
+            }
+        }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref missionName);
-            serializer.SerializeValue(ref enemiesCount);
-            serializer.SerializeValue(ref averageDanger);
+
+            // FixedList32Bytes<int> has no built-in SerializeValue overload — serialize manually.
+            int length = dangerLevels.Length;
+            serializer.SerializeValue(ref length);
+            if (serializer.IsReader)
+            {
+                dangerLevels = new FixedList32Bytes<int>();
+                for (int i = 0; i < length; i++)
+                {
+                    int val = 0;
+                    serializer.SerializeValue(ref val);
+                    dangerLevels.Add(val);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    int val = dangerLevels[i];
+                    serializer.SerializeValue(ref val);
+                }
+            }
         }
 
         public bool Equals(MissionData other)
         {
-            return missionName.Equals(other.missionName) &&
-                   enemiesCount == other.enemiesCount &&
-                   Mathf.Approximately(averageDanger, other.averageDanger);
+            if (!missionName.Equals(other.missionName)) return false;
+            if (dangerLevels.Length != other.dangerLevels.Length) return false;
+            for (int i = 0; i < dangerLevels.Length; i++)
+                if (dangerLevels[i] != other.dangerLevels[i]) return false;
+            return true;
         }
     }
 
@@ -139,7 +174,7 @@ namespace Base.WorldChooser
                 var cardObj = Instantiate(cardPrefab, cardParent);
                 if (cardObj.TryGetComponent<WorldCard>(out var card))
                 {
-                    card.Setup(this, mission.missionName, mission.enemiesCount, mission.averageDanger);
+                    card.Setup(this, mission.missionName, mission.EnemiesCount, mission.AverageDanger);
                 }
             }
         }
@@ -168,29 +203,40 @@ namespace Base.WorldChooser
             {
                 var missionName = new FixedString64Bytes(availableWorlds[Random.Range(0, availableWorlds.Length)]);
 
-                int difficultyStep = Mathf.Max(0, currentRating + i - 1);
+                int difficultyStep = Mathf.Max(1, currentRating + i - 1);
                 int enemiesCount = EnemySpawner.RandomEnemiesNumber(difficultyStep);
-                float averageDanger = Random.Range(1f, 5f);
+                var rolledDangers = EnemySpawner.CalculateDangers(difficultyStep, enemiesCount);
+
+                var dangerLevels = new FixedList32Bytes<int>();
+                foreach (int d in rolledDangers) dangerLevels.Add(d);
 
                 availableMissions.Add(new MissionData
                 {
                     missionName = missionName,
-                    enemiesCount = enemiesCount,
-                    averageDanger = averageDanger
+                    dangerLevels = dangerLevels,
                 });
             }
         }
 
+        // Client sends only the mission name — the server looks up dangerLevels from
+        // its own authoritative availableMissions list, avoiding ILPP serialization issues
+        // with FixedList32Bytes<int> as an RPC parameter.
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void SetMissionServerRpc(FixedString64Bytes missionName, int enemiesCount, float averageDanger)
+        public void SetMissionServerRpc(FixedString64Bytes missionName)
         {
             if (GameManager.Instance == null || GameManager.Instance.hasStartedMission.Value) return;
 
-            GameManager.Instance.missionName = missionName.ToString();
-            GameManager.Instance.enemiesCount = enemiesCount;
-            GameManager.Instance.averageDanger = averageDanger;
+            for (int i = 0; i < availableMissions.Count; i++)
+            {
+                if (!availableMissions[i].missionName.Equals(missionName)) continue;
 
-            selectedMissionName.Value = missionName;
+                GameManager.Instance.missionName = missionName.ToString();
+                GameManager.Instance.dangerLevels = availableMissions[i].dangerLevels;
+                selectedMissionName.Value = missionName;
+                return;
+            }
+
+            Debug.LogWarning($"[WorldChooser] Mission '{missionName}' not found in availableMissions.");
         }
     }
 }

@@ -7,7 +7,8 @@ namespace Base.Radar
 {
     public class BeamDamage : NetworkBehaviour, ICollidable
     {
-        [SerializeField] private float damage = 2f;
+        [SerializeField] private float weakDuration = 5f;
+
         public void OnColliderEnter(GameObject collider)
         {
             if (!IsServer) return;
@@ -16,8 +17,9 @@ namespace Base.Radar
             {
                 Debug.Log($"---Beam: Shot entity: {entity.name}");
 
-                entity.ApplyEffectServerRpc(EffectType.Water, 5f);
-                entity.AddHealth(-damage);
+                entity.ApplyEffectServerRpc(EffectType.Freeze, weakDuration);
+                // Slot 1: Radar Beam owns this weakness layer.
+                entity.ApplyWeakStack(1, weakDuration, slot: 1);
             }
         }
     }

@@ -7,7 +7,7 @@ namespace Player.Equipment.Landmine
     public class Landmine : Item, ICollidable
     {
         [SerializeField] float explosionRadius = 5;
-        [SerializeField] float damage = 1f;
+        [SerializeField] float weakDuration = 8f;
         [SerializeField] ParticleSystem emit;
         [SerializeField] LayerMask entityLayer;
         [SerializeField] LayerMask wallLayer;
@@ -62,36 +62,18 @@ namespace Player.Equipment.Landmine
 
         void ApplyDamage(Collider collider)
         {
-            //Calculate all vectors
             Vector3 toTarget = collider.transform.position - transform.position;
-            Vector3 direction = toTarget.normalized;
             float distanceToTarget = toTarget.magnitude;
 
-            //Check for walls
-            if (Physics.Raycast(transform.position, direction, out RaycastHit hit, distanceToTarget, wallLayer)) return;
+            // Check for walls between mine and target
+            if (Physics.Raycast(transform.position, toTarget.normalized, out RaycastHit hit, distanceToTarget, wallLayer)) return;
 
-            //Apply damage (can depand on distance)
             Entity entity = collider.GetComponentInParent<Entity>();
-            if (entity == null)
-            {
-                return;
-            }
-            // float damageToApply = damage / Mathf.Max(distanceToTarget, 1f);
-            entity.AddHealth(-damage);
+            if (entity == null || entity.isDead.Value) return;
 
-            Debug.Log("---Landmine: Damaged entity.");
-
-
-            if (entity.IsDead())
-            {
-                var rigidbody = collider.GetComponent<Rigidbody>();
-                if (rigidbody != null)
-                {
-                    collider.GetComponent<Rigidbody>()?.AddForce(direction * 10f);
-                }
-
-                Debug.Log("---Landmine: Killed some entity.");
-            }
+            // Slot 2: Landmine owns this weakness layer.
+            entity.ApplyWeakStack(1, weakDuration, slot: 2);
+            Debug.Log($"---Landmine: Applied weakness to {entity.name}.");
         }
 
 

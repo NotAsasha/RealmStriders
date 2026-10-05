@@ -72,7 +72,7 @@ namespace FileSystem.Scripts
             public int formatVersion;
             public int teamRating = 3;
             public int lossRating;
-            public int teamMoney = 5600;
+            public int teamMoney = 300;
 
             public List<ObjectEntry> objects = new List<ObjectEntry>();
 

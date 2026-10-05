@@ -160,6 +160,11 @@ namespace Base.BaseUpgrader
             {
                 light.enabled = active;
             }
+
+            if (netObj.TryGetComponent<IPowerConsumer>(out var power))
+            {
+                power.OnPowerStateChanged(active);
+            }
         }
 
         private void OnTerminalBoughtChanged(int _, int current)

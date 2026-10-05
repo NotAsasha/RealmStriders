@@ -87,8 +87,8 @@ namespace Player.Equipment.Subwoofer
                 if (hitColliders[i].TryGetComponent<Entity>(out var enemy))
                 {
                     if (enemy.isDead.Value) continue;
-                    Debug.Log($"---SubWoofer: Applied Weekness to {enemy.name}");
-                    enemy.ApplyEffect(EffectType.Weak, 2f);
+                    // Slot 0: Subwoofer owns this weakness layer.
+                    enemy.ApplyWeakStack(1, 2f, slot: 0);
                 }
                 hitColliders[i] = null;
             }

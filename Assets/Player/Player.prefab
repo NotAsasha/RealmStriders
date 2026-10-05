@@ -589,6 +589,38 @@ CharacterJoint:
   m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!1 &1126046811202901745
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7003236191670892837}
+  m_Layer: 7
+  m_Name: CameraBob
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7003236191670892837
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1126046811202901745}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8896019179699647101}
+  m_Father: {fileID: 7048491912341459997}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1134555276929252607
 GameObject:
   m_ObjectHideFlags: 0
@@ -1367,9 +1399,9 @@ GameObject:
   - component: {fileID: 8896019179699647101}
   - component: {fileID: 4306073554550943434}
   - component: {fileID: 7821530433008171447}
-  - component: {fileID: 6014704158171311374}
   - component: {fileID: 8231992225741517602}
-  - component: {fileID: 5935903473039807011}
+  - component: {fileID: 6389153372692682155}
+  - component: {fileID: 7053880121620667662}
   m_Layer: 7
   m_Name: Camera
   m_TagString: MainCamera
@@ -1387,12 +1419,12 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.000000026077034, y: -0.0000000037252907, z: -0.000000012107194,
     w: 1}
-  m_LocalPosition: {x: 0, y: 0.75, z: 0.093599826}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2879341079176598713}
-  m_Father: {fileID: 3127143841573814391}
+  m_Father: {fileID: 7003236191670892837}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!81 &4306073554550943434
 AudioListener:
@@ -1453,29 +1485,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &6014704158171311374
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3186685686920028311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48db5cf40e9caa646aa4b1bec8e5aab8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  playerBody: {fileID: 3127143841573814391}
-  ragdollHead: {fileID: 6193048333720268308}
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  spectatorController: {fileID: 5935903473039807011}
-  mouseSensitivity: 500
-  hitDistance: 2
-  startPosition: {x: 0, y: 0, z: 0}
-  moveDuration: 0.5
 --- !u!114 &8231992225741517602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1520,13 +1529,116 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!114 &5935903473039807011
+--- !u!114 &6389153372692682155
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3186685686920028311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58e4c0d6a79a43539b1224708aa2f8f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.Movement.PlayerProximityCameraFX
+  ShowTopMostFoldoutHeaderGroup: 1
+  dangerDistance: 9
+  safeDistance: 1.8
+  intensitySpeed: 2.5
+  scanInterval: 0.2
+  maxJitterAmplitude: 0.012
+  jitterFrequency: 8
+  maxFovReduction: 7
+  fovLerpSpeed: 4
+  dangerVolume: {fileID: 7053880121620667662}
+  maxVignetteIntensity: 1
+  maxChromaticIntensity: 1
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  overlapBufferSize: 16
+--- !u!114 &7053880121620667662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3186685686920028311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 4af6c82bc329eb3438e6318b5ee47fbe, type: 2}
+--- !u!1 &3483306655439999558
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7048491912341459997}
+  - component: {fileID: 3583324982144684415}
+  - component: {fileID: 4274922025663217724}
+  - component: {fileID: 7235720421017041723}
+  m_Layer: 7
+  m_Name: CameraManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7048491912341459997
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3483306655439999558}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.75, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7003236191670892837}
+  m_Father: {fileID: 3127143841573814391}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3583324982144684415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3483306655439999558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48db5cf40e9caa646aa4b1bec8e5aab8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  playerBody: {fileID: 3127143841573814391}
+  ragdollHead: {fileID: 6193048333720268308}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  spectatorController: {fileID: 4274922025663217724}
+  mouseSensitivity: 500
+  hitDistance: 2
+  startPosition: {x: 0, y: 0.75, z: 0}
+  moveDuration: 0.5
+--- !u!114 &4274922025663217724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3483306655439999558}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ffdcd77b16b74fa4ea201ffaafb3d0ef, type: 3}
@@ -1536,6 +1648,33 @@ MonoBehaviour:
   followSmoothness: 10
   mouseSensitivity: 2
   distanceFromPlayer: 3
+--- !u!114 &7235720421017041723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3483306655439999558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a6c15aada9452da0969d4a48c7d2c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.Movement.PlayerCameraBob
+  ShowTopMostFoldoutHeaderGroup: 1
+  bobPivot: {fileID: 7003236191670892837}
+  characterController: {fileID: 9155629318535776824}
+  walk:
+    frequency: 3
+    amplitudeY: 0.1
+    amplitudeX: 0.15
+    amplitudeZ: 0.35
+  run:
+    frequency: 6
+    amplitudeY: 0.1
+    amplitudeX: 0.15
+    amplitudeZ: 0.005
+  returnSpeed: 3
+  minSpeedThreshold: 0.15
 --- !u!1 &3512777154750557659
 GameObject:
   m_ObjectHideFlags: 0
@@ -2509,7 +2648,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2617928344032219255}
-  - {fileID: 8896019179699647101}
+  - {fileID: 7048491912341459997}
   - {fileID: 3389593335323767829}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2601,7 +2740,7 @@ CharacterController:
   m_Height: 2
   m_Radius: 0.5
   m_SlopeLimit: 45
-  m_StepOffset: 0.3
+  m_StepOffset: 0.5
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
@@ -2700,7 +2839,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 40
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -2813,6 +2952,9 @@ MonoBehaviour:
   dangerLevel: 1
   glassCage: {fileID: 707610815179461094, guid: de46285eca51e2d4c9e0994d3b25a964,
     type: 3}
+  captureSequenceDuration: 0.85
+  captureLift: 1.1
+  captureTransformation: {fileID: 0}
   isDead:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
