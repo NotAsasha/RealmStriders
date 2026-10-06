@@ -1,4 +1,4 @@
-﻿using Player.Equipment;
+using Player.Equipment;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -20,9 +20,9 @@ namespace Base.SellPoint
             foreach (var collider in colliders)
             {
                 var item = collider.GetComponent<Item>();
-                if (item == null || item.isCurrentlyHeld) continue;
+                if (item == null || item.isCurrentlyHeld || item.sellPrice <= 0) continue;
                 sum += item.sellPrice;
-                Debug.Log($"---SellPoint: Sold {name}");
+                Debug.Log($"---SellPoint: Sold {item.name} for {item.sellPrice}");
                 item.DestroyItemServerRpc();
             }
             Debug.Log($"---SellPoint: Sold items for {sum}");

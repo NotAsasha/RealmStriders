@@ -314,6 +314,9 @@ MonoBehaviour:
   isConsumable: 0
   sellPrice: 200
   clickSounds: []
+  gripPoint: {fileID: 0}
+  gripPositionOffset: {x: 0, y: 0, z: 0}
+  gripRotationOffset: {x: 0, y: 0, z: 0}
   prefabId: 18
   isCurrentlyHeld: 0
 --- !u!114 &7320632974485258231
@@ -331,6 +334,7 @@ MonoBehaviour:
   eyeLocalPosition: {x: 0, y: 0, z: 0}
   viewDistance: 10
   viewAngle: 360
+  verticalPadding: 1.5
   playerLayer:
     serializedVersion: 2
     m_Bits: 128

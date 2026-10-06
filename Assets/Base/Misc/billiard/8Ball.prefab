@@ -156,7 +156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 4272464231
+  GlobalObjectIdHash: 4040052924
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -183,8 +183,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player.Equipment.Item
   ShowTopMostFoldoutHeaderGroup: 1
   isConsumable: 0
-  sellPrice: 1
+  sellPrice: 0
   clickSounds: []
+  gripPoint: {fileID: 0}
+  gripPositionOffset: {x: 0, y: 0, z: 0}
+  gripRotationOffset: {x: 0, y: 0, z: 0}
   prefabId: 16
   isCurrentlyHeld: 0
 --- !u!114 &7134890470268953663

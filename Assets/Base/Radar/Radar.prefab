@@ -184,7 +184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 525009674
+  GlobalObjectIdHash: 3376012841
   InScenePlacedSourceGlobalObjectIdHash: 3418177741
   DeferredDespawnTick: 0
   Ownership: 1
@@ -214,12 +214,17 @@ MonoBehaviour:
   terminalCanvas: {fileID: 8157406508887669796}
   cameraPoint: {fileID: 7478994723036505424}
   interactSound: {fileID: 1315335145842421513}
-  prefabId: 12
+  prefabId: 20
   isTaken:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  currentInteractingClientId:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 18446744073709551615
   moveSpeed: 2
   border: {x: 4.9, y: 4.9}
   beamLifetime: 7
@@ -636,8 +641,8 @@ MeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: 698883ec95c8dcc48984f516a86de42c, type: 2}
   m_StaticBatchInfo:
-  firstSubMesh: 0
-  subMeshCount: 0
+    firstSubMesh: 0
+    subMeshCount: 0
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}

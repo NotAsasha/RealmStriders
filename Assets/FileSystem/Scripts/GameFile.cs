@@ -82,7 +82,7 @@ namespace FileSystem.Scripts
         /// <summary>
         /// Tries to save some data to the file
         /// </summary>
-        public void Save()
+        public bool Save()
         {
             string filePath = Path.Combine(Application.persistentDataPath + GetFullPath());
             string dirPath = Path.GetDirectoryName(filePath);
@@ -102,12 +102,14 @@ namespace FileSystem.Scripts
                 // write the serialized data to the file
                 using StreamWriter writer = new(filePath);
                 writer.Write(dataToStore);
+                Debug.Log($"---{nameof(GameFile)}: File saved: {filePath}");
+                return true;
             }
             catch (Exception e)
             {
                 Debug.LogError($"---GameFile: Error saving data to file: {filePath}\n{e}");
+                return false;
             }
-            Debug.Log($"---{nameof(GameFile)}: File saved: {filePath}");
         }
         /// <summary>
         /// Deletes current file

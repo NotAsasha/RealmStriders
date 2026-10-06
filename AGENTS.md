@@ -41,3 +41,33 @@
 - **Targeted Exploration**: Do not read directory trees recursively. Check folder structures locally around the target task.
 - **No Hallucinated Tools**: Do not attempt to invoke non-standard execution tools or visual screenshot APIs unless an active Unity MCP server is explicitly loaded.
 - **Verification**: Ensure all generated C# code has correct namespace imports and passes type safety checks before concluding tasks.
+
+## Source of Truth
+
+When sources disagree, use this priority:
+
+1. Explicit decisions confirmed by the project owner.
+2. Current gameplay design in `docs/GAME_DESIGN.md`.
+3. Current implementation in `Assets/`.
+4. The original GDD, which may contain obsolete proposals.
+5. Other project documentation.
+
+If a requested change conflicts with a confirmed design rule or affects an
+unresolved rule, stop and ask for clarification before editing. If the code
+and confirmed design disagree, describe the implementation gap rather than
+silently treating the code as the intended behaviour.
+
+## Project Documentation
+
+Before changing gameplay or architecture, consult the relevant documentation:
+
+- [Game design](docs/GAME_DESIGN.md) — core loop, design pillars, and open questions.
+- [Systems overview](docs/SYSTEMS.md) — system boundaries and responsibilities.
+- [Networking](docs/NETWORKING.md) — authority, state, and RPC guidance.
+- [Enemies](docs/ENEMIES.md) — enemy content and spawn conventions.
+- [Development conventions](docs/CONVENTIONS.md) — implementation and asset rules.
+- [Content pipeline](docs/CONTENT_PIPELINE.md) — how to add monsters, equipment, and missions.
+
+These documents describe the current state. Use the source-of-truth priority
+above when code and documentation disagree. Record implementation gaps instead
+of silently treating current code as intended design.

@@ -1,3 +1,4 @@
+using Base.Shop;
 using Enemy;
 using FileSystem.Scripts;
 using Player;
@@ -206,6 +207,9 @@ public class GameManager : NetworkBehaviour
         //revive
         RevivePlayers();
 
+        yield return null;
+
+        Shop.Instance?.EnsureFreeLeafBlowerServer();
 
         //Resume Lobby Connections
         if (SteamManager.Instance.CurrentLobby != null)
