@@ -174,7 +174,7 @@ namespace Base.WorldChooser
                 var cardObj = Instantiate(cardPrefab, cardParent);
                 if (cardObj.TryGetComponent<WorldCard>(out var card))
                 {
-                    card.Setup(this, mission.missionName, mission.EnemiesCount, mission.AverageDanger);
+                    card.Setup(this, i, mission.missionName, mission.EnemiesCount, mission.AverageDanger);
                 }
             }
         }
@@ -218,25 +218,24 @@ namespace Base.WorldChooser
             }
         }
 
-        // Client sends only the mission name — the server looks up dangerLevels from
+        // Client sends only the mission index — the server looks up dangerLevels from
         // its own authoritative availableMissions list, avoiding ILPP serialization issues
         // with FixedList32Bytes<int> as an RPC parameter.
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void SetMissionServerRpc(FixedString64Bytes missionName)
+        public void SetMissionServerRpc(int missionIndex)
         {
             if (GameManager.Instance == null || GameManager.Instance.hasStartedMission.Value) return;
 
-            for (int i = 0; i < availableMissions.Count; i++)
+            if (missionIndex < 0 || missionIndex >= availableMissions.Count)
             {
-                if (!availableMissions[i].missionName.Equals(missionName)) continue;
-
-                GameManager.Instance.missionName = missionName.ToString();
-                GameManager.Instance.dangerLevels = availableMissions[i].dangerLevels;
-                selectedMissionName.Value = missionName;
+                Debug.LogWarning($"[WorldChooser] Mission index '{missionIndex}' is not valid.");
                 return;
             }
 
-            Debug.LogWarning($"[WorldChooser] Mission '{missionName}' not found in availableMissions.");
+            var mission = availableMissions[missionIndex];
+            GameManager.Instance.missionName = mission.missionName.ToString();
+            GameManager.Instance.dangerLevels = mission.dangerLevels;
+            selectedMissionName.Value = mission.missionName;
         }
     }
 }

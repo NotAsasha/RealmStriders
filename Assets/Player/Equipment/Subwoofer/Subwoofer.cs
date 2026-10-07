@@ -1,6 +1,7 @@
 using UnityEngine;
 using Player.Equipment;
 using Unity.Netcode;
+using Enemy;
 
 namespace Player.Equipment.Subwoofer
 {
@@ -9,6 +10,7 @@ namespace Player.Equipment.Subwoofer
         [SerializeField] float effectRadius = 5f;
         [SerializeField] LayerMask entityLayer;
         [SerializeField] AudioSource audioS;
+        [SerializeField] SoundProducer soundProducer;
 
         [SerializeField] GameObject effectBubble;
         [SerializeField] Renderer indicator;
@@ -62,6 +64,12 @@ namespace Player.Equipment.Subwoofer
 
         private void Update()
         {
+            if (IsServer)
+            {
+                if (isOn.Value && !isCurrentlyHeld) soundProducer?.StartContinuousNoise();
+                else soundProducer?.StopContinuousNoise();
+            }
+
             if (!isOn.Value || isCurrentlyHeld) return;
 
             checkTimer += Time.deltaTime;

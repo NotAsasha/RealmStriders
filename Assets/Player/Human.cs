@@ -9,6 +9,7 @@ namespace Player
     {
         private Animator animator;
         public CharacterController characterController;
+        public AudioSource source;
         protected override void Awake()
         {
             base.Awake();
@@ -37,6 +38,7 @@ namespace Player
         override protected void KillEntity()
         {
             ToggleRagdoll(true);
+            PlayDeathSound();
             if (IsOwner)
             {
                 GameManager.Instance.OnPlayerDeathServerRpc();
@@ -67,6 +69,11 @@ namespace Player
             animator.enabled = !isActive;
             characterController.enabled = !isActive;
             Debug.Log($"---Human: Toggled ragdoll: {isActive}");
+        }
+
+        private void PlayDeathSound()
+        {
+            source.Play();
         }
     }
 }

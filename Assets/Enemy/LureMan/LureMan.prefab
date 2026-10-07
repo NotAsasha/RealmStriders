@@ -35388,6 +35388,8 @@ GameObject:
   - component: {fileID: 1600353629535544127}
   - component: {fileID: -44859057082312483}
   - component: {fileID: -4771866877653863931}
+  - component: {fileID: 8624440939700949744}
+  - component: {fileID: 7526035938980679288}
   m_Layer: 7
   m_Name: LureMan
   m_TagString: Untagged
@@ -35448,7 +35450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4029104727
+  GlobalObjectIdHash: 2417151809
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -35486,10 +35488,10 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.75
-  m_Speed: 20
+  m_Speed: 15
   m_Acceleration: 20
   avoidancePriority: 50
-  m_AngularSpeed: 360
+  m_AngularSpeed: 600
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 0
@@ -35559,6 +35561,7 @@ MonoBehaviour:
   eyeLocalPosition: {x: 0, y: 0, z: 0}
   viewDistance: 20
   viewAngle: 120
+  verticalPadding: 1.5
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -35581,6 +35584,9 @@ MonoBehaviour:
   dangerLevel: 3
   glassCage: {fileID: 707610815179461094, guid: de46285eca51e2d4c9e0994d3b25a964,
     type: 3}
+  captureSequenceDuration: 0.85
+  captureLift: 1.1
+  captureTransformation: {fileID: 0}
   isDead:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -35595,12 +35601,20 @@ MonoBehaviour:
   overAggresive: 1
   moveRange: 10
   defaultSpeed: 10
+  chaseSpeed: 15
   thinkCooldown: 0.3
   stepSoundCooldown: 0.2
-  audioSource: {fileID: -44859057082312483}
+  chaseStepSoundCooldown: 0.15
+  stepSoundRadius: 25
+  audioSource: {fileID: 8624440939700949744}
   stepSounds:
-  - {fileID: 8300000, guid: e64eac18257a7004f944ef3c91520d1b, type: 3}
-  - {fileID: 8300000, guid: 8107dc939c211fe4c8069d6a30846cc1, type: 3}
+  - {fileID: 8300000, guid: f7edd5e48f06930479754aae5604cae0, type: 3}
+  - {fileID: 8300000, guid: 0f71390005e531348acbee6dc8f7d2b5, type: 3}
+  netEnemyState:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 3
   triggerDistance: 7
   musicSource: {fileID: -44859057082312483}
   jumpScreamClip: {fileID: 8300000, guid: e6154feed21e9ff45a84cd01bf4727ae, type: 3}
@@ -35608,7 +35622,7 @@ MonoBehaviour:
   spinSpeed: 90
   ballerinaAnimator: {fileID: 2234663746387192264}
   musicBoxTransform: {fileID: 6788352211892430611}
-  jumpAnimationDuration: 2.5
+  jumpAnimationDuration: 3
   jumpTriggerName: Jump
 --- !u!114 &-6363728834847499910
 MonoBehaviour:
@@ -35703,17 +35717,17 @@ AudioSource:
   m_Resource: {fileID: 8300000, guid: 27b689accbf0b314d830a21d529ee170, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
-  m_Pitch: 0.7
+  m_Pitch: 0.6
   Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1
+  DopplerLevel: 0
   MinDistance: 1
-  MaxDistance: 20
+  MaxDistance: 40
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 2
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -35811,6 +35825,153 @@ AudioLowPassFilter:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!82 &8624440939700949744
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5629089953353955407}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 2
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 0
+  MinDistance: 1
+  MaxDistance: 15
+  Pan2D: 0
+  rolloffMode: 2
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.06666667
+      value: 1
+      inSlope: -15.005997
+      outSlope: -15.005997
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.13333334
+      value: 0.5
+      inSlope: -3.7514992
+      outSlope: -3.7514992
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.26666668
+      value: 0.25
+      inSlope: -0.9378748
+      outSlope: -0.9378748
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.53333336
+      value: 0.125
+      inSlope: -0.2344687
+      outSlope: -0.2344687
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -0.06669331
+      outSlope: -0.06669331
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &7526035938980679288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5629089953353955407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6890fa83d072185469b73ccb500fe0f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySounds
+  enemy: {fileID: 1762973566592295038}
+  idleSounds:
+  - {fileID: 8300000, guid: a04d1f53a4678e14e9ee3c4c219d0e96, type: 3}
+  - {fileID: 8300000, guid: 0ee0f92a0383dc041acbc3c18ebc219c, type: 3}
+  angrySounds: []
+  deathSound: {fileID: 0}
+  jumpscareSound: {fileID: 0}
+  idleRadius: 35
+  angryRadius: 35
+  deathRadius: 50
+  jumpscareRadius: 50
 --- !u!1 &5974213371291158424
 GameObject:
   m_ObjectHideFlags: 0

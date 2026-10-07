@@ -45,6 +45,11 @@ monster's danger or difficulty. Other equipment can weaken a monster before
 and during capture; multiple weaknesses can be combined and their effects
 stack, reducing the time required by the `LeafBlower`.
 
+Equipment noise is server-authoritative. A running `LeafBlower` or grounded
+`Subwoofer` continuously lures nearby enemies, while a walkie-talkie only
+lures them while voice data is actively transmitted. `Flashbang` and `Taser`
+create one-shot noise when they activate.
+
 A successful capture produces an `EnemyCage`. All target monsters must be
 captured for a successful mission; killing is not an alternative objective.
 The mission may still be ended early from the base, but it gives no rating

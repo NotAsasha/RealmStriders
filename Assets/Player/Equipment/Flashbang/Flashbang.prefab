@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 3228763991021067294}
   - component: {fileID: 5819060135507272248}
   - component: {fileID: 1577710506482555670}
+  - component: {fileID: 900000000000000004}
   m_Layer: 6
   m_Name: Flashbang
   m_TagString: Untagged
@@ -1220,6 +1221,10 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   isConsumable: 1
   sellPrice: 10
+  clickSounds: []
+  gripPoint: {fileID: 0}
+  gripPositionOffset: {x: 0, y: 0, z: 0}
+  gripRotationOffset: {x: 0, y: 0, z: 0}
   prefabId: 1
   isCurrentlyHeld: 0
   effectRadius: 20
@@ -1228,6 +1233,29 @@ MonoBehaviour:
     m_Bits: 128
   emit: {fileID: 5318549761499764903}
   audioS: {fileID: 3139778475051121661}
+  soundProducer: {fileID: 900000000000000004}
+--- !u!114 &900000000000000004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 800438960164502356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 964159904b634dd418799dd0762f718a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.SoundProducer
+  ShowTopMostFoldoutHeaderGroup: 1
+  soundEmitor: {fileID: 2433609159755514743}
+  soundRadius: 30
+  continuousNoiseInterval: 0.35
+  refreshedNoiseTimeout: 0.5
+  entityLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  source: {fileID: 3139778475051121661}
+  clip: []
 --- !u!1 &7094220508849297507
 GameObject:
   m_ObjectHideFlags: 0

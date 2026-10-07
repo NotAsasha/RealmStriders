@@ -3199,6 +3199,7 @@ GameObject:
   - component: {fileID: 5223368813646543573}
   - component: {fileID: 3387458183286657816}
   - component: {fileID: 1434022619994968818}
+  - component: {fileID: 5396805485059762867}
   m_Layer: 6
   m_Name: BaseUpgrader
   m_TagString: Untagged
@@ -3262,16 +3263,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BaseUpgrader
   ShowTopMostFoldoutHeaderGroup: 1
-  terminalPrefabID: 0
-  terminalCanvas: {fileID: 3013050711042986232}
-  cameraPoint: {fileID: 7837431273183339094}
-  interactSound: {fileID: 0}
-  prefabId: 10
-  isTaken:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
   terminalPrice: 200
   detectionPrice: 300
   beamPrice: 400
@@ -3299,6 +3290,34 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.7, y: 2, z: 1}
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &5396805485059762867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5833512590392862751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ebb1acce09eaa44891f4586fc85ba4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Base.Terminal
+  ShowTopMostFoldoutHeaderGroup: 1
+  terminalPrefabID: 0
+  terminalCanvas: {fileID: 3013050711042986232}
+  cameraPoint: {fileID: 7837431273183339094}
+  interactSound: {fileID: 0}
+  prefabId: 10
+  isTaken:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  currentInteractingClientId:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 18446744073709551615
 --- !u!1 &5877134232903713383
 GameObject:
   m_ObjectHideFlags: 0
@@ -4104,8 +4123,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8018029762623290068}
   m_HandleRect: {fileID: 3915074430159803064}
   m_Direction: 2
-  m_Value: 0.99999577
-  m_Size: 0.5499999
+  m_Value: 0.99999595
+  m_Size: 0.5499988
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

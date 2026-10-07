@@ -100,6 +100,11 @@ namespace Player.Network
         private void SendVoiceServerRpc(byte[] compressedData, int length, bool isRadio, RpcParams rpcParams = default)
         {
             ulong senderClientId = rpcParams.Receive.SenderClientId;
+            if (isRadio)
+            {
+                WalkieTalkie.GetTransmittingRadio(senderClientId)?.RefreshNoiseFromVoice();
+            }
+
             ReceiveVoiceClientRpc(compressedData, length, isRadio, senderClientId);
         }
 

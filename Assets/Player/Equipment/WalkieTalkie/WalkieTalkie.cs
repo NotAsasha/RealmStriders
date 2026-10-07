@@ -5,6 +5,7 @@ using Steamworks;
 using Unity.Netcode;
 using UnityEngine;
 using Player.Network;
+using Enemy;
 
 namespace Player.Equipment
 {
@@ -24,6 +25,7 @@ namespace Player.Equipment
         [SerializeField] private AudioSource speakerSource;
         [SerializeField] private AudioClip turnOnClip;
         [SerializeField] private AudioClip turnOffClip;
+        [SerializeField] private SoundProducer soundProducer;
 
         [Header("Visual Feedback")]
         [SerializeField] private Renderer indicatorRenderer;
@@ -38,6 +40,7 @@ namespace Player.Equipment
         {
             base.OnNetworkSpawn();
             AllRadios.Add(this);
+            if (soundProducer == null) soundProducer = GetComponent<SoundProducer>();
 
             try { InitAudioBuffer(); }
             catch (Exception ex)
@@ -112,6 +115,26 @@ namespace Player.Equipment
         {
             if (!isOn.Value || radioBuffer == null) return;
             radioBuffer.WriteData(uncompressedData, size, volumeMultiplier);
+        }
+
+        public void RefreshNoiseFromVoice()
+        {
+            if (!IsServer || !CanTransmit() || soundProducer == null) return;
+
+            soundProducer.RefreshContinuousNoise();
+        }
+
+        public static WalkieTalkie GetTransmittingRadio(ulong clientId)
+        {
+            if (NetworkManager.Singleton == null
+                || !NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out NetworkClient client)
+                || client.PlayerObject == null)
+            {
+                return null;
+            }
+
+            Inventory inventory = client.PlayerObject.GetComponent<Inventory>();
+            return inventory?.GetActiveItem() as WalkieTalkie;
         }
 
         private void OnAudioRead(float[] data)

@@ -144,6 +144,7 @@ namespace Player.Movement
             if (human.isDead.Value)
             {
                 if (movement != null && movement.isInInteraction) StopInteraction();
+                SetSpectatorCursor(true);
 
                 if (!ragdollHead) return;
                 transform.parent = ragdollHead;
@@ -163,6 +164,7 @@ namespace Player.Movement
                 }
                 if (spectatorController) spectatorController.StopSpectating();
                 this.enabled = true; // Вмикаємо назад FPS камеру
+                UpdateCursorState();
 
                 transform.parent = playerBody;
                 transform.localPosition = startPosition;
@@ -271,6 +273,17 @@ namespace Player.Movement
             UnityEngine.Cursor.lockState = (movement.isPaused || movement.isInInteraction)
         ? CursorLockMode.None
         : CursorLockMode.Locked;
+            UnityEngine.Cursor.visible = movement.isPaused || movement.isInInteraction;
+        }
+
+        public void SetSpectatorCursor(bool isTerminalTarget)
+        {
+            if (!IsOwner) return;
+
+            UnityEngine.Cursor.lockState = isTerminalTarget
+                ? CursorLockMode.None
+                : CursorLockMode.Locked;
+            UnityEngine.Cursor.visible = isTerminalTarget;
         }
 
         private IEnumerator TransitionToSpectator(float delay)

@@ -118,6 +118,7 @@ GameObject:
   - component: {fileID: 8002736168745895723}
   - component: {fileID: 6980002636788170861}
   - component: {fileID: 6998975540909714524}
+  - component: {fileID: 900000000000000005}
   m_Layer: 6
   m_Name: Taser
   m_TagString: Untagged
@@ -310,6 +311,28 @@ MonoBehaviour:
   danger: {fileID: 4045124531342387241}
   sound: {fileID: 6998975540909714524}
   particle: {fileID: 8825538087164892633}
+  soundProducer: {fileID: 900000000000000005}
+--- !u!114 &900000000000000005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5335012707719721587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 964159904b634dd418799dd0762f718a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.SoundProducer
+  soundEmitor: {fileID: 0}
+  soundRadius: 10
+  continuousNoiseInterval: 0.35
+  refreshedNoiseTimeout: 0.5
+  entityLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  source: {fileID: 0}
+  clip: []
 --- !u!82 &6998975540909714524
 AudioSource:
   m_ObjectHideFlags: 0

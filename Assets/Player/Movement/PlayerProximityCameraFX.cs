@@ -69,10 +69,6 @@ namespace Player.Movement
         [Tooltip("Buffer size for OverlapSphereNonAlloc. Must be >= expected max enemies in range.")]
         public int overlapBufferSize = 16;
 
-        // ──────────────────────────────────────────────────────────────────────
-        //  Private state — zero GC in Update
-        // ──────────────────────────────────────────────────────────────────────
-
         private Camera _cam;
         private float _baseFov;
         private float _threatIntensity;   // current smoothed 0–1 value

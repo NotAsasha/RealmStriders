@@ -400,6 +400,7 @@ GameObject:
   - component: {fileID: 464452778466763374}
   - component: {fileID: 4855995713643638015}
   - component: {fileID: 4052446503360061434}
+  - component: {fileID: 900000000000000001}
   m_Layer: 6
   m_Name: LeafBlower
   m_TagString: Untagged
@@ -487,7 +488,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 959338214
+  GlobalObjectIdHash: 2003781745
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -586,6 +587,7 @@ MonoBehaviour:
   gripRotationOffset: {x: 0, y: 0, z: 0}
   prefabId: 3
   isCurrentlyHeld: 0
+  soundProducer: {fileID: 900000000000000001}
   particle: {fileID: 271574717427928921}
   baseCaptureTime: 1
   starTimeMultiplier: 5
@@ -733,6 +735,28 @@ MonoBehaviour:
   wallLayer:
     serializedVersion: 2
     m_Bits: 1
+--- !u!114 &900000000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6279692169614002265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 964159904b634dd418799dd0762f718a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.SoundProducer
+  ShowTopMostFoldoutHeaderGroup: 1
+  soundEmitor: {fileID: 6634900640289316099}
+  soundRadius: 20
+  continuousNoiseInterval: 0.35
+  refreshedNoiseTimeout: 0.5
+  entityLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  source: {fileID: 4855995713643638015}
+  clip: []
 --- !u!1 &6563803232512073303
 GameObject:
   m_ObjectHideFlags: 0

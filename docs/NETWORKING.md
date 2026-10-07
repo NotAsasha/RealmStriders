@@ -45,6 +45,9 @@ success rating increase.
 - Keep presentation-only effects local unless every client must observe them.
 - Subscribe and unsubscribe to network lifecycle events in
   `OnNetworkSpawn`/`OnNetworkDespawn`.
+- Noise that affects enemy behaviour is emitted and resolved on the server.
+  Continuous equipment noise is driven by server-owned state, while voice
+  transmission refreshes a short-lived server-side noise window.
 
 ## Adding a networked interaction
 

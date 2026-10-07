@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 3737952651707053744}
   - component: {fileID: 2426271837834936454}
   - component: {fileID: 3773162021928973764}
+  - component: {fileID: 900000000000000003}
   m_Layer: 6
   m_Name: Subwoofer
   m_TagString: Untagged
@@ -299,6 +300,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   audioS: {fileID: 2426271837834936454}
+  soundProducer: {fileID: 900000000000000003}
   effectBubble: {fileID: 8849198741739745067}
   indicator: {fileID: 9209998021561286904}
   isOn:
@@ -306,6 +308,27 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+--- !u!114 &900000000000000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6009567064067073031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 964159904b634dd418799dd0762f718a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.SoundProducer
+  soundEmitor: {fileID: 0}
+  soundRadius: 18
+  continuousNoiseInterval: 0.35
+  refreshedNoiseTimeout: 0.5
+  entityLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  source: {fileID: 0}
+  clip: []
 --- !u!1001 &152266130545849943
 PrefabInstance:
   m_ObjectHideFlags: 0

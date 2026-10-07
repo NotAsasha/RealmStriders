@@ -207,9 +207,9 @@ public class GameManager : NetworkBehaviour
         //revive
         RevivePlayers();
 
-        yield return null;
-
         Shop.Instance?.EnsureFreeLeafBlowerServer();
+
+        currentSave.Save();
 
         //Resume Lobby Connections
         if (SteamManager.Instance.CurrentLobby != null)

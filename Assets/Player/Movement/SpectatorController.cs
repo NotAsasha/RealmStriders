@@ -24,6 +24,8 @@ namespace Player.Movement
         [SerializeField] private float followSmoothness = 10f;
         [SerializeField] private float mouseSensitivity = 2f;
         [SerializeField] private float distanceFromPlayer = 3f;
+        [SerializeField] private float cameraCollisionPadding = 0.15f;
+        [SerializeField] private LayerMask cameraCollisionLayers = Physics.DefaultRaycastLayers;
 
         private Transform camTransform;
         private List<SpectatorTarget> targets = new List<SpectatorTarget>();
@@ -47,6 +49,7 @@ namespace Player.Movement
             camTransform.parent = null; // Відв'язуємо від регдолу!
             isSpectating = true;
             this.enabled = true;
+            SetCursorForTarget(true);
 
             RebuildTargetList();
             SwitchTarget(0);
@@ -58,6 +61,10 @@ namespace Player.Movement
 
             isSpectating = false;
             this.enabled = false;
+            if (CameraMovement.Instance != null)
+            {
+                CameraMovement.Instance.SetSpectatorCursor(false);
+            }
         }
 
         private void RebuildTargetList()
@@ -109,6 +116,11 @@ namespace Player.Movement
                         }
                     }
                 }
+
+                if (targets.Count > 0)
+                {
+                    currentIndex = Mathf.Clamp(currentIndex, 0, targets.Count - 1);
+                }
             }
         }
 
@@ -116,13 +128,12 @@ namespace Player.Movement
         {
             if (!isSpectating || targets.Count == 0) return;
 
-            // Перемикання цілей на стрілочки або кліки миші
-            // (Краще прив'язати до твоїх Action Maps в Input System)
-            if (Keyboard.current.rightArrowKey.wasPressedThisFrame || Mouse.current.leftButton.wasPressedThisFrame)
+            // Перемикання цілей клавішами A/D.
+            if (Keyboard.current.dKey.wasPressedThisFrame)
             {
                 NextTarget();
             }
-            if (Keyboard.current.leftArrowKey.wasPressedThisFrame || Mouse.current.rightButton.wasPressedThisFrame)
+            if (Keyboard.current.aKey.wasPressedThisFrame)
             {
                 PrevTarget();
             }
@@ -144,12 +155,14 @@ namespace Player.Movement
             if (currentTarget.Type == SpectatorTargetType.Terminal)
             {
                 // Жорстка прив'язка до монітора термінала
+                SetCursorForTarget(true);
                 camTransform.position = Vector3.Lerp(camTransform.position, currentTarget.Transform.position, Time.deltaTime * followSmoothness);
                 camTransform.rotation = Quaternion.Slerp(camTransform.rotation, currentTarget.Transform.rotation, Time.deltaTime * followSmoothness);
             }
             else if (currentTarget.Type == SpectatorTargetType.Player)
             {
                 // Орбітальна камера навколо живого гравця (3-я особа)
+                SetCursorForTarget(false);
                 Vector2 lookInput = Mouse.current.delta.ReadValue();
                 orbitX += lookInput.x * mouseSensitivity * 0.1f;
                 orbitY -= lookInput.y * mouseSensitivity * 0.1f;
@@ -157,10 +170,38 @@ namespace Player.Movement
 
                 Quaternion rotation = Quaternion.Euler(orbitY, orbitX, 0);
                 Vector3 targetPosition = currentTarget.Transform.position + Vector3.up * 1.5f; // Рівень плечей/голови
-                Vector3 position = targetPosition - (rotation * Vector3.forward * distanceFromPlayer);
+                Vector3 directionToCamera = rotation * Vector3.back;
+                Vector3 position = targetPosition + directionToCamera * distanceFromPlayer;
+
+                if (Physics.Raycast(
+                    targetPosition,
+                    directionToCamera,
+                    out RaycastHit hit,
+                    distanceFromPlayer,
+                    cameraCollisionLayers,
+                    QueryTriggerInteraction.Ignore))
+                {
+                    position = hit.point - directionToCamera * cameraCollisionPadding;
+                }
 
                 camTransform.rotation = Quaternion.Slerp(camTransform.rotation, rotation, Time.deltaTime * followSmoothness);
-                camTransform.position = Vector3.Lerp(camTransform.position, position, Time.deltaTime * followSmoothness);
+                Vector3 smoothedPosition = Vector3.Lerp(
+                    camTransform.position,
+                    position,
+                    Time.deltaTime * followSmoothness);
+
+                if (Physics.Raycast(
+                    targetPosition,
+                    smoothedPosition - targetPosition,
+                    out hit,
+                    Vector3.Distance(targetPosition, smoothedPosition),
+                    cameraCollisionLayers,
+                    QueryTriggerInteraction.Ignore))
+                {
+                    smoothedPosition = hit.point - (smoothedPosition - targetPosition).normalized * cameraCollisionPadding;
+                }
+
+                camTransform.position = smoothedPosition;
             }
         }
 
@@ -170,9 +211,18 @@ namespace Player.Movement
             currentIndex = (index + targets.Count) % targets.Count;
 
             // TODO: Викликати UIManager.Instance.ShowSpectatorUI(targets[currentIndex].DisplayName);
+            SetCursorForTarget(targets[currentIndex].Type == SpectatorTargetType.Terminal);
             Debug.Log($"Спостерігаємо за: {targets[currentIndex].DisplayName}");
             Debug.Log($"скіку: {targets.Count}");
 
+        }
+
+        private void SetCursorForTarget(bool isTerminalTarget)
+        {
+            if (CameraMovement.Instance != null)
+            {
+                CameraMovement.Instance.SetSpectatorCursor(isTerminalTarget);
+            }
         }
 
         private void NextTarget() => SwitchTarget(currentIndex + 1);

@@ -2,6 +2,7 @@ using Player.Movement;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using Enemy;
 
 namespace Player.Equipment.Taser
 {
@@ -20,6 +21,7 @@ namespace Player.Equipment.Taser
         [SerializeField] private TMP_Text danger;
         [SerializeField] private AudioSource sound;
         [SerializeField] private ParticleSystem particle;
+        [SerializeField] private SoundProducer soundProducer;
 
         public readonly NetworkVariable<int> chargePercent = new(
             100,
@@ -98,6 +100,7 @@ namespace Player.Equipment.Taser
         private void HitEntityServerRpc(NetworkObjectReference targetRef, RpcParams rpcParams = default)
         {
             if (chargePercent.Value < shotCost) return;
+            soundProducer?.EmitSoundServerRpc();
 
             if (targetRef.TryGet(out NetworkObject targetNetObj) &&
                 targetNetObj.TryGetComponent<Entity>(out var entity))
@@ -124,6 +127,7 @@ namespace Player.Equipment.Taser
         private void MissServerRpc(RpcParams rpcParams = default)
         {
             if (chargePercent.Value < shotCost) return;
+            soundProducer?.EmitSoundServerRpc();
 
             ((IChargeable)this).ModifyCharge(-shotCost);
 

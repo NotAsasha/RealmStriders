@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 6704006022247996588}
   - component: {fileID: 7416074145442448591}
   - component: {fileID: 6435529080706665426}
+  - component: {fileID: 900000000000000002}
   m_Layer: 6
   m_Name: WalkieTalkie
   m_TagString: Untagged
@@ -207,8 +208,8 @@ MonoBehaviour:
   speakerSource: {fileID: 5737772644998410239}
   turnOnClip: {fileID: 8300000, guid: 387fb346b74d73d439abc062514729d3, type: 3}
   turnOffClip: {fileID: 0}
+  soundProducer: {fileID: 900000000000000002}
   indicatorRenderer: {fileID: 5178603964109303888}
-  indicatorMaterialIndex: 1
 --- !u!82 &5737772644998410239
 AudioSource:
   m_ObjectHideFlags: 0
@@ -350,6 +351,28 @@ AudioDistortionFilter:
   m_GameObject: {fileID: 800438960164502356}
   m_Enabled: 1
   m_DistortionLevel: 0.2
+--- !u!114 &900000000000000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 800438960164502356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 964159904b634dd418799dd0762f718a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.SoundProducer
+  ShowTopMostFoldoutHeaderGroup: 1
+  soundEmitor: {fileID: 2433609159755514743}
+  soundRadius: 20
+  continuousNoiseInterval: 0.35
+  refreshedNoiseTimeout: 0.5
+  entityLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  source: {fileID: 5737772644998410239}
+  clip: []
 --- !u!1001 &5220480672885709801
 PrefabInstance:
   m_ObjectHideFlags: 0

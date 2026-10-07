@@ -11,6 +11,7 @@ namespace Player.Equipment.LeafBlower
     [RequireComponent(typeof(EntityDetector))]
     public class LeafBlower : Item, IChargeable
     {
+        [SerializeField] private SoundProducer soundProducer;
         [SerializeField] private ParticleSystem particle;
         [SerializeField] private float baseCaptureTime = 2.0f;
         [SerializeField] private float starTimeMultiplier = 1.75f;
@@ -51,6 +52,7 @@ namespace Player.Equipment.LeafBlower
         private void Start()
         {
             detector = GetComponent<EntityDetector>();
+            if (soundProducer == null) soundProducer = GetComponent<SoundProducer>();
             if (audioSource != null)
             {
                 basePitch = audioSource.pitch;
@@ -98,6 +100,12 @@ namespace Player.Equipment.LeafBlower
 
         private void SwitchState(bool oldV, bool newV)
         {
+            if (soundProducer != null)
+            {
+                if (newV) soundProducer.StartContinuousNoise();
+                else soundProducer.StopContinuousNoise();
+            }
+
             if (particle != null && newV)
             {
                 particle.Play();

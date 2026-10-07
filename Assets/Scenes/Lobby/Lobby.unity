@@ -4262,7 +4262,7 @@ PrefabInstance:
     - target: {fileID: 7678481956299105857, guid: e6c0a4f410f490144ac8512b4d836c4a,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 54
+      value: 87
       objectReference: {fileID: 0}
     - target: {fileID: 7993533973759362802, guid: e6c0a4f410f490144ac8512b4d836c4a,
         type: 3}
@@ -4322,7 +4322,7 @@ PrefabInstance:
     - target: {fileID: 8494507264682673876, guid: e6c0a4f410f490144ac8512b4d836c4a,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.8999996
+      value: 1.57
       objectReference: {fileID: 0}
     - target: {fileID: 8494507264682673876, guid: e6c0a4f410f490144ac8512b4d836c4a,
         type: 3}
@@ -5337,6 +5337,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5396805485059762867, guid: 97cc25990a314734db8b6f0d37af1a96,
+        type: 3}
+      propertyPath: terminalCanvas
+      value: 
+      objectReference: {fileID: 661398137}
     - target: {fileID: 5646094269431947940, guid: 97cc25990a314734db8b6f0d37af1a96,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -5651,6 +5656,12 @@ PrefabInstance:
 --- !u!4 &661398136 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5224805091327604296, guid: 97cc25990a314734db8b6f0d37af1a96,
+    type: 3}
+  m_PrefabInstance: {fileID: 661398135}
+  m_PrefabAsset: {fileID: 0}
+--- !u!223 &661398137 stripped
+Canvas:
+  m_CorrespondingSourceObject: {fileID: 3013050711042986232, guid: 97cc25990a314734db8b6f0d37af1a96,
     type: 3}
   m_PrefabInstance: {fileID: 661398135}
   m_PrefabAsset: {fileID: 0}
@@ -5999,6 +6010,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   soundEmitor: {fileID: 718112514}
   soundRadius: 55
+  continuousNoiseInterval: 0.35
+  refreshedNoiseTimeout: 0.5
   entityLayer:
     serializedVersion: 2
     m_Bits: 128

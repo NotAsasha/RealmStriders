@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using Enemy;
 
 namespace Player.Equipment.Flashbang
 {
@@ -9,6 +10,7 @@ namespace Player.Equipment.Flashbang
         [SerializeField] LayerMask entityLayer;
         [SerializeField] ParticleSystem emit;
         [SerializeField] AudioSource audioS;
+        [SerializeField] SoundProducer soundProducer;
         protected override void ExecuteItemAction(GameObject player)
         {
             Debug.Log("---Landmine: Used!");
@@ -18,6 +20,8 @@ namespace Player.Equipment.Flashbang
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void ExplodeServerRpc()
         {
+            soundProducer?.EmitSoundServerRpc();
+
             Collider[] hits = Physics.OverlapSphere(transform.position, effectRadius, entityLayer, QueryTriggerInteraction.Collide);
             foreach (Collider collider in hits)
             {

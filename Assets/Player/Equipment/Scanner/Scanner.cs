@@ -13,6 +13,13 @@ namespace Player.Equipment.Scanner
         [SerializeField] TMP_Text danger;
         [SerializeField] Image freezeIcon;
         [SerializeField] Image waterIcon;
+        [SerializeField] Transform arrow;
+        [SerializeField] private Renderer indicatorRenderer;
+
+        [Header("Arrow rotation")]
+        [SerializeField] private float minimumHealthRotationX = -75f;
+        [SerializeField] private float maximumHealthRotationX = 75f;
+        [SerializeField, UnityEngine.Min(0.01f)] private float rotationSmoothTime = 0.2f;
 
 
         [SerializeField] AudioClip toggleSound;
@@ -23,12 +30,34 @@ namespace Player.Equipment.Scanner
 
         EntityDetector detector;
         private float basePitch = 1f;
+        private float initialArrowRotationY;
+        private float initialArrowRotationZ;
+        private float targetArrowRotationX;
+        private float currentArrowRotationX;
+        private float arrowRotationVelocity;
+        private Color defaultIndicatorColor = Color.white;
+
         private void Start()
         {
             detector = GetComponent<EntityDetector>();
             basePitch = audioSource.pitch;
-            
+
+            if (indicatorRenderer != null && indicatorRenderer.material.HasProperty("_Color"))
+            {
+                defaultIndicatorColor = indicatorRenderer.material.color;
+            }
+
+            if (arrow != null)
+            {
+                Vector3 initialRotation = arrow.localEulerAngles;
+                initialArrowRotationY = initialRotation.y;
+                initialArrowRotationZ = initialRotation.z;
+                currentArrowRotationX = Mathf.DeltaAngle(0f, initialRotation.x);
+                targetArrowRotationX = currentArrowRotationX;
+            }
+
             isOn.OnValueChanged += SwitchState;
+            SetIndicatorColor(isOn.Value);
         }
 
         #region Item Specific Functionality
@@ -46,16 +75,32 @@ namespace Player.Equipment.Scanner
 
         private void SwitchState(bool oldV, bool newV)
         {
-            if (!newV) danger.text = " ";
+            SetIndicatorColor(newV);
+
+            if (!newV)
+            {
+                danger.text = " ";
+                SetArrowRotation(0f);
+            }
+
             audioSource.pitch = basePitch;
             audioSource.PlayOneShot(toggleSound);
             audioSource.clip = scanSound;
+        }
+
+        private void SetIndicatorColor(bool isScannerOn)
+        {
+            if (indicatorRenderer == null || !indicatorRenderer.material.HasProperty("_Color")) return;
+
+            indicatorRenderer.material.color = isScannerOn ? defaultIndicatorColor : Color.black;
         }
 
         float cooldown = 1f;
         float currTime = 0f;
         private void Update()
         {
+            UpdateArrowRotation();
+
             if (!isOn.Value) return;
 
             //peep once per second
@@ -68,7 +113,9 @@ namespace Player.Equipment.Scanner
             {
                 Entity entity = entityObj.GetComponent<Entity>();
 
-                danger.text = entity.GetHealth().ToString();
+                float activeHealth = entity.GetHealth();
+                danger.text = activeHealth.ToString();
+                SetArrowRotation(activeHealth);
                 freezeIcon.color = entity.IsEffectActive(EffectType.Freeze) ? Color.white : Color.black;
                 waterIcon.color = entity.IsEffectActive(EffectType.Water) ? Color.white : Color.black;
 
@@ -81,6 +128,7 @@ namespace Player.Equipment.Scanner
                 freezeIcon.color = Color.black;
                 waterIcon.color = Color.black;
                 danger.text = "Not Found";
+                SetArrowRotation(0f);
 
                 audioSource.pitch = basePitch;
                 cooldown = 1f;
@@ -91,6 +139,33 @@ namespace Player.Equipment.Scanner
             // - Sound effects --- DONE
             // - Physics interactions with enemies --- DONE
             // - Cooldown mechanics --- DONE
+        }
+
+        private void SetArrowRotation(float activeHealth)
+        {
+            if (arrow == null) return;
+
+            float normalizedHealth = Mathf.InverseLerp(0f, 5f, Mathf.Clamp(activeHealth, 0f, 5f));
+            targetArrowRotationX = Mathf.Lerp(
+                minimumHealthRotationX,
+                maximumHealthRotationX,
+                normalizedHealth);
+        }
+
+        private void UpdateArrowRotation()
+        {
+            if (arrow == null) return;
+
+            currentArrowRotationX = Mathf.SmoothDamp(
+                currentArrowRotationX,
+                targetArrowRotationX,
+                ref arrowRotationVelocity,
+                rotationSmoothTime);
+
+            arrow.localRotation = Quaternion.Euler(
+                currentArrowRotationX,
+                initialArrowRotationY,
+                initialArrowRotationZ);
         }
 
         #endregion

@@ -300,9 +300,10 @@ namespace Enemy
             return (player != null);
         }
 
-        public void Lure(Vector3 coords)
+        public virtual void Lure(Vector3 coords)
         {
-            if (!IsServer || enemyState < EnemyState.IsChasingSound || agent == null || !agent.isOnNavMesh) return;
+            if (!IsServer || IsEffectActive(EffectType.Asleep) || enemyState < EnemyState.IsChasingSound ||
+                agent == null || !agent.isOnNavMesh) return;
             if (agent.SetDestination(coords))
             {
                 enemyState = EnemyState.IsChasingSound;

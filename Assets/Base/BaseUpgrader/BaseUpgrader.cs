@@ -3,7 +3,7 @@ using Base.BaseUpgrader;
 using Unity.Netcode;
 using UnityEngine;
 
-public class BaseUpgrader : Terminal
+public class BaseUpgrader : NetworkBehaviour
 {
     [Header("Prices")]
     [SerializeField] private int terminalPrice = 200;

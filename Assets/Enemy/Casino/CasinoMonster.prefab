@@ -36972,6 +36972,11 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  currentInteractingClientId:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 18446744073709551615
   spinCost: 10
   spinLength: 1.5
   fullSpins: 5
@@ -38730,6 +38735,7 @@ GameObject:
   - component: {fileID: 6201046140839225868}
   - component: {fileID: 3436696204227681505}
   - component: {fileID: 1260547947693396776}
+  - component: {fileID: 5394576420641348537}
   m_Layer: 7
   m_Name: CasinoMonster
   m_TagString: Untagged
@@ -38907,6 +38913,7 @@ MonoBehaviour:
   eyeLocalPosition: {x: 0, y: 1, z: 0}
   viewDistance: 20
   viewAngle: 60
+  verticalPadding: 1.5
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -38928,6 +38935,9 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   dangerLevel: 4
   glassCage: {fileID: 0}
+  captureSequenceDuration: 0.85
+  captureLift: 1.1
+  captureTransformation: {fileID: 0}
   isDead:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -38942,12 +38952,20 @@ MonoBehaviour:
   overAggresive: 0
   moveRange: 20
   defaultSpeed: 5
+  chaseSpeed: 8
   thinkCooldown: 0.3
   stepSoundCooldown: 0.3
+  chaseStepSoundCooldown: 0.18
+  stepSoundRadius: 15
   audioSource: {fileID: 3436696204227681505}
   stepSounds:
   - {fileID: 8300000, guid: f7edd5e48f06930479754aae5604cae0, type: 3}
   - {fileID: 8300000, guid: 0f71390005e531348acbee6dc8f7d2b5, type: 3}
+  netEnemyState:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 3
   isStatic: 0
   legSpacing: 3
   legRotation: 48.3
@@ -39103,11 +39121,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CasinoSounds
   enemy: {fileID: 7170836212076919080}
-  idleSounds: []
-  angrySounds: []
-  deathSound: {fileID: 0}
-  jumpscareSound: {fileID: 0}
+  idleSounds:
+  - {fileID: 8300000, guid: 04e6fb453e97b35408d903261894124f, type: 3}
+  angrySounds:
+  - {fileID: 8300000, guid: 03f1e99b15c4b914fb3ec7a8dd5a61ed, type: 3}
+  deathSound: {fileID: 8300000, guid: 03f1e99b15c4b914fb3ec7a8dd5a61ed, type: 3}
+  jumpscareSound: {fileID: 8300000, guid: 03f1e99b15c4b914fb3ec7a8dd5a61ed, type: 3}
+  idleRadius: 15
+  angryRadius: 25
+  deathRadius: 30
+  jumpscareRadius: 40
   spawnSound: {fileID: 8300000, guid: 1b0e42f6b0a9fd04dbd2f78e98b59cda, type: 3}
+  spawnRadius: 25
+--- !u!114 &5394576420641348537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5882143472327072591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bc76b87c7e048d8a987734b04a71ed6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.CaptureTransformationController
+  modelRenderers:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  implosionMaterialTemplate: {fileID: 2100000, guid: 698883ec95c8dcc48984f516a86de42c,
+    type: 2}
+  vacuumLoop: {fileID: 8300000, guid: accc014927a8edb42b182f2167ec0736, type: 3}
+  implosionPop: {fileID: 8300000, guid: 7f4dc8c1301992642b1a31ac4f235213, type: 3}
+  effectRadius: 3
+  vacuumVolume: 2
+  energyColor: {r: 1, g: 0.19999999, b: 0.23132361, a: 1}
 --- !u!1 &6060197765344482691
 GameObject:
   m_ObjectHideFlags: 0

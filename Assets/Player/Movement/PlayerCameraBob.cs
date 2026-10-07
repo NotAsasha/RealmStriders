@@ -111,6 +111,11 @@ namespace Player.Movement
         private void LateUpdate()
         {
             if (bobPivot == null || characterController == null) return;
+            if (_movement != null && _movement.human != null && _movement.human.isDead.Value)
+            {
+                ReturnToNeutral();
+                return;
+            }
 
             // ── Horizontal speed (ignores vertical velocity for air phases) ──
             Vector3 vel       = characterController.velocity;

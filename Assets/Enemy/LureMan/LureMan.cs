@@ -24,6 +24,7 @@ namespace Enemy.LureMan
         [SerializeField] private string jumpTriggerName = "Jump";
 
         private bool isAwakened;
+        private bool isWakingUp;
 
         protected override void Start()
         {
@@ -67,9 +68,13 @@ namespace Enemy.LureMan
 
         protected override void Think()
         {
-            if (!isAwakened)
+            if (!isAwakened || isWakingUp)
             {
-                CheckForNearbyPlayers();
+                if (!isAwakened)
+                {
+                    CheckForNearbyPlayers();
+                }
+
                 return;
             }
 
@@ -82,6 +87,12 @@ namespace Enemy.LureMan
 
             // second priority, search for player
             if (ChasePlayer(overAggresive)) return;
+        }
+
+        public override void Lure(Vector3 coords)
+        {
+            AwakenServer();
+            base.Lure(coords);
         }
 
         private void CheckForNearbyPlayers()
@@ -99,8 +110,15 @@ namespace Enemy.LureMan
 
         private void AwakenServer()
         {
-            if (isAwakened) return;
+            if (isAwakened || isWakingUp) return;
             isAwakened = true;
+            isWakingUp = true;
+
+            if (agent != null && agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+                agent.isStopped = true;
+            }
 
             WakeUpClientRpc();
             StartCoroutine(WakeUpSequence());
@@ -137,6 +155,12 @@ namespace Enemy.LureMan
 
             if (IsServer)
             {
+                isWakingUp = false;
+                if (agent != null)
+                {
+                    agent.isStopped = false;
+                }
+
                 effects[EffectType.Asleep].Value = false;
                 effects[EffectType.Invincible].Value = false;
 
