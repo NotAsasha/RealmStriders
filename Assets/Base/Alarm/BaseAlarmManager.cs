@@ -145,7 +145,15 @@ namespace Base.Alarm
             {
                 yield return wait;
 
-                if (!isAlarmActive.Value && HasActiveIntruderInBase())
+                bool hasIntruder = HasActiveIntruderInBase();
+                if (isAlarmActive.Value)
+                {
+                    if (!hasIntruder)
+                    {
+                        CancelAlarm();
+                    }
+                }
+                else if (hasIntruder)
                 {
                     TriggerAlarm();
                 }
@@ -224,13 +232,13 @@ namespace Base.Alarm
             float radius = GameManager.Instance.baseRadius;
             Vector3 center = GameManager.Instance.spawnPoint;
 
-            // Use OverlapSphere to find ALL enemies in the base radius — including static scene
-            // enemies (e.g. CasinoMonster) that are never registered in activeEnemies.
+            // Use OverlapSphere to find active enemies in the base radius — including static
+            // scene enemies (e.g. an awake CasinoMonster) that are not in activeEnemies.
             int count = Physics.OverlapSphereNonAlloc(center, radius, _overlapBuffer);
             for (int i = 0; i < count; i++)
             {
                 var enemy = _overlapBuffer[i].GetComponentInParent<Enemy.Enemy>();
-                if (enemy == null || enemy.isDead.Value) continue;
+                if (!IsActiveIntruder(enemy)) continue;
                 enemy.isDead.Value = true;
             }
 

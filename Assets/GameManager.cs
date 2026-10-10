@@ -14,7 +14,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
 {
-    public Vector3 spawnPoint = new(0f, -49f, 0f);
+    public Vector3 spawnPoint = new(0f, -48f, 0f);
     public float baseRadius = 20f;
     public int defaultMissionTime = 360;
     public int maxTimeSpread = 120;
@@ -58,8 +58,6 @@ public class GameManager : NetworkBehaviour
         //Decrease timer every second
         InvokeRepeating(nameof(Radiation), 0f, 1f);
 
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = 144;
         spawner = GetComponent<EnemySpawner>();
     }
 
@@ -199,6 +197,7 @@ public class GameManager : NetworkBehaviour
         }
 
         DestroyOutOfRangeItems();
+        PreserveItemsBroughtToBase();
 
         //unload world
         UnloadWorld();
@@ -314,10 +313,13 @@ public class GameManager : NetworkBehaviour
 
             // local primary scene
             SceneManager.SetActiveScene(loadedScene);
-
-            // update skybox
-            DynamicGI.UpdateEnvironment();
+            UpdateLocalSceneRpc();
         }
+    }
+
+    [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
+    private void UpdateLocalSceneRpc() {
+        DynamicGI.UpdateEnvironment();
     }
 
     private void KillEnemies()
@@ -347,9 +349,83 @@ public class GameManager : NetworkBehaviour
 
         foreach (var item in toDelete)
         {
-            item.Despawn();
+            item.Despawn(true);
         }
     }
+
+    private void PreserveItemsBroughtToBase()
+    {
+        if (missionScene.IsValid() == false) return;
+
+        Scene baseScene = SceneManager.GetSceneByName("Lobby");
+        if (baseScene.IsValid() == false)
+        {
+            Debug.LogError("---MissionManager: Cannot preserve mission items because the base scene is not loaded.");
+            return;
+        }
+
+        var missionItemsInBase = NetworkItemsHandler.Instance.activeSaveables
+            .Where(item => item != null
+                && item.IsSpawned
+                && item.IsSceneObject == true
+                && item.gameObject.scene == missionScene
+                && IsWithinBaseRange(item.transform.position))
+            .ToList();
+
+        foreach (var item in missionItemsInBase)
+        {
+            NetworkObject parentNetworkObject = item.transform.parent?.GetComponentInParent<NetworkObject>();
+            NetworkObjectReference parentReference = parentNetworkObject != null
+                ? new NetworkObjectReference(parentNetworkObject)
+                : default;
+
+            item.TryRemoveParent();
+            item.SetSceneObjectStatus(false);
+            item.DestroyWithScene = false;
+            SceneManager.MoveGameObjectToScene(item.gameObject, baseScene);
+
+            if (parentNetworkObject != null)
+            {
+                item.TrySetParent(parentNetworkObject);
+            }
+
+            PreserveItemClientRpc(new NetworkObjectReference(item), parentReference);
+        }
+    }
+
+    [ClientRpc]
+    private void PreserveItemClientRpc(NetworkObjectReference itemReference, NetworkObjectReference parentReference)
+    {
+        if (IsServer || !itemReference.TryGet(out NetworkObject item)) return;
+
+        NetworkObject parentNetworkObject = null;
+        if (parentReference.TryGet(out var resolvedParent))
+        {
+            parentNetworkObject = resolvedParent;
+        }
+
+        item.TryRemoveParent();
+        item.SetSceneObjectStatus(false);
+        item.DestroyWithScene = false;
+
+        Scene baseScene = SceneManager.GetSceneByName("Lobby");
+        if (baseScene.IsValid())
+        {
+            SceneManager.MoveGameObjectToScene(item.gameObject, baseScene);
+        }
+
+        if (parentNetworkObject != null)
+        {
+            item.TrySetParent(parentNetworkObject);
+        }
+    }
+
+    private bool IsWithinBaseRange(Vector3 position)
+    {
+        Vector3 offset = position - spawnPoint;
+        return offset.sqrMagnitude <= baseRadius * baseRadius;
+    }
+
     public void UnloadWorld()
     {
         if (currentSceneName == null)

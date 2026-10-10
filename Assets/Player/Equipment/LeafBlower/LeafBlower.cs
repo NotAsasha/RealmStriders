@@ -16,6 +16,8 @@ namespace Player.Equipment.LeafBlower
         [SerializeField] private float baseCaptureTime = 2.0f;
         [SerializeField] private float starTimeMultiplier = 1.75f;
         [SerializeField] private float validationInterval = 0.5f;
+        [SerializeField, Min(0f)] private float lostTargetGracePeriod = 1f;
+        [SerializeField, Range(0f, 1f)] private float lostTargetProgressPenalty = 0.2f;
         [SerializeField] private float capturePitchIncrease = 0.35f;
         [SerializeField] private Slider captureSlider;
         [SerializeField] private AudioClip captureLoopSound;
@@ -41,6 +43,7 @@ namespace Player.Equipment.LeafBlower
         float currentHoldTime;
         float currentRequiredHoldTime;
         float validationTimer;
+        float lostTargetTimer;
         float basePitch = 1f;
         float baseEmissionRate;
         bool targetIsValid;
@@ -130,6 +133,12 @@ namespace Player.Equipment.LeafBlower
             if (!IsServer || !isOn.Value) return;
 
             currentHoldTime += targetIsValid ? Time.deltaTime : 0f;
+            if (!targetIsValid && currentTarget != null)
+            {
+                lostTargetTimer += Time.deltaTime;
+                ApplyLostTargetPenalty();
+            }
+
             validationTimer += Time.deltaTime;
             DrainCharge();
 
@@ -180,7 +189,15 @@ namespace Player.Equipment.LeafBlower
 
             if (detectedTarget == null || detectedTarget.isDead.Value)
             {
-                ResetCaptureProgress();
+                if (currentTarget == null || currentTarget.isDead.Value)
+                {
+                    ResetCaptureProgress();
+                }
+                else
+                {
+                    targetIsValid = false;
+                }
+
                 return;
             }
 
@@ -190,6 +207,7 @@ namespace Player.Equipment.LeafBlower
             }
 
             currentTarget = detectedTarget;
+            lostTargetTimer = 0f;
             // Recalculate every tick so weakness stacks (Subwoofer/Beam/Landmine/Taser+Water) are reflected mid-capture.
             currentRequiredHoldTime = CalculateRequiredHoldTime(detectedTarget);
             targetIsValid = true;
@@ -211,9 +229,23 @@ namespace Player.Equipment.LeafBlower
             currentHoldTime = 0f;
             currentRequiredHoldTime = 0f;
             validationTimer = 0f;
+            lostTargetTimer = 0f;
             targetIsValid = false;
 
             if (IsServer) CaptureProgressNormalized.Value = 0f;
+        }
+
+        private void ApplyLostTargetPenalty()
+        {
+            if (lostTargetGracePeriod <= 0f || lostTargetProgressPenalty <= 0f) return;
+
+            while (lostTargetTimer >= lostTargetGracePeriod)
+            {
+                lostTargetTimer -= lostTargetGracePeriod;
+                currentHoldTime = Mathf.Max(
+                    0f,
+                    currentHoldTime - currentRequiredHoldTime * lostTargetProgressPenalty);
+            }
         }
 
         private void UpdateFeedback()

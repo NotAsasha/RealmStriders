@@ -100,7 +100,15 @@ namespace Base.Shop
             }
 
             var blowers = FindObjectsByType<Player.Equipment.LeafBlower.LeafBlower>(FindObjectsSortMode.None);
-            return blowers != null && blowers.Length > 0;
+            foreach (var blower in blowers)
+            {
+                if (blower != null && blower.NetworkObject != null && blower.NetworkObject.IsSpawned)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void SpawnFreeItem(string name)
@@ -118,5 +126,6 @@ namespace Base.Shop
             card.itemPrefab.InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, spawnPosition);
             Debug.Log($"---Shop: Emergency free item spawned: {name}");
         }
+
     }
 }

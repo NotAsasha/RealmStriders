@@ -98,9 +98,13 @@ namespace Player.Equipment
                 itemNetworkTransform.enabled = false;
             }
 
-            if (inventory.HandAnchor != null)
+            if (inventory != null)
             {
-                inventory.ApplyParentConstraint(gameObject, inventory.HandAnchor);
+                inventory.ApplyParentConstraint(gameObject);
+                if (inventory.IsOwner)
+                {
+                    inventory.ItemHolder?.SetActiveItem(this);
+                }
             }
         }
 
@@ -275,6 +279,15 @@ namespace Player.Equipment
             {
                 NetworkObject.Despawn(true);
             }
+        }
+
+        public void ReturnToSpawnServer(Vector3 position)
+        {
+            if (!IsServer || isCurrentlyHeld || itemRigidbody == null) return;
+
+            itemRigidbody.linearVelocity = Vector3.zero;
+            itemRigidbody.angularVelocity = Vector3.zero;
+            transform.SetPositionAndRotation(position, Quaternion.identity);
         }
 
         #endregion

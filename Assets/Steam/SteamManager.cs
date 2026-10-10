@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Steam
 {
@@ -18,6 +19,9 @@ namespace Steam
         public List<Lobby> Lobbies { get; private set; } = new(100);
 
         private FacepunchTransport cachedTransport;
+        private bool clientConnectedToHost;
+        private string notificationMessage;
+        private float notificationExpiresAt;
 
         private FacepunchTransport Transport
         {
@@ -140,6 +144,7 @@ namespace Steam
             UnsubscribeNetworkEvents();
             NetworkManager.Singleton.OnClientConnectedCallback += ClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnected;
+            clientConnectedToHost = false;
 
             // Приведення SteamId до ulong для сумісності з FacepunchTransport
             Transport.targetSteamId = (ulong)hostSteamId;
@@ -155,6 +160,7 @@ namespace Steam
         public void Disconnect()
         {
             Debug.Log("[SteamManager] Leaving current lobby and stopping network.");
+            clientConnectedToHost = false;
             CurrentLobby?.Leave();
             CurrentLobby = null;
 
@@ -292,12 +298,20 @@ namespace Steam
         private void ClientConnected(ulong clientId)
         {
             Debug.Log($"[SteamManager] Local client connected to server! ClientId: {clientId}");
+            clientConnectedToHost = true;
         }
 
         private void ClientDisconnected(ulong clientId)
         {
             Debug.LogWarning($"[SteamManager] Local client disconnected! ClientId: {clientId}");
+            bool lostHost = clientConnectedToHost;
+            clientConnectedToHost = false;
             UnsubscribeNetworkEvents();
+
+            if (lostHost)
+            {
+                HandleHostLeft();
+            }
         }
 
         private void OnServerStarted()
@@ -316,5 +330,44 @@ namespace Steam
         }
 
         #endregion
+
+        private void HandleHostLeft()
+        {
+            const string message = "host left the game";
+            Debug.LogWarning(message);
+            ShowNotification(message);
+
+            Disconnect();
+            SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);
+        }
+
+        private void ShowNotification(string message)
+        {
+            notificationMessage = message;
+            notificationExpiresAt = Time.unscaledTime + 5f;
+        }
+
+        private void OnGUI()
+        {
+            if (string.IsNullOrEmpty(notificationMessage) || Time.unscaledTime > notificationExpiresAt)
+            {
+                return;
+            }
+
+            const float width = 420f;
+            const float height = 60f;
+            Rect notificationRect = new(
+                (Screen.width - width) / 2f,
+                Screen.height * 0.15f,
+                width,
+                height);
+
+            GUI.Box(notificationRect, GUIContent.none);
+            GUI.Label(notificationRect, notificationMessage, new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 20
+            });
+        }
     }
 }

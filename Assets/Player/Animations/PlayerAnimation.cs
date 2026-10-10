@@ -85,8 +85,8 @@ namespace Player
         {
             if (animator == null) return;
 
-            float targetAnimationSpeed = netSpeed.Value * speedModifier;
-            animator.speed = Mathf.Lerp(animator.speed, targetAnimationSpeed, Time.deltaTime * 15f);
+            float targetAnimationSpeed = Mathf.Max(0f, netSpeed.Value * speedModifier);
+            animator.speed = Mathf.Max(0f, Mathf.Lerp(animator.speed, targetAnimationSpeed, Time.deltaTime * 15f));
         }
 
         #region Item Rig Weight Lerping
@@ -103,24 +103,28 @@ namespace Player
 
         private void ApplyHandWeight(bool isHolding)
         {
-            float targetWeight = isHolding ? 1f : 0f;
+            float targetRigWeight = isHolding ? 1f : 0f;
 
             if (weightLerpCoroutine != null)
             {
                 StopCoroutine(weightLerpCoroutine);
             }
-            weightLerpCoroutine = StartCoroutine(AnimateRigWeightCoroutine(targetWeight));
+            weightLerpCoroutine = StartCoroutine(AnimateRigWeightCoroutine(targetRigWeight));
         }
 
-        private IEnumerator AnimateRigWeightCoroutine(float targetWeight)
+        private IEnumerator AnimateRigWeightCoroutine(float targetRigWeight)
         {
-            while (!Mathf.Approximately(handWeight.weight, targetWeight))
+            float currentRigWeight = handWeight != null ? handWeight.weight : 0f;
+
+            while (handWeight != null && Mathf.Abs(currentRigWeight - targetRigWeight) > 0.001f)
             {
-                handWeight.weight = Mathf.Lerp(handWeight.weight, targetWeight, Time.deltaTime * handAnimationSpeed);
+                float dt = Time.deltaTime * handAnimationSpeed;
+                currentRigWeight = Mathf.Lerp(currentRigWeight, targetRigWeight, dt);
+                handWeight.weight = currentRigWeight;
                 yield return null;
             }
 
-            handWeight.weight = targetWeight;
+            if (handWeight != null) handWeight.weight = targetRigWeight;
             weightLerpCoroutine = null;
         }
 

@@ -33,9 +33,10 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4371358256800068125}
   - {fileID: 4221738394937737970}
   - {fileID: 2797978076554083941}
   m_Father: {fileID: 0}
@@ -59,8 +60,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 2, z: 4.5}
-  m_Center: {x: 0, y: 0, z: 0.35}
+  m_Size: {x: 0.125, y: 0.25, z: 0.545}
+  m_Center: {x: 0, y: 0, z: 0.045}
 --- !u!54 &3467916412403249122
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -69,7 +70,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1027748834022641332}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 10
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -192,6 +193,9 @@ MonoBehaviour:
   isConsumable: 0
   sellPrice: 10
   clickSounds: []
+  gripPoint: {fileID: 4371358256800068125}
+  gripPositionOffset: {x: 0, y: 0, z: 0}
+  gripRotationOffset: {x: 0, y: 0, z: 0}
   prefabId: 6
   isCurrentlyHeld: 0
   effectTime: 5
@@ -208,15 +212,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21fe3cdabba635b4e9826381049b971d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy.EntityDetector
-  eyeLocalPosition: {x: 0, y: 0, z: 0}
+  eyeLocalPosition: {x: 0, y: 0.0425, z: 0.325}
   viewDistance: 20
-  viewAngle: 60
+  viewAngle: 30
+  verticalPadding: 1.5
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
   wallLayer:
     serializedVersion: 2
-    m_Bits: 65
+    m_Bits: 1
+--- !u!1 &3434588669315251455
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4371358256800068125}
+  m_Layer: 6
+  m_Name: GripPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4371358256800068125
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3434588669315251455}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.075, z: -0.063}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 631498996800677750}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6722913279849283884
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,7 +264,7 @@ GameObject:
   - component: {fileID: 2797978076554083941}
   - component: {fileID: 5121519851595716548}
   - component: {fileID: 970887999150881697}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Particle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -244,7 +280,7 @@ Transform:
   m_GameObject: {fileID: 6722913279849283884}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.318, z: 2.53}
+  m_LocalPosition: {x: 0, y: 0.036, z: 0.317}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -333,7 +369,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 0.6
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -386,7 +422,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 7.5
+      scalar: 30
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -1087,7 +1123,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 20
+      scalar: 50
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -5064,17 +5100,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 446a5492c4a33464eadd316a7cae1655,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 2
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 446a5492c4a33464eadd316a7cae1655,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 446a5492c4a33464eadd316a7cae1655,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 2
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 446a5492c4a33464eadd316a7cae1655,
         type: 3}
@@ -5126,10 +5162,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: 446a5492c4a33464eadd316a7cae1655,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -5568371526223589888, guid: 446a5492c4a33464eadd316a7cae1655,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -5117700066308340382, guid: 446a5492c4a33464eadd316a7cae1655,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 446a5492c4a33464eadd316a7cae1655,
         type: 3}
       propertyPath: m_Name
       value: WaterGun
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 446a5492c4a33464eadd316a7cae1655,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

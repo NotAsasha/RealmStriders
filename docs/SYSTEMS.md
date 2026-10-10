@@ -12,7 +12,7 @@ the implementation.
 | Player | `Assets/Player/` | Player entity, movement, four-slot inventory, equipment, UI, voice |
 | Enemies | `Assets/Enemy/` | Shared enemy behaviour, spawning, detection, and monster-specific logic |
 | Base | `Assets/Base/` | Shop, upgrades, power, portals, radar, selling, and base interactions |
-| Persistence | `Assets/FileSystem/` | Save files and load/delete operations |
+| Persistence | `Assets/FileSystem/` | Save files and load/delete operations, including local settings |
 | Steam/network bootstrap | `Assets/Steam/`, `Assets/Plugins/Facepunch/` | Steam startup, lobbies, transport, and network setup |
 | Scenes | `Assets/Scenes/` | Menu, base, mission, end, and world scene assets |
 | Shared effects | `Assets/Resources/`, `Assets/Scripts/`, `Assets/Shaders/` | Reusable presentation and rendering effects |
@@ -28,10 +28,21 @@ operations. In particular:
 - Network scene loading is initiated by the server.
 - Persistent save behaviour is handled by the file-system classes and should
   not be duplicated inside gameplay components.
+- `SettingsFile` owns local settings such as input bindings, mouse sensitivity,
+  and master volume. Master volume is applied through `AudioListener.volume`,
+  so it affects every `AudioSource` in the active scene.
+- Graphics settings are also local and are applied through Unity's
+  `QualitySettings`, `Screen.SetResolution`, `Screen.fullScreenMode`,
+  VSync, frame-rate, and shadow-quality APIs. Post-processing is intentionally
+  not toggled yet; its control can be added without changing the save boundary.
 - The host owns the save file; automatic saves happen after mission
   completion, while manual saves are allowed only outside active missions.
 - Mission-zone objects are transient; objects left outside the base are
   destroyed when the mission ends, while objects brought into the base remain.
+- Items that fall below the lobby are caught by an independent return zone and
+  restored to the shop tube's configured spawn point on the server.
+- Mission scene objects brought into the base are promoted to runtime network
+  objects before the mission scene is unloaded, so they survive scene cleanup.
 
 When adding a networked feature, identify its authoritative owner before
 adding a `NetworkVariable`, RPC, or local cache.

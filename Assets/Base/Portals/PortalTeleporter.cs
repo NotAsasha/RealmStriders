@@ -1,4 +1,5 @@
 using Player;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -6,6 +7,9 @@ namespace Portals
 {
     public class PortalTeleporter : MonoBehaviour
     {
+        private const float EnemyTeleportCooldown = 1f;
+        private static readonly Dictionary<Enemy.Enemy, float> EnemyTeleportCooldowns = new();
+
         public Transform receiver;
         public Transform enemyReceiver;
 
@@ -68,6 +72,15 @@ namespace Portals
                 if (PortalManager.Instance.IsMonsterPassBlockedServer) return;
 
                 Enemy.Enemy enemy = other.GetComponentInParent<Enemy.Enemy>();
+                if (EnemyTeleportCooldowns.TryGetValue(enemy, out float cooldownUntil))
+                {
+                    if (Time.time < cooldownUntil) return;
+
+                    EnemyTeleportCooldowns.Remove(enemy);
+                }
+
+                EnemyTeleportCooldowns[enemy] = Time.time + EnemyTeleportCooldown;
+
                 NavMeshAgent nma = enemy.GetComponent<NavMeshAgent>();
                 if (nma != null) nma.enabled = false;
                 enemy.transform.position = enemyReceiver.position;

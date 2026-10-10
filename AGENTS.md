@@ -42,6 +42,35 @@
 - **No Hallucinated Tools**: Do not attempt to invoke non-standard execution tools or visual screenshot APIs unless an active Unity MCP server is explicitly loaded.
 - **Verification**: Ensure all generated C# code has correct namespace imports and passes type safety checks before concluding tasks.
 
+## Unity Editor Tooling
+
+When a task involves Unity Editor state or Unity-serialized data, use the
+configured Unity MCP server first. This includes scenes, prefab contents,
+GameObjects, components, serialized fields, AnimatorControllers, import
+settings, Build Settings, Play Mode, the Unity Console, and Unity tests.
+
+Recommended read-only workflow:
+
+1. Call `unity-editor_status` to confirm that the Editor is connected and ready.
+2. Use Unity MCP inspection commands such as `unity-find_assets`,
+   `unity-find_gameobjects`, `unity-get_component_properties`,
+   `unity-get_serialized_fields`, `unity-get_scene_hierarchy`, or
+   `unity-console` as appropriate.
+3. Use `unity-eval` only for a small, read-only Editor API check when no
+   dedicated inspection command exposes the required information.
+4. Report when Unity MCP was unavailable instead of silently presenting a
+   file-level approximation as authoritative.
+
+Do not parse Unity YAML, `.meta` files, prefab fileIDs, or GUID mappings with
+Python or ad-hoc scripts as a substitute for Unity MCP. Direct file inspection
+is appropriate for C# source, Markdown, JSON configuration, and other
+text-authored files. It is a fallback for Unity assets only when the Editor or
+MCP connection is unavailable, and that limitation must be stated explicitly.
+
+For mutating Unity operations, use the corresponding Unity MCP command and
+confirm the intended scope before applying changes. Prefer read-only inspection
+first, and never modify a scene, prefab, or asset merely to investigate it.
+
 ## Source of Truth
 
 When sources disagree, use this priority:

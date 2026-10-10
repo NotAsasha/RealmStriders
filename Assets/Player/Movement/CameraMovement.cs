@@ -9,6 +9,7 @@ using System.Collections;
 
 namespace Player.Movement
 {
+    [DefaultExecutionOrder(-100)]
     public class CameraMovement : NetworkBehaviour
     {
         [Header("Essential")]
@@ -35,6 +36,11 @@ namespace Player.Movement
         private bool inputHandlersRegistered;
 
         public static CameraMovement Instance;
+
+        /// <summary>
+        /// Current camera vertical look pitch in degrees (-90 to +90). Negative is looking up, positive is looking down.
+        /// </summary>
+        public float CurrentPitch => xRotation;
 
 
         #region Unity Lifecycle

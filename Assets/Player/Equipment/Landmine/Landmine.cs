@@ -72,6 +72,7 @@ namespace Player.Equipment.Landmine
             if (entity == null || entity.isDead.Value) return;
 
             // Slot 2: Landmine owns this weakness layer.
+            entity.AddHealth(-1);
             entity.ApplyWeakStack(1, weakDuration, slot: 2);
             Debug.Log($"---Landmine: Applied weakness to {entity.name}.");
         }

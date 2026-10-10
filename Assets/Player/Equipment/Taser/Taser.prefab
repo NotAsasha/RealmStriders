@@ -142,6 +142,7 @@ Transform:
   - {fileID: 1637153562698068695}
   - {fileID: 4310625157591370306}
   - {fileID: 5124111088144374834}
+  - {fileID: 7486296073202891505}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &159268654104959106
@@ -298,11 +299,15 @@ MonoBehaviour:
   clickSounds:
   - {fileID: 8300000, guid: 66a89853be2501b4ab1ecd91a44e09b8, type: 3}
   - {fileID: 8300000, guid: 2328c988986a795439f0d8292a9855bb, type: 3}
+  gripPoint: {fileID: 7486296073202891505}
+  gripPositionOffset: {x: 0, y: 0, z: 0}
+  gripRotationOffset: {x: 0, y: 0, z: 0}
   prefabId: 5
   isCurrentlyHeld: 0
   maxDistance: 5
   cooldown: 0.5
   freezeTime: 2
+  comboWeakDuration: 6
   shotCost: 20
   maxCharge: 100
   entityLayer:
@@ -312,27 +317,6 @@ MonoBehaviour:
   sound: {fileID: 6998975540909714524}
   particle: {fileID: 8825538087164892633}
   soundProducer: {fileID: 900000000000000005}
---- !u!114 &900000000000000005
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5335012707719721587}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 964159904b634dd418799dd0762f718a, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Enemy.SoundProducer
-  soundEmitor: {fileID: 0}
-  soundRadius: 10
-  continuousNoiseInterval: 0.35
-  refreshedNoiseTimeout: 0.5
-  entityLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  source: {fileID: 0}
-  clip: []
 --- !u!82 &6998975540909714524
 AudioSource:
   m_ObjectHideFlags: 0
@@ -430,6 +414,28 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &900000000000000005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5335012707719721587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 964159904b634dd418799dd0762f718a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.SoundProducer
+  ShowTopMostFoldoutHeaderGroup: 1
+  soundEmitor: {fileID: 0}
+  soundRadius: 10
+  continuousNoiseInterval: 0.35
+  refreshedNoiseTimeout: 0.5
+  entityLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  source: {fileID: 0}
+  clip: []
 --- !u!1 &5935040130484326328
 GameObject:
   m_ObjectHideFlags: 0
@@ -5404,6 +5410,37 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &6595873953508829173
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7486296073202891505}
+  m_Layer: 0
+  m_Name: Grip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7486296073202891505
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6595873953508829173}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.051, z: -0.201}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2153198191683362735}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &4654125654101539801
 PrefabInstance:
   m_ObjectHideFlags: 0

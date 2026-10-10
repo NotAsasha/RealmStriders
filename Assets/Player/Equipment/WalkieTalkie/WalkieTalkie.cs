@@ -98,7 +98,10 @@ namespace Player.Equipment
 
         private void UpdateVisualsAndAudioState(bool active, bool playSound)
         {
-            indicatorRenderer.material.color = active ? Color.green : Color.red;
+            if (indicatorRenderer != null)
+            {
+                indicatorRenderer.material.color = active ? Color.green : Color.red;
+            }
 
             if (playSound && audioSource != null)
             {
@@ -133,8 +136,15 @@ namespace Player.Equipment
                 return null;
             }
 
-            Inventory inventory = client.PlayerObject.GetComponent<Inventory>();
-            return inventory?.GetActiveItem() as WalkieTalkie;
+            foreach (var radio in AllRadios)
+            {
+                if (IsHeldByPlayer(radio, client.PlayerObject))
+                {
+                    return radio;
+                }
+            }
+
+            return null;
         }
 
         private void OnAudioRead(float[] data)
@@ -161,8 +171,23 @@ namespace Player.Equipment
             NetworkObject localPlayer = localClient?.PlayerObject;
             if (localPlayer == null) return false;
 
-            Inventory inventory = localPlayer.GetComponent<Inventory>();
-            return inventory?.GetActiveItem() is WalkieTalkie radio && radio.CanTransmit();
+            foreach (var radio in AllRadios)
+            {
+                if (IsHeldByPlayer(radio, localPlayer))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsHeldByPlayer(WalkieTalkie radio, NetworkObject player)
+        {
+            return radio != null
+                && radio.gameObject.activeInHierarchy
+                && radio.CanTransmit()
+                && radio.transform.IsChildOf(player.transform);
         }
 
         public override string GetInfo() => isOn.Value.ToString();

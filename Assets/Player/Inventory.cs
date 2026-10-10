@@ -21,6 +21,10 @@ namespace Player
         [SerializeField] private Transform handAnchor;
         public Transform HandAnchor => handAnchor;
 
+        [Tooltip("Item holder managing first-person viewmodel and IK target")]
+        [SerializeField] private ItemHolder itemHolder;
+        public ItemHolder ItemHolder => itemHolder;
+
         [Header("Configuration")]
         public int capacity = 4;
         [SerializeField] private LayerMask layer;
@@ -48,6 +52,11 @@ namespace Player
         {
             human = GetComponent<Human>();
             playerMovement = GetComponent<PlayerMovement>();
+
+            if (itemHolder == null)
+            {
+                itemHolder = GetComponentInChildren<ItemHolder>(true);
+            }
 
             InitializeInventory();
             SetupInputHandlers();
@@ -128,7 +137,11 @@ namespace Player
             }
             else
             {
-                if (IsOwner) isHoldingItem.Value = true;
+                if (IsOwner)
+                {
+                    isHoldingItem.Value = true;
+                    itemHolder?.SetActiveItem(takableComponent);
+                }
             }
 
             items[targetSlot] = takableComponent;
@@ -149,7 +162,11 @@ namespace Player
 
             if (slot == activeSlotIndex)
             {
-                if (IsOwner) isHoldingItem.Value = false;
+                if (IsOwner)
+                {
+                    isHoldingItem.Value = false;
+                    itemHolder?.SetActiveItem(null);
+                }
                 itemChanged?.Invoke(false);
             }
 
@@ -218,7 +235,11 @@ namespace Player
             if (itemToDrop == null) return;
 
             items[activeSlotIndex] = null;
-            if (IsOwner) isHoldingItem.Value = false;
+            if (IsOwner)
+            {
+                isHoldingItem.Value = false;
+                itemHolder?.SetActiveItem(null);
+            }
 
             DropItemServerRpc(itemToDrop.gameObject);
             UpdateUI();
@@ -282,12 +303,20 @@ namespace Player
             if (newItem != null)
             {
                 SetItemActiveServerRpc(newItem.gameObject, true);
-                if (IsOwner) isHoldingItem.Value = true;
+                if (IsOwner)
+                {
+                    isHoldingItem.Value = true;
+                    itemHolder?.SetActiveItem(newItem);
+                }
                 itemChanged?.Invoke(true);
             }
             else
             {
-                if (IsOwner) isHoldingItem.Value = false;
+                if (IsOwner)
+                {
+                    isHoldingItem.Value = false;
+                    itemHolder?.SetActiveItem(null);
+                }
                 itemChanged?.Invoke(false);
             }
             UpdateUI();
@@ -301,7 +330,11 @@ namespace Player
                 DropItemServerRpc(items[i].gameObject);
                 items[i] = null;
             }
-            if (IsOwner) isHoldingItem.Value = false;
+            if (IsOwner)
+            {
+                isHoldingItem.Value = false;
+                itemHolder?.SetActiveItem(null);
+            }
             UpdateUI();
         }
 
@@ -391,7 +424,7 @@ namespace Player
 
             // Вимикаємо синхронізацію координат у мережі, поки предмет у руках
             ToggleNetworkTransform(obj.gameObject, false);
-            ApplyParentConstraint(obj.gameObject, handAnchor);
+            ApplyParentConstraint(obj.gameObject);
 
             SetItemParentClientRpc(objRef, newParentRef);
         }
@@ -405,7 +438,7 @@ namespace Player
                 obj.TrySetParent(newParent.transform);
 
                 ToggleNetworkTransform(obj.gameObject, false);
-                ApplyParentConstraint(obj.gameObject, handAnchor);
+                ApplyParentConstraint(obj.gameObject);
             }
         }
 
@@ -414,8 +447,15 @@ namespace Player
         {
             if (!objRef.TryGet(out NetworkObject networkObject)) return;
 
-            if (!Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 1f, layer))
-                networkObject.transform.localPosition = handAnchor.localPosition + new Vector3(0, 0, 0.75f);
+            Vector3 dropOrigin = CameraMovement.Instance != null ? CameraMovement.Instance.transform.position : transform.position + Vector3.up * 1f;
+            Vector3 dropForward = CameraMovement.Instance != null ? CameraMovement.Instance.transform.forward : transform.forward;
+            Vector3 dropPos = dropOrigin + dropForward * 0.75f;
+            if (Physics.Raycast(dropOrigin, dropForward, out RaycastHit hit, 1f, layer))
+            {
+                dropPos = hit.point - dropForward * 0.2f;
+            }
+
+            networkObject.transform.position = dropPos;
 
             networkObject.TryRemoveParent();
             RemoveParentConstraint(networkObject.gameObject);
@@ -453,20 +493,39 @@ namespace Player
             }
         }
 
-        public void ApplyParentConstraint(GameObject item, Transform anchor)
+        public void ApplyParentConstraint(GameObject item, Transform customAnchor = null)
         {
+            if (item == null) return;
+
+            Transform targetAnchor = customAnchor;
+            if (targetAnchor == null)
+            {
+                if (IsOwner && itemHolder != null && itemHolder.HeldItemSocket != null)
+                {
+                    targetAnchor = itemHolder.HeldItemSocket;
+                }
+                else
+                {
+                    targetAnchor = handAnchor;
+                }
+            }
+
+            if (targetAnchor == null) return;
+
             ParentConstraint constraint = item.GetComponent<ParentConstraint>();
             if (constraint == null)
             {
                 constraint = item.AddComponent<ParentConstraint>();
             }
 
+            constraint.constraintActive = false;
+
             while (constraint.sourceCount > 0)
             {
                 constraint.RemoveSource(0);
             }
 
-            ConstraintSource source = new ConstraintSource { sourceTransform = anchor, weight = 1f };
+            ConstraintSource source = new ConstraintSource { sourceTransform = targetAnchor, weight = 1f };
             constraint.AddSource(source);
 
             Vector3 transOffset = Vector3.zero;
@@ -480,6 +539,7 @@ namespace Player
             constraint.SetTranslationOffset(0, transOffset);
             constraint.SetRotationOffset(0, rotOffset);
 
+            constraint.weight = 1f;
             constraint.constraintActive = true;
         }
 

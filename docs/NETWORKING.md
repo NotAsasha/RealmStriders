@@ -27,6 +27,10 @@ The game uses Steamworks lobbies with a player host. The host owns the game's
 save file. If the host leaves, the networked game shuts down and the host can
 later load the last save.
 
+Clients detect a lost host through the local NGO disconnect callback, show
+`host left the game`, and return to the main menu instead of remaining in a
+stalled network session.
+
 The save is written automatically after a mission completes. Manual saving is
 allowed only while no mission is active.
 
@@ -58,6 +62,10 @@ success rating increase.
    object.
 5. Use an RPC only for a transient notification or presentation event.
 6. Handle despawn, scene changes, and late joining.
+
+Mission scene objects brought into the base must be promoted to runtime network
+objects before the mission scene is unloaded. Otherwise NGO removes them with
+the scene even though they are inside the base.
 
 ## Known areas to verify
 

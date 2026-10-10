@@ -45,6 +45,12 @@ monster's danger or difficulty. Other equipment can weaken a monster before
 and during capture; multiple weaknesses can be combined and their effects
 stack, reducing the time required by the `LeafBlower`.
 
+The `LeafBlower` keeps the current target and capture progress when the target
+briefly leaves its view. While the target is lost, capture does not advance.
+After one second without reacquiring that same target, 20% of the required
+capture time is removed from progress; this penalty repeats once per second
+until the target is reacquired or the progress reaches zero.
+
 Equipment noise is server-authoritative. A running `LeafBlower` or grounded
 `Subwoofer` continuously lures nearby enemies, while a walkie-talkie only
 lures them while voice data is actively transmitted. `Flashbang` and `Taser`

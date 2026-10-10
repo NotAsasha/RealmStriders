@@ -22,6 +22,7 @@ namespace Player.Movement
     ///      local position relative to BobPivot (usually Vector3.zero).
     /// ────────────────────────────────────────────────────────────────────────
     /// </summary>
+    [DefaultExecutionOrder(-90)]
     public class PlayerCameraBob : NetworkBehaviour
     {
         // ─────────────────────────────────────────────────────────────────────
@@ -105,10 +106,10 @@ namespace Player.Movement
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        //  Per-frame (LateUpdate keeps bob applied after CameraMovement's Update)
+        //  Per-frame (Update applies bob before animation and constraint passes)
         // ─────────────────────────────────────────────────────────────────────
 
-        private void LateUpdate()
+        private void Update()
         {
             if (bobPivot == null || characterController == null) return;
             if (_movement != null && _movement.human != null && _movement.human.isDead.Value)

@@ -26,3 +26,8 @@ making gameplay changes.
 
 Keep Unity `.meta` files synchronized with their assets. Check prefabs and
 scene references when changing serialized fields or component names.
+
+When inspecting scenes, prefabs, GameObjects, components, or serialized fields,
+use the Unity MCP server before parsing Unity YAML or `.meta` files manually.
+Use direct file tools for C# source and documentation; use Unity MCP for the
+actual imported Unity object state.
