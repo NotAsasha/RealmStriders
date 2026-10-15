@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Player.Movement;
 using Player.Equipment;
+using Enemy;
 
 namespace Player.Network
 {
@@ -15,8 +16,13 @@ namespace Player.Network
         [Tooltip("3D AudioSource на голові персонажа (живий голос гравця поруч)")]
         [SerializeField] private AudioSource proximityAudioSource;
 
+        [Header("Enemy Hearing")]
+        [SerializeField] private SoundProducer voiceSoundProducer;
+        [SerializeField, Range(0f, 1f)] private float voiceNoiseThreshold = 0.04f;
+
         private MemoryStream voiceInputStream;
         private MemoryStream voiceOutputStream;
+        private MemoryStream voiceAnalysisStream;
 
         private int sampleRate;
         private VoiceAudioBuffer proximityBuffer;
@@ -28,6 +34,7 @@ namespace Player.Network
 
             voiceInputStream = new MemoryStream();
             voiceOutputStream = new MemoryStream();
+            voiceAnalysisStream = new MemoryStream();
 
             if (!IsOwner)
             {
@@ -89,17 +96,57 @@ namespace Player.Network
                     byte[] dataToSend = new byte[compressedBytesWritten];
                     Array.Copy(voiceInputStream.GetBuffer(), dataToSend, compressedBytesWritten);
 
+                    float voiceLevel = GetVoiceLevel(compressedBytesWritten);
                     bool isTransmittingRadio = WalkieTalkie.IsLocalPlayerHoldingActiveRadio();
-                    SendVoiceServerRpc(dataToSend, compressedBytesWritten, isTransmittingRadio);
+                    SendVoiceServerRpc(dataToSend, compressedBytesWritten, isTransmittingRadio, voiceLevel);
                 }
             }
         }
 
+        private float GetVoiceLevel(int compressedBytes)
+        {
+            voiceInputStream.Position = 0;
+            voiceAnalysisStream.SetLength(0);
+            voiceAnalysisStream.Position = 0;
+
+            int uncompressedBytes = SteamUser.DecompressVoice(
+                voiceInputStream,
+                compressedBytes,
+                voiceAnalysisStream);
+
+            if (uncompressedBytes < 2) return 0f;
+
+            byte[] rawBuffer = voiceAnalysisStream.GetBuffer();
+            int sampleCount = uncompressedBytes / 2;
+            double sumSquares = 0d;
+
+            for (int i = 0; i < sampleCount; i++)
+            {
+                short sample = (short)(rawBuffer[i * 2] | (rawBuffer[i * 2 + 1] << 8));
+                float normalizedSample = sample / 32768f;
+                sumSquares += normalizedSample * normalizedSample;
+            }
+
+            return Mathf.Clamp01(Mathf.Sqrt((float)(sumSquares / sampleCount)));
+        }
+
         // Прибрали Delivery = RpcDelivery.Unreliable! Тепер Netcode сам фрагментує будь-які розміри без OverflowException
         [Rpc(SendTo.Server)]
-        private void SendVoiceServerRpc(byte[] compressedData, int length, bool isRadio, RpcParams rpcParams = default)
+        private void SendVoiceServerRpc(
+            byte[] compressedData,
+            int length,
+            bool isRadio,
+            float voiceLevel,
+            RpcParams rpcParams = default)
         {
+            if (rpcParams.Receive.SenderClientId != OwnerClientId) return;
+
             ulong senderClientId = rpcParams.Receive.SenderClientId;
+            if (voiceSoundProducer != null && voiceLevel >= voiceNoiseThreshold)
+            {
+                voiceSoundProducer.RefreshContinuousNoise();
+            }
+
             if (isRadio)
             {
                 WalkieTalkie.GetTransmittingRadio(senderClientId)?.RefreshNoiseFromVoice();
@@ -192,6 +239,7 @@ namespace Player.Network
         {
             voiceInputStream?.Dispose();
             voiceOutputStream?.Dispose();
+            voiceAnalysisStream?.Dispose();
         }
     }
 }

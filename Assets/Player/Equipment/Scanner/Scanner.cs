@@ -73,6 +73,14 @@ namespace Player.Equipment.Scanner
             isOn.Value = !isOn.Value;
         }
 
+        public override void TurnOffServer()
+        {
+            if (isOn.Value)
+            {
+                isOn.Value = false;
+            }
+        }
+
         private void SwitchState(bool oldV, bool newV)
         {
             SetIndicatorColor(newV);

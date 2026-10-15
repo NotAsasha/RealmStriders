@@ -24,10 +24,19 @@ namespace Player.Equipment.Dosimeter
             SwitchStateServerRpc();
         }
 
-        [ServerRpc]
-        private void SwitchStateServerRpc()
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        private void SwitchStateServerRpc(RpcParams rpcParams = default)
         {
+            if (!IsHeldByClient(rpcParams.Receive.SenderClientId)) return;
             isOn.Value = !isOn.Value;
+        }
+
+        public override void TurnOffServer()
+        {
+            if (isOn.Value)
+            {
+                isOn.Value = false;
+            }
         }
         #endregion
 

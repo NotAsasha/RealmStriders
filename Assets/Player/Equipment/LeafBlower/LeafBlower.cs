@@ -30,6 +30,16 @@ namespace Player.Equipment.LeafBlower
         [SerializeField] private TMP_Text chargeText;
 
         NetworkVariable<bool> isOn = new(false, 0, 0);
+        readonly NetworkVariable<Vector3> aimOrigin = new(
+            Vector3.zero,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+        readonly NetworkVariable<Vector3> aimForward = new(
+            Vector3.forward,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
         public NetworkVariable<float> CaptureProgressNormalized = new(0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public readonly NetworkVariable<int> Charge = new(
             100,
@@ -51,6 +61,8 @@ namespace Player.Equipment.LeafBlower
         AudioClip defaultAudioClip;
         bool defaultAudioLoop;
         float chargeDrainAccumulator;
+        CameraMovement aimCamera;
+        float nextAimUpdateTime;
 
         private void Start()
         {
@@ -90,15 +102,32 @@ namespace Player.Equipment.LeafBlower
 
         override protected void ExecuteItemAction(GameObject player)
         {
-            SwitchStateServerRpc();
+            aimCamera = player.GetComponentInChildren<CameraMovement>(true);
+            if (aimCamera == null)
+            {
+                Debug.LogWarning($"---LeafBlower: No owner camera found for {name}");
+                return;
+            }
+
+            SwitchStateServerRpc(aimCamera.transform.position, aimCamera.transform.forward);
         }
 
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        private void SwitchStateServerRpc()
+        [Rpc(SendTo.Server)]
+        private void SwitchStateServerRpc(Vector3 origin, Vector3 forward, RpcParams rpcParams = default)
         {
+            if (!IsHeldByClient(rpcParams.Receive.SenderClientId)) return;
+            if (!TrySetAim(rpcParams.Receive.SenderClientId, origin, forward)) return;
             if (!isOn.Value && Charge.Value <= 0) return;
 
             isOn.Value = !isOn.Value;
+        }
+
+        public override void TurnOffServer()
+        {
+            if (isOn.Value)
+            {
+                isOn.Value = false;
+            }
         }
 
         private void SwitchState(bool oldV, bool newV)
@@ -128,6 +157,7 @@ namespace Player.Equipment.LeafBlower
 
         private void Update()
         {
+            UpdateOwnerAim();
             UpdateFeedback();
 
             if (!IsServer || !isOn.Value) return;
@@ -182,9 +212,59 @@ namespace Player.Equipment.LeafBlower
             }
         }
 
+        private void UpdateOwnerAim()
+        {
+            if (!isOn.Value) return;
+
+            if (aimCamera == null &&
+                NetworkManager.Singleton != null &&
+                NetworkManager.Singleton.LocalClient != null &&
+                NetworkManager.Singleton.LocalClient.PlayerObject != null)
+            {
+                aimCamera = NetworkManager.Singleton.LocalClient.PlayerObject
+                    .GetComponentInChildren<CameraMovement>(true);
+            }
+
+            if (NetworkManager.Singleton == null ||
+                !IsHeldByClient(NetworkManager.Singleton.LocalClientId) ||
+                aimCamera == null ||
+                Time.time < nextAimUpdateTime)
+            {
+                return;
+            }
+
+            nextAimUpdateTime = Time.time + 0.05f;
+            UpdateAimServerRpc(aimCamera.transform.position, aimCamera.transform.forward);
+        }
+
+        [Rpc(SendTo.Server)]
+        private void UpdateAimServerRpc(Vector3 origin, Vector3 forward, RpcParams rpcParams = default)
+        {
+            TrySetAim(rpcParams.Receive.SenderClientId, origin, forward);
+        }
+
+        private bool TrySetAim(ulong clientId, Vector3 origin, Vector3 forward)
+        {
+            if (!IsHeldByClient(clientId) || forward.sqrMagnitude <= Mathf.Epsilon)
+            {
+                return false;
+            }
+
+            if (!NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client) ||
+                client.PlayerObject == null ||
+                (origin - client.PlayerObject.transform.position).sqrMagnitude > 9f)
+            {
+                return false;
+            }
+
+            aimOrigin.Value = origin;
+            aimForward.Value = forward.normalized;
+            return true;
+        }
+
         private void ValidateTarget()
         {
-            GameObject entityObject = detector.EntityInSight(true);
+            GameObject entityObject = detector.EntityInSight(aimOrigin.Value, aimForward.Value, true);
             Entity detectedTarget = entityObject != null ? entityObject.GetComponent<Entity>() : null;
 
             if (detectedTarget == null || detectedTarget.isDead.Value)
@@ -273,6 +353,11 @@ namespace Player.Equipment.LeafBlower
                 captureSlider.SetValueWithoutNotify(progress);
             }
 
+        }
+
+        public override Quaternion GetRemoteGripRotation(Inventory inventory)
+        {
+            return base.GetRemoteGripRotation(inventory);
         }
 
         private void UpdateChargeText(int _, int charge)

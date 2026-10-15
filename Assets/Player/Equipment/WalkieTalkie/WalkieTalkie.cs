@@ -91,6 +91,14 @@ namespace Player.Equipment
             isOn.Value = !isOn.Value;
         }
 
+        public override void TurnOffServer()
+        {
+            if (isOn.Value)
+            {
+                isOn.Value = false;
+            }
+        }
+
         private void OnPowerStateChanged(bool previousValue, bool newValue)
         {
             UpdateVisualsAndAudioState(newValue, playSound: true);

@@ -34394,6 +34394,7 @@ Transform:
   - {fileID: 4391407676387065334}
   - {fileID: 4986201206460060877}
   - {fileID: 8463894524392694122}
+  - {fileID: 6877587010084255202}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2331233842958963472
@@ -34439,7 +34440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2586086996
+  GlobalObjectIdHash: 1316024962
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -34585,7 +34586,7 @@ Animator:
   m_GameObject: {fileID: 5629089953353955407}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 26292f3814142b34882a7ab9d2385c3a, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -34788,6 +34789,15 @@ MonoBehaviour:
   angryRadius: 40
   deathRadius: 50
   jumpscareRadius: 40
+  vocalAudioSource: {fileID: 0}
+  enablePeriodicIdleSounds: 1
+  minIdleInterval: 7
+  maxIdleInterval: 15
+  enablePeriodicAngrySounds: 1
+  minAngryInterval: 3.5
+  maxAngryInterval: 6.5
+  pitchVariation: 0.08
+  volumeVariation: 0.05
 --- !u!114 &858551871322918889
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34806,6 +34816,7 @@ MonoBehaviour:
   captureSequenceDuration: 0.85
   captureLift: 1.1
   captureTransformation: {fileID: 7623451754018295720}
+  statusVisuals: {fileID: 0}
   isDead:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -34837,7 +34848,7 @@ MonoBehaviour:
     m_InternalValue: 3
   dischargeRange: 15
   chargeUpDuration: 2
-  dischargeCooldown: 15
+  dischargeCooldown: 5
   aoeShockDamage: 0.1
   freezeDuration: 5
   chargeVFX: {fileID: 7767263150273184952}
@@ -34893,10 +34904,146 @@ MonoBehaviour:
   angryRadius: 25
   deathRadius: 30
   jumpscareRadius: 40
+  vocalAudioSource: {fileID: 0}
+  enablePeriodicIdleSounds: 1
+  minIdleInterval: 7
+  maxIdleInterval: 15
+  enablePeriodicAngrySounds: 1
+  minAngryInterval: 3.5
+  maxAngryInterval: 6.5
+  pitchVariation: 0.08
+  volumeVariation: 0.05
   chargeSound: {fileID: 8300000, guid: 48218816c9daa3748a433f066f228b33, type: 3}
   dischargeSound: {fileID: 8300000, guid: 67b6d65e68aae1e408e19aefc7922ec9, type: 3}
   chargeRadius: 20
   dischargeRadius: 30
+--- !u!1 &6370119218078329889
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6877587010084255202}
+  - component: {fileID: 3945761232941124018}
+  - component: {fileID: 6776975118071520880}
+  m_Layer: 0
+  m_Name: Point Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6877587010084255202
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6370119218078329889}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 3, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8881780079078998430}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!108 &3945761232941124018
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6370119218078329889}
+  m_Enabled: 1
+  serializedVersion: 12
+  m_Type: 2
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 1
+  m_Range: 10
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize2D: {x: 0.5, y: 0.5}
+  m_Shadows:
+    m_Type: 2
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 1911
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
+--- !u!114 &6776975118071520880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6370119218078329889}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1001 &1058044943015720574
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -45387,7 +45534,7 @@ MonoBehaviour:
   - {fileID: 4988080324096983457}
   - {fileID: 8161416454698176424}
   - {fileID: 8796568287275657867}
-  - {fileID: 7165204559737907020}
+  - {fileID: 0}
   - {fileID: 1168744023630157035}
 --- !u!114 &553296552291100498
 MonoBehaviour:
@@ -45415,7 +45562,7 @@ Animator:
   m_GameObject: {fileID: 5654651106758577783}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e80afdb699d0cd546a108c24925278eb, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -45442,12 +45589,6 @@ Transform:
 --- !u!4 &6854341526689004478 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2136871867427965080, guid: 0145ba4c57e728d4a8a945ea11e7fdd6,
-    type: 3}
-  m_PrefabInstance: {fileID: 4807648579450598182}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &7165204559737907020 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2438656852951536746, guid: 0145ba4c57e728d4a8a945ea11e7fdd6,
     type: 3}
   m_PrefabInstance: {fileID: 4807648579450598182}
   m_PrefabAsset: {fileID: 0}

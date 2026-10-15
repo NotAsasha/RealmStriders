@@ -23,9 +23,16 @@ namespace Enemy
         private Collider[] nearbyEntities = new Collider[20];
         public GameObject EntityInSight(bool chaseEnemies = false)
         {
+            return EntityInSight(transform.position + eyeLocalPosition, transform.forward, chaseEnemies);
+        }
+
+        public GameObject EntityInSight(Vector3 eyePosition, Vector3 viewDirection, bool chaseEnemies = false)
+        {
             if (viewAngle == 0 || viewDistance == 0) return null;
 
-            Vector3 eyePosition = transform.position + eyeLocalPosition;
+            if (viewDirection.sqrMagnitude <= Mathf.Epsilon) return null;
+            viewDirection.Normalize();
+
             int numColliders = Physics.OverlapCapsuleNonAlloc(
                 eyePosition - Vector3.up * verticalPadding,
                 eyePosition + Vector3.up * verticalPadding,
@@ -46,7 +53,7 @@ namespace Enemy
                 Vector3 targetPosition = collider.ClosestPoint(eyePosition);
                 Vector3 direction = targetPosition - eyePosition;
                 if (direction.sqrMagnitude <= Mathf.Epsilon) continue;
-                if (Vector3.Angle(direction, transform.forward) <= halfAngle)
+                if (Vector3.Angle(direction, viewDirection) <= halfAngle)
                 {
                     // if entity is behind a wall
                     if (Physics.Raycast(eyePosition, direction, direction.magnitude, wallLayer)) continue;

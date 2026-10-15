@@ -54,6 +54,7 @@ namespace Enemy
             }
         }
         public event Action<EnemyState> onStateChanged;
+        public event Action onBite;
         
 
         protected Animator animator;
@@ -205,6 +206,7 @@ namespace Enemy
         {
             obj.TryGet(out NetworkObject player);
             Debug.Log($"---Enemy: Eaten {player.name}");
+            onBite?.Invoke();
         }
 
         #endregion

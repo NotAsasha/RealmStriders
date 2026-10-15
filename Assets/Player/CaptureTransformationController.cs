@@ -172,7 +172,7 @@ namespace Player
             for (int i = 0; i < rendererBindings.Length; i++)
             {
                 RendererBinding binding = rendererBindings[i];
-                if (binding.Renderer == null || binding.OriginalMaterials == null) continue;
+                if (binding.Renderer == null || binding.OriginalMaterials == null || !binding.Renderer.transform.IsChildOf(transform)) continue;
 
                 int materialCount = binding.OriginalMaterials.Length;
                 binding.ImplosionMaterials = new Material[materialCount];
@@ -221,7 +221,7 @@ namespace Player
             for (int i = 0; i < rendererBindings.Length; i++)
             {
                 RendererBinding binding = rendererBindings[i];
-                if (binding.Renderer == null || binding.ImplosionMaterials == null) continue;
+                if (binding.Renderer == null || binding.ImplosionMaterials == null || !binding.Renderer.transform.IsChildOf(transform)) continue;
 
                 for (int materialIndex = 0; materialIndex < binding.ImplosionMaterials.Length; materialIndex++)
                 {

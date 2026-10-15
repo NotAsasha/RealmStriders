@@ -15,6 +15,7 @@ namespace Enemy.Shocker
         [SerializeField] private float dischargeRange = 6f;
         [SerializeField] private float chargeUpDuration = 2f;
         [SerializeField] private float dischargeCooldown = 4f;
+        [SerializeField] private float attackRange = 2f;
 
         [Header("Shocker - Damage")]
         [SerializeField] private float aoeShockDamage = 0.4f;
@@ -90,7 +91,11 @@ namespace Enemy.Shocker
                 if (distSq <= dischargeRange * dischargeRange)
                 {
                     // Stop and begin charge-up
-                    if (agent != null && agent.isOnNavMesh) agent.ResetPath();
+                    if (agent != null && agent.isOnNavMesh)
+                    {
+                        agent.ResetPath();
+                        agent.velocity = Vector3.zero;
+                    }
                     StartCoroutine(ChargeAndDischarge());
                     return;
                 }
@@ -114,8 +119,18 @@ namespace Enemy.Shocker
                 return;
             }
 
-            // Chase the frozen target at full speed
             Vector3 targetPos = _huntTarget.transform.position;
+            float distSq = (transform.position - targetPos).sqrMagnitude;
+            if (distSq <= attackRange * attackRange)
+            {
+                if (agent != null && agent.isOnNavMesh) agent.ResetPath();
+                BiteClientRpc(_huntTarget.gameObject);
+                _huntTarget.AddHealth(-damage);
+                EndHunt();
+                return;
+            }
+
+            // Chase the frozen target at full speed
             if (agent != null && agent.isOnNavMesh)
             {
                 if ((agent.destination - targetPos).sqrMagnitude > 0.25f)
@@ -131,6 +146,11 @@ namespace Enemy.Shocker
         private void EndHunt()
         {
             _huntTarget = null;
+            if (agent != null && agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+                agent.velocity = Vector3.zero;
+            }
             StartCoroutine(HuntCooldown());
         }
 

@@ -24,12 +24,35 @@ namespace Player.Equipment
         {
             if (gripPoint != null)
             {
-                Quaternion invRot = Quaternion.Inverse(gripPoint.localRotation);
-                Vector3 rot = invRot.eulerAngles;
-                Vector3 trans = -(invRot * gripPoint.localPosition);
-                return (trans, rot);
+                // World-scale and hierarchy-depth safe calculation from gripPoint to root item transform
+                Quaternion gripToItemRot = Quaternion.Inverse(gripPoint.rotation) * transform.rotation;
+                Vector3 gripToItemPos = Quaternion.Inverse(gripPoint.rotation) * (transform.position - gripPoint.position);
+                return (gripToItemPos, gripToItemRot.eulerAngles);
             }
             return (gripPositionOffset, gripRotationOffset);
+        }
+
+        /// <summary>
+        /// Places the item in world space so that its gripPoint (or grip offset) matches
+        /// the exact target grip world position and rotation regardless of item scale.
+        /// </summary>
+        public void AlignToGripPose(Vector3 targetGripWorldPos, Quaternion targetGripWorldRot)
+        {
+            if (gripPoint != null)
+            {
+                Quaternion gripToItemRot = Quaternion.Inverse(gripPoint.rotation) * transform.rotation;
+                Vector3 gripToItemPos = Quaternion.Inverse(gripPoint.rotation) * (transform.position - gripPoint.position);
+
+                Quaternion itemWorldRot = targetGripWorldRot * gripToItemRot;
+                Vector3 itemWorldPos = targetGripWorldPos + targetGripWorldRot * gripToItemPos;
+                transform.SetPositionAndRotation(itemWorldPos, itemWorldRot);
+            }
+            else
+            {
+                Quaternion itemWorldRot = targetGripWorldRot * Quaternion.Euler(gripRotationOffset);
+                Vector3 itemWorldPos = targetGripWorldPos + targetGripWorldRot * gripPositionOffset;
+                transform.SetPositionAndRotation(itemWorldPos, itemWorldRot);
+            }
         }
 
         [Header("Save System")]
@@ -44,15 +67,89 @@ namespace Player.Equipment
         private Rigidbody itemRigidbody;
         private NetworkTransform itemNetworkTransform;
         private NetworkRigidbody itemNetworkRigidbody;
+        private ParentConstraint itemParentConstraint;
+        private Inventory holderInventory;
         protected AudioSource audioSource;
 
         public bool isCurrentlyHeld = false;
+
+        public void BindHolderInventory(Inventory inventory, ParentConstraint constraint)
+        {
+            holderInventory = inventory;
+            itemParentConstraint = constraint;
+        }
+
+        public void ClearHolderInventory()
+        {
+            holderInventory = null;
+        }
+
+        protected bool TryGetHolderInventory(out Inventory inventory)
+        {
+            if (transform.parent == null)
+            {
+                holderInventory = null;
+                inventory = null;
+                return false;
+            }
+
+            if (holderInventory == null || holderInventory.transform != transform.parent)
+            {
+                transform.parent.TryGetComponent(out holderInventory);
+            }
+
+            inventory = holderInventory;
+            return inventory != null;
+        }
+
+        public bool IsHeldByClient(ulong clientId)
+        {
+            return TryGetHolderInventory(out var inventory) && inventory.OwnerClientId == clientId;
+        }
+
+        public virtual Quaternion GetRemoteGripRotation(Inventory inventory)
+        {
+            return inventory != null ? inventory.GetRemoteAimRotation() : transform.rotation;
+        }
+
+        public void UpdateRemoteHeldPose()
+        {
+            if (!TryGetHolderInventory(out var inventory))
+            {
+                return;
+            }
+
+            if (inventory.IsOwner && inventory.ItemHolder != null && inventory.ItemHolder.HeldItemSocket != null)
+            {
+                return;
+            }
+
+            Transform handAnchor = inventory.HandAnchor;
+            if (handAnchor == null)
+            {
+                return;
+            }
+
+            if (itemParentConstraint != null && itemParentConstraint.constraintActive)
+            {
+                // Disable ParentConstraint so it never snaps the item to the un-IK'd hand during InternalAnimationUpdate
+                itemParentConstraint.constraintActive = false;
+            }
+
+            Quaternion gripWorldRot = GetRemoteGripRotation(inventory);
+            AlignToGripPose(handAnchor.position, gripWorldRot);
+        }
 
         #region Unity Lifecycle
 
         private void Awake()
         {
             CacheComponents();
+        }
+
+        protected virtual void LateUpdate()
+        {
+            UpdateRemoteHeldPose();
         }
 
         public override void OnNetworkSpawn()
@@ -90,6 +187,7 @@ namespace Player.Equipment
 
         private void AttachToPlayer(Inventory inventory)
         {
+            holderInventory = inventory;
             isCurrentlyHeld = true;
             SetPhysicsState(false);
 
@@ -101,7 +199,7 @@ namespace Player.Equipment
             if (inventory != null)
             {
                 inventory.ApplyParentConstraint(gameObject);
-                if (inventory.IsOwner)
+                if (inventory.IsOwner && gameObject.activeSelf)
                 {
                     inventory.ItemHolder?.SetActiveItem(this);
                 }
@@ -110,6 +208,7 @@ namespace Player.Equipment
 
         private void DetachFromPlayer()
         {
+            holderInventory = null;
             isCurrentlyHeld = false;
             SetPhysicsState(true);
 
@@ -118,11 +217,15 @@ namespace Player.Equipment
                 itemNetworkTransform.enabled = true;
             }
 
-            ParentConstraint constraint = GetComponent<ParentConstraint>();
-            if (constraint != null)
+            if (itemParentConstraint == null)
             {
-                while (constraint.sourceCount > 0) constraint.RemoveSource(0);
-                constraint.constraintActive = false;
+                TryGetComponent(out itemParentConstraint);
+            }
+
+            if (itemParentConstraint != null)
+            {
+                while (itemParentConstraint.sourceCount > 0) itemParentConstraint.RemoveSource(0);
+                itemParentConstraint.constraintActive = false;
             }
         }
 
@@ -136,6 +239,7 @@ namespace Player.Equipment
             itemRigidbody = GetComponent<Rigidbody>();
             itemNetworkTransform = GetComponent<NetworkTransform>();
             itemNetworkRigidbody = GetComponent<NetworkRigidbody>();
+            itemParentConstraint = GetComponent<ParentConstraint>();
             audioSource = GetComponent<AudioSource>();
         }
 
@@ -145,7 +249,6 @@ namespace Player.Equipment
 
         public bool IsConsumable() => isConsumable;
         public bool IsSingleUse() => true;
-
 
         public void Interact(GameObject player)
         {
@@ -166,19 +269,17 @@ namespace Player.Equipment
             }
 
             Inventory inventory = player.GetComponentInParent<Inventory>();
+            if (inventory == null) return;
 
             bool wasAdded = inventory.AddItem(gameObject);
             if (wasAdded)
             {
                 isCurrentlyHeld = true;
-
                 SetPhysicsState(false);
-
-                TakeServerRpc();
             }
             else
             {
-                Debug.Log("---Item: Inventory is full or idk what happened");
+                Debug.Log("---Item: Inventory is full or cannot add item");
             }
         }
 
@@ -186,15 +287,11 @@ namespace Player.Equipment
         {
             if (!isCurrentlyHeld)
             {
-                Debug.LogWarning("---Item: Trying to drop item that isn't held");
                 return;
             }
 
             isCurrentlyHeld = false;
-
             SetPhysicsState(true);
-
-            DropServerRpc();
         }
 
         virtual public void Use(GameObject player)
@@ -205,14 +302,26 @@ namespace Player.Equipment
                 return;
             }
 
-            Debug.Log($"Using {gameObject.name} by {player.name}");
-
-            //Do things
-            if (clickSounds.Length > 0 && audioSource != null)
+            if (clickSounds != null && clickSounds.Length > 0 && audioSource != null)
             {
                 audioSource.PlayOneShot(clickSounds[UnityEngine.Random.Range(0, clickSounds.Length)]);
             }
             ExecuteItemAction(player);
+        }
+
+        public virtual void OnUnequip()
+        {
+            RequestTurnOffServerRpc();
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void RequestTurnOffServerRpc()
+        {
+            TurnOffServer();
+        }
+
+        public virtual void TurnOffServer()
+        {
         }
 
         #endregion
@@ -223,13 +332,9 @@ namespace Player.Equipment
 
         virtual protected void HandleSingleUseItem(GameObject player)
         {
-            Debug.Log("Single-use item consumed!");
-
-            // Remove from inventory
             Inventory inventory = player.GetComponentInParent<Inventory>();
             if (inventory != null)
             {
-                // Find this item in inventory and remove it
                 for (int i = 0; i < inventory.capacity; i++)
                 {
                     if (inventory.GetItem(i)?.gameObject == gameObject)
@@ -247,35 +352,9 @@ namespace Player.Equipment
         #region Network RPCs
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        private void TakeServerRpc()
-        {
-            TakeClientRpc();
-        }
-
-        [ClientRpc]
-        private void TakeClientRpc()
-        {
-            SetPhysicsState(false);
-            isCurrentlyHeld = true;
-        }
-
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        private void DropServerRpc()
-        {
-            DropClientRpc();
-        }
-
-        [ClientRpc]
-        private void DropClientRpc()
-        {
-            SetPhysicsState(true);
-            isCurrentlyHeld = false;
-        }
-
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void DestroyItemServerRpc()
         {
-            if (NetworkObject != null)
+            if (NetworkObject != null && NetworkObject.IsSpawned)
             {
                 NetworkObject.Despawn(true);
             }
@@ -296,10 +375,14 @@ namespace Player.Equipment
 
         private void SetPhysicsState(bool isPhysicsEnabled)
         {
-            //itemCollider.enabled = isPhysicsEnabled;
-            itemRigidbody.isKinematic = !isPhysicsEnabled;
-            //itemNetworkTransform.enabled = isPhysicsEnabled;
-            itemNetworkRigidbody.enabled = isPhysicsEnabled;
+            if (itemRigidbody != null)
+            {
+                itemRigidbody.isKinematic = !isPhysicsEnabled;
+            }
+            if (itemNetworkRigidbody != null)
+            {
+                itemNetworkRigidbody.enabled = isPhysicsEnabled;
+            }
         }
 
         #endregion

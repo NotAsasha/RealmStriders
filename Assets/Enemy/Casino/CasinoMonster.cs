@@ -78,6 +78,18 @@ namespace Enemy.Casino
             base.Update();
         }
 
+        protected override void OnFreezeStateChange(bool oldV, bool isFreezed)
+        {
+            if (animator != null)
+            {
+                animator.speed = (isFreezed || !isSpawned) ? 0f : 1f;
+            }
+            if (agent != null)
+            {
+                agent.speed = isFreezed ? 0f : defaultSpeed;
+            }
+        }
+
 
         [ClientRpc]
         public void WakeUpClientRpc()

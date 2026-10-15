@@ -2,6 +2,8 @@ using Player;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 namespace Enemy.LureMan
 {
@@ -52,6 +54,27 @@ namespace Enemy.LureMan
             {
                 effects[EffectType.Asleep].Value = true;
                 effects[EffectType.Invincible].Value = true;
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            CleanupMusicBox();
+            base.OnNetworkDespawn();
+        }
+
+        public override void OnDestroy()
+        {
+            CleanupMusicBox();
+            base.OnDestroy();
+        }
+
+        private void CleanupMusicBox()
+        {
+            if (musicBoxTransform != null)
+            {
+                Destroy(musicBoxTransform.gameObject);
+                musicBoxTransform = null;
             }
         }
 
@@ -141,6 +164,10 @@ namespace Enemy.LureMan
             if (musicBoxTransform != null)
             {
                 musicBoxTransform.SetParent(null);
+                if (GameManager.Instance != null && GameManager.Instance.missionScene.IsValid())
+                {
+                    SceneManager.MoveGameObjectToScene(musicBoxTransform.gameObject, GameManager.Instance.missionScene);
+                }
             }
 
             if (animator != null)

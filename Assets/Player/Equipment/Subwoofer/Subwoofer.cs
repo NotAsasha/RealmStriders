@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Player.Equipment;
 using Unity.Netcode;
@@ -18,6 +19,7 @@ namespace Player.Equipment.Subwoofer
         private float checkTimer = 0f;
         private const float CheckInterval = 0.5f;
         private Collider[] hitColliders = new Collider[10];
+        private readonly HashSet<Entity> affectedEntitiesInTick = new();
 
         public NetworkVariable<bool> isOn = new(
             false,
@@ -62,13 +64,20 @@ namespace Player.Equipment.Subwoofer
             isOn.Value = !isOn.Value;
         }
 
+        public override void TurnOffServer()
+        {
+            if (isOn.Value)
+            {
+                isOn.Value = false;
+            }
+        }
+
         private void Update()
         {
-            if (IsServer)
-            {
-                if (isOn.Value && !isCurrentlyHeld) soundProducer?.StartContinuousNoise();
-                else soundProducer?.StopContinuousNoise();
-            }
+            if (!IsServer) return;
+
+            if (isOn.Value && !isCurrentlyHeld) soundProducer?.StartContinuousNoise();
+            else soundProducer?.StopContinuousNoise();
 
             if (!isOn.Value || isCurrentlyHeld) return;
 
@@ -90,15 +99,19 @@ namespace Player.Equipment.Subwoofer
                 QueryTriggerInteraction.Collide
             );
 
+            affectedEntitiesInTick.Clear();
+
             for (int i = 0; i < numColliders; i++)
             {
-                if (hitColliders[i].TryGetComponent<Entity>(out var enemy))
-                {
-                    if (enemy.isDead.Value) continue;
-                    // Slot 0: Subwoofer owns this weakness layer.
-                    enemy.ApplyWeakStack(1, 2f, slot: 0);
-                }
+                var col = hitColliders[i];
                 hitColliders[i] = null;
+                if (col == null) continue;
+
+                var enemy = col.GetComponentInParent<Entity>();
+                if (enemy == null || enemy.isDead.Value || !affectedEntitiesInTick.Add(enemy)) continue;
+
+                // Slot 0: Subwoofer owns this weakness layer.
+                enemy.ApplyWeakStack(1, 2f, slot: 0);
             }
         }
 

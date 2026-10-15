@@ -33,7 +33,7 @@ namespace Enemy
                 if (danger < 1 || danger > enemiesByDanger.Length) continue;
 
                 var pool = enemiesByDanger[danger - 1].enemies;
-                if (pool.Length == 0) continue;
+                if (pool == null || pool.Length == 0) continue;
 
                 if (!RandomMapPoint(out var position)) continue;
                 var prefab = pool[Random.Range(0, pool.Length)];
@@ -47,28 +47,46 @@ namespace Enemy
 
         public static int RandomEnemiesNumber(int teamRating)
         {
-            //You always start with a single enemy.
-            //With every star(3 rating) you are starting to aquire, max enemies count increases by one
-            int maxCount = (int)Mathf.Ceil(teamRating / 3.0f);
-            int minCount = (int)Mathf.Ceil(teamRating / 5.0f);
+            // You always start with a single enemy.
+            // With every star(3 rating) you acquire, max enemies count increases by one
+            int clampedRating = Mathf.Max(1, teamRating);
+            int maxCount = (int)Mathf.Ceil(clampedRating / 3.0f);
+            int minCount = (int)Mathf.Ceil(clampedRating / 5.0f);
 
             return Random.Range(minCount, maxCount + 1);
         }
 
+        public static int GetMaxDanger(int teamRating)
+        {
+            // Star 1 (Rating 1-3): Danger 1-2 only (tiers 3, 4, 5 are strictly prohibited)
+            // Star 2 (Rating 4-6): up to Danger 3
+            // Star 3 (Rating 7-9): up to Danger 4
+            // Star 4-5 (Rating 10+): up to Danger 5
+            if (teamRating <= 3) return 2;
+            if (teamRating <= 6) return 3;
+            if (teamRating <= 9) return 4;
+            return 5;
+        }
+
         public static List<int> CalculateDangers(int teamRating, int enemiesNumber)
         {
-            int maxDanger = teamRating > 8 ? 5 : teamRating > 5 ? 4 : 3;
+            int maxDanger = GetMaxDanger(teamRating);
             float[] weights = new float[maxDanger];
 
-            //Gives spawn probability for every enemy, depending on rating
+            int clampedRating = Mathf.Clamp(teamRating, 1, 15);
+            // Continuous target danger scales smoothly from 0.5 at rating 1 to 5.0 at rating 15
+            float targetDanger = Mathf.Min(5.0f, 0.5f + (clampedRating - 1) * (4.5f / 14.0f));
+            const float sigma = 0.85f;
+            const float twoSigmaSq = 2f * sigma * sigma;
+
             for (int i = 0; i < maxDanger; ++i)
             {
-                weights[i] = Mathf.Pow(teamRating / 15f * (i + 1) / 5f, (i + 1));
+                float diff = (i + 1) - targetDanger;
+                weights[i] = Mathf.Exp(-(diff * diff) / twoSigmaSq);
             }
 
-            //Randomly choose few dangers
+            // Randomly choose danger levels for each enemy
             List<int> dangers = new(enemiesNumber);
-
             for (int i = 0; i < enemiesNumber; ++i)
             {
                 dangers.Add(ChooseWeight(weights) + 1);
@@ -78,23 +96,25 @@ namespace Enemy
 
         private static int ChooseWeight(float[] weights)
         {
-            float sum = 0;
-            foreach (float weight in weights)
-            {
-                sum += weight;
-            }
+            if (weights == null || weights.Length == 0) return 0;
 
-            //Random float within sum range
-            float rand = Random.value * sum;
-
-            //Search where on range it landed by subtracting every weight
+            float sum = 0f;
             for (int i = 0; i < weights.Length; ++i)
             {
-                if (rand < weights[i]) return i;
-                rand -= weights[i];
+                sum += weights[i];
             }
 
-            //If nothing worked, choose last (spawn the strongest enemy ;)
+            if (sum <= 0f) return 0;
+
+            float rand = Random.value * sum;
+            float accumulated = 0f;
+
+            for (int i = 0; i < weights.Length; ++i)
+            {
+                accumulated += weights[i];
+                if (rand <= accumulated) return i;
+            }
+
             return weights.Length - 1;
         }
 

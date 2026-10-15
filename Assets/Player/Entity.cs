@@ -14,6 +14,10 @@ namespace Player
         [SerializeField, Min(0f)] private float captureLift = 1.1f;
         [SerializeField] private CaptureTransformationController captureTransformation;
 
+        [Header("Status Visuals")]
+        [SerializeField] private EntityStatusVisuals statusVisuals;
+        public EntityStatusVisuals StatusVisuals => statusVisuals;
+
         public NetworkVariable<bool> isDead = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<float> entityHealth = new(1f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
@@ -35,6 +39,7 @@ namespace Player
 
         // Tracks one active coroutine per weakness slot (tool source).
         private readonly Dictionary<int, Coroutine> weakStackCoroutines = new();
+        private readonly Dictionary<int, int> weakSlotStacks = new();
         private Dictionary<EffectType, Coroutine> activeCoroutines = new();
 
         public bool IsBeingCaptured => isCapturingNet.Value;
@@ -52,6 +57,15 @@ namespace Player
                 }
             }
 
+            if (statusVisuals == null)
+            {
+                statusVisuals = GetComponent<EntityStatusVisuals>();
+                if (statusVisuals == null)
+                {
+                    statusVisuals = gameObject.AddComponent<EntityStatusVisuals>();
+                }
+            }
+
             effects = new Dictionary<EffectType, NetworkVariable<bool>>()
             {
                 { EffectType.Freeze,     isFrozenNet },
@@ -65,15 +79,31 @@ namespace Player
         public override void OnNetworkSpawn()
         {
             isDead.OnValueChanged += OnDeathStateChange;
-            effects[EffectType.Freeze].OnValueChanged += OnFreezeStateChange;
-            weakStacks.OnValueChanged += OnWeakStacksChanged;
+            effects[EffectType.Freeze].OnValueChanged += HandleFreezeStateChange;
+            effects[EffectType.Water].OnValueChanged += HandleWaterStateChange;
+            weakStacks.OnValueChanged += HandleWeakStacksChanged;
+
+            // Apply active effects on spawn so late-joining clients and new spawns show visuals immediately
+            if (effects[EffectType.Freeze].Value)
+            {
+                HandleFreezeStateChange(false, true);
+            }
+            if (effects[EffectType.Water].Value)
+            {
+                HandleWaterStateChange(false, true);
+            }
+            if (weakStacks.Value > 0)
+            {
+                HandleWeakStacksChanged(0, weakStacks.Value);
+            }
         }
 
         public override void OnNetworkDespawn()
         {
             isDead.OnValueChanged -= OnDeathStateChange;
-            effects[EffectType.Freeze].OnValueChanged -= OnFreezeStateChange;
-            weakStacks.OnValueChanged -= OnWeakStacksChanged;
+            effects[EffectType.Freeze].OnValueChanged -= HandleFreezeStateChange;
+            effects[EffectType.Water].OnValueChanged -= HandleWaterStateChange;
+            weakStacks.OnValueChanged -= HandleWeakStacksChanged;
         }
 
         #endregion
@@ -149,6 +179,7 @@ namespace Player
         [Rpc(SendTo.Everyone)]
         private void PlayCaptureSequenceRpc(Vector3 collapsePoint, double serverStartTime)
         {
+            statusVisuals?.OnCapture();
             captureTransformation?.Play(collapsePoint, serverStartTime, captureSequenceDuration);
         }
 
@@ -206,23 +237,42 @@ namespace Player
             if (!IsServer || isDead.Value || IsBeingCaptured) return;
             if (IsEffectActive(EffectType.Invincible)) return;
 
-            // Refresh: cancel existing timer for this slot before starting a new one.
-            if (weakStackCoroutines.TryGetValue(slot, out Coroutine existing))
+            // If this slot is already active with the exact same stack count, simply refresh the duration timer.
+            if (weakSlotStacks.TryGetValue(slot, out int currentStacks) && currentStacks == stacks)
             {
-                if (existing != null) StopCoroutine(existing);
-                weakStackCoroutines.Remove(slot);
+                if (weakStackCoroutines.TryGetValue(slot, out Coroutine existing))
+                {
+                    if (existing != null) StopCoroutine(existing);
+                }
+                weakStackCoroutines[slot] = StartCoroutine(WeakStackTimer(duration, slot));
+                return;
             }
 
-            weakStackCoroutines[slot] = StartCoroutine(WeakStackTimer(stacks, duration, slot));
+            // If this slot previously had stacks, cancel the timer and subtract them before applying the new amount.
+            if (weakStackCoroutines.TryGetValue(slot, out Coroutine existingCor))
+            {
+                if (existingCor != null) StopCoroutine(existingCor);
+                weakStackCoroutines.Remove(slot);
+                if (weakSlotStacks.TryGetValue(slot, out int prevStacks))
+                {
+                    weakStacks.Value = Mathf.Max(0, weakStacks.Value - prevStacks);
+                }
+            }
+
+            weakSlotStacks[slot] = stacks;
+            weakStacks.Value += stacks;
+            weakStackCoroutines[slot] = StartCoroutine(WeakStackTimer(duration, slot));
         }
 
-        private IEnumerator WeakStackTimer(int stacks, float duration, int slot)
+        private IEnumerator WeakStackTimer(float duration, int slot)
         {
-            weakStacks.Value += stacks;
-
             yield return new WaitForSeconds(duration);
 
-            weakStacks.Value = Mathf.Max(0, weakStacks.Value - stacks);
+            if (weakSlotStacks.TryGetValue(slot, out int stacksToRemove))
+            {
+                weakStacks.Value = Mathf.Max(0, weakStacks.Value - stacksToRemove);
+                weakSlotStacks.Remove(slot);
+            }
             weakStackCoroutines.Remove(slot);
         }
 
@@ -231,13 +281,78 @@ namespace Player
 
         #endregion
 
+        public void ClearAllEffectsServer()
+        {
+            if (!IsServer) return;
+
+            foreach (var kvp in activeCoroutines)
+            {
+                if (kvp.Value != null) StopCoroutine(kvp.Value);
+            }
+            activeCoroutines.Clear();
+
+            foreach (var effect in effects.Values)
+            {
+                effect.Value = false;
+            }
+
+            foreach (var kvp in weakStackCoroutines)
+            {
+                if (kvp.Value != null) StopCoroutine(kvp.Value);
+            }
+            weakStackCoroutines.Clear();
+            weakSlotStacks.Clear();
+            weakStacks.Value = 0;
+        }
+
         protected void OnDeathStateChange(bool oldValue, bool isDead)
         {
-            if (this.isDead.Value) KillEntity();
-            else ReviveEntity();
+            if (this.isDead.Value)
+            {
+                if (IsServer)
+                {
+                    ClearAllEffectsServer();
+                }
+                statusVisuals?.SetDead(true);
+                KillEntity();
+            }
+            else
+            {
+                ReviveEntity();
+                statusVisuals?.SetDead(false);
+                statusVisuals?.OnRevive(effects[EffectType.Freeze].Value, effects[EffectType.Water].Value, weakStacks.Value);
+            }
+        }
+
+        private void HandleFreezeStateChange(bool oldV, bool isFreezed)
+        {
+            if (!this.isDead.Value)
+            {
+                statusVisuals?.SetFreeze(isFreezed);
+            }
+            OnFreezeStateChange(oldV, isFreezed);
+        }
+
+        private void HandleWaterStateChange(bool oldV, bool isWater)
+        {
+            if (!this.isDead.Value)
+            {
+                statusVisuals?.SetWater(isWater);
+            }
+            OnWaterStateChange(oldV, isWater);
+        }
+
+        private void HandleWeakStacksChanged(int oldV, int newV)
+        {
+            if (!this.isDead.Value)
+            {
+                statusVisuals?.SetWeakStacks(newV);
+            }
+            OnWeakStacksChanged(oldV, newV);
         }
 
         virtual protected void OnFreezeStateChange(bool oldV, bool newV) { }
+        virtual protected void OnWaterStateChange(bool oldV, bool newV) { }
         virtual protected void OnWeakStacksChanged(int oldV, int newV) { }
         protected virtual void BeginCaptureLockServer() { }
         protected virtual void OnCaptureFinalizedServer() { }

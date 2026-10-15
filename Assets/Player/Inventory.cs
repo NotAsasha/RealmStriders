@@ -3,7 +3,7 @@ using Player.Movement;
 using Player.UI;
 using System;
 using Unity.Netcode;
-using Unity.Netcode.Components; // Додано для доступу до NetworkTransform
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.InputSystem;
@@ -45,10 +45,11 @@ namespace Player
         private Controls controls;
         private Human human;
         private PlayerMovement playerMovement;
+        private PlayerHeadSync headSync;
 
         #region Unity Lifecycle
 
-        void Start()
+        private void Awake()
         {
             human = GetComponent<Human>();
             playerMovement = GetComponent<PlayerMovement>();
@@ -58,6 +59,17 @@ namespace Player
                 itemHolder = GetComponentInChildren<ItemHolder>(true);
             }
 
+            if (headSync == null)
+            {
+                headSync = GetComponentInChildren<PlayerHeadSync>(true);
+            }
+
+            items = new Item[capacity];
+            slots = new UISlot[capacity];
+        }
+
+        private void Start()
+        {
             InitializeInventory();
             SetupInputHandlers();
             UpdateUI();
@@ -74,9 +86,6 @@ namespace Player
 
         private void InitializeInventory()
         {
-            items = new Item[capacity];
-            slots = new UISlot[capacity];
-
             if (playerMovement != null && playerMovement.controls != null)
             {
                 controls = playerMovement.controls;
@@ -131,6 +140,9 @@ namespace Player
             if (!IsValidSlot(targetSlot) || items[targetSlot] != null)
                 return false;
 
+            items[targetSlot] = takableComponent;
+            SetItemParentServerRpc(itemToAdd, gameObject);
+
             if (targetSlot != activeSlotIndex)
             {
                 SetItemActiveServerRpc(itemToAdd, false);
@@ -142,14 +154,10 @@ namespace Player
                     isHoldingItem.Value = true;
                     itemHolder?.SetActiveItem(takableComponent);
                 }
+                itemChanged?.Invoke(true);
             }
 
-            items[targetSlot] = takableComponent;
-            SetItemParentServerRpc(itemToAdd, gameObject);
-
-            itemChanged?.Invoke(true);
             UpdateUI();
-
             return true;
         }
 
@@ -176,12 +184,12 @@ namespace Player
 
         public Item GetActiveItem()
         {
-            return IsValidSlot(activeSlotIndex) ? items[activeSlotIndex] : null;
+            return items != null && IsValidSlot(activeSlotIndex) ? items[activeSlotIndex] : null;
         }
 
         public Item GetItem(int slot)
         {
-            return IsValidSlot(slot) ? items[slot] : null;
+            return items != null && IsValidSlot(slot) ? items[slot] : null;
         }
 
         public void ToggleUI(bool isActive)
@@ -239,14 +247,19 @@ namespace Player
             {
                 isHoldingItem.Value = false;
                 itemHolder?.SetActiveItem(null);
+                itemChanged?.Invoke(false);
             }
 
-            DropItemServerRpc(itemToDrop.gameObject);
+            GetDropPose(out Vector3 dropOrigin, out Vector3 dropForward);
+            ReleaseItemVisual(itemToDrop.gameObject);
+            DropItemServerRpc(itemToDrop.gameObject, dropOrigin, dropForward);
             UpdateUI();
         }
 
         private void OnDeathStateChange(bool _, bool isDead)
         {
+            ToggleUI(!isDead);
+
             if (!isDead) return;
             DropEverything();
         }
@@ -294,6 +307,7 @@ namespace Player
             Item currentItem = GetActiveItem();
             if (currentItem != null)
             {
+                currentItem.OnUnequip();
                 SetItemActiveServerRpc(currentItem.gameObject, false);
             }
 
@@ -327,13 +341,15 @@ namespace Player
             for (int i = 0; i < capacity; ++i)
             {
                 if (items[i] == null) continue;
-                DropItemServerRpc(items[i].gameObject);
+                GetDropPose(out Vector3 dropOrigin, out Vector3 dropForward);
+                DropItemServerRpc(items[i].gameObject, dropOrigin, dropForward);
                 items[i] = null;
             }
             if (IsOwner)
             {
                 isHoldingItem.Value = false;
                 itemHolder?.SetActiveItem(null);
+                itemChanged?.Invoke(false);
             }
             UpdateUI();
         }
@@ -344,6 +360,8 @@ namespace Player
 
         private void UpdateUI()
         {
+            if (userInterface == null || slotPrefab == null) return;
+
             ValidateUISetup();
 
             if (userInterface.childCount == 0)
@@ -353,6 +371,7 @@ namespace Player
 
             for (int i = 0; i < capacity; i++)
             {
+                if (slots[i] == null) continue;
                 bool hasItem = items[i] != null;
                 bool isActive = i == activeSlotIndex;
                 slots[i].UpdateUI(hasItem, isActive);
@@ -387,11 +406,41 @@ namespace Player
 
         private void ToggleNetworkTransform(GameObject item, bool isEnabled)
         {
-            // Вимикаємо або вмикаємо NetworkTransform, щоб він не конфліктував із локальним рендер-аттачем
             if (item.TryGetComponent<NetworkTransform>(out var netTransform))
             {
                 netTransform.enabled = isEnabled;
             }
+        }
+
+        private void ReleaseItemVisual(GameObject item)
+        {
+            if (item == null) return;
+
+            if (item.TryGetComponent<NetworkObject>(out var networkObject))
+            {
+                networkObject.TryRemoveParent();
+            }
+
+            RemoveParentConstraint(item);
+            ToggleNetworkTransform(item, true);
+
+            if (!item.activeSelf)
+            {
+                item.SetActive(true);
+            }
+        }
+
+        private void GetDropPose(out Vector3 origin, out Vector3 forward)
+        {
+            if (CameraMovement.Instance != null)
+            {
+                origin = CameraMovement.Instance.transform.position;
+                forward = CameraMovement.Instance.transform.forward;
+                return;
+            }
+
+            origin = transform.position + Vector3.up;
+            forward = transform.forward;
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
@@ -400,6 +449,10 @@ namespace Player
             if (objRef.TryGet(out NetworkObject networkObject))
             {
                 networkObject.gameObject.SetActive(isActive);
+                if (isActive && networkObject.TryGetComponent<Item>(out var item))
+                {
+                    item.UpdateRemoteHeldPose();
+                }
                 SetItemActiveClientRpc(objRef, isActive);
             }
         }
@@ -411,6 +464,10 @@ namespace Player
             if (objRef.TryGet(out NetworkObject networkObject))
             {
                 networkObject.gameObject.SetActive(isActive);
+                if (isActive && networkObject.TryGetComponent<Item>(out var item))
+                {
+                    item.UpdateRemoteHeldPose();
+                }
             }
         }
 
@@ -421,8 +478,6 @@ namespace Player
                 return;
 
             obj.TrySetParent(newParent.transform);
-
-            // Вимикаємо синхронізацію координат у мережі, поки предмет у руках
             ToggleNetworkTransform(obj.gameObject, false);
             ApplyParentConstraint(obj.gameObject);
 
@@ -436,19 +491,36 @@ namespace Player
             if (objRef.TryGet(out NetworkObject obj) && newParentRef.TryGet(out NetworkObject newParent))
             {
                 obj.TrySetParent(newParent.transform);
-
                 ToggleNetworkTransform(obj.gameObject, false);
                 ApplyParentConstraint(obj.gameObject);
             }
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void DropItemServerRpc(NetworkObjectReference objRef)
+        public void DropItemServerRpc(
+            NetworkObjectReference objRef,
+            Vector3 requestedOrigin,
+            Vector3 requestedForward)
         {
             if (!objRef.TryGet(out NetworkObject networkObject)) return;
 
-            Vector3 dropOrigin = CameraMovement.Instance != null ? CameraMovement.Instance.transform.position : transform.position + Vector3.up * 1f;
-            Vector3 dropForward = CameraMovement.Instance != null ? CameraMovement.Instance.transform.forward : transform.forward;
+            Vector3 playerOrigin = transform.position + Vector3.up;
+            Vector3 dropOrigin = requestedOrigin;
+            if ((dropOrigin - playerOrigin).sqrMagnitude > 9f)
+            {
+                dropOrigin = playerOrigin;
+            }
+
+            Vector3 dropForward = requestedForward;
+            if (dropForward.sqrMagnitude < 0.0001f)
+            {
+                dropForward = transform.forward;
+            }
+            else
+            {
+                dropForward.Normalize();
+            }
+
             Vector3 dropPos = dropOrigin + dropForward * 0.75f;
             if (Physics.Raycast(dropOrigin, dropForward, out RaycastHit hit, 1f, layer))
             {
@@ -459,8 +531,6 @@ namespace Player
 
             networkObject.TryRemoveParent();
             RemoveParentConstraint(networkObject.gameObject);
-
-            // Повертаємо мережеву синхронізацію предмету, коли він лежить на землі
             ToggleNetworkTransform(networkObject.gameObject, true);
 
             if (!networkObject.gameObject.activeSelf)
@@ -481,71 +551,75 @@ namespace Player
             itemChanged?.Invoke(false);
             if (objRef.TryGet(out NetworkObject networkObject))
             {
-                networkObject.TryRemoveParent();
-                RemoveParentConstraint(networkObject.gameObject);
-
-                ToggleNetworkTransform(networkObject.gameObject, true);
-
-                if (!networkObject.gameObject.activeSelf)
+                if (networkObject.TryGetComponent<Item>(out var takable))
                 {
-                    networkObject.gameObject.SetActive(true);
+                    takable.Drop();
                 }
+                ReleaseItemVisual(networkObject.gameObject);
             }
+        }
+
+        public Quaternion GetRemoteAimRotation()
+        {
+            if (headSync == null)
+            {
+                headSync = GetComponentInChildren<PlayerHeadSync>(true);
+            }
+
+            if (itemHolder == null)
+            {
+                itemHolder = GetComponentInChildren<ItemHolder>(true);
+            }
+
+            float pitch = headSync != null ? headSync.CurrentPitch : 0f;
+            if (itemHolder != null && itemHolder.ClampItemPitch)
+            {
+                pitch = Mathf.Clamp(pitch, itemHolder.MinItemPitch, itemHolder.MaxItemPitch);
+            }
+            else
+            {
+                pitch = Mathf.Clamp(pitch, -45f, 45f);
+            }
+
+            return transform.rotation * Quaternion.Euler(pitch, 0f, 0f);
         }
 
         public void ApplyParentConstraint(GameObject item, Transform customAnchor = null)
         {
             if (item == null) return;
 
-            Transform targetAnchor = customAnchor;
-            if (targetAnchor == null)
-            {
-                if (IsOwner && itemHolder != null && itemHolder.HeldItemSocket != null)
-                {
-                    targetAnchor = itemHolder.HeldItemSocket;
-                }
-                else
-                {
-                    targetAnchor = handAnchor;
-                }
-            }
-
-            if (targetAnchor == null) return;
-
             ParentConstraint constraint = item.GetComponent<ParentConstraint>();
-            if (constraint == null)
+            if (constraint != null)
             {
-                constraint = item.AddComponent<ParentConstraint>();
+                constraint.constraintActive = false;
             }
-
-            constraint.constraintActive = false;
-
-            while (constraint.sourceCount > 0)
-            {
-                constraint.RemoveSource(0);
-            }
-
-            ConstraintSource source = new ConstraintSource { sourceTransform = targetAnchor, weight = 1f };
-            constraint.AddSource(source);
-
-            Vector3 transOffset = Vector3.zero;
-            Vector3 rotOffset = Vector3.zero;
 
             if (item.TryGetComponent<Item>(out var itemComp))
             {
-                (transOffset, rotOffset) = itemComp.GetGripOffsets();
+                itemComp.BindHolderInventory(this, constraint);
+
+                if (IsOwner && itemHolder != null)
+                {
+                    if (item.activeSelf)
+                    {
+                        itemHolder.SetActiveItem(itemComp);
+                    }
+                }
+                else
+                {
+                    itemComp.UpdateRemoteHeldPose();
+                }
             }
-
-            constraint.SetTranslationOffset(0, transOffset);
-            constraint.SetRotationOffset(0, rotOffset);
-
-            constraint.weight = 1f;
-            constraint.constraintActive = true;
         }
 
         private void RemoveParentConstraint(GameObject item)
         {
-            ParentConstraint constraint = item.GetComponent<ParentConstraint>();
+            if (item != null && item.TryGetComponent<Item>(out var itemComp))
+            {
+                itemComp.ClearHolderInventory();
+            }
+
+            ParentConstraint constraint = item != null ? item.GetComponent<ParentConstraint>() : null;
             if (constraint == null) return;
 
             while (constraint.sourceCount > 0)

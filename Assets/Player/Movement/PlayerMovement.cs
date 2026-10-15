@@ -5,6 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace Player.Movement
 {
@@ -201,9 +202,38 @@ namespace Player.Movement
 
 
         private Vector3 previousMove;
+
+        public void ResetMovementState()
+        {
+            velocity = Vector3.zero;
+            previousMove = Vector3.zero;
+            jumpRequested = false;
+            maxFallSpeedThisFlight = 0f;
+        }
+
         private void Update()
         {
             if (!player.enabled) return;
+
+            // Не застосовувати гравітацію та рух, поки ще не завантажилась ігрова сцена (Lobby)
+            string activeSceneName = SceneManager.GetActiveScene().name;
+            if (activeSceneName == "Menu" || activeSceneName == "SteamBoot")
+            {
+                ResetMovementState();
+                return;
+            }
+
+            if (human != null && human.IsEffectActive(EffectType.Freeze))
+            {
+                velocity = Vector3.zero;
+                previousMove = Vector3.zero;
+                jumpRequested = false;
+                if (currentNoiseRadius.Value != 0f) currentNoiseRadius.Value = 0f;
+                return;
+            }
+
+            // Обмежуємо крок часу, щоб під час фризів ПК CharacterController не пролітав крізь тонкі коллайдери підлоги
+            float dt = Mathf.Min(Time.deltaTime, 0.05f);
 
             bool wasGrounded = player.isGrounded;
             InputAction movementControls = controls.Gameplay.Movement;
@@ -245,8 +275,8 @@ namespace Player.Movement
 
             //Apply movement
             Vector3 targetMove = move * currentSpeed;
-            previousMove = Vector3.Lerp(previousMove, targetMove, 15f * Time.deltaTime);
-            player.Move((previousMove + velocity) * Time.deltaTime);
+            previousMove = Vector3.Lerp(previousMove, targetMove, 15f * dt);
+            player.Move((previousMove + velocity) * dt);
 
             //Fall Multiplier
             if (player.isGrounded)
@@ -280,11 +310,11 @@ namespace Player.Movement
                 // Застосовуємо гравітацію
                 if (velocity.y < 0)
                 {
-                    velocity.y += gravity * fallMultiplier * Time.deltaTime; // Падаємо швидше
+                    velocity.y += gravity * fallMultiplier * dt; // Падаємо швидше
                 }
                 else
                 {
-                    velocity.y += gravity * Time.deltaTime; // Летимо вгору зі звичайною швидкістю
+                    velocity.y += gravity * dt; // Летимо вгору зі звичайною швидкістю
                 }
             }
         }

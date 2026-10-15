@@ -220,7 +220,7 @@ MonoBehaviour:
     m_TargetRotationWeight: 1
     m_HintWeight: 1
     m_MaintainTargetPositionOffset: 0
-    m_MaintainTargetRotationOffset: 1
+    m_MaintainTargetRotationOffset: 0
 --- !u!1 &529494577447207419
 GameObject:
   m_ObjectHideFlags: 0
@@ -348,7 +348,7 @@ Transform:
   m_GameObject: {fileID: 617092444077278711}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.18, y: -0.2, z: 0.24}
+  m_LocalPosition: {x: 0.18, y: -0.2, z: 0.18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1198,7 +1198,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 72, y: -41.6}
+  m_AnchoredPosition: {x: 56.7, y: -32.18}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8146702061088190467
@@ -2752,6 +2752,7 @@ MonoBehaviour:
   cameraTransform: {fileID: 7048491912341459997}
   smoothSpeed: 15
   spinePitchFraction: 0
+  pitchNetworkThreshold: 0.1
   minPitchAngle: -50
   maxPitchAngle: 45
 --- !u!1 &6222078028103688546
@@ -2872,6 +2873,7 @@ GameObject:
   - component: {fileID: 7142264790690856648}
   - component: {fileID: 5017923243239964587}
   - component: {fileID: 2694365610372396719}
+  - component: {fileID: 900000000000000003}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -3049,6 +3051,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   proximityAudioSource: {fileID: -9047785158912128643}
+  voiceSoundProducer: {fileID: 900000000000000003}
+  voiceNoiseThreshold: 0.04
 --- !u!114 &8996415516234884795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3246,6 +3250,7 @@ MonoBehaviour:
   captureSequenceDuration: 0.85
   captureLift: 1.1
   captureTransformation: {fileID: 0}
+  statusVisuals: {fileID: 0}
   isDead:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -3300,6 +3305,28 @@ MonoBehaviour:
   AnimatorParameterEntries:
     ParameterEntries: []
   AnimatorParametersExpanded: 0
+--- !u!114 &900000000000000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6525882219545758579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 964159904b634dd418799dd0762f718a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.SoundProducer
+  ShowTopMostFoldoutHeaderGroup: 1
+  soundEmitor: {fileID: 3127143841573814391}
+  soundRadius: 20
+  continuousNoiseInterval: 0.35
+  refreshedNoiseTimeout: 0.5
+  entityLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  source: {fileID: 0}
+  clip: []
 --- !u!1 &6536011491286402701
 GameObject:
   m_ObjectHideFlags: 0

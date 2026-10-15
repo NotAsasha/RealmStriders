@@ -15,12 +15,29 @@ Current specialized enemy areas include:
 - `Runner`
 - `Shocker`
 
+### Sound conventions
+
+- `EnemySounds` handles vocal presentation (idle breathing, chase roars, jumpscares, death).
+- Idle sounds play periodically with randomized intervals while roaming (`minIdleInterval` to `maxIdleInterval`).
+- Angry sounds trigger on detection and repeat periodically during chase (`minAngryInterval` to `maxAngryInterval`).
+- Vocal audio uses a dedicated `AudioSource` to avoid conflicting with movement footstep attenuation or pitch modulation.
+- Vocals are guarded: suppressed while dead, asleep (e.g. music box, static sleep state), frozen, or during capture.
+- Attack/jumpscare sounds trigger automatically on player bite via `Enemy.onBite`.
+
 ## Spawn model
 
 The enemy spawner runs on the server. Mission selection can provide a
-pre-rolled list of danger levels. The spawner selects a prefab from the
-configured danger pool, chooses a map position, moves the object to the
-mission scene, and spawns its `NetworkObject`.
+pre-rolled list of danger levels. Danger tiers are gated by the team rating / star level:
+- Star 1 (Rating 1–3): Danger 1–2 only (Grabar, Runner). Higher tiers (3–5) are strictly prohibited.
+- Star 2 (Rating 4–6): up to Danger 3 (LureMan, Shocker).
+- Star 3 (Rating 7–9): up to Danger 4 (CasinoMonster).
+- Star 4–5 (Rating 10+): up to Danger 5 (InvisiMan).
+
+Within the allowed tiers, danger probability follows a smooth bell curve centered
+around the target danger for the current rating.
+
+The spawner selects a prefab from the configured danger pool, chooses a map position,
+moves the object to the mission scene, and spawns its `NetworkObject`.
 
 The current placement logic excludes the portal area and low positions.
 However, once a mission is active, enemies are intentionally allowed to
@@ -55,6 +72,12 @@ Equipment noise is server-authoritative. A running `LeafBlower` or grounded
 `Subwoofer` continuously lures nearby enemies, while a walkie-talkie only
 lures them while voice data is actively transmitted. `Flashbang` and `Taser`
 create one-shot noise when they activate.
+
+`Runner` treats every lure as a threat: on the server it selects the farthest
+reachable NavMesh point in the direction away from the sound and runs there.
+Repeated continuous noise can update its escape destination. If no complete
+escape path is available, it falls back to its normal random running behaviour
+instead of becoming stationary.
 
 A successful capture produces an `EnemyCage`. All target monsters must be
 captured for a successful mission; killing is not an alternative objective.

@@ -313,12 +313,17 @@ public class GameManager : NetworkBehaviour
 
             // local primary scene
             SceneManager.SetActiveScene(loadedScene);
-            UpdateLocalSceneRpc();
+            UpdateLocalSceneRpc(sceneName);
         }
     }
 
     [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
-    private void UpdateLocalSceneRpc() {
+    private void UpdateLocalSceneRpc(string sceneName) {
+        Scene loadedScene = SceneManager.GetSceneByName(sceneName);
+        if (loadedScene.IsValid())
+        {
+            missionScene = loadedScene;
+        }
         DynamicGI.UpdateEnvironment();
     }
 
@@ -444,6 +449,7 @@ public class GameManager : NetworkBehaviour
         Scene sceneToUnload = SceneManager.GetSceneByName(currentSceneName);
         NetworkManager.Singleton.SceneManager.UnloadScene(sceneToUnload);
         currentSceneName = null;
+        missionScene = default;
     }
 
     #endregion

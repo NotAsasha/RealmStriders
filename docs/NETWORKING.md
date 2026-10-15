@@ -51,7 +51,15 @@ success rating increase.
   `OnNetworkSpawn`/`OnNetworkDespawn`.
 - Noise that affects enemy behaviour is emitted and resolved on the server.
   Continuous equipment noise is driven by server-owned state, while voice
-  transmission refreshes a short-lived server-side noise window.
+  transmission refreshes a short-lived server-side noise window only when the
+  decoded microphone RMS level exceeds the `VoiceChat` threshold (0.04 by
+  default). This prevents microphone static from producing enemy reactions.
+- Held equipment uses a local camera socket for the owning player's
+  first-person view and the networked hand anchor on remote peers. Directional
+  equipment sends the owner's camera origin and direction to the server for
+  authoritative validation. Item drops send the requesting player's drop
+  pose; the server does not use the host's camera as a fallback for client
+  requests.
 
 ## Adding a networked interaction
 
