@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 2352619051838414817}
   - component: {fileID: 1845586188420365749}
   - component: {fileID: 4245422125474942533}
-  - component: {fileID: 8201498570481945829}
   - component: {fileID: 8922254634166151368}
+  - component: {fileID: 3186365447097390515}
   m_Layer: 10
   m_Name: Moon
   m_TagString: Untagged
@@ -58,6 +58,14 @@ MonoBehaviour:
   - {fileID: 8300000, guid: a8033ef17da0b3e40bd1b23262d1a899, type: 3}
   - {fileID: 8300000, guid: 720f6c56c951c024fa836566bbce6593, type: 3}
   - {fileID: 8300000, guid: 39a528c18f1276e4faf090a23aea589a, type: 3}
+  sprites:
+  - {fileID: -1537594644, guid: bdd2f75b844fcf342a14066e412b4323, type: 3}
+  - {fileID: 1974368616, guid: bdd2f75b844fcf342a14066e412b4323, type: 3}
+  - {fileID: -984223356, guid: bdd2f75b844fcf342a14066e412b4323, type: 3}
+  - {fileID: 1614382072, guid: bdd2f75b844fcf342a14066e412b4323, type: 3}
+  - {fileID: 1840183327, guid: bdd2f75b844fcf342a14066e412b4323, type: 3}
+  - {fileID: -337167512, guid: bdd2f75b844fcf342a14066e412b4323, type: 3}
+  - {fileID: -890259150, guid: bdd2f75b844fcf342a14066e412b4323, type: 3}
 --- !u!114 &1845586188420365749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65,7 +73,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5401313124587172463}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0852e1aaa6283fb4ba378a52a6c24539, type: 3}
   m_Name: 
@@ -129,28 +137,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!95 &8201498570481945829
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5401313124587172463}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 45fbf0317d9c1d64baa0b3eecea92e4e, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!82 &8922254634166151368
 AudioSource:
   m_ObjectHideFlags: 0
@@ -163,14 +149,14 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
+  m_PlayOnAwake: 0
+  m_Volume: 0.6
   m_Pitch: 1.5
   Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 179
   DopplerLevel: 1
   MinDistance: 1
   MaxDistance: 2000
@@ -248,3 +234,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3186365447097390515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5401313124587172463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2d8418b0b9634b1892b0268dd9c2743, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Animation.Rigging::UnityEngine.Animations.Rigging.BoneRenderer
+  boneShape: 1
+  drawBones: 1
+  drawTripods: 0
+  boneSize: 1
+  tripodSize: 1
+  boneColor: {r: 0, g: 0, b: 1, a: 0.5}
+  m_Transforms:
+  - {fileID: 5893680151882782501}

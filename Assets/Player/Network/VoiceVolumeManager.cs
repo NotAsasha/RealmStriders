@@ -1,49 +1,96 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using Steamworks;
 using UnityEngine;
 
 namespace Player.Network
 {
     public static class VoiceVolumeManager
     {
-        // Словник: ClientId гравця -> Множник гучності (від 0.0f до 2.0f, де 1.0f = 100%)
+        // Словник: ClientId гравця -> Множник гучності (від 0.0f до 10.0f, де 5.0f = 100%)
         private static readonly Dictionary<ulong, float> playerVolumes = new();
+
+        // Маппінг SteamId <-> NGO ClientId, заповнюється при OnNetworkSpawn кожного VoiceChat
+        private static readonly Dictionary<SteamId, ulong> steamToClient = new();
+        private static readonly Dictionary<ulong, SteamId> clientToSteam = new();
 
         // Подія зміни гучності (на випадок, якщо треба оновити UI)
         public static event Action<ulong, float> OnVolumeChanged;
 
         public const float DEFAULT_VOLUME = 5.0f;
-        public const float MAX_VOLUME = 10.0f; // Можна підсилювати до 200% для тихих мікрофонів
+        public const float MAX_VOLUME = 10.0f;
 
         /// <summary>
-        /// Встановити гучність для конкретного гравця за його ClientId
+        /// Реєструє зв'язок між NGO ClientId та SteamId гравця.
+        /// Викликати з VoiceChat при OnNetworkSpawn.
+        /// </summary>
+        public static void RegisterPlayer(ulong clientId, SteamId steamId)
+        {
+            steamToClient[steamId] = clientId;
+            clientToSteam[clientId] = steamId;
+        }
+
+        /// <summary>
+        /// Знімає реєстрацію гравця при відключенні.
+        /// </summary>
+        public static void UnregisterPlayer(ulong clientId)
+        {
+            if (clientToSteam.TryGetValue(clientId, out SteamId steamId))
+            {
+                steamToClient.Remove(steamId);
+            }
+            clientToSteam.Remove(clientId);
+            playerVolumes.Remove(clientId);
+        }
+
+        /// <summary>
+        /// Встановити гучність через NGO ClientId.
         /// </summary>
         public static void SetVolume(ulong clientId, float volume)
         {
             volume = Mathf.Clamp(volume, 0.0f, MAX_VOLUME);
             playerVolumes[clientId] = volume;
-
             OnVolumeChanged?.Invoke(clientId, volume);
         }
 
         /// <summary>
-        /// Отримати поточний множник гучності гравця (за замовчуванням 1.0f)
+        /// Встановити гучність через SteamId (зручно для PlayerCard).
         /// </summary>
-        public static float GetVolume(ulong clientId)
+        public static void SetVolumeBySteamId(SteamId steamId, float volume)
         {
-            if (playerVolumes.TryGetValue(clientId, out float volume))
-            {
-                return volume;
-            }
-            return DEFAULT_VOLUME;
+            if (steamToClient.TryGetValue(steamId, out ulong clientId))
+                SetVolume(clientId, volume);
         }
 
         /// <summary>
-        /// Скинути всі налаштування гучності (наприклад, при виході з лобі)
+        /// Отримати поточний множник гучності гравця (за замовчуванням DEFAULT_VOLUME).
+        /// </summary>
+        public static float GetVolume(ulong clientId)
+        {
+            return playerVolumes.TryGetValue(clientId, out float volume) ? volume : DEFAULT_VOLUME;
+        }
+
+        /// <summary>
+        /// Отримати поточний множник гучності гравця за SteamId.
+        /// </summary>
+        public static float GetVolumeBySteamId(SteamId steamId)
+        {
+            return steamToClient.TryGetValue(steamId, out ulong clientId) ? GetVolume(clientId) : DEFAULT_VOLUME;
+        }
+
+        /// <summary>
+        /// Перевіряє, чи зареєстрований гравець з таким SteamId.
+        /// </summary>
+        public static bool IsRegistered(SteamId steamId) => steamToClient.ContainsKey(steamId);
+
+        /// <summary>
+        /// Скинути всі налаштування гучності (наприклад, при виході з лобі).
         /// </summary>
         public static void ResetAll()
         {
             playerVolumes.Clear();
+            steamToClient.Clear();
+            clientToSteam.Clear();
         }
     }
-}
+}

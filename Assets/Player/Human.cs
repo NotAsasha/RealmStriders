@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Player.Movement;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 
 namespace Player
 {
@@ -43,16 +44,45 @@ namespace Player
             }
         }
 
-        public void Teleport(Vector3 position)
+        public void Teleport(Vector3 position, Quaternion? rotation = null)
+        {
+            Quaternion targetRotation = rotation ?? transform.rotation;
+
+            if (IsOwner)
+            {
+                ApplyTeleportLocal(position, targetRotation);
+            }
+            else if (IsServer)
+            {
+                TeleportOwnerRpc(position, targetRotation);
+            }
+        }
+
+        private void ApplyTeleportLocal(Vector3 position, Quaternion rotation)
         {
             if (characterController != null) characterController.enabled = false;
-            transform.position = position;
+
+            if (TryGetComponent<NetworkTransform>(out var netTransform))
+            {
+                netTransform.Teleport(position, rotation, transform.localScale);
+            }
+            else
+            {
+                transform.SetPositionAndRotation(position, rotation);
+            }
+
             if (characterController != null) characterController.enabled = true;
 
             if (playerMovement != null)
             {
                 playerMovement.ResetMovementState();
             }
+        }
+
+        [Rpc(SendTo.Owner, InvokePermission = RpcInvokePermission.Server)]
+        private void TeleportOwnerRpc(Vector3 position, Quaternion rotation)
+        {
+            ApplyTeleportLocal(position, rotation);
         }
 
         public void ToSpawnPoint()
@@ -80,7 +110,10 @@ namespace Player
         override protected void ReviveEntity()
         {
             Debug.Log($"---Human: Reviving myself");
-            ToSpawnPoint();
+            if (IsOwner)
+            {
+                ToSpawnPoint();
+            }
             ToggleRagdoll(false);
             StatusVisuals?.SetDead(false);
         }

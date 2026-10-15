@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace Player.UI
 {
@@ -105,6 +106,12 @@ namespace Player.UI
                     Destroy(cardToDestroy.gameObject);
                 }
             }
+        }
+
+        public void LeaveLobby()
+        {
+            SteamManager.Instance.Disconnect();
+            SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);
         }
     }
 }

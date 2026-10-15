@@ -1,35 +1,34 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Animator), typeof(AudioSource))]
+[RequireComponent(typeof(SpriteRenderer), typeof(AudioSource))]
 public class Moon : MonoBehaviour
 {
-    private Animator animator;
     private AudioSource audioSource;
+    private SpriteRenderer spriteRenderer;
 
     public float soundPause = 0.9f;
     public float animSpeed = 1f;
 
     public AudioClip[] audioClips;
-    void Start()
-    {
-        animator = GetComponent<Animator>();
-        audioSource = GetComponent<AudioSource>();
-    }
+    public Sprite[] sprites;
 
     int currentSound = 0;
     float timePassed = 0.85f;
-    void Update()
+
+
+    void Start()
     {
-        //Amination
-        animator.speed = animSpeed;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
+    }
 
-
-
-        //Sound
+    void FixedUpdate()
+    {
         if (timePassed > soundPause)
         {
-            audioSource.clip = audioClips[currentSound];
-            audioSource.Play();
+            audioSource.PlayOneShot(audioClips[currentSound]);
+            spriteRenderer.sprite = sprites[currentSound];
+
 
             currentSound = (currentSound + 1) % audioClips.Length;
             timePassed = 0f;

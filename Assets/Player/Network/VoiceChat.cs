@@ -45,7 +45,21 @@ namespace Player.Network
             else
             {
                 BindInput();
+                // Реєструємо маппінг SteamId ↔ NGO ClientId на всіх клієнтах
+                RegisterSteamIdServerRpc((ulong)SteamClient.SteamId);
             }
+        }
+
+        [Rpc(SendTo.Server)]
+        private void RegisterSteamIdServerRpc(ulong steamId, RpcParams rpcParams = default)
+        {
+            BroadcastSteamIdClientRpc(rpcParams.Receive.SenderClientId, steamId);
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void BroadcastSteamIdClientRpc(ulong clientId, ulong steamId)
+        {
+            VoiceVolumeManager.RegisterPlayer(clientId, steamId);
         }
 
         private void SetupProximityAudio()
@@ -230,6 +244,8 @@ namespace Player.Network
                 voiceAction.started -= OnVoiceStarted;
                 voiceAction.canceled -= OnVoiceCanceled;
             }
+
+            VoiceVolumeManager.UnregisterPlayer(OwnerClientId);
 
             SteamUser.VoiceRecord = false;
             base.OnNetworkDespawn();

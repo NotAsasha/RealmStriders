@@ -223,13 +223,18 @@ public class GameManager : NetworkBehaviour
     {
         foreach (var player in NetworkManager.Singleton.ConnectedClientsList)
         {
+            if (player.PlayerObject == null) continue;
+
             Debug.Log($"---Mission: Reviving player: {player.ClientId}");
-            var human = player.PlayerObject.gameObject.GetComponent<Human>();
-            if (human.isDead.Value)
+            if (player.PlayerObject.TryGetComponent<Human>(out var human))
             {
-                human.isDead.Value = false;
+                if (human.isDead.Value)
+                {
+                    human.isDead.Value = false;
+                    human.Teleport(spawnPoint);
+                }
+                human.entityHealth.Value = human.dangerLevel;
             }
-            human.entityHealth.Value = human.dangerLevel;
         }
     }
 

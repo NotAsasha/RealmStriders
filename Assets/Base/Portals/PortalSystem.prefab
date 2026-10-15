@@ -281,7 +281,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3, y: 0, z: 3}
+  m_Size: {x: 3, y: 2.5, z: 3}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1369873335673406299
 MonoBehaviour:
@@ -864,7 +864,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3, y: 0, z: 3}
+  m_Size: {x: 3, y: 2.5, z: 3}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6921979545388852922
 MonoBehaviour:
@@ -1137,8 +1137,14 @@ MonoBehaviour:
   cameraB: {fileID: 1310157100184466599}
   cameraMatA: {fileID: 2100000, guid: 5ea2270db3b1cee428dd1792ec79644b, type: 2}
   cameraMatB: {fileID: 2100000, guid: c751b8331ffdf0242a579b22503ea4cb, type: 2}
-  isForward: 1
   portalParent: {fileID: 5880079331310546008}
+  portalRenderers: []
+  openDuration: 0.8
+  closeDuration: 0.5
+  audioSource: {fileID: 0}
+  portalOpenSound: {fileID: 0}
+  portalCloseSound: {fileID: 0}
+  isForward: 1
 --- !u!1 &7357977580699593303
 GameObject:
   m_ObjectHideFlags: 0

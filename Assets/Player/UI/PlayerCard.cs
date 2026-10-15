@@ -17,7 +17,62 @@ namespace Player.UI
         public SteamPlayer linkedPlayer;
         public Lobby currentLobby;
 
+        [SerializeField] private Slider volumeSlider;
+        [SerializeField] private GameObject volumeSliderContainer;
+
         [HideInInspector] public bool isFoundInLobby;
+
+        private void OnEnable()
+        {
+            VoiceVolumeManager.OnVolumeChanged += OnVolumeChangedExternally;
+            InitializeSlider();
+        }
+
+        private void OnDisable()
+        {
+            VoiceVolumeManager.OnVolumeChanged -= OnVolumeChangedExternally;
+        }
+
+        private void InitializeSlider()
+        {
+            if (volumeSlider == null || linkedPlayer == null) return;
+
+            bool isLocalPlayer = linkedPlayer.playerSteamId == SteamClient.SteamId;
+
+            // Слайдер власного гравця прихований — немає сенсу регулювати власний голос
+            if (volumeSliderContainer != null)
+                volumeSliderContainer.SetActive(!isLocalPlayer);
+
+            if (isLocalPlayer) return;
+
+            volumeSlider.minValue = 0f;
+            volumeSlider.maxValue = VoiceVolumeManager.MAX_VOLUME;
+            volumeSlider.value = VoiceVolumeManager.GetVolumeBySteamId(linkedPlayer.playerSteamId);
+        }
+
+        /// <summary>
+        /// Викликається з UnityEvent слайдера при зміні значення користувачем.
+        /// </summary>
+        public void OnVolumeSliderChanged(float value)
+        {
+            if (linkedPlayer == null) return;
+            VoiceVolumeManager.SetVolumeBySteamId(linkedPlayer.playerSteamId, value);
+        }
+
+        /// <summary>
+        /// Оновлює слайдер, якщо гучність змінилась ззовні (наприклад, після реєстрації VoiceChat).
+        /// </summary>
+        private void OnVolumeChangedExternally(ulong clientId, float volume)
+        {
+            // Якщо нас не стосується ця подія — ігноруємо
+            if (linkedPlayer == null || volumeSlider == null) return;
+            if (!VoiceVolumeManager.IsRegistered(linkedPlayer.playerSteamId)) return;
+
+            // Оновлюємо слайдер тільки якщо значення відрізняється (щоб не зациклитись)
+            float current = VoiceVolumeManager.GetVolumeBySteamId(linkedPlayer.playerSteamId);
+            if (!Mathf.Approximately(volumeSlider.value, current))
+                volumeSlider.SetValueWithoutNotify(current);
+        }
 
         public void KickButton()
         {
