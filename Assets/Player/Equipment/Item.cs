@@ -11,6 +11,13 @@ namespace Player.Equipment
         [SerializeField] protected bool isConsumable = false;
         [SerializeField] public int sellPrice = 10;
         [SerializeField] public AudioClip[] clickSounds;
+        [Tooltip("Icon displayed in inventory slots when held")]
+        [SerializeField] private Sprite icon;
+        public Sprite Icon
+        {
+            get => icon;
+            set => icon = value;
+        }
 
         [Header("Grip Settings")]
         [Tooltip("Optional child transform defining where the hand holds this item")]

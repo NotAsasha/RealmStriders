@@ -1,3 +1,4 @@
+using System.Collections;
 using Base.BaseUpgrader;
 using Player.Movement;
 using Unity.Netcode;
@@ -21,6 +22,10 @@ namespace Base.Radar
         [SerializeField] private Transform screen;
         [SerializeField] private NetworkObject beamPrefab;
         [SerializeField] private float mapSizeMultiplier = 25.6f;
+
+        [Header("Strike Audio Feedback")]
+        [SerializeField] private AudioSource beamAlarmSource;
+        [SerializeField] private AudioClip strikeAlarmClip;
 
         public readonly NetworkVariable<Vector2> syncedCrosshairPos = new(
             Vector2.zero,
@@ -108,6 +113,57 @@ namespace Base.Radar
             beam = Instantiate(beamPrefab, spawnPos, Quaternion.identity);
             beam.Spawn();
             beamEndTime = Time.time + beamLifetime;
+
+            OnBeamFiredClientRpc();
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void OnBeamFiredClientRpc()
+        {
+            if (beamAlarmSource != null && strikeAlarmClip != null)
+            {
+                beamAlarmSource.PlayOneShot(strikeAlarmClip);
+            }
+            else if (strikeAlarmClip != null)
+            {
+                AudioSource.PlayClipAtPoint(strikeAlarmClip, transform.position);
+            }
+
+            if (crosshair != null)
+            {
+                StartCoroutine(FlashCrosshairRoutine());
+            }
+        }
+
+        private IEnumerator FlashCrosshairRoutine()
+        {
+            if (crosshair == null) yield break;
+            var mr = crosshair.GetComponent<MeshRenderer>();
+            if (mr == null) yield break;
+
+            var mpb = new MaterialPropertyBlock();
+            int colorId = Shader.PropertyToID("_BaseColor");
+            int emissionId = Shader.PropertyToID("_EmissionColor");
+
+            float elapsed = 0f;
+            float duration = 3.5f;
+            while (elapsed < duration && crosshair != null)
+            {
+                elapsed += Time.deltaTime;
+                float blink = Mathf.PingPong(elapsed * 7f, 1f);
+                Color flashColor = Color.Lerp(Color.yellow, new Color(1f, 0.18f, 0.02f), blink);
+
+                mr.GetPropertyBlock(mpb);
+                mpb.SetColor(colorId, flashColor);
+                mpb.SetColor(emissionId, flashColor * 2.5f);
+                mr.SetPropertyBlock(mpb);
+                yield return null;
+            }
+
+            if (crosshair != null && mr != null)
+            {
+                mr.SetPropertyBlock(null);
+            }
         }
 
         private void Update()

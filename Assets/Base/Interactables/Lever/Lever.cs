@@ -8,12 +8,14 @@ namespace Base.Interactables
     {
         [SerializeField] private float cooldown = 0f;
         [SerializeField] private Animator anim;
+        [SerializeField] private AudioSource source;
 
         private bool isReady = true;
 
         private void Awake()
         {
             anim = GetComponent<Animator>();
+            source = GetComponent<AudioSource>();
         }
 
         public void SwitchMissionState()
@@ -49,6 +51,7 @@ namespace Base.Interactables
         private void OnMissionStateChanged(bool oldValue, bool newValue)
         {
             anim.SetBool("IsOn", newValue);
+            source.Play();
             //Debug.LogError($"OnMissionStateChanged, newValue = {newValue}");
             //GetComponent<Renderer>().material.color = newValue ? Color.gray : Color.white; 
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -49,22 +49,31 @@ namespace Netcode.Transports.Facepunch
             catch (Exception e)
             {
                 if (LogLevel <= LogLevel.Error)
-                    Debug.LogError($"[{nameof(FacepunchTransport)}] - Caught an exeption during initialization of Steam client: {e}");
+                    Debug.LogWarning($"[{nameof(FacepunchTransport)}] - Steam is not running or failed to initialize: {e.Message}");
             }
             finally
             {
-                StartCoroutine(InitSteamworks());
+                if (SteamClient.IsValid)
+                {
+                    StartCoroutine(InitSteamworks());
+                }
             }
         }
 
         private void Update()
         {
-            SteamClient.RunCallbacks();
+            if (SteamClient.IsValid)
+            {
+                SteamClient.RunCallbacks();
+            }
         }
 
         private void OnDestroy()
         {
-            SteamClient.Shutdown();
+            if (SteamClient.IsValid)
+            {
+                SteamClient.Shutdown();
+            }
         }
 
         #endregion
@@ -162,6 +171,12 @@ namespace Netcode.Transports.Facepunch
 
         public override bool StartClient()
         {
+            if (!SteamClient.IsValid)
+            {
+                Debug.LogError($"[{nameof(FacepunchTransport)}] - Cannot start client: Steam client is not initialized.");
+                return false;
+            }
+
             if (LogLevel <= LogLevel.Developer)
                 Debug.Log($"[{nameof(FacepunchTransport)}] - Starting as client.");
 
@@ -172,6 +187,12 @@ namespace Netcode.Transports.Facepunch
 
         public override bool StartServer()
         {
+            if (!SteamClient.IsValid)
+            {
+                Debug.LogError($"[{nameof(FacepunchTransport)}] - Cannot start server: Steam client is not initialized.");
+                return false;
+            }
+
             if (LogLevel <= LogLevel.Developer)
                 Debug.Log($"[{nameof(FacepunchTransport)}] - Starting as server.");
 

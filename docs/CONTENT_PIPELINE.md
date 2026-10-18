@@ -27,7 +27,7 @@ requires a different process, document the exception and its reason.
    team.
 3. Reuse the existing equipment interfaces and item flow.
 4. Validate client requests on the server before applying gameplay effects.
-5. Create the prefab, visuals, audio, and UI entry as needed.
+5. Create the prefab, visuals, audio, and UI entry as needed (assign the item sprite in `Item`'s `icon` field for inventory slot display).
 6. Test stacking with other equipment and verify that capture timing remains
    understandable.
 

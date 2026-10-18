@@ -29,7 +29,22 @@ namespace Player.Network
 
         public override void OnNetworkSpawn()
         {
-            sampleRate = (int)SteamUser.OptimalSampleRate;
+            if (SteamClient.IsValid)
+            {
+                try
+                {
+                    sampleRate = (int)SteamUser.OptimalSampleRate;
+                }
+                catch
+                {
+                    sampleRate = 24000;
+                }
+            }
+            else
+            {
+                sampleRate = 24000;
+            }
+
             if (sampleRate <= 0) sampleRate = 24000;
 
             voiceInputStream = new MemoryStream();
@@ -46,7 +61,12 @@ namespace Player.Network
             {
                 BindInput();
                 // Реєструємо маппінг SteamId ↔ NGO ClientId на всіх клієнтах
-                RegisterSteamIdServerRpc((ulong)SteamClient.SteamId);
+                ulong steamId = 0;
+                if (SteamClient.IsValid)
+                {
+                    try { steamId = (ulong)SteamClient.SteamId; } catch { }
+                }
+                RegisterSteamIdServerRpc(steamId);
             }
         }
 
@@ -86,8 +106,21 @@ namespace Player.Network
             }
         }
 
-        private void OnVoiceStarted(InputAction.CallbackContext ctx) => SteamUser.VoiceRecord = true;
-        private void OnVoiceCanceled(InputAction.CallbackContext ctx) => SteamUser.VoiceRecord = false;
+        private void OnVoiceStarted(InputAction.CallbackContext ctx)
+        {
+            if (SteamClient.IsValid)
+            {
+                try { SteamUser.VoiceRecord = true; } catch { }
+            }
+        }
+
+        private void OnVoiceCanceled(InputAction.CallbackContext ctx)
+        {
+            if (SteamClient.IsValid)
+            {
+                try { SteamUser.VoiceRecord = false; } catch { }
+            }
+        }
 
         private void Update()
         {
@@ -119,6 +152,8 @@ namespace Player.Network
 
         private float GetVoiceLevel(int compressedBytes)
         {
+            if (!SteamClient.IsValid) return 0f;
+
             voiceInputStream.Position = 0;
             voiceAnalysisStream.SetLength(0);
             voiceAnalysisStream.Position = 0;
@@ -172,6 +207,8 @@ namespace Player.Network
         [Rpc(SendTo.ClientsAndHost)]
         private void ReceiveVoiceClientRpc(byte[] compressedData, int length, bool isRadio, ulong senderClientId)
         {
+            if (!SteamClient.IsValid) return;
+
             bool isMyOwnVoice = (senderClientId == NetworkManager.Singleton.LocalClientId);
 
             // Отримуємо налаштовану користувачем гучність для цього конкретного гравця
@@ -247,7 +284,10 @@ namespace Player.Network
 
             VoiceVolumeManager.UnregisterPlayer(OwnerClientId);
 
-            SteamUser.VoiceRecord = false;
+            if (SteamClient.IsValid)
+            {
+                try { SteamUser.VoiceRecord = false; } catch { }
+            }
             base.OnNetworkDespawn();
         }
 

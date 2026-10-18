@@ -2,6 +2,7 @@ using Player.Equipment;
 using Player.Movement;
 using Player.UI;
 using System;
+using System.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -29,6 +30,16 @@ namespace Player
         public int capacity = 4;
         [SerializeField] private LayerMask layer;
 
+        [Header("Auto-Hide Settings")]
+        [Tooltip("Automatically hide inventory UI when not in use")]
+        [SerializeField] private bool autoHideUI = true;
+        [Tooltip("Seconds before the inventory UI hides after last activity")]
+        [SerializeField] private float autoHideDelay = 3f;
+        [Tooltip("Duration of the fade-out transition in seconds")]
+        [SerializeField] private float fadeDuration = 0.3f;
+        [Tooltip("CanvasGroup used for smooth fading of the inventory UI")]
+        [SerializeField] private CanvasGroup uiCanvasGroup;
+
         [Header("Current State")]
         [SerializeField] private int activeSlotIndex;
 
@@ -46,6 +57,7 @@ namespace Player
         private Human human;
         private PlayerMovement playerMovement;
         private PlayerHeadSync headSync;
+        private Coroutine hideCoroutine;
 
         #region Unity Lifecycle
 
@@ -64,6 +76,16 @@ namespace Player
                 headSync = GetComponentInChildren<PlayerHeadSync>(true);
             }
 
+            if (uiCanvasGroup == null && userInterface != null)
+            {
+                uiCanvasGroup = userInterface.GetComponent<CanvasGroup>();
+                if (uiCanvasGroup == null)
+                {
+                    uiCanvasGroup = userInterface.gameObject.AddComponent<CanvasGroup>();
+                    uiCanvasGroup.blocksRaycasts = false;
+                }
+            }
+
             items = new Item[capacity];
             slots = new UISlot[capacity];
         }
@@ -73,10 +95,37 @@ namespace Player
             InitializeInventory();
             SetupInputHandlers();
             UpdateUI();
+            if (autoHideUI)
+            {
+                ShowInventoryUI();
+            }
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            if (!IsOwner)
+            {
+                ToggleUI(false);
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (hideCoroutine != null)
+            {
+                StopCoroutine(hideCoroutine);
+                hideCoroutine = null;
+            }
         }
 
         public override void OnDestroy()
         {
+            if (hideCoroutine != null)
+            {
+                StopCoroutine(hideCoroutine);
+                hideCoroutine = null;
+            }
             CleanupInputHandlers();
         }
 
@@ -158,6 +207,10 @@ namespace Player
             }
 
             UpdateUI();
+            if (autoHideUI)
+            {
+                ShowInventoryUI();
+            }
             return true;
         }
 
@@ -179,6 +232,10 @@ namespace Player
             }
 
             UpdateUI();
+            if (autoHideUI)
+            {
+                ShowInventoryUI();
+            }
             return true;
         }
 
@@ -194,9 +251,37 @@ namespace Player
 
         public void ToggleUI(bool isActive)
         {
+            if (hideCoroutine != null)
+            {
+                StopCoroutine(hideCoroutine);
+                hideCoroutine = null;
+            }
+
             if (userInterface != null)
             {
-                userInterface.gameObject.SetActive(isActive);
+                if (isActive)
+                {
+                    if (autoHideUI)
+                    {
+                        ShowInventoryUI();
+                    }
+                    else
+                    {
+                        userInterface.gameObject.SetActive(true);
+                        if (uiCanvasGroup != null)
+                        {
+                            uiCanvasGroup.alpha = 1f;
+                        }
+                    }
+                }
+                else
+                {
+                    if (uiCanvasGroup != null)
+                    {
+                        uiCanvasGroup.alpha = 0f;
+                    }
+                    userInterface.gameObject.SetActive(false);
+                }
             }
         }
 
@@ -212,7 +297,14 @@ namespace Player
             if (Mathf.Approximately(scrollValue, 0f)) return;
 
             int newSlotIndex = CalculateNewSlotIndex(scrollValue);
-            if (newSlotIndex == activeSlotIndex) return;
+            if (newSlotIndex == activeSlotIndex)
+            {
+                if (autoHideUI)
+                {
+                    ShowInventoryUI();
+                }
+                return;
+            }
 
             ChangeActiveSlot(newSlotIndex);
         }
@@ -222,7 +314,14 @@ namespace Player
             if (IsPlayerInInteraction()) return;
 
             int newSlot = (int)context.ReadValue<float>() - 1;
-            if (newSlot == activeSlotIndex) return;
+            if (newSlot == activeSlotIndex)
+            {
+                if (autoHideUI)
+                {
+                    ShowInventoryUI();
+                }
+                return;
+            }
             ChangeActiveSlot(newSlot);
         }
 
@@ -254,6 +353,10 @@ namespace Player
             ReleaseItemVisual(itemToDrop.gameObject);
             DropItemServerRpc(itemToDrop.gameObject, dropOrigin, dropForward);
             UpdateUI();
+            if (autoHideUI)
+            {
+                ShowInventoryUI();
+            }
         }
 
         private void OnDeathStateChange(bool _, bool isDead)
@@ -334,6 +437,10 @@ namespace Player
                 itemChanged?.Invoke(false);
             }
             UpdateUI();
+            if (autoHideUI)
+            {
+                ShowInventoryUI();
+            }
         }
 
         private void DropEverything()
@@ -358,6 +465,55 @@ namespace Player
 
         #region UI Management
 
+        public void ShowInventoryUI()
+        {
+            if (userInterface == null) return;
+            if (human != null && human.isDead.Value) return;
+            if (IsPlayerInInteraction()) return;
+            if (IsSpawned && !IsOwner) return;
+
+            if (hideCoroutine != null)
+            {
+                StopCoroutine(hideCoroutine);
+                hideCoroutine = null;
+            }
+
+            userInterface.gameObject.SetActive(true);
+            if (uiCanvasGroup != null)
+            {
+                uiCanvasGroup.alpha = 1f;
+            }
+
+            if (autoHideUI && gameObject.activeInHierarchy)
+            {
+                hideCoroutine = StartCoroutine(HideAfterDelayRoutine());
+            }
+        }
+
+        private IEnumerator HideAfterDelayRoutine()
+        {
+            yield return new WaitForSeconds(autoHideDelay);
+
+            if (uiCanvasGroup != null && fadeDuration > 0f)
+            {
+                float elapsed = 0f;
+                while (elapsed < fadeDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    uiCanvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / fadeDuration);
+                    yield return null;
+                }
+                uiCanvasGroup.alpha = 0f;
+            }
+
+            if (userInterface != null)
+            {
+                userInterface.gameObject.SetActive(false);
+            }
+
+            hideCoroutine = null;
+        }
+
         private void UpdateUI()
         {
             if (userInterface == null || slotPrefab == null) return;
@@ -374,7 +530,8 @@ namespace Player
                 if (slots[i] == null) continue;
                 bool hasItem = items[i] != null;
                 bool isActive = i == activeSlotIndex;
-                slots[i].UpdateUI(hasItem, isActive);
+                Sprite icon = hasItem ? items[i].Icon : null;
+                slots[i].UpdateUI(hasItem, isActive, icon);
             }
         }
 

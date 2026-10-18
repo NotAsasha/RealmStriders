@@ -21,13 +21,19 @@ namespace Player.UI
 
         private void Start()
         {
-            SteamMatchmaking.OnLobbyDataChanged += UpdatePauseUI;
+            if (SteamClient.IsValid)
+            {
+                SteamMatchmaking.OnLobbyDataChanged += UpdatePauseUI;
+            }
             PlayerMovement.Instance.controls.System.Pause.performed += UpdateMenuState;
         }
 
         private void OnDisable()
         {
-            SteamMatchmaking.OnLobbyDataChanged -= UpdatePauseUI;
+            if (SteamClient.IsValid)
+            {
+                SteamMatchmaking.OnLobbyDataChanged -= UpdatePauseUI;
+            }
             if (PlayerMovement.Instance != null && PlayerMovement.Instance.controls != null)
             {
                 PlayerMovement.Instance.controls.System.Pause.performed -= UpdateMenuState;

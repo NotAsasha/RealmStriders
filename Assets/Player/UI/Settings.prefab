@@ -1495,10 +1495,10 @@ MonoBehaviour:
   inputActions: {fileID: -944628639613478452, guid: 828497b2da6bde74f9582b7ef8aa8b74,
     type: 3}
   qualityDropdown: {fileID: 1660570514287624323}
-  resolutionDropdown: {fileID: 0}
-  windowModeDropdown: {fileID: 0}
+  resolutionDropdown: {fileID: 4939558429322848864}
+  windowModeDropdown: {fileID: 3048985490621486115}
   vSyncToggle: {fileID: 2725079256672019207}
-  frameRateDropdown: {fileID: 0}
+  frameRateDropdown: {fileID: 3876591388118181365}
   shadowQualityDropdown: {fileID: 3645588156030368351}
   OnClose:
     m_PersistentCalls:
@@ -3944,6 +3944,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 3074359432826001888}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4939558429322848864 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7937180539891757952, guid: 3e8e921decd1a0346a3c98c0603a8aad,
+    type: 3}
+  m_PrefabInstance: {fileID: 3074359432826001888}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b743370ac3e4ec2a1668f5455a8ef8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TMP_Dropdown
 --- !u!1001 &4933319023706531747
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4147,6 +4159,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3e8e921decd1a0346a3c98c0603a8aad, type: 3}
+--- !u!114 &3048985490621486115 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7937180539891757952, guid: 3e8e921decd1a0346a3c98c0603a8aad,
+    type: 3}
+  m_PrefabInstance: {fileID: 4933319023706531747}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b743370ac3e4ec2a1668f5455a8ef8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TMP_Dropdown
 --- !u!224 &5098413407125148681 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 195792752435065770, guid: 3e8e921decd1a0346a3c98c0603a8aad,
@@ -4501,6 +4525,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3e8e921decd1a0346a3c98c0603a8aad, type: 3}
+--- !u!114 &3876591388118181365 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7937180539891757952, guid: 3e8e921decd1a0346a3c98c0603a8aad,
+    type: 3}
+  m_PrefabInstance: {fileID: 6623366725901178485}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b743370ac3e4ec2a1668f5455a8ef8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TMP_Dropdown
 --- !u!224 &6439431175580132831 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 195792752435065770, guid: 3e8e921decd1a0346a3c98c0603a8aad,

@@ -34812,11 +34812,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Shocker
   ShowTopMostFoldoutHeaderGroup: 1
   dangerLevel: 3
-  glassCage: {fileID: 7185718866269338340}
+  glassCage: {fileID: 4645287559731344207, guid: fc52f54fcc9527943b93bb0c425bda33,
+    type: 3}
   captureSequenceDuration: 0.85
   captureLift: 1.1
   captureTransformation: {fileID: 7623451754018295720}
   statusVisuals: {fileID: 0}
+  shockAudioSource: {fileID: 0}
+  shockAudioClip: {fileID: 0}
   isDead:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -34849,6 +34852,7 @@ MonoBehaviour:
   dischargeRange: 15
   chargeUpDuration: 2
   dischargeCooldown: 5
+  attackRange: 2
   aoeShockDamage: 0.1
   freezeDuration: 5
   chargeVFX: {fileID: 7767263150273184952}

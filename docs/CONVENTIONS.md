@@ -24,6 +24,7 @@
 - Cache component references outside frame loops.
 - Avoid allocations, LINQ, and repeated lookups in hot update paths.
 - Reuse existing interfaces and events before adding new communication paths.
+- Rely on serialized fields (`[SerializeField]`) assigned in the Inspector; do not write runtime fallback search heuristics (e.g. searching child names with `GetComponentsInChildren` / `.name.Contains(...)`).
 
 ## Networked code
 

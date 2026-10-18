@@ -63,7 +63,18 @@ namespace Player.Equipment
 
         private void InitAudioBuffer()
         {
-            sampleRate = (int)SteamUser.OptimalSampleRate;
+            sampleRate = 24000;
+            if (SteamClient.IsValid)
+            {
+                try
+                {
+                    sampleRate = (int)SteamUser.OptimalSampleRate;
+                }
+                catch
+                {
+                    sampleRate = 24000;
+                }
+            }
             if (sampleRate <= 0) sampleRate = 24000;
 
             radioBuffer = new VoiceAudioBuffer(sampleRate, bufferSeconds: 2.5f, prebufferSeconds: 0.08f);

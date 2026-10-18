@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_FieryOrbitalBeam
+  m_Shader: {fileID: 4800000, guid: e574c95be0df4f14a95c9eb4dfccfebd, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _NoiseTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _CoreRadius: 2.6
+    - _CoreSharpness: 2.2
+    - _CoreTurbulence: 0.35
+    - _DepthFade: 1.25
+    - _EdgeBreakup: 0.85
+    - _EdgeClipThreshold: 0.18
+    - _FresnelPower: 2.5
+    - _GroundFlareBoost: 1.5
+    - _GroundFlareHeight: 0.12
+    - _Intensity: 1
+    - _SecondarySpeedRatio: 1.65
+    - _SkyFadeEnd: 0.99
+    - _SkyFadeStart: 0.78
+    - _Speed: 7.5
+    - _StrikeWidthScale: 1
+    - _TurbulenceDistortion: 0.28
+    - _UseNoiseTex: 0
+    - _VertexDisplacement: 0.04
+    m_Colors:
+    - _CoreColor: {r: 8, g: 6, b: 2, a: 1}
+    - _MainColor: {r: 5, g: 1.6, b: 0.1, a: 1}
+    - _NoiseScale1: {r: 4, g: 2.5, b: 0, a: 0}
+    - _NoiseScale2: {r: 8, g: 6, b: 0, a: 0}
+    - _RimColor: {r: 1.5, g: 0.25, b: 0.03, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

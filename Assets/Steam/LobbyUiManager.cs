@@ -21,14 +21,25 @@ namespace Steam
 
         public void CreateLobbyButton()
         {
-            if (steamManager == null) return;
+            if (steamManager == null)
+            {
+                steamManager = SteamManager.Instance;
+            }
+            if (steamManager == null)
+            {
+                Debug.LogError("[LobbyUiManager] SteamManager instance is not available.");
+                return;
+            }
+
             try
             {
-                steamManager.StartHost(6, friendsOnly.isOn);
+                bool isFriendsOnly = friendsOnly != null && friendsOnly.isOn;
+                steamManager.StartHost(6, isFriendsOnly);
             }
-            catch
+            catch (Exception ex)
             {
-                throw new Exception("Cannot start the steam lobby");
+                Debug.LogError($"[LobbyUiManager] Error starting host: {ex}");
+                throw;
             }
         }
 

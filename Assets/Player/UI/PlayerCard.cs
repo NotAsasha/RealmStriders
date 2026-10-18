@@ -37,7 +37,7 @@ namespace Player.UI
         {
             if (volumeSlider == null || linkedPlayer == null) return;
 
-            bool isLocalPlayer = linkedPlayer.playerSteamId == SteamClient.SteamId;
+            bool isLocalPlayer = SteamClient.IsValid && linkedPlayer.playerSteamId == SteamClient.SteamId;
 
             // Слайдер власного гравця прихований — немає сенсу регулювати власний голос
             if (volumeSliderContainer != null)
@@ -79,7 +79,7 @@ namespace Player.UI
             if (linkedPlayer == null) return; 
             KickPlayerServerRpc(currentLobby, linkedPlayer);
 
-            if (currentLobby.IsOwnedBy(SteamClient.SteamId))
+            if (SteamClient.IsValid && currentLobby.IsOwnedBy(SteamClient.SteamId))
             {
                 Debug.Log("TO DO!!!!!!!!!!!!!!!!!!!!");
             }
@@ -89,7 +89,7 @@ namespace Player.UI
         public void KickPlayerServerRpc(Lobby lobby, SteamPlayer player)
         {
             LeaveLobbyClientRpc(lobby, player);
-            if (player.playerSteamId != SteamClient.SteamId) return;
+            if (SteamClient.IsValid && player.playerSteamId != SteamClient.SteamId) return;
 
             Debug.Log("Kicked yourselfff --- " + player.playerName);
             SteamManager.Instance.Disconnect();

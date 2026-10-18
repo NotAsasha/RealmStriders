@@ -18,6 +18,24 @@ namespace Player
         [SerializeField] private EntityStatusVisuals statusVisuals;
         public EntityStatusVisuals StatusVisuals => statusVisuals;
 
+        [Header("Audio")]
+        [Tooltip("AudioSource played when the entity is shocked / hit with electricity.")]
+        [SerializeField] private AudioSource shockAudioSource;
+        [Tooltip("Optional audio clip played on shockAudioSource when shocked. If null, shockAudioSource.clip is used.")]
+        [SerializeField] private AudioClip shockAudioClip;
+
+        public AudioSource ShockAudioSource
+        {
+            get => shockAudioSource;
+            set => shockAudioSource = value;
+        }
+
+        public AudioClip ShockAudioClip
+        {
+            get => shockAudioClip;
+            set => shockAudioClip = value;
+        }
+
         public NetworkVariable<bool> isDead = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<float> entityHealth = new(1f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
@@ -100,6 +118,7 @@ namespace Player
 
         public override void OnNetworkDespawn()
         {
+            StopShockSound(force: true);
             isDead.OnValueChanged -= OnDeathStateChange;
             effects[EffectType.Freeze].OnValueChanged -= HandleFreezeStateChange;
             effects[EffectType.Water].OnValueChanged -= HandleWaterStateChange;
@@ -179,6 +198,7 @@ namespace Player
         [Rpc(SendTo.Everyone)]
         private void PlayCaptureSequenceRpc(Vector3 collapsePoint, double serverStartTime)
         {
+            StopShockSound(force: true);
             statusVisuals?.OnCapture();
             captureTransformation?.Play(collapsePoint, serverStartTime, captureSequenceDuration);
         }
@@ -197,6 +217,18 @@ namespace Player
             if (!IsServer || isDead.Value || IsBeingCaptured) return;
 
             if (IsEffectActive(EffectType.Invincible) && type != EffectType.Invincible) return;
+
+            if (type == EffectType.Freeze)
+            {
+                if (IsSpawned)
+                {
+                    PlayShockSoundRpc();
+                }
+                else
+                {
+                    PlayShockSound();
+                }
+            }
 
             if (activeCoroutines.TryGetValue(type, out Coroutine existingCor))
             {
@@ -314,6 +346,7 @@ namespace Player
                     ClearAllEffectsServer();
                 }
                 statusVisuals?.SetDead(true);
+                StopShockSound(force: true);
                 KillEntity();
             }
             else
@@ -330,6 +363,19 @@ namespace Player
             {
                 statusVisuals?.SetFreeze(isFreezed);
             }
+
+            if (isFreezed)
+            {
+                if (shockAudioSource != null && shockAudioSource.loop)
+                {
+                    PlayShockSound();
+                }
+            }
+            else
+            {
+                StopShockSound(force: false);
+            }
+
             OnFreezeStateChange(oldV, isFreezed);
         }
 
@@ -359,6 +405,81 @@ namespace Player
 
         virtual protected void KillEntity() { }
         virtual protected void ReviveEntity() { }
+
+        #region Electric Shock Audio
+
+        /// <summary>
+        /// Applies an electric shock effect (freezes/stuns the entity and plays the shock sound).
+        /// </summary>
+        public void ApplyShock(float seconds)
+        {
+            ApplyEffect(EffectType.Freeze, seconds);
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void ApplyShockServerRpc(float seconds)
+        {
+            ApplyEffect(EffectType.Freeze, seconds);
+        }
+
+        /// <summary>
+        /// Plays the electric shock sound on this entity across all clients.
+        /// </summary>
+        [Rpc(SendTo.Everyone)]
+        public void PlayShockSoundRpc()
+        {
+            PlayShockSound();
+        }
+
+        /// <summary>
+        /// Plays the electric shock sound locally on this entity.
+        /// </summary>
+        public void PlayShockSound()
+        {
+            if (isDead.Value || IsBeingCaptured) return;
+            if (shockAudioSource == null) return;
+
+            AudioClip clipToPlay = shockAudioClip != null ? shockAudioClip : shockAudioSource.clip;
+
+            if (shockAudioSource.loop)
+            {
+                if (clipToPlay != null && shockAudioSource.clip != clipToPlay)
+                {
+                    shockAudioSource.clip = clipToPlay;
+                }
+                if (!shockAudioSource.isPlaying)
+                {
+                    shockAudioSource.Play();
+                }
+            }
+            else
+            {
+                if (clipToPlay != null)
+                {
+                    shockAudioSource.PlayOneShot(clipToPlay);
+                }
+                else
+                {
+                    shockAudioSource.Play();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Stops the electric shock sound if it is currently playing.
+        /// </summary>
+        /// <param name="force">If true, stops even non-looping sounds immediately.</param>
+        public void StopShockSound(bool force = false)
+        {
+            if (shockAudioSource == null) return;
+
+            if (force || shockAudioSource.loop)
+            {
+                shockAudioSource.Stop();
+            }
+        }
+
+        #endregion
     }
 
     public enum EffectType

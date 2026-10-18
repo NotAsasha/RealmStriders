@@ -9,12 +9,12 @@ namespace Player.Other
         private void OnTriggerEnter(Collider other)
         {
             if (IsHost || IsServer)
-                other.GetComponent<ICollidable>()?.OnColliderEnter(gameObject);
+                other.GetComponentInParent<ICollidable>()?.OnColliderEnter(gameObject);
         }
         private void OnTriggerExit(Collider other)
         {
             if (IsHost || IsServer)
-                other.GetComponent<ICollidable>()?.OnColliderExit(gameObject);
+                other.GetComponentInParent<ICollidable>()?.OnColliderExit(gameObject);
         }
     }
 }

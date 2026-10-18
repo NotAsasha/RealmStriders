@@ -17,7 +17,10 @@ public class NetworkItemsHandler : NetworkBehaviour
     public void Start()
     {
         if (!IsServer) return;
-        GameManager.Instance.currentSave.LoadGameSave();
+        if (GameManager.Instance != null && GameManager.Instance.currentSave != null)
+        {
+            GameManager.Instance.currentSave.LoadGameSave();
+        }
     }
     public List<ObjectEntry> GetSaveablesInfo()
     {

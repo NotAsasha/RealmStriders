@@ -34,6 +34,8 @@
   - Strongly typed, idiomatic C#.
   - Explicit access modifiers (`private`, `protected`, `public`).
   - Minimal, high-signal comments explaining *why*, not *what*.
+- **Inspector-Driven Configuration**:
+  - DO NOT write fallback runtime search heuristics (e.g. iterating child GameObjects with `GetComponentsInChildren`, matching strings via `.name.ToLowerInvariant().Contains(...)` in `Awake()` / `Start()`) for components or fields that are meant to be configured in the Inspector. Rely directly on serialized fields (`[SerializeField]`).
 
 ---
 

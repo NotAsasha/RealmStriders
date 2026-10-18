@@ -34157,7 +34157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3928757481
+  GlobalObjectIdHash: 1902272690
   InScenePlacedSourceGlobalObjectIdHash: 3830304034
   DeferredDespawnTick: 0
   Ownership: 1
@@ -34268,6 +34268,7 @@ MonoBehaviour:
   eyeLocalPosition: {x: 0, y: 1, z: 0}
   viewDistance: 20
   viewAngle: 120
+  verticalPadding: 1.5
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -34288,8 +34289,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   dangerLevel: 1.5
-  glassCage: {fileID: 707610815179461094, guid: de46285eca51e2d4c9e0994d3b25a964,
+  glassCage: {fileID: 2715807275020494363, guid: ef862e122833586428ca8ba491857366,
     type: 3}
+  captureSequenceDuration: 0.85
+  captureLift: 1.1
+  captureTransformation: {fileID: 0}
+  statusVisuals: {fileID: 0}
+  shockAudioSource: {fileID: 0}
+  shockAudioClip: {fileID: 0}
   isDead:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -34304,12 +34311,20 @@ MonoBehaviour:
   overAggresive: 0
   moveRange: 30
   defaultSpeed: 1
+  chaseSpeed: 8
   thinkCooldown: 0.3
   stepSoundCooldown: 0.3
+  chaseStepSoundCooldown: 0.18
+  stepSoundRadius: 15
   audioSource: {fileID: 8629408249902914250}
   stepSounds:
   - {fileID: 8300000, guid: e64eac18257a7004f944ef3c91520d1b, type: 3}
   - {fileID: 8300000, guid: 5f7ce3e3e3fb9d14c8945e531026aa76, type: 3}
+  netEnemyState:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 3
 --- !u!114 &7085088716978831672
 MonoBehaviour:
   m_ObjectHideFlags: 0

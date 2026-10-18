@@ -23,6 +23,11 @@ namespace Player.Equipment.LeafBlower
         [SerializeField] private AudioClip captureLoopSound;
         [SerializeField] private AudioClip captureStopSound;
         [SerializeField] private AudioClip captureSuccessSound;
+        [Header("Lost Target Audio")]
+        [Tooltip("AudioSource для відтворення звуку втрати цілі (призначається в інспекторі)")]
+        [SerializeField] private AudioSource lostTargetAudioSource;
+        [Tooltip("Аудіокліп звуку втрати цілі (якщо не призначено, буде використано кліп з lostTargetAudioSource)")]
+        [SerializeField] private AudioClip lostTargetSound;
         [SerializeField] private float captureLoopVolume = 1f;
         [SerializeField] private float captureLoopPitchIncrease = 0.25f;
         [SerializeField] private int maxCharge = 100;
@@ -275,7 +280,11 @@ namespace Player.Equipment.LeafBlower
                 }
                 else
                 {
-                    targetIsValid = false;
+                    if (targetIsValid)
+                    {
+                        targetIsValid = false;
+                        PlayLostTargetSoundRpc();
+                    }
                 }
 
                 return;
@@ -283,6 +292,10 @@ namespace Player.Equipment.LeafBlower
 
             if (detectedTarget != currentTarget)
             {
+                if (currentTarget != null && targetIsValid)
+                {
+                    PlayLostTargetSoundRpc();
+                }
                 ResetCaptureProgress();
             }
 
@@ -403,6 +416,35 @@ namespace Player.Equipment.LeafBlower
             if (audioSource == null || captureSuccessSound == null) return;
 
             audioSource.PlayOneShot(captureSuccessSound);
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void PlayLostTargetSoundRpc()
+        {
+            PlayLostTargetAudio();
+        }
+
+        private void PlayLostTargetAudio()
+        {
+            if (lostTargetAudioSource != null)
+            {
+                if (lostTargetSound != null)
+                {
+                    lostTargetAudioSource.PlayOneShot(lostTargetSound);
+                }
+                else if (lostTargetAudioSource.clip != null)
+                {
+                    lostTargetAudioSource.PlayOneShot(lostTargetAudioSource.clip);
+                }
+                else
+                {
+                    lostTargetAudioSource.Play();
+                }
+            }
+            else if (audioSource != null && lostTargetSound != null)
+            {
+                audioSource.PlayOneShot(lostTargetSound);
+            }
         }
 
         #region IChargeable Implementation

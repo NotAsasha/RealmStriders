@@ -864,13 +864,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Stuns entities for 2 seconds.
-
-    Reload time: 10 seconds.
+  m_text: 'Stuns entities for a few seconds.
 
 
-    Can
-    deal damage when combined with water.'
+    weakens them when combined with
+    water.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3ea304948c5df18468729e86c52cce71, type: 2}
   m_sharedMaterial: {fileID: 7505331871414497412, guid: 3ea304948c5df18468729e86c52cce71,
@@ -1706,10 +1704,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Covers entities in water for one second.
+  m_text: 'Covers entities in water for a few seconds.
 
 
-    Can deal damage when combined
+    Weakens them when combined
     with taser.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3ea304948c5df18468729e86c52cce71, type: 2}
@@ -4769,7 +4767,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: $75
+  m_text: $50
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3ea304948c5df18468729e86c52cce71, type: 2}
   m_sharedMaterial: {fileID: 7505331871414497412, guid: 3ea304948c5df18468729e86c52cce71,
@@ -4907,7 +4905,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Shows enemy effects and stars of danger.
+  m_text: Shows entity effects and danger stars.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3ea304948c5df18468729e86c52cce71, type: 2}
   m_sharedMaterial: {fileID: 7505331871414497412, guid: 3ea304948c5df18468729e86c52cce71,
@@ -5045,7 +5043,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: $25
+  m_text: $15
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3ea304948c5df18468729e86c52cce71, type: 2}
   m_sharedMaterial: {fileID: 7505331871414497412, guid: 3ea304948c5df18468729e86c52cce71,
@@ -6117,7 +6115,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Scanner
-  itemPrice: 25
+  itemPrice: 15
   itemPrefab: {fileID: 895901380240031348, guid: 23fed63beb2a54e47aecd03aa2e99fa4,
     type: 3}
 --- !u!1 &6669490746683337576
@@ -7048,7 +7046,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: WalkieTalkie
-  itemPrice: 25
+  itemPrice: 10
   itemPrefab: {fileID: 742197212546932466, guid: afb107c634d22c74bb33899eb38ecb92,
     type: 3}
 --- !u!1 &7839813958171239236
@@ -7145,7 +7143,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Taser
-  itemPrice: 75
+  itemPrice: 50
   itemPrefab: {fileID: 2706276264817999895, guid: a428306e6cdaaf34ea56e45268656a69,
     type: 3}
 --- !u!1 &8068679057506920145
@@ -7213,7 +7211,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: $25
+  m_text: $10
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3ea304948c5df18468729e86c52cce71, type: 2}
   m_sharedMaterial: {fileID: 7505331871414497412, guid: 3ea304948c5df18468729e86c52cce71,
@@ -8829,7 +8827,7 @@ PrefabInstance:
     - target: {fileID: 3689439645031618335, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
       propertyPath: itemPrice
-      value: 50
+      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 3689439645031618335, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
@@ -8940,7 +8938,7 @@ PrefabInstance:
     - target: {fileID: 4405812966972892114, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
       propertyPath: m_text
-      value: $50
+      value: $75
       objectReference: {fileID: 0}
     - target: {fileID: 4650806998330705628, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
@@ -8955,7 +8953,7 @@ PrefabInstance:
     - target: {fileID: 6020794456390566748, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
       propertyPath: m_text
-      value: Shows how much time is left until the end of the mission.
+      value: Shows the remaining mission time.
       objectReference: {fileID: 0}
     - target: {fileID: 6715719085215692023, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
@@ -9007,7 +9005,7 @@ PrefabInstance:
     - target: {fileID: 3689439645031618335, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
       propertyPath: itemPrice
-      value: 150
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 3689439645031618335, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
@@ -9118,7 +9116,7 @@ PrefabInstance:
     - target: {fileID: 4405812966972892114, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
       propertyPath: m_text
-      value: $150
+      value: $100
       objectReference: {fileID: 0}
     - target: {fileID: 4650806998330705628, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
@@ -9133,11 +9131,7 @@ PrefabInstance:
     - target: {fileID: 6020794456390566748, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
       propertyPath: m_text
-      value: 'Emits strong sound that reduces entities health by one star.
-
-
-        Works
-        in certain radius.'
+      value: Emits a strong sound in a small radius, weakening entities by one star.
       objectReference: {fileID: 0}
     - target: {fileID: 6715719085215692023, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
@@ -9516,10 +9510,11 @@ PrefabInstance:
     - target: {fileID: 6020794456390566748, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
       propertyPath: m_text
-      value: 'Explodes via colliding entity.
+      value: 'Detonates upon colliding with an entity, dealing permanent damage.
 
 
-        Can be used in hand...'
+        Can
+        be held in hand...'
       objectReference: {fileID: 0}
     - target: {fileID: 6715719085215692023, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
@@ -10000,10 +9995,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4405812966972892114, guid: 3d9032203f453d74ea3210f229413dbb,
+        type: 3}
+      propertyPath: m_text
+      value: $25
+      objectReference: {fileID: 0}
     - target: {fileID: 4650806998330705628, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
       propertyPath: m_Name
       value: LeafBlower
+      objectReference: {fileID: 0}
+    - target: {fileID: 4650806998330705628, guid: 3d9032203f453d74ea3210f229413dbb,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6020794456390566748, guid: 3d9032203f453d74ea3210f229413dbb,
+        type: 3}
+      propertyPath: m_text
+      value: 'Captures enemies into spheres that you can sell.
+
+
+        The stronger
+        an enemy is, the more time it takes to capture.'
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10250,10 +10264,11 @@ PrefabInstance:
     - target: {fileID: 6020794456390566748, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}
       propertyPath: m_text
-      value: 'Moves furniture.
+      value: 'Allows moving furniture.
 
 
-        Work in progress.'
+        Work in progress. (Will break your
+        save)'
       objectReference: {fileID: 0}
     - target: {fileID: 6715719085215692023, guid: 3d9032203f453d74ea3210f229413dbb,
         type: 3}

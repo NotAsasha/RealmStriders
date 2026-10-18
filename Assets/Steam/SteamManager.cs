@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,7 +19,11 @@ namespace Steam
         public Lobby? CurrentLobby { get; private set; }
         public List<Lobby> Lobbies { get; private set; } = new(100);
 
+        public bool IsSteamActive => SteamClient.IsValid;
+        public bool IsSingleplayer { get; private set; }
+
         private FacepunchTransport cachedTransport;
+        private UnityTransport cachedUnityTransport;
         private bool clientConnectedToHost;
         private string notificationMessage;
         private float notificationExpiresAt;
@@ -31,16 +36,27 @@ namespace Steam
 
                 if (NetworkManager.Singleton != null)
                 {
-                    cachedTransport = NetworkManager.Singleton.NetworkConfig.NetworkTransport as FacepunchTransport
-                                      ?? NetworkManager.Singleton.GetComponent<FacepunchTransport>();
-                }
-
-                if (cachedTransport == null)
-                {
-                    cachedTransport = FindFirstObjectByType<FacepunchTransport>();
+                    cachedTransport = NetworkManager.Singleton.GetComponentInChildren<FacepunchTransport>(true)
+                                      ?? FindFirstObjectByType<FacepunchTransport>();
                 }
 
                 return cachedTransport;
+            }
+        }
+
+        private UnityTransport UnityTransport
+        {
+            get
+            {
+                if (cachedUnityTransport != null) return cachedUnityTransport;
+
+                if (NetworkManager.Singleton != null)
+                {
+                    cachedUnityTransport = NetworkManager.Singleton.GetComponentInChildren<UnityTransport>(true)
+                                           ?? FindFirstObjectByType<UnityTransport>();
+                }
+
+                return cachedUnityTransport;
             }
         }
 
@@ -56,6 +72,7 @@ namespace Steam
             else
             {
                 Destroy(gameObject);
+                return;
             }
         }
 
@@ -66,29 +83,87 @@ namespace Steam
 #else
             Debug.unityLogger.logEnabled = Debug.isDebugBuild;
 #endif
-            SteamMatchmaking.OnLobbyCreated += OnLobbyCreated;
-            SteamMatchmaking.OnLobbyEntered += OnLobbyEntered;
-            SteamMatchmaking.OnLobbyMemberJoined += OnLobbyMemberJoined;
-            SteamMatchmaking.OnLobbyMemberLeave += OnLobbyMemberLeave;
-            SteamMatchmaking.OnLobbyInvite += OnLobbyInvite;
-            SteamFriends.OnGameLobbyJoinRequested += OnGameLobbyJoinRequested;
+            if (IsSteamActive)
+            {
+                SteamMatchmaking.OnLobbyCreated += OnLobbyCreated;
+                SteamMatchmaking.OnLobbyEntered += OnLobbyEntered;
+                SteamMatchmaking.OnLobbyMemberJoined += OnLobbyMemberJoined;
+                SteamMatchmaking.OnLobbyMemberLeave += OnLobbyMemberLeave;
+                SteamMatchmaking.OnLobbyInvite += OnLobbyInvite;
+                SteamFriends.OnGameLobbyJoinRequested += OnGameLobbyJoinRequested;
+            }
+            else
+            {
+                Debug.Log("[SteamManager] Steam is not running. Singleplayer/offline mode enabled.");
+                ConfigureTransport(forceSingleplayer: true);
+            }
         }
 
         private void OnDestroy()
         {
-            SteamMatchmaking.OnLobbyCreated -= OnLobbyCreated;
-            SteamMatchmaking.OnLobbyEntered -= OnLobbyEntered;
-            SteamMatchmaking.OnLobbyMemberJoined -= OnLobbyMemberJoined;
-            SteamMatchmaking.OnLobbyMemberLeave -= OnLobbyMemberLeave;
-            SteamMatchmaking.OnLobbyInvite -= OnLobbyInvite;
-            SteamFriends.OnGameLobbyJoinRequested -= OnGameLobbyJoinRequested;
+            if (IsSteamActive)
+            {
+                SteamMatchmaking.OnLobbyCreated -= OnLobbyCreated;
+                SteamMatchmaking.OnLobbyEntered -= OnLobbyEntered;
+                SteamMatchmaking.OnLobbyMemberJoined -= OnLobbyMemberJoined;
+                SteamMatchmaking.OnLobbyMemberLeave -= OnLobbyMemberLeave;
+                SteamMatchmaking.OnLobbyInvite -= OnLobbyInvite;
+                SteamFriends.OnGameLobbyJoinRequested -= OnGameLobbyJoinRequested;
+            }
 
             UnsubscribeNetworkEvents();
         }
 
         private void OnApplicationQuit() => Disconnect();
 
-        public async void StartHost(uint maxMembers, bool isFriendsOnly)
+        public void ConfigureTransport(bool forceSingleplayer = false)
+        {
+            if (NetworkManager.Singleton == null) return;
+
+            bool useSingleplayer = forceSingleplayer || !IsSteamActive;
+            IsSingleplayer = useSingleplayer;
+
+            var utp = UnityTransport;
+            var fp = Transport;
+
+            if (useSingleplayer)
+            {
+                if (fp != null)
+                {
+                    fp.gameObject.SetActive(false);
+                }
+
+                if (utp != null)
+                {
+                    utp.gameObject.SetActive(true);
+                    NetworkManager.Singleton.NetworkConfig.NetworkTransport = utp;
+                    Debug.Log("[SteamManager] Configured UnityTransport (singleplayer/offline).");
+                }
+                else
+                {
+                    Debug.LogWarning("[SteamManager] UnityTransport component not found! Adding component to NetworkManager.");
+                    utp = NetworkManager.Singleton.gameObject.AddComponent<UnityTransport>();
+                    cachedUnityTransport = utp;
+                    NetworkManager.Singleton.NetworkConfig.NetworkTransport = utp;
+                }
+            }
+            else
+            {
+                if (utp != null)
+                {
+                    utp.gameObject.SetActive(false);
+                }
+
+                if (fp != null)
+                {
+                    fp.gameObject.SetActive(true);
+                    NetworkManager.Singleton.NetworkConfig.NetworkTransport = fp;
+                    Debug.Log("[SteamManager] Configured FacepunchTransport (Steam online).");
+                }
+            }
+        }
+
+        public async void StartHost(uint maxMembers, bool isFriendsOnly, bool singleplayer = false)
         {
             if (NetworkManager.Singleton == null)
             {
@@ -96,7 +171,9 @@ namespace Steam
                 return;
             }
 
-            Debug.Log("[SteamManager] Initializing host...");
+            ConfigureTransport(forceSingleplayer: singleplayer || !IsSteamActive);
+
+            Debug.Log($"[SteamManager] Initializing host... (Singleplayer: {IsSingleplayer}, Steam: {IsSteamActive}, Transport: {NetworkManager.Singleton.NetworkConfig.NetworkTransport?.GetType().Name})");
 
             UnsubscribeNetworkEvents();
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
@@ -109,16 +186,35 @@ namespace Steam
                 return;
             }
 
-            // Створення лобі в Steam. Після успіху Steam сам викличе OnLobbyEntered
-            CurrentLobby = await SteamMatchmaking.CreateLobbyAsync((int)maxMembers);
-            if (CurrentLobby.HasValue)
+            if (IsSteamActive && !IsSingleplayer)
             {
-                if (!isFriendsOnly) CurrentLobby.Value.SetPublic();
-                else CurrentLobby.Value.SetFriendsOnly();
+                try
+                {
+                    // Створення лобі в Steam. Після успіху Steam сам викличе OnLobbyEntered
+                    CurrentLobby = await SteamMatchmaking.CreateLobbyAsync((int)maxMembers);
+                    if (CurrentLobby.HasValue)
+                    {
+                        if (!isFriendsOnly) CurrentLobby.Value.SetPublic();
+                        else CurrentLobby.Value.SetFriendsOnly();
 
-                CurrentLobby.Value.SetJoinable(true);
-                CurrentLobby.Value.SetData("name", "Realm Striders Session");
+                        CurrentLobby.Value.SetJoinable(true);
+                        CurrentLobby.Value.SetData("name", "Realm Striders Session");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"[SteamManager] Failed to create Steam lobby: {ex.Message}. Session will continue locally.");
+                }
             }
+            else
+            {
+                Debug.Log("[SteamManager] Host started in singleplayer/offline mode.");
+            }
+        }
+
+        public void StartSingleplayer()
+        {
+            StartHost(1, true, singleplayer: true);
         }
 
         public void StartClient(SteamId hostSteamId)
@@ -129,11 +225,19 @@ namespace Steam
                 return;
             }
 
+            if (!IsSteamActive)
+            {
+                Debug.LogError("[SteamManager] Cannot connect via Steam: Steam is not running!");
+                return;
+            }
+
             if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer)
             {
                 Debug.LogWarning("[SteamManager] Network session is already running.");
                 return;
             }
+
+            ConfigureTransport(forceSingleplayer: false);
 
             if (Transport == null)
             {
@@ -161,7 +265,17 @@ namespace Steam
         {
             Debug.Log("[SteamManager] Leaving current lobby and stopping network.");
             clientConnectedToHost = false;
-            CurrentLobby?.Leave();
+            if (IsSteamActive)
+            {
+                try
+                {
+                    CurrentLobby?.Leave();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"[SteamManager] Error leaving lobby: {ex.Message}");
+                }
+            }
             CurrentLobby = null;
 
             ResetNetwork();
@@ -180,6 +294,7 @@ namespace Steam
             }
 
             cachedTransport = null;
+            cachedUnityTransport = null;
 
             if (GameManager.Instance != null)
             {
@@ -201,11 +316,18 @@ namespace Steam
 
         public async void TryConnectLobby(SteamId id)
         {
+            if (!IsSteamActive) return;
             CurrentLobby = await SteamMatchmaking.JoinLobbyAsync(id);
         }
 
         public async Task<bool> RefreshLobbies(int maxResults = 20)
         {
+            if (!IsSteamActive)
+            {
+                Lobbies.Clear();
+                return false;
+            }
+
             try
             {
                 Lobbies.Clear();
@@ -232,7 +354,7 @@ namespace Steam
         public async Task<List<SteamPlayer>> GetLobbyMembersAsync()
         {
             List<SteamPlayer> playerList = new();
-            if (!CurrentLobby.HasValue) return playerList;
+            if (!IsSteamActive || !CurrentLobby.HasValue) return playerList;
 
             foreach (var member in CurrentLobby.Value.Members)
             {
@@ -248,6 +370,7 @@ namespace Steam
         // Запит на підключення через інвайт/оверлей Steam
         private async void OnGameLobbyJoinRequested(Lobby lobby, SteamId friendId)
         {
+            if (!IsSteamActive) return;
             Debug.Log($"[SteamManager] Lobby join requested for ID: {lobby.Id}");
 
             // Надійний спосіб Facepunch: приєднуємося через статичний метод Matchmaking
@@ -265,7 +388,7 @@ namespace Steam
             Debug.Log($"[SteamManager] Entered lobby {lobby.Id}. Owner: {lobby.Owner.Id}");
 
             // Безпечна перевірка: чи ми є творцем лобі в Steam
-            if (lobby.Owner.Id == SteamClient.SteamId)
+            if (IsSteamActive && lobby.Owner.Id == SteamClient.SteamId)
             {
                 Debug.Log("[SteamManager] We are the lobby owner. Skipping client start.");
                 return;
