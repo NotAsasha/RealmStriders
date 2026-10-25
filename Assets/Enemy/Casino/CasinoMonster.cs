@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Base.Alarm;
+using Base.BaseUpgrader;
 using Player;
 using Unity.Netcode;
 using UnityEngine;
@@ -152,6 +153,10 @@ namespace Enemy.Casino
             yield return new WaitForSeconds(1.5f);
 
             if (!IsSpawned) yield break;
+
+            // Notify BaseManager so it can start the respawn countdown.
+            BaseManager.Instance?.NotifyCasinoDied();
+
             NetworkObject.Despawn(true);
         }
 

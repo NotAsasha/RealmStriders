@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -24,6 +25,14 @@ namespace Base.BaseUpgrader
         [SerializeField] private NetworkObject shieldButton;
         [SerializeField] private GameObject casinoWall;
         [SerializeField] private NetworkObject charger;
+
+        [Header("Casino Respawn")]
+        [Tooltip("CasinoMonster prefab (NetworkObject) to spawn when the wall re-appears.")]
+        [SerializeField] private NetworkObject casinoMonsterPrefab;
+        [Tooltip("Seconds after the Casino is killed before it respawns and can be purchased again.")]
+        [SerializeField, Min(1f)] private float casinoRespawnDelay = 60f;
+        [Tooltip("Local spawn point for the new CasinoMonster (leave null to use the wall's position).")]
+        [SerializeField] private Transform casinoSpawnPoint;
 
         [Header("Power Grid")]
         [SerializeField] private PowerGrid powerGrid;
@@ -209,6 +218,44 @@ namespace Base.BaseUpgrader
         {
             bool isBought = (current & (int)BaseUpgrades.IsChargerBought) != 0;
             SetUpgradeActive(charger, isBought);
+        }
+
+        #endregion
+
+        #region Casino Respawn
+
+        /// <summary>
+        /// Called by CasinoMonster (server-side) when it despawns after death.
+        /// Starts the respawn countdown: after <see cref="casinoRespawnDelay"/> seconds
+        /// the wall comes back and a fresh CasinoMonster is spawned so players can buy it again.
+        /// </summary>
+        public void NotifyCasinoDied()
+        {
+            if (!IsServer) return;
+            if (casinoMonsterPrefab == null)
+            {
+                Debug.LogWarning("[BaseManager] casinoMonsterPrefab is not assigned — Casino will not respawn.");
+                return;
+            }
+            StartCoroutine(RespawnCasinoAfterDelay());
+        }
+
+        private IEnumerator RespawnCasinoAfterDelay()
+        {
+            Debug.Log($"[BaseManager] Casino killed — respawning in {casinoRespawnDelay}s.");
+            yield return new WaitForSeconds(casinoRespawnDelay);
+
+            // Reset the purchased flag so the wall reappears and the buy button works again.
+            baseUpgrades.Value &= ~(int)BaseUpgrades.IsCasinoBought;
+
+            // Spawn the new static Casino monster at the configured point (or world origin as fallback).
+            Vector3 spawnPos = casinoSpawnPoint != null ? casinoSpawnPoint.position : Vector3.zero;
+            Quaternion spawnRot = casinoSpawnPoint != null ? casinoSpawnPoint.rotation : Quaternion.identity;
+
+            var newCasino = Instantiate(casinoMonsterPrefab, spawnPos, spawnRot);
+            newCasino.Spawn();
+
+            Debug.Log("[BaseManager] New CasinoMonster spawned — ready for purchase.");
         }
 
         #endregion

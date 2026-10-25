@@ -239,7 +239,9 @@ namespace Base.Alarm
             {
                 var enemy = _overlapBuffer[i].GetComponentInParent<Enemy.Enemy>();
                 if (!IsActiveIntruder(enemy)) continue;
-                enemy.isDead.Value = true;
+                // Drive through AddHealth so the full KillEntity pipeline fires
+                // (e.g. CasinoMonster.KillEntity → DespawnAfterDelay).
+                enemy.AddHealth(-enemy.GetHealth() - 1f);
             }
 
             // Kill all players inside the base

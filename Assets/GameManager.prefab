@@ -73,7 +73,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   spawnPoint: {x: 0, y: -49, z: 0}
-  baseRadius: 25
+  baseRadius: 20
   defaultMissionTime: 360
   maxTimeSpread: 120
   teamRating:
@@ -90,7 +90,7 @@ MonoBehaviour:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 10000
+    m_InternalValue: 300
   hasStartedMission:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -135,6 +135,6 @@ MonoBehaviour:
   - enemies:
     - {fileID: 8182809179516268396, guid: eaed7f625dff62a439ba4a1380ed7ee2, type: 3}
   worldCenter: {x: 0, y: 0, z: 0}
-  portalArea: 40
+  portalArea: 20
   spawnRadius: 100
   portalPos: {x: 3, y: 0, z: 0}

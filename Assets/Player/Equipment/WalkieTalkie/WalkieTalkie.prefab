@@ -231,7 +231,7 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 0
+  DopplerLevel: 0.5
   MinDistance: 1
   MaxDistance: 20
   Pan2D: 0
@@ -352,7 +352,7 @@ AudioHighPassFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 800438960164502356}
   m_Enabled: 1
-  m_CutoffFrequency: 600
+  m_CutoffFrequency: 4574
   m_HighpassResonanceQ: 1
 --- !u!169 &7416074145442448591
 AudioLowPassFilter:
@@ -369,7 +369,7 @@ AudioLowPassFilter:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.004092769
+      value: 0.20754889
       inSlope: 0
       outSlope: 0
       tangentMode: 0

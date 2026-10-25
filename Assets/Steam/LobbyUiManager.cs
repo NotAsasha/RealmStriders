@@ -14,9 +14,26 @@ namespace Steam
 
         private SteamManager steamManager;
 
+        private void Awake()
+        {
+            UnlockCursor();
+        }
+
+        private void OnEnable()
+        {
+            UnlockCursor();
+        }
+
         public void Start()
         {
+            UnlockCursor();
             steamManager = SteamManager.Instance;
+        }
+
+        private static void UnlockCursor()
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         public void CreateLobbyButton()

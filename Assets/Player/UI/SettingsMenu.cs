@@ -28,6 +28,11 @@ namespace Assets.Player.UI
         private SettingsFile settingsFile;
         private bool isInitialized;
         private readonly List<ResolutionOption> resolutionOptions = new();
+        [Header("Voice settings")]
+        [SerializeField] private Button buttonHoldVoiceModeButton;
+        [SerializeField] private Button voiceActivationModeButton;
+        [SerializeField] private Image buttonHoldVoiceModeBackground;
+        [SerializeField] private Image voiceActivationModeBackground;
 
         private static readonly int[] FrameRates = { 30, 60, 120, 144, 240, -1 };
         private static readonly string[] FrameRateLabels = { "30", "60", "120", "144", "240", "Unlimited" };
@@ -64,6 +69,8 @@ namespace Assets.Player.UI
 
             BuildResolutionOptions();
             ConfigureGraphicsDropdowns();
+            buttonHoldVoiceModeButton.onClick.AddListener(() => SetVoiceMode(VoiceMode.ButtonHold));
+            voiceActivationModeButton.onClick.AddListener(() => SetVoiceMode(VoiceMode.VoiceActivation));
             isInitialized = true;
             Refresh();
         }
@@ -140,6 +147,29 @@ namespace Assets.Player.UI
             AudioListener.volume = masterVolume;
 
             SelectGraphicsValues();
+            RefreshVoiceModeControls();
+        }
+
+        private void SetVoiceMode(VoiceMode voiceMode)
+        {
+            if (settingsFile == null) return;
+
+            settingsFile.save.voiceMode = voiceMode;
+            RefreshVoiceModeControls();
+        }
+
+        private void RefreshVoiceModeControls()
+        {
+            if (settingsFile == null || buttonHoldVoiceModeBackground == null ||
+                voiceActivationModeBackground == null) return;
+
+            bool isButtonHold = settingsFile.save.voiceMode == VoiceMode.ButtonHold;
+            buttonHoldVoiceModeBackground.color = isButtonHold
+                ? new Color(0.18f, 0.72f, 0.43f, 1f)
+                : new Color(0.18f, 0.18f, 0.18f, 1f);
+            voiceActivationModeBackground.color = isButtonHold
+                ? new Color(0.18f, 0.18f, 0.18f, 1f)
+                : new Color(0.18f, 0.72f, 0.43f, 1f);
         }
 
         private void SelectGraphicsValues()

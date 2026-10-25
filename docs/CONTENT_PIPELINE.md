@@ -28,6 +28,9 @@ requires a different process, document the exception and its reason.
 3. Reuse the existing equipment interfaces and item flow.
 4. Validate client requests on the server before applying gameplay effects.
 5. Create the prefab, visuals, audio, and UI entry as needed (assign the item sprite in `Item`'s `icon` field for inventory slot display).
+   If `clickSounds` is populated, add an enabled `AudioSource` to the same root
+   GameObject as `Item`, with Play On Awake disabled. `Item` caches that source;
+   an AudioSource on a child does not supply the default use click.
 6. Test stacking with other equipment and verify that capture timing remains
    understandable.
 

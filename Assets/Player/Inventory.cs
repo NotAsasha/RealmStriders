@@ -92,10 +92,13 @@ namespace Player
 
         private void Start()
         {
-            InitializeInventory();
-            SetupInputHandlers();
+            if (controls == null && (!IsSpawned || IsOwner))
+            {
+                InitializeInventory();
+                SetupInputHandlers();
+            }
             UpdateUI();
-            if (autoHideUI)
+            if (autoHideUI && (!IsSpawned || IsOwner))
             {
                 ShowInventoryUI();
             }
@@ -104,10 +107,36 @@ namespace Player
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            if (!IsOwner)
+
+            if (human != null)
+            {
+                human.isDead.OnValueChanged += OnDeathStateChange;
+            }
+
+            if (IsOwner)
+            {
+                InitializeInventory();
+                SetupInputHandlers();
+                UpdateUI();
+                if (autoHideUI)
+                {
+                    ShowInventoryUI();
+                }
+            }
+            else
             {
                 ToggleUI(false);
             }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (human != null)
+            {
+                human.isDead.OnValueChanged -= OnDeathStateChange;
+            }
+            CleanupInputHandlers();
+            base.OnNetworkDespawn();
         }
 
         private void OnDisable()
@@ -139,22 +168,21 @@ namespace Player
             {
                 controls = playerMovement.controls;
             }
-            else
-            {
-                Debug.LogError("Movement controls not found on this player object!");
-            }
         }
 
         private void SetupInputHandlers()
         {
             if (controls == null || human == null) return;
 
+            controls.Gameplay.MouseWheel.performed -= OnMouseWheelChanged;
+            controls.Gameplay.SwitchSlot.performed -= OnSlotSwitched;
+            controls.Gameplay.Use.performed -= OnUseItem;
+            controls.Gameplay.Drop.performed -= OnDropItem;
+
             controls.Gameplay.MouseWheel.performed += OnMouseWheelChanged;
             controls.Gameplay.SwitchSlot.performed += OnSlotSwitched;
             controls.Gameplay.Use.performed += OnUseItem;
             controls.Gameplay.Drop.performed += OnDropItem;
-
-            human.isDead.OnValueChanged += OnDeathStateChange;
         }
 
         private void CleanupInputHandlers()
@@ -165,8 +193,6 @@ namespace Player
             controls.Gameplay.SwitchSlot.performed -= OnSlotSwitched;
             controls.Gameplay.Use.performed -= OnUseItem;
             controls.Gameplay.Drop.performed -= OnDropItem;
-
-            human.isDead.OnValueChanged -= OnDeathStateChange;
         }
 
         #endregion
@@ -261,6 +287,9 @@ namespace Player
             {
                 if (isActive)
                 {
+                    if (human != null && human.isDead.Value) return;
+
+                    UpdateUI();
                     if (autoHideUI)
                     {
                         ShowInventoryUI();
@@ -359,12 +388,18 @@ namespace Player
             }
         }
 
-        private void OnDeathStateChange(bool _, bool isDead)
+        private void OnDeathStateChange(bool oldValue, bool isDead)
         {
-            ToggleUI(!isDead);
-
-            if (!isDead) return;
-            DropEverything();
+            if (isDead)
+            {
+                DropEverything();
+                ToggleUI(false);
+            }
+            else
+            {
+                UpdateUI();
+                ToggleUI(true);
+            }
         }
 
         #endregion
@@ -445,12 +480,19 @@ namespace Player
 
         private void DropEverything()
         {
-            for (int i = 0; i < capacity; ++i)
+            if (items != null)
             {
-                if (items[i] == null) continue;
-                GetDropPose(out Vector3 dropOrigin, out Vector3 dropForward);
-                DropItemServerRpc(items[i].gameObject, dropOrigin, dropForward);
-                items[i] = null;
+                for (int i = 0; i < capacity; ++i)
+                {
+                    if (items[i] == null) continue;
+                    Item itemToDrop = items[i];
+                    items[i] = null;
+
+                    itemToDrop.OnUnequip();
+                    GetDropPose(out Vector3 dropOrigin, out Vector3 dropForward);
+                    ReleaseItemVisual(itemToDrop.gameObject);
+                    DropItemServerRpc(itemToDrop.gameObject, dropOrigin, dropForward);
+                }
             }
             if (IsOwner)
             {
@@ -477,6 +519,8 @@ namespace Player
                 StopCoroutine(hideCoroutine);
                 hideCoroutine = null;
             }
+
+            UpdateUI();
 
             userInterface.gameObject.SetActive(true);
             if (uiCanvasGroup != null)
@@ -520,15 +564,30 @@ namespace Player
 
             ValidateUISetup();
 
+            if (slots == null || slots.Length != capacity)
+            {
+                slots = new UISlot[capacity];
+            }
+
             if (userInterface.childCount == 0)
             {
                 CreateUISlots();
+            }
+            else
+            {
+                for (int i = 0; i < capacity && i < userInterface.childCount; i++)
+                {
+                    if (slots[i] == null)
+                    {
+                        slots[i] = userInterface.GetChild(i).GetComponent<UISlot>();
+                    }
+                }
             }
 
             for (int i = 0; i < capacity; i++)
             {
                 if (slots[i] == null) continue;
-                bool hasItem = items[i] != null;
+                bool hasItem = items != null && items[i] != null;
                 bool isActive = i == activeSlotIndex;
                 Sprite icon = hasItem ? items[i].Icon : null;
                 slots[i].UpdateUI(hasItem, isActive, icon);

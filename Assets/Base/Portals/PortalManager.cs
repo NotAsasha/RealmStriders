@@ -1,13 +1,25 @@
 using Base.BaseUpgrader;
+using FileSystem.Scripts;
 using Player;
 using System;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.Serialization;
 
 namespace Portals
 {
+    [Serializable]
+    public struct PortalQualityConfig
+    {
+        [Range(0.25f, 1f)] public float resolutionScale;
+        public bool enableShadows;
+        public bool enablePostProcessing;
+        public float maxRenderDistance;
+        public bool throttleFarDistance;
+    }
+
     public class PortalManager : NetworkBehaviour, IPowerConsumer {
 
         [Header("Cameras & Materials")]
@@ -29,12 +41,44 @@ namespace Portals
         [SerializeField] private AudioSource audioSource;
         [SerializeField] private AudioClip portalOpenSound;
         [SerializeField] private AudioClip portalCloseSound;
+        [SerializeField] private AudioClip portalTeleportSound;
+
+        [Header("Quality Presets")]
+        [SerializeField] private PortalQualityConfig performantConfig = new()
+        {
+            resolutionScale = 0.5f,
+            enableShadows = false,
+            enablePostProcessing = false,
+            maxRenderDistance = 25f,
+            throttleFarDistance = true
+        };
+
+        [SerializeField] private PortalQualityConfig balancedConfig = new()
+        {
+            resolutionScale = 0.75f,
+            enableShadows = false,
+            enablePostProcessing = false,
+            maxRenderDistance = 45f,
+            throttleFarDistance = false
+        };
+
+        [SerializeField] private PortalQualityConfig highFidelityConfig = new()
+        {
+            resolutionScale = 1.0f,
+            enableShadows = true,
+            enablePostProcessing = true,
+            maxRenderDistance = 80f,
+            throttleFarDistance = false
+        };
 
         public static PortalManager Instance;
 
         public bool isForward = true;
 
         public event Action<Human, bool> OnTeleport;
+
+        public AudioClip PortalTeleportSound => portalTeleportSound;
+        public AudioSource AudioSource => audioSource;
 
         private PowerGrid powerGrid;
         private bool isPowerGridRegistered;
@@ -63,42 +107,35 @@ namespace Portals
             if (audioSource == null)
             {
                 audioSource = GetComponent<AudioSource>();
+                if (audioSource == null)
+                {
+                    audioSource = gameObject.AddComponent<AudioSource>();
+                    audioSource.playOnAwake = false;
+                    audioSource.spatialBlend = 0f;
+                }
             }
 
             CacheRenderers();
+        }
+
+        private void OnEnable()
+        {
+            SettingsFile.OnSettingsChanged += ApplyQualitySettings;
         }
 
         void Start () {
             CacheRenderers();
             ChangeState(false, instant: true);
 
-            if (cameraA != null)
-            {
-                if (cameraA.targetTexture != null)
-                {
-                    cameraA.targetTexture.Release();
-                }
-                cameraA.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
-                if (cameraMatA != null) cameraMatA.mainTexture = cameraA.targetTexture;
-                cameraA.gameObject.SetActive(true);
-            }
-
-            if (cameraB != null)
-            {
-                if (cameraB.targetTexture != null)
-                {
-                    cameraB.targetTexture.Release();
-                }
-                cameraB.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
-                if (cameraMatB != null) cameraMatB.mainTexture = cameraB.targetTexture;
-                cameraB.gameObject.SetActive(true);
-            }
+            ApplyQualitySettings();
 
             isForward = true;
         }
 
         private void OnDisable()
         {
+            SettingsFile.OnSettingsChanged -= ApplyQualitySettings;
+
             if (transitionRoutine != null)
             {
                 StopCoroutine(transitionRoutine);
@@ -106,6 +143,14 @@ namespace Portals
             }
 
             SetProgress(0f);
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            SettingsFile.OnSettingsChanged -= ApplyQualitySettings;
+
+            ReleaseCameraTextures();
         }
 
         public override void OnNetworkSpawn()
@@ -137,6 +182,87 @@ namespace Portals
             powerGrid = basePowerGrid;
             powerGrid.RegisterConsumer(this);
             isPowerGridRegistered = true;
+        }
+
+        public void ApplyQualitySettings()
+        {
+            int qualityLevel = QualitySettings.GetQualityLevel();
+            SettingsFile settings = (SettingsFile)GameFileHandler.Instance?.SearchForFileByName("Settings");
+            if (settings != null && settings.save != null && settings.save.qualityLevel >= 0)
+            {
+                qualityLevel = Mathf.Clamp(settings.save.qualityLevel, 0, 2);
+            }
+
+            PortalQualityConfig config = qualityLevel switch
+            {
+                0 => performantConfig,
+                1 => balancedConfig,
+                _ => highFidelityConfig
+            };
+
+            ApplyConfig(config);
+        }
+
+        private void ApplyConfig(PortalQualityConfig config)
+        {
+            int width = Mathf.Max(256, Mathf.RoundToInt(Screen.width * config.resolutionScale));
+            int height = Mathf.Max(256, Mathf.RoundToInt(Screen.height * config.resolutionScale));
+
+            SetupPortalCamera(cameraA, cameraMatA, width, height, "PortalRT_A", config);
+            SetupPortalCamera(cameraB, cameraMatB, width, height, "PortalRT_B", config);
+        }
+
+        private void SetupPortalCamera(Camera cam, Material mat, int width, int height, string rtName, PortalQualityConfig config)
+        {
+            if (cam == null) return;
+
+            if (cam.targetTexture == null || cam.targetTexture.width != width || cam.targetTexture.height != height)
+            {
+                if (cam.targetTexture != null)
+                {
+                    cam.targetTexture.Release();
+                    Destroy(cam.targetTexture);
+                    cam.targetTexture = null;
+                }
+
+                RenderTexture rt = new RenderTexture(width, height, 24, RenderTextureFormat.DefaultHDR)
+                {
+                    name = rtName,
+                    filterMode = FilterMode.Bilinear
+                };
+                cam.targetTexture = rt;
+                if (mat != null) mat.mainTexture = rt;
+            }
+
+            if (cam.TryGetComponent<UniversalAdditionalCameraData>(out var uacd))
+            {
+                uacd.renderShadows = config.enableShadows;
+                uacd.renderPostProcessing = config.enablePostProcessing;
+            }
+
+            if (cam.TryGetComponent<PortalCamera>(out var portalCam))
+            {
+                portalCam.SetQualityConfig(config.maxRenderDistance, config.throttleFarDistance);
+            }
+
+            cam.gameObject.SetActive(true);
+        }
+
+        private void ReleaseCameraTextures()
+        {
+            if (cameraA != null && cameraA.targetTexture != null)
+            {
+                cameraA.targetTexture.Release();
+                Destroy(cameraA.targetTexture);
+                cameraA.targetTexture = null;
+            }
+
+            if (cameraB != null && cameraB.targetTexture != null)
+            {
+                cameraB.targetTexture.Release();
+                Destroy(cameraB.targetTexture);
+                cameraB.targetTexture = null;
+            }
         }
 	
         public void ChangeState(bool isStarted, bool instant = false)
@@ -288,6 +414,12 @@ namespace Portals
         public void CallOnTeleport(Human player)
         {
             if (!isPortalOpen) return;
+
+            if (audioSource != null && portalTeleportSound != null)
+            {
+                audioSource.PlayOneShot(portalTeleportSound);
+            }
+
             OnTeleport?.Invoke(player, isForward);
         }
 

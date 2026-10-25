@@ -38943,6 +38943,8 @@ MonoBehaviour:
   captureLift: 1.1
   captureTransformation: {fileID: 5394576420641348537}
   statusVisuals: {fileID: 0}
+  shockAudioSource: {fileID: 0}
+  shockAudioClip: {fileID: 0}
   isDead:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -39027,7 +39029,7 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1.06
+  DopplerLevel: 0.5
   MinDistance: 1
   MaxDistance: 100
   Pan2D: 0
@@ -39128,13 +39130,14 @@ MonoBehaviour:
   enemy: {fileID: 7170836212076919080}
   idleSounds:
   - {fileID: 8300000, guid: 04e6fb453e97b35408d903261894124f, type: 3}
+  - {fileID: 8300000, guid: 3695b90fba94e1246b3076bed15d9913, type: 3}
   angrySounds:
   - {fileID: 8300000, guid: 03f1e99b15c4b914fb3ec7a8dd5a61ed, type: 3}
   deathSound: {fileID: 8300000, guid: 03f1e99b15c4b914fb3ec7a8dd5a61ed, type: 3}
   jumpscareSound: {fileID: 8300000, guid: 03f1e99b15c4b914fb3ec7a8dd5a61ed, type: 3}
-  idleRadius: 15
-  angryRadius: 25
-  deathRadius: 30
+  idleRadius: 30
+  angryRadius: 35
+  deathRadius: 40
   jumpscareRadius: 40
   vocalAudioSource: {fileID: 0}
   enablePeriodicIdleSounds: 1

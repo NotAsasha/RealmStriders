@@ -46,6 +46,9 @@ success rating increase.
 - Use `NetworkVariable<T>` for persistent replicated state that late-joining
   clients need.
 - Use RPCs for requests and transient events.
+- Flashbang validates the requesting holder, active inventory item, charge,
+  and pulse cooldown on the server. Charge is a server-written NetworkVariable;
+  successful uses broadcast a visual pulse at the authoritative effect origin.
 - Keep presentation-only effects local unless every client must observe them.
 - Subscribe and unsubscribe to network lifecycle events in
   `OnNetworkSpawn`/`OnNetworkDespawn`.

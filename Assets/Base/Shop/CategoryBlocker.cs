@@ -17,13 +17,19 @@ public class CategoryBlocker : MonoBehaviour
 
     private void OnEnable()
     {
-        GameManager.Instance.teamRating.OnValueChanged += UpdateUI;
-        UpdateUI(0, GameManager.Instance.teamRating.Value);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.teamRating.OnValueChanged += UpdateUI;
+            UpdateUI(0, GameManager.Instance.teamRating.Value);
+        }
     }
 
     private void OnDisable()
     {
-        GameManager.Instance.teamRating.OnValueChanged -= UpdateUI;
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.teamRating.OnValueChanged -= UpdateUI;
+        }
     }
 
     private void UpdateUI(int _, int val)

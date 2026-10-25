@@ -1,4 +1,4 @@
-using System.Collections;
+п»їusing System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,26 +6,32 @@ namespace Steam
 {
     public class BootstrapManager : MonoBehaviour
     {
-        [Header("Наступна сцена")]
+        [Header("Next scene")]
         public string sceneToLoad = "Menu";
+
+        private void Awake()
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
 
         private void Start()
         {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             StartCoroutine(LoadSceneAsync());
         }
 
         private IEnumerator LoadSceneAsync()
         {
-            // (Опціонально) Затримка — на випадок, якщо треба трохи почекати
             yield return new WaitForSeconds(1f);
 
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneToLoad);  
 
             while (!asyncLoad.isDone)
             { 
-                // (Опціонально) Можна оновлювати progress-бар: asyncLoad.progress
                 yield return null; 
             }
         }
     }
-} 
+}

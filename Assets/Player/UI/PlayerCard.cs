@@ -33,6 +33,37 @@ namespace Player.UI
             VoiceVolumeManager.OnVolumeChanged -= OnVolumeChangedExternally;
         }
 
+        private void OnDestroy()
+        {
+            if (playerImage != null && playerImage.texture != null)
+            {
+                Destroy(playerImage.texture);
+                playerImage.texture = null;
+            }
+        }
+
+        public void Setup(SteamPlayer player, Lobby? lobby = null)
+        {
+            linkedPlayer = player;
+            if (lobby.HasValue)
+            {
+                currentLobby = lobby.Value;
+            }
+            if (playerName != null)
+            {
+                playerName.text = player.playerName;
+            }
+            if (playerImage != null && player.playerImage.HasValue)
+            {
+                if (playerImage.texture == null)
+                {
+                    var img = player.playerImage.Value;
+                    playerImage.texture = ImageFromBytes((int)img.Width, (int)img.Height, img.Data);
+                }
+            }
+            InitializeSlider();
+        }
+
         private void InitializeSlider()
         {
             if (volumeSlider == null || linkedPlayer == null) return;
@@ -92,6 +123,8 @@ namespace Player.UI
             if (SteamClient.IsValid && player.playerSteamId != SteamClient.SteamId) return;
 
             Debug.Log("Kicked yourselfff --- " + player.playerName);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             SteamManager.Instance.Disconnect();
 
             SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);

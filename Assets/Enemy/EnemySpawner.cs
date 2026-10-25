@@ -122,7 +122,7 @@ namespace Enemy
         public bool RandomMapPoint(out Vector3 position)
         {
             Vector3 searchPos;
-            for (int i = 0; i < 200; ++i)
+            for (int i = 0; i < 1000; ++i)
             {
                 if (!RandomMove.RandomPoint(worldCenter, spawnRadius, out searchPos)) continue;
                 Debug.Log($"---EnemySpawner: Tried {searchPos}");

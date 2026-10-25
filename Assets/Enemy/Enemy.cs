@@ -21,6 +21,12 @@ namespace Enemy
         public float chaseSpeed = 8f;
         public float thinkCooldown = 0.3f;
 
+        [Header("Flee")]
+        [SerializeField, Min(0.5f)] private float fleeDistance = 12f;
+        [SerializeField, Range(1, 8)] private int fleeDirectionSamples = 5;
+        [SerializeField, Min(0.5f)] private float navMeshSampleDistance = 4f;
+        private NavMeshPath fleePath;
+
         [Header("Step Sounds")]
         public float stepSoundCooldown = 0.3f;
         public float chaseStepSoundCooldown = 0.18f;
@@ -223,7 +229,7 @@ namespace Enemy
                 if (Time.time >= nextUpdate)
                 {
                     nextUpdate = Time.time + thinkCooldown + UnityEngine.Random.Range(0f, 0.1f);
-                    Think();
+                    if (!ContinueRunning()) Think();
                 }
             }
 
@@ -243,17 +249,6 @@ namespace Enemy
         {
             if (agent == null) return;
 
-            //first priority, run
-            if (enemyState == EnemyState.IsRunning)
-            {
-                if (agent.isOnNavMesh && agent.remainingDistance > agent.stoppingDistance) return;
-                enemyState = EnemyState.IsMoving;
-                if (!IsEffectActive(EffectType.Freeze))
-                {
-                    agent.speed = defaultSpeed;
-                }
-            }
-
             //second priority, search for player
             if (ChasePlayer(overAggresive)) return;
 
@@ -266,12 +261,84 @@ namespace Enemy
 
         public void Run()
         {
-            Move();
+            if (!IsServer) return;
+            var threat = vision != null ? vision.EntityInSight() ?? vision.EntityInHearing() : null;
+            Run(threat != null ? threat.transform.position : transform.position + transform.forward);
+        }
+
+        public void Run(Vector3 sourcePosition)
+        {
+            if (!IsServer || isDead.Value || IsBeingCaptured || IsEffectActive(EffectType.Asleep) ||
+                agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
+
+            if (!TryFindFleePoint(sourcePosition, out Vector3 fleePoint) || !agent.SetDestination(fleePoint)) return;
+
             enemyState = EnemyState.IsRunning;
-            if (agent != null && !IsEffectActive(EffectType.Freeze))
+            if (!IsEffectActive(EffectType.Freeze))
             {
                 agent.speed = chaseSpeed;
             }
+        }
+
+        private bool ContinueRunning()
+        {
+            if (enemyState != EnemyState.IsRunning) return false;
+            if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+            {
+                if (agent.pathPending || (agent.hasPath && agent.pathStatus == NavMeshPathStatus.PathComplete &&
+                    agent.remainingDistance > agent.stoppingDistance))
+                {
+                    agent.speed = chaseSpeed;
+                    return true;
+                }
+                agent.speed = defaultSpeed;
+            }
+            enemyState = EnemyState.IsMoving;
+            return false;
+        }
+
+        protected bool TryFindFleePoint(Vector3 sourcePosition, out Vector3 fleePoint)
+        {
+            fleePath ??= new NavMeshPath();
+            Vector3 origin = transform.position;
+            Vector3 away = origin - sourcePosition;
+            away.y = 0f;
+            float sourceDistanceSquared = away.sqrMagnitude;
+            if (away.sqrMagnitude <= 0.001f) away = -transform.forward;
+            away.y = 0f;
+            if (away.sqrMagnitude <= 0.001f) away = Vector3.back;
+            away.Normalize();
+
+            fleePoint = origin;
+            float bestDistance = sourceDistanceSquared;
+            int sampleCount = Mathf.Max(1, fleeDirectionSamples);
+            var filter = new NavMeshQueryFilter { agentTypeID = agent.agentTypeID, areaMask = agent.areaMask };
+
+            // Shorter candidates let enemies escape in tight rooms without choosing a random direction.
+            for (int distanceStep = 0; distanceStep < 3; distanceStep++)
+            {
+                float distance = Mathf.Max(0.5f, fleeDistance) / (1 << distanceStep);
+                for (int i = 0; i < sampleCount; i++)
+                {
+                    float angle = sampleCount == 1 ? 0f : -60f + 120f * i / (sampleCount - 1);
+                    Vector3 direction = Quaternion.Euler(0f, angle, 0f) * away;
+                    Vector3 candidate = origin + direction * distance;
+                    if (!NavMesh.SamplePosition(candidate, out NavMeshHit hit, navMeshSampleDistance, filter)) continue;
+
+                    Vector3 displacement = hit.position - origin;
+                    displacement.y = 0f;
+                    Vector3 fromSource = hit.position - sourcePosition;
+                    fromSource.y = 0f;
+                    float distanceFromSource = fromSource.sqrMagnitude;
+                    if (Vector3.Dot(displacement, away) <= 0f || distanceFromSource <= bestDistance ||
+                        displacement.sqrMagnitude <= agent.stoppingDistance * agent.stoppingDistance) continue;
+                    if (!agent.CalculatePath(hit.position, fleePath) || fleePath.status != NavMeshPathStatus.PathComplete) continue;
+
+                    bestDistance = distanceFromSource;
+                    fleePoint = hit.position;
+                }
+            }
+            return bestDistance > sourceDistanceSquared;
         }
 
         protected virtual bool ChasePlayer(bool countEnemies = false)

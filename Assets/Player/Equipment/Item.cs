@@ -2,6 +2,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Animations;
+using static Unity.VisualScripting.Member;
 
 namespace Player.Equipment
 {
@@ -10,7 +11,14 @@ namespace Player.Equipment
         [Header("Item Settings")]
         [SerializeField] protected bool isConsumable = false;
         [SerializeField] public int sellPrice = 10;
+
+
+        [Header("Audio Variation")]
+        [Range(0f, 0.3f)] public float pitchVariation = 0.08f;
+
+
         [SerializeField] public AudioClip[] clickSounds;
+
         [Tooltip("Icon displayed in inventory slots when held")]
         [SerializeField] private Sprite icon;
         public Sprite Icon
@@ -19,6 +27,7 @@ namespace Player.Equipment
             set => icon = value;
         }
 
+
         [Header("Grip Settings")]
         [Tooltip("Optional child transform defining where the hand holds this item")]
         [SerializeField] public Transform gripPoint;
@@ -26,6 +35,8 @@ namespace Player.Equipment
         [SerializeField] public Vector3 gripPositionOffset;
         [Tooltip("Rotation offset (Euler angles) applied to handAnchor if gripPoint is not assigned")]
         [SerializeField] public Vector3 gripRotationOffset;
+
+        
 
         public (Vector3 translationOffset, Vector3 rotationOffset) GetGripOffsets()
         {
@@ -77,6 +88,7 @@ namespace Player.Equipment
         private ParentConstraint itemParentConstraint;
         private Inventory holderInventory;
         protected AudioSource audioSource;
+        private DroppedItemHighlight droppedItemHighlight;
 
         public bool isCurrentlyHeld = false;
 
@@ -197,6 +209,7 @@ namespace Player.Equipment
             holderInventory = inventory;
             isCurrentlyHeld = true;
             SetPhysicsState(false);
+            droppedItemHighlight?.Stop();
 
             if (itemNetworkTransform != null)
             {
@@ -218,6 +231,7 @@ namespace Player.Equipment
             holderInventory = null;
             isCurrentlyHeld = false;
             SetPhysicsState(true);
+            droppedItemHighlight?.Play();
 
             if (itemNetworkTransform != null)
             {
@@ -248,6 +262,7 @@ namespace Player.Equipment
             itemNetworkRigidbody = GetComponent<NetworkRigidbody>();
             itemParentConstraint = GetComponent<ParentConstraint>();
             audioSource = GetComponent<AudioSource>();
+            TryGetComponent(out droppedItemHighlight);
         }
 
         #endregion
@@ -311,6 +326,8 @@ namespace Player.Equipment
 
             if (clickSounds != null && clickSounds.Length > 0 && audioSource != null)
             {
+                float pitchOffset = Random.Range(-pitchVariation, pitchVariation);
+                audioSource.pitch = Mathf.Clamp(1.0f + pitchOffset, 0.5f, 2.0f);
                 audioSource.PlayOneShot(clickSounds[UnityEngine.Random.Range(0, clickSounds.Length)]);
             }
             ExecuteItemAction(player);

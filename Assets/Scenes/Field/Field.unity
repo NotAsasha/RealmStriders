@@ -2167,6 +2167,7 @@ GameObject:
   - component: {fileID: 136462838}
   - component: {fileID: 136462837}
   - component: {fileID: 136462836}
+  - component: {fileID: 136462839}
   m_Layer: 9
   m_Name: Global Volume
   m_TagString: Untagged
@@ -2186,7 +2187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
-  m_IsGlobal: 1
+  m_IsGlobal: 0
   priority: 1
   blendDistance: 0
   weight: 1
@@ -2235,7 +2236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e14dd7562445e14d9016043ce33827b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Scenes.EffectManager
-  defaultEffects: {fileID: 136462833}
+  defaultEffects: {fileID: 0}
   timeEffects: {fileID: 136462836}
   ambientSounds: []
   sceneAudios:
@@ -2339,6 +2340,27 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!65 &136462839
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 136462832}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 512, y: 50, z: 512}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &150885708
 GameObject:
   m_ObjectHideFlags: 0
@@ -33636,8 +33658,8 @@ Terrain:
   m_TreeBillboardDistance: 50
   m_TreeCrossFadeLength: 5
   m_TreeMaximumFullLODCount: 50
-  m_DetailObjectDistance: 80
-  m_DetailObjectDensity: 1
+  m_DetailObjectDistance: 50
+  m_DetailObjectDensity: 0.5
   m_HeightmapPixelError: 5
   m_SplatMapDistance: 1000
   m_HeightmapMinimumLODSimplification: 0

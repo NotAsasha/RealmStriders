@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 using Player.Movement;
 using Player.Equipment;
 using Enemy;
+using FileSystem.Scripts;
 
 namespace Player.Network
 {
@@ -20,15 +21,25 @@ namespace Player.Network
         [SerializeField] private SoundProducer voiceSoundProducer;
         [SerializeField, Range(0f, 1f)] private float voiceNoiseThreshold = 0.04f;
 
+        [Header("Local HUD")]
+        [SerializeField] private GameObject voiceIndicator;
+
         private MemoryStream voiceInputStream;
         private MemoryStream voiceOutputStream;
         private MemoryStream voiceAnalysisStream;
 
         private int sampleRate;
         private VoiceAudioBuffer proximityBuffer;
+        private SettingsFile settingsFile;
+        private VoiceMode voiceMode = VoiceMode.ButtonHold;
+        private bool isVoiceButtonHeld;
+        private bool isRecording;
+        private float lastSpeechTime;
 
         public override void OnNetworkSpawn()
         {
+            SetVoiceIndicatorVisible(false);
+
             if (SteamClient.IsValid)
             {
                 try
@@ -60,6 +71,8 @@ namespace Player.Network
             else
             {
                 BindInput();
+                LoadVoiceMode();
+
                 // Реєструємо маппінг SteamId ↔ NGO ClientId на всіх клієнтах
                 ulong steamId = 0;
                 if (SteamClient.IsValid)
@@ -108,24 +121,86 @@ namespace Player.Network
 
         private void OnVoiceStarted(InputAction.CallbackContext ctx)
         {
-            if (SteamClient.IsValid)
-            {
-                try { SteamUser.VoiceRecord = true; } catch { }
-            }
+            isVoiceButtonHeld = true;
+            UpdateRecordingState();
         }
 
         private void OnVoiceCanceled(InputAction.CallbackContext ctx)
         {
-            if (SteamClient.IsValid)
-            {
-                try { SteamUser.VoiceRecord = false; } catch { }
-            }
+            isVoiceButtonHeld = false;
+            UpdateRecordingState();
         }
 
         private void Update()
         {
-            if (!IsOwner) return;
+            if (!IsSpawned || !IsOwner) return;
+
+            if (settingsFile == null)
+                LoadVoiceMode();
+
+            if (!Application.isFocused)
+            {
+                SetRecording(false);
+                SetVoiceIndicatorVisible(false);
+                return;
+            }
+
+            UpdateRecordingState();
             ListenForVoice();
+
+            if (Time.unscaledTime - lastSpeechTime > 0.15f)
+                SetVoiceIndicatorVisible(false);
+        }
+
+        private void LoadVoiceMode()
+        {
+            if (GameFileHandler.Instance == null) return;
+
+            SettingsFile foundSettings =
+                GameFileHandler.Instance.SearchForFileByName("Settings") as SettingsFile;
+            if (foundSettings == null) return;
+
+            if (settingsFile != foundSettings)
+            {
+                if (settingsFile != null) SettingsFile.OnSettingsChanged -= OnSettingsChanged;
+                settingsFile = foundSettings;
+                SettingsFile.OnSettingsChanged += OnSettingsChanged;
+            }
+
+            voiceMode = settingsFile.save.voiceMode;
+            UpdateRecordingState();
+        }
+
+        private void OnSettingsChanged()
+        {
+            if (settingsFile == null) return;
+
+            voiceMode = settingsFile.save.voiceMode;
+            UpdateRecordingState();
+        }
+
+        private void UpdateRecordingState()
+        {
+            if (!IsSpawned || !IsOwner) return;
+
+            bool shouldRecord = Application.isFocused &&
+                                (voiceMode == VoiceMode.VoiceActivation || isVoiceButtonHeld);
+            SetRecording(shouldRecord);
+        }
+
+        private void SetRecording(bool shouldRecord)
+        {
+            if (isRecording == shouldRecord || !SteamClient.IsValid) return;
+
+            try
+            {
+                SteamUser.VoiceRecord = shouldRecord;
+                isRecording = shouldRecord;
+            }
+            catch
+            {
+                isRecording = false;
+            }
         }
 
         private void ListenForVoice()
@@ -144,6 +219,16 @@ namespace Player.Network
                     Array.Copy(voiceInputStream.GetBuffer(), dataToSend, compressedBytesWritten);
 
                     float voiceLevel = GetVoiceLevel(compressedBytesWritten);
+                    bool isSpeaking = voiceLevel >= voiceNoiseThreshold;
+                    if (isSpeaking)
+                    {
+                        lastSpeechTime = Time.unscaledTime;
+                        SetVoiceIndicatorVisible(true);
+                    }
+
+                    if (voiceMode == VoiceMode.VoiceActivation && !isSpeaking)
+                        continue;
+
                     bool isTransmittingRadio = WalkieTalkie.IsLocalPlayerHoldingActiveRadio();
                     SendVoiceServerRpc(dataToSend, compressedBytesWritten, isTransmittingRadio, voiceLevel);
                 }
@@ -273,6 +358,13 @@ namespace Player.Network
             }
         }
 
+        private void SetVoiceIndicatorVisible(bool isVisible)
+        {
+            isVisible = isVisible && IsSpawned && IsOwner;
+            if (voiceIndicator != null && voiceIndicator.activeSelf != isVisible)
+                voiceIndicator.SetActive(isVisible);
+        }
+
         public override void OnNetworkDespawn()
         {
             if (IsOwner && PlayerMovement.Instance != null && PlayerMovement.Instance.controls != null)
@@ -284,10 +376,12 @@ namespace Player.Network
 
             VoiceVolumeManager.UnregisterPlayer(OwnerClientId);
 
-            if (SteamClient.IsValid)
-            {
-                try { SteamUser.VoiceRecord = false; } catch { }
-            }
+            if (IsOwner && settingsFile != null)
+                SettingsFile.OnSettingsChanged -= OnSettingsChanged;
+
+            if (IsOwner) SetRecording(false);
+            isVoiceButtonHeld = false;
+            SetVoiceIndicatorVisible(false);
             base.OnNetworkDespawn();
         }
 

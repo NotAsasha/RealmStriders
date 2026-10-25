@@ -22,6 +22,11 @@ namespace Steam
         public bool IsSteamActive => SteamClient.IsValid;
         public bool IsSingleplayer { get; private set; }
 
+        public event Action<Lobby, Friend> OnMemberJoined;
+        public event Action<Lobby, Friend> OnMemberLeft;
+        public event Action<ulong> OnRemoteClientConnected;
+        public event Action<ulong> OnRemoteClientDisconnected;
+
         private FacepunchTransport cachedTransport;
         private UnityTransport cachedUnityTransport;
         private bool clientConnectedToHost;
@@ -112,6 +117,25 @@ namespace Steam
             }
 
             UnsubscribeNetworkEvents();
+        }
+
+        private void OnEnable()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        private void OnDisable()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (scene.name == "Menu" || scene.name == "SteamBoot")
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
         }
 
         private void OnApplicationQuit() => Disconnect();
@@ -265,6 +289,8 @@ namespace Steam
         {
             Debug.Log("[SteamManager] Leaving current lobby and stopping network.");
             clientConnectedToHost = false;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             if (IsSteamActive)
             {
                 try
@@ -402,9 +428,17 @@ namespace Steam
             Debug.Log($"[SteamManager] Invite received from {friend.Name}");
         }
 
-        private void OnLobbyMemberLeave(Lobby lobby, Friend friend) { }
+        private void OnLobbyMemberLeave(Lobby lobby, Friend friend)
+        {
+            Debug.Log($"[SteamManager] Lobby member left: {friend.Name} ({friend.Id})");
+            OnMemberLeft?.Invoke(lobby, friend);
+        }
 
-        private void OnLobbyMemberJoined(Lobby lobby, Friend friend) { }
+        private void OnLobbyMemberJoined(Lobby lobby, Friend friend)
+        {
+            Debug.Log($"[SteamManager] Lobby member joined: {friend.Name} ({friend.Id})");
+            OnMemberJoined?.Invoke(lobby, friend);
+        }
 
         private void OnLobbyCreated(Result result, Lobby lobby)
         {
@@ -445,11 +479,13 @@ namespace Steam
         private void OnClientConnectedCallback(ulong clientId)
         {
             Debug.Log($"[SteamManager] Remote client connected to host. ClientId: {clientId}");
+            OnRemoteClientConnected?.Invoke(clientId);
         }
 
         private void OnClientDisconnectCallback(ulong clientId)
         {
             Debug.Log($"[SteamManager] Remote client disconnected from host. ClientId: {clientId}");
+            OnRemoteClientDisconnected?.Invoke(clientId);
         }
 
         #endregion
@@ -459,6 +495,9 @@ namespace Steam
             const string message = "host left the game";
             Debug.LogWarning(message);
             ShowNotification(message);
+
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
 
             Disconnect();
             SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);

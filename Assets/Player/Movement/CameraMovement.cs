@@ -86,6 +86,18 @@ namespace Player.Movement
 
             SettingsFile.OnSettingsChanged -= UpdateSensitivity;
             CleanupInputHandlers();
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
+            UnityEngine.Cursor.visible = true;
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+                UnityEngine.Cursor.lockState = CursorLockMode.None;
+                UnityEngine.Cursor.visible = true;
+            }
         }
 
 
@@ -270,7 +282,10 @@ namespace Player.Movement
 
 
             UpdateCursorState();
-            GetComponentInParent<Inventory>()?.ToggleUI(!isInteracting);
+            if (human == null || !human.isDead.Value)
+            {
+                GetComponentInParent<Inventory>()?.ToggleUI(!isInteracting);
+            }
         }
 
         private void UpdateCursorState()

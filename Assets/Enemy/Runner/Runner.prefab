@@ -34096,6 +34096,7 @@ GameObject:
   - component: {fileID: -44859057082312483}
   - component: {fileID: -4771866877653863931}
   - component: {fileID: 396521852551058754}
+  - component: {fileID: 2195121783874003385}
   m_Layer: 7
   m_Name: Runner
   m_TagString: Untagged
@@ -34384,7 +34385,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 20
+  MaxDistance: 40
   Pan2D: 0
   rolloffMode: 2
   BypassEffects: 0
@@ -34394,46 +34395,55 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.05
+      time: 0.025
       value: 1
-      inSlope: -20.007967
-      outSlope: -20.007967
+      inSlope: -40.015934
+      outSlope: -40.015934
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.05
+      value: 0.5
+      inSlope: -10.0039835
+      outSlope: -10.0039835
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 0.1
-      value: 0.5
-      inSlope: -5.0019917
-      outSlope: -5.0019917
+      value: 0.25
+      inSlope: -2.5009959
+      outSlope: -2.5009959
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 0.2
-      value: 0.25
-      inSlope: -1.2504979
-      outSlope: -1.2504979
+      value: 0.125
+      inSlope: -0.62524897
+      outSlope: -0.62524897
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 0.4
-      value: 0.125
-      inSlope: -0.31262448
-      outSlope: -0.31262448
+      value: 0.0625
+      inSlope: -0.15631224
+      outSlope: -0.15631224
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 0.8
-      value: 0.0625
-      inSlope: -0.07815612
-      outSlope: -0.07815612
+      value: 0.03125
+      inSlope: -0.03907806
+      outSlope: -0.03907806
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -34441,8 +34451,8 @@ AudioSource:
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: -0.05001994
-      outSlope: -0.05001994
+      inSlope: -0.02500997
+      outSlope: -0.02500997
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -34541,6 +34551,38 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.5, y: 1.5, z: 3.5}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2195121783874003385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5629089953353955407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6890fa83d072185469b73ccb500fe0f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySounds
+  enemy: {fileID: 6036963752928671945}
+  idleSounds:
+  - {fileID: 8300000, guid: 1ee24d340b44caa4e99efedadc3ca5f1, type: 3}
+  angrySounds:
+  - {fileID: 8300000, guid: 4a0a7cfee7fa9254da2d28def8c2292b, type: 3}
+  deathSound: {fileID: 8300000, guid: 1ee24d340b44caa4e99efedadc3ca5f1, type: 3}
+  jumpscareSound: {fileID: 8300000, guid: 1ee24d340b44caa4e99efedadc3ca5f1, type: 3}
+  idleRadius: 120
+  angryRadius: 40
+  deathRadius: 120
+  jumpscareRadius: 40
+  vocalAudioSource: {fileID: 0}
+  enablePeriodicIdleSounds: 1
+  minIdleInterval: 20
+  maxIdleInterval: 50
+  enablePeriodicAngrySounds: 1
+  minAngryInterval: 3.5
+  maxAngryInterval: 6.5
+  pitchVariation: 0.2
+  volumeVariation: 0.05
 --- !u!1001 &2874580358192904833
 PrefabInstance:
   m_ObjectHideFlags: 0

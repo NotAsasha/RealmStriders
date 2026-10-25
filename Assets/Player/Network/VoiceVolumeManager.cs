@@ -17,6 +17,9 @@ namespace Player.Network
         // Подія зміни гучності (на випадок, якщо треба оновити UI)
         public static event Action<ulong, float> OnVolumeChanged;
 
+        // Подія відключення гравця
+        public static event Action<ulong, SteamId> OnPlayerUnregistered;
+
         public const float DEFAULT_VOLUME = 5.0f;
         public const float MAX_VOLUME = 10.0f;
 
@@ -38,9 +41,23 @@ namespace Player.Network
             if (clientToSteam.TryGetValue(clientId, out SteamId steamId))
             {
                 steamToClient.Remove(steamId);
+                clientToSteam.Remove(clientId);
+                playerVolumes.Remove(clientId);
+                OnPlayerUnregistered?.Invoke(clientId, steamId);
             }
-            clientToSteam.Remove(clientId);
-            playerVolumes.Remove(clientId);
+            else
+            {
+                clientToSteam.Remove(clientId);
+                playerVolumes.Remove(clientId);
+            }
+        }
+
+        /// <summary>
+        /// Отримати SteamId гравця за NGO ClientId.
+        /// </summary>
+        public static bool TryGetSteamId(ulong clientId, out SteamId steamId)
+        {
+            return clientToSteam.TryGetValue(clientId, out steamId);
         }
 
         /// <summary>

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 9124229597744053503}
   - component: {fileID: 4507183023895903261}
   - component: {fileID: 310984694380349151}
-  m_Layer: 6
+  m_Layer: 10
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -305,11 +305,11 @@ MonoBehaviour:
   gripRotationOffset: {x: 0, y: 0, z: 0}
   prefabId: 5
   isCurrentlyHeld: 0
-  maxDistance: 5
+  maxDistance: 7
   cooldown: 0.5
   freezeTime: 2
   comboWeakDuration: 6
-  shotCost: 20
+  shotCost: 15
   maxCharge: 100
   entityLayer:
     serializedVersion: 2
@@ -484,7 +484,7 @@ GameObject:
   - component: {fileID: 1637153562698068695}
   - component: {fileID: 8825538087164892633}
   - component: {fileID: 4142024949057262796}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Particle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -589,7 +589,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 0.5
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -642,7 +642,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 16
+      scalar: 40
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -4480,7 +4480,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 1, b: 1, a: 1}
+      maxColor: {r: 1, g: 0.71984833, b: 0.6933962, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -5321,7 +5321,7 @@ GameObject:
   - component: {fileID: 3534865137747250397}
   - component: {fileID: 1213462697816254348}
   - component: {fileID: 4045124531342387241}
-  m_Layer: 6
+  m_Layer: 10
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

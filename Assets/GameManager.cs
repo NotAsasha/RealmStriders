@@ -1,4 +1,4 @@
-using Base.Shop;
+﻿using Base.Shop;
 using Enemy;
 using FileSystem.Scripts;
 using Player;
@@ -21,7 +21,7 @@ public class GameManager : NetworkBehaviour
 
     public NetworkVariable<int> teamRating = new(3, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<int> lossRating = new(0, writePerm: NetworkVariableWritePermission.Server);
-    public NetworkVariable<int> teamMoney = new(10000, writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> teamMoney = new(300, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<bool> hasStartedMission = new(false, writePerm: NetworkVariableWritePermission.Server);
 
 
@@ -64,6 +64,15 @@ public class GameManager : NetworkBehaviour
     private void OnDisable()
     {
         CleanupInputHandlers();
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        // Initial synchronization via ReadField does not fire OnValueChanged in Netcode.
+        // Explicitly trigger OnValueChanged on spawn so UI and listeners receive synced values.
+        teamMoney.OnValueChanged?.Invoke(teamMoney.Value, teamMoney.Value);
+        teamRating.OnValueChanged?.Invoke(teamRating.Value, teamRating.Value);
     }
 
     #endregion
@@ -181,6 +190,7 @@ public class GameManager : NetworkBehaviour
             //Loss
             Debug.Log("---MissionManager: Game Over, you lost...");
             Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
 
             //TEMP - to main menu.  --- TODO
             SteamManager.Instance.Disconnect();
@@ -252,19 +262,18 @@ public class GameManager : NetworkBehaviour
     }
     private int CalculateRating(int current)
     {
-        if (alivePlayers <= 0 && current > 0)
+        bool areAllDead = activeEnemies.All(enemy => enemy.isDead.Value);
+        if (areAllDead)
         {
-            current -= 1;
-        }
-        else
-        {
-            bool areAllDead = activeEnemies.All(enemy => enemy.isDead.Value);
-            if (areAllDead)
-            {
-                current += 1;
-            }
+            return current + 1;
         }
 
+        bool isAnyDead = activeEnemies.Any(enemy => enemy.isDead.Value);
+        if (!isAnyDead && current > 0)
+        {
+            return current - 1;
+        }
+        
         return current;
     }
 
@@ -309,17 +318,20 @@ public class GameManager : NetworkBehaviour
 
     private void OnSceneLoaded(ulong conn, string sceneName, LoadSceneMode mode)
     {
-        spawner.SpawnEnemies(dangerLevels);
-        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded; // ������� -- ok, comment broke...
+        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded;
         Scene loadedScene = SceneManager.GetSceneByName(sceneName);
         if (loadedScene.IsValid())
-        { 
+        {
             missionScene = loadedScene;
 
-            // local primary scene
+            // Must set active scene BEFORE spawning enemies so that
+            // NavMesh.SamplePosition queries the mission scene's NavMesh,
+            // not the still-active Lobby scene.
             SceneManager.SetActiveScene(loadedScene);
             UpdateLocalSceneRpc(sceneName);
         }
+
+        spawner.SpawnEnemies(dangerLevels);
     }
 
     [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]

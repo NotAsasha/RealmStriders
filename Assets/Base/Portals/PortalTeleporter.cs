@@ -17,6 +17,10 @@ namespace Portals
         public Transform receiver;
         public Transform enemyReceiver;
 
+        [Header("Audio (Optional)")]
+        [Tooltip("Optional sound override to play when teleporting through this specific portal.")]
+        [SerializeField] private AudioClip customTeleportSound;
+
         private bool objectIsOverlapping = false;
         private Transform objectToTeleport;
 
@@ -162,6 +166,11 @@ namespace Portals
 
                 objectIsOverlapping = false;
                 objectToTeleport = null;
+
+                if (customTeleportSound != null && PortalManager.Instance != null && PortalManager.Instance.AudioSource != null)
+                {
+                    PortalManager.Instance.AudioSource.PlayOneShot(customTeleportSound);
+                }
 
                 PortalManager.Instance.CallOnTeleport(human);
             }

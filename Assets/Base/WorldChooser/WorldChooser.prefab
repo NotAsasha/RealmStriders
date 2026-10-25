@@ -568,6 +568,11 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  currentInteractingClientId:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 18446744073709551615
 --- !u!114 &9139482021649055997
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -583,9 +588,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   missionNumber: 3
   availableWorlds:
-  - World1
-  - World2
-  - World3
+  - Field
   - Casino
   - Library
   cardParent: {fileID: 1465888213185114580}

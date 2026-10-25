@@ -35450,7 +35450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2417151809
+  GlobalObjectIdHash: 4029104727
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -35588,6 +35588,8 @@ MonoBehaviour:
   captureLift: 1.1
   captureTransformation: {fileID: 0}
   statusVisuals: {fileID: 0}
+  shockAudioSource: {fileID: 0}
+  shockAudioClip: {fileID: 0}
   isDead:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -35969,7 +35971,7 @@ MonoBehaviour:
   angrySounds: []
   deathSound: {fileID: 0}
   jumpscareSound: {fileID: 0}
-  idleRadius: 35
+  idleRadius: 60
   angryRadius: 35
   deathRadius: 50
   jumpscareRadius: 50

@@ -3,6 +3,12 @@ using UnityEngine;
 
 namespace FileSystem.Scripts
 {
+    public enum VoiceMode
+    {
+        ButtonHold = 0,
+        VoiceActivation = 1
+    }
+
     [CreateAssetMenu(fileName = "SettingsFile", menuName = "Not/SettingsFile")]
     public class SettingsFile : GameFile
     {
@@ -71,5 +77,6 @@ namespace FileSystem.Scripts
         public bool vSync;
         public int frameRate = 144;
         public int shadowQuality = (int)ShadowQuality.All;
+        public VoiceMode voiceMode = VoiceMode.ButtonHold;
     }
 }

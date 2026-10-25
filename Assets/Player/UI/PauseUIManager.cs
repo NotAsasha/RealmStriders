@@ -3,8 +3,10 @@ using Player.Network;
 using Steam;
 using Steamworks;
 using Steamworks.Data;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -19,39 +21,230 @@ namespace Player.UI
         public GameObject playerCard;
         public ScreenShatterEffect shatterEffect;
 
+        private readonly List<PlayerCard> playerCards = new();
+        private readonly HashSet<SteamId> removedMemberSteamIds = new();
+        private bool isSubscribed;
+        private bool isInputSubscribed;
+        private bool isUpdating;
+        private bool refreshRequested;
+
         private void Start()
         {
-            if (SteamClient.IsValid)
-            {
-                SteamMatchmaking.OnLobbyDataChanged += UpdatePauseUI;
-            }
-            PlayerMovement.Instance.controls.System.Pause.performed += UpdateMenuState;
+            SubscribeEvents();
+            RefreshPauseUI();
+        }
+
+        private void OnEnable()
+        {
+            SubscribeEvents();
         }
 
         private void OnDisable()
         {
-            if (SteamClient.IsValid)
+            UnsubscribeEvents();
+        }
+
+        private void OnDestroy()
+        {
+            UnsubscribeEvents();
+        }
+
+        private void SubscribeEvents()
+        {
+            if (!isSubscribed)
             {
-                SteamMatchmaking.OnLobbyDataChanged -= UpdatePauseUI;
+                isSubscribed = true;
+
+                if (SteamClient.IsValid)
+                {
+                    SteamMatchmaking.OnLobbyMemberLeave += HandleLobbyMemberLeave;
+                    SteamMatchmaking.OnLobbyMemberDisconnected += HandleLobbyMemberDisconnected;
+                    SteamMatchmaking.OnLobbyMemberKicked += HandleLobbyMemberKicked;
+                    SteamMatchmaking.OnLobbyMemberBanned += HandleLobbyMemberBanned;
+                    SteamMatchmaking.OnLobbyMemberJoined += HandleLobbyMemberJoined;
+                    SteamMatchmaking.OnLobbyDataChanged += HandleLobbyDataChanged;
+                }
+
+                if (NetworkManager.Singleton != null)
+                {
+                    NetworkManager.Singleton.OnClientDisconnectCallback += HandleNetworkClientDisconnected;
+                    NetworkManager.Singleton.OnClientConnectedCallback += HandleNetworkClientConnected;
+                }
+
+                VoiceVolumeManager.OnPlayerUnregistered += HandleVoicePlayerUnregistered;
             }
+
+            SubscribeInput();
+        }
+
+        private void UnsubscribeEvents()
+        {
+            if (isSubscribed)
+            {
+                isSubscribed = false;
+
+                if (SteamClient.IsValid)
+                {
+                    SteamMatchmaking.OnLobbyMemberLeave -= HandleLobbyMemberLeave;
+                    SteamMatchmaking.OnLobbyMemberDisconnected -= HandleLobbyMemberDisconnected;
+                    SteamMatchmaking.OnLobbyMemberKicked -= HandleLobbyMemberKicked;
+                    SteamMatchmaking.OnLobbyMemberBanned -= HandleLobbyMemberBanned;
+                    SteamMatchmaking.OnLobbyMemberJoined -= HandleLobbyMemberJoined;
+                    SteamMatchmaking.OnLobbyDataChanged -= HandleLobbyDataChanged;
+                }
+
+                if (NetworkManager.Singleton != null)
+                {
+                    NetworkManager.Singleton.OnClientDisconnectCallback -= HandleNetworkClientDisconnected;
+                    NetworkManager.Singleton.OnClientConnectedCallback -= HandleNetworkClientConnected;
+                }
+
+                VoiceVolumeManager.OnPlayerUnregistered -= HandleVoicePlayerUnregistered;
+            }
+
+            UnsubscribeInput();
+        }
+
+        private void SubscribeInput()
+        {
+            if (isInputSubscribed) return;
+            if (PlayerMovement.Instance != null && PlayerMovement.Instance.controls != null)
+            {
+                PlayerMovement.Instance.controls.System.Pause.performed += UpdateMenuState;
+                isInputSubscribed = true;
+            }
+        }
+
+        private void UnsubscribeInput()
+        {
+            if (!isInputSubscribed) return;
             if (PlayerMovement.Instance != null && PlayerMovement.Instance.controls != null)
             {
                 PlayerMovement.Instance.controls.System.Pause.performed -= UpdateMenuState;
+            }
+            isInputSubscribed = false;
+        }
+
+        private void HandleLobbyMemberLeave(Lobby lobby, Friend friend)
+        {
+            if (SteamClient.IsValid && friend.Id == SteamClient.SteamId) return;
+            OnMemberRemoved(friend.Id);
+        }
+
+        private void HandleLobbyMemberDisconnected(Lobby lobby, Friend friend)
+        {
+            if (SteamClient.IsValid && friend.Id == SteamClient.SteamId) return;
+            OnMemberRemoved(friend.Id);
+        }
+
+        private void HandleLobbyMemberKicked(Lobby lobby, Friend target, Friend kicker)
+        {
+            if (SteamClient.IsValid && target.Id == SteamClient.SteamId) return;
+            OnMemberRemoved(target.Id);
+        }
+
+        private void HandleLobbyMemberBanned(Lobby lobby, Friend target, Friend banner)
+        {
+            if (SteamClient.IsValid && target.Id == SteamClient.SteamId) return;
+            OnMemberRemoved(target.Id);
+        }
+
+        private void HandleVoicePlayerUnregistered(ulong clientId, SteamId steamId)
+        {
+            if (SteamClient.IsValid && steamId == SteamClient.SteamId) return;
+            OnMemberRemoved(steamId);
+        }
+
+        private void HandleNetworkClientDisconnected(ulong clientId)
+        {
+            if (NetworkManager.Singleton != null && clientId == NetworkManager.Singleton.LocalClientId) return;
+
+            if (VoiceVolumeManager.TryGetSteamId(clientId, out SteamId steamId))
+            {
+                OnMemberRemoved(steamId);
+            }
+            else
+            {
+                RefreshPauseUI();
+            }
+        }
+
+        private void HandleLobbyMemberJoined(Lobby lobby, Friend friend)
+        {
+            removedMemberSteamIds.Remove(friend.Id);
+            RefreshPauseUI();
+        }
+
+        private void HandleLobbyDataChanged(Lobby lobby)
+        {
+            RefreshPauseUI();
+        }
+
+        private void HandleNetworkClientConnected(ulong clientId)
+        {
+            RefreshPauseUI();
+        }
+
+        private void OnMemberRemoved(SteamId steamId)
+        {
+            removedMemberSteamIds.Add(steamId);
+            RemoveCardBySteamId(steamId);
+            RefreshPauseUI();
+        }
+
+        private void RemoveCardBySteamId(SteamId steamId)
+        {
+            for (int i = playerCards.Count - 1; i >= 0; i--)
+            {
+                var card = playerCards[i];
+                if (card == null)
+                {
+                    playerCards.RemoveAt(i);
+                    continue;
+                }
+
+                if (card.linkedPlayer != null && card.linkedPlayer.playerSteamId == steamId)
+                {
+                    playerCards.RemoveAt(i);
+                    if (card.gameObject != null)
+                    {
+                        Destroy(card.gameObject);
+                    }
+                }
+            }
+
+            if (cardsParent != null)
+            {
+                var remainingChildCards = cardsParent.GetComponentsInChildren<PlayerCard>(true);
+                foreach (var c in remainingChildCards)
+                {
+                    if (c != null && c.linkedPlayer != null && c.linkedPlayer.playerSteamId == steamId)
+                    {
+                        playerCards.Remove(c);
+                        Destroy(c.gameObject);
+                    }
+                }
             }
         }
 
         private void UpdateMenuState(InputAction.CallbackContext obj)
         {
-            if (PlayerMovement.Instance.isInInteraction)
+            if (PlayerMovement.Instance != null && PlayerMovement.Instance.isInInteraction)
             {
-                CameraMovement.Instance.StopInteraction();
+                if (CameraMovement.Instance != null)
+                {
+                    CameraMovement.Instance.StopInteraction();
+                }
                 return;
             }
+
+            if (pauseMenu == null) return;
 
             bool opening = !pauseMenu.activeSelf;
 
             if (opening)
             {
+                RefreshPauseUI();
                 if (shatterEffect != null) shatterEffect.TriggerEffect(() => { pauseMenu.SetActive(true); });
                 else pauseMenu.SetActive(true);
             }
@@ -63,60 +256,106 @@ namespace Player.UI
             }
         }
 
-        private List<PlayerCard> playerCards = new();
+        public void UpdatePauseUI(Lobby lobby) => RefreshPauseUI();
 
-        private async void UpdatePauseUI(Lobby lobby)
+        public async void RefreshPauseUI()
         {
+            if (isUpdating)
+            {
+                refreshRequested = true;
+                return;
+            }
+
+            isUpdating = true;
+            try
+            {
+                do
+                {
+                    refreshRequested = false;
+                    await UpdatePauseUIInternal();
+                } while (refreshRequested);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[PauseUIManager] Error updating pause UI: {ex.Message}");
+            }
+            finally
+            {
+                isUpdating = false;
+            }
+        }
+
+        private async Task UpdatePauseUIInternal()
+        {
+            if (SteamManager.Instance == null) return;
+
             List<SteamPlayer> playerList = await SteamManager.Instance.GetLobbyMembersAsync();
 
-            //set each card as inactive
+            if (this == null || cardsParent == null) return;
+
+            // Remove destroyed cards from list
+            playerCards.RemoveAll(c => c == null || c.gameObject == null);
+
+            // Set each card as inactive initially
             foreach (var card in playerCards)
             {
                 card.isFoundInLobby = false;
             }
 
+            var currentLobby = SteamManager.Instance.CurrentLobby;
 
             foreach (SteamPlayer player in playerList)
             {
-                PlayerCard existingCard = playerCards.Find(c => c.linkedPlayer.playerSteamId == player.playerSteamId);
+                // If member was explicitly marked removed, don't re-add
+                if (removedMemberSteamIds.Contains(player.playerSteamId))
+                {
+                    continue;
+                }
+
+                PlayerCard existingCard = playerCards.Find(c => c != null && c.linkedPlayer != null && c.linkedPlayer.playerSteamId == player.playerSteamId);
 
                 if (existingCard != null)
                 {
                     existingCard.isFoundInLobby = true;
-                    existingCard.playerName.text = player.playerName;
+                    existingCard.Setup(player, currentLobby);
                 }
                 else
                 {
-                    var newCard = Instantiate(playerCard, cardsParent).GetComponent<PlayerCard>();
-                    newCard.linkedPlayer = player;
-                    newCard.playerName.text = player.playerName;
-                    newCard.isFoundInLobby = true;
+                    if (playerCard == null) continue;
 
-                    if (player.playerImage.HasValue)
+                    var cardObj = Instantiate(playerCard, cardsParent);
+                    if (cardObj.TryGetComponent<PlayerCard>(out var newCard))
                     {
-                        var img = player.playerImage.Value;
-                        newCard.playerImage.texture = PlayerCard.ImageFromBytes((int)img.Width, (int)img.Height, img.Data);
+                        newCard.isFoundInLobby = true;
+                        newCard.Setup(player, currentLobby);
+                        playerCards.Add(newCard);
                     }
-
-                    playerCards.Add(newCard);
                 }
             }
 
-            //delete all inactive
+            // Delete all cards that are no longer in the lobby
             for (int i = playerCards.Count - 1; i >= 0; i--)
             {
                 if (!playerCards[i].isFoundInLobby)
                 {
                     PlayerCard cardToDestroy = playerCards[i];
                     playerCards.RemoveAt(i);
-                    Destroy(cardToDestroy.gameObject);
+                    if (cardToDestroy != null && cardToDestroy.gameObject != null)
+                    {
+                        Destroy(cardToDestroy.gameObject);
+                    }
                 }
             }
         }
 
         public void LeaveLobby()
         {
-            SteamManager.Instance.Disconnect();
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            if (SteamManager.Instance != null)
+            {
+                SteamManager.Instance.Disconnect();
+            }
             SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);
         }
     }

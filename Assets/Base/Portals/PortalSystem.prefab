@@ -151,7 +151,7 @@ Camera:
     height: 1
   near clip plane: 1
   far clip plane: 2000
-  field of view: 60
+  field of view: 70
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -229,6 +229,8 @@ MonoBehaviour:
   portal: {fileID: 6619336614045083311}
   otherPortal: {fileID: 4552565632530616173}
   portalRenderer: {fileID: 6139246088506203804}
+  maxRenderDistance: 60
+  throttleFarDistance: 0
 --- !u!1 &1103745445219070095
 GameObject:
   m_ObjectHideFlags: 0
@@ -297,6 +299,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   receiver: {fileID: 6619336614045083311}
   enemyReceiver: {fileID: 5647502235408638886}
+  customTeleportSound: {fileID: 0}
 --- !u!1 &1865181568721818629
 GameObject:
   m_ObjectHideFlags: 0
@@ -880,6 +883,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   receiver: {fileID: 4552565632530616173}
   enemyReceiver: {fileID: 7320239321924863449}
+  customTeleportSound: {fileID: 0}
 --- !u!1 &5880079331310546008
 GameObject:
   m_ObjectHideFlags: 0
@@ -1069,6 +1073,8 @@ GameObject:
   - component: {fileID: 7887549515993165832}
   - component: {fileID: 976154305188532824}
   - component: {fileID: 3799009159155514822}
+  - component: {fileID: 9092438907343756645}
+  - component: {fileID: 4667931983332077196}
   m_Layer: 0
   m_Name: PortalSystem
   m_TagString: Untagged
@@ -1141,10 +1147,143 @@ MonoBehaviour:
   portalRenderers: []
   openDuration: 0.8
   closeDuration: 0.5
-  audioSource: {fileID: 0}
-  portalOpenSound: {fileID: 0}
-  portalCloseSound: {fileID: 0}
+  audioSource: {fileID: 4667931983332077196}
+  portalOpenSound: {fileID: 8300000, guid: fa19536e6ab931c478429c63b64f2e06, type: 3}
+  portalCloseSound: {fileID: 8300000, guid: fa19536e6ab931c478429c63b64f2e06, type: 3}
+  portalTeleportSound: {fileID: 8300000, guid: fa19536e6ab931c478429c63b64f2e06, type: 3}
+  performantConfig:
+    resolutionScale: 0.25
+    enableShadows: 0
+    enablePostProcessing: 0
+    maxRenderDistance: 20
+    throttleFarDistance: 1
+  balancedConfig:
+    resolutionScale: 0.75
+    enableShadows: 0
+    enablePostProcessing: 0
+    maxRenderDistance: 45
+    throttleFarDistance: 0
+  highFidelityConfig:
+    resolutionScale: 1
+    enableShadows: 1
+    enablePostProcessing: 1
+    maxRenderDistance: 80
+    throttleFarDistance: 0
   isForward: 1
+--- !u!114 &9092438907343756645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6915375909490760689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e936232d5de5454d9574c8dbb35a4458, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PortalTransitionEffect
+  rampUpDuration: 0
+  fadeDuration: 0.45
+  peakIntensity: 1
+  audioSource: {fileID: 0}
+  teleportSound: {fileID: 0}
+--- !u!82 &4667931983332077196
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6915375909490760689}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &7357977580699593303
 GameObject:
   m_ObjectHideFlags: 0
@@ -1212,7 +1351,7 @@ Camera:
     height: 1
   near clip plane: 1
   far clip plane: 2000
-  field of view: 60
+  field of view: 70
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -1290,6 +1429,8 @@ MonoBehaviour:
   portal: {fileID: 4552565632530616173}
   otherPortal: {fileID: 6619336614045083311}
   portalRenderer: {fileID: 6880438889033667901}
+  maxRenderDistance: 60
+  throttleFarDistance: 0
 --- !u!1 &7406887690688309490
 GameObject:
   m_ObjectHideFlags: 0

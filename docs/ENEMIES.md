@@ -73,11 +73,20 @@ Equipment noise is server-authoritative. A running `LeafBlower` or grounded
 lures them while voice data is actively transmitted. `Flashbang` and `Taser`
 create one-shot noise when they activate.
 
-`Runner` treats every lure as a threat: on the server it selects the farthest
-reachable NavMesh point in the direction away from the sound and runs there.
-Repeated continuous noise can update its escape destination. If no complete
-escape path is available, it falls back to its normal random running behaviour
-instead of becoming stationary.
+`Enemy.Run(sourcePosition)` selects a reachable NavMesh point away from the
+source on the server, preferring the point farthest from that source. It checks
+shorter escape distances when space is limited and only accepts complete paths
+using the enemy agent's navigation type and allowed areas. If no escape point
+exists, it preserves the current movement instead of picking a random point.
+Running takes priority over normal pursuit until the escape path finishes.
+Flashbang passes its pulse origin to this shared behaviour.
+
+`Runner` treats every lure as a threat and calls the same `Run` method.
+Repeated continuous noise can update its escape destination. Its damage
+notification does not include an attacker position, so parameterless `Run()`
+uses a visible/heard threat when available and otherwise retreats backwards.
+The shared Inspector fields `fleeDistance`, `fleeDirectionSamples`, and
+`navMeshSampleDistance` retain Runner's existing settings.
 
 A successful capture produces an `EnemyCage`. All target monsters must be
 captured for a successful mission; killing is not an alternative objective.

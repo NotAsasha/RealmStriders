@@ -91,6 +91,10 @@ implemented today and may still need work.
   danger levels. Mission duration is limited and is exposed by the
   `Dosimeter`.
 - Players carry equipment from the `Assets/Player/Equipment/` area.
+- `Flashbang` is rechargeable like `Taser`: each activation consumes 50 of
+  its 100 charge, and the item remains when empty. Its indicator is green at
+  100%, yellow at 50–99%, and red below 50%. Each activation repels enemies
+  within 30 m and displays a brief expanding pulse matching that radius.
 - The current inventory implementation has four configurable slots. The
   supplied GDD's two-hand model and fixed key bindings are not current
   requirements.

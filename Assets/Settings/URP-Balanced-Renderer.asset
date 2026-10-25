@@ -56,6 +56,7 @@ MonoBehaviour:
   - {fileID: -1878332245247344467}
   - {fileID: 347495646679176829}
   - {fileID: 83693475309254753}
+  - {fileID: 4729336084084137006}
   m_RendererFeatureMap: adc0de57c6d2eee57d964e15738dd2046178d3b9c5562901
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
@@ -143,3 +144,17 @@ MonoBehaviour:
       restoreCamera: 1
       offset: {x: 0, y: 0, z: 0, w: 0}
       cameraFieldOfView: 60
+--- !u!114 &4729336084084137006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c268346850cf47b783404048957fb6c0, type: 3}
+  m_Name: PortalDistortionFeature
+  m_EditorClassIdentifier: Assembly-CSharp::Portals.PortalDistortionFeature
+  m_Active: 1
+  material: {fileID: 2100000, guid: 50e49fe2a00fdc647a651b2ea089e503, type: 2}
