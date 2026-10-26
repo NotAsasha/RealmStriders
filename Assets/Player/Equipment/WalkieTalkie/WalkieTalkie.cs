@@ -31,6 +31,34 @@ namespace Player.Equipment
         [SerializeField] private Renderer indicatorRenderer;
 
 
+        private readonly NetworkVariable<bool> isTransmitting = new(false);
+        private float transmissionExpiresAt;
+        private float localTransmissionExpiresAt;
+        private const float TransmissionHoldSeconds = 0.35f;
+
+        public override bool IsHoldActionActive => CanTransmit() &&
+            (isTransmitting.Value || (NetworkManager != null && IsHeldByClient(NetworkManager.LocalClientId) &&
+                                     Time.unscaledTime < localTransmissionExpiresAt));
+
+        public void NotifyLocalTransmission()
+        {
+            localTransmissionExpiresAt = Time.unscaledTime + TransmissionHoldSeconds;
+        }
+
+        public void RefreshTransmissionServer()
+        {
+            if (!IsServer || !CanTransmit()) return;
+            transmissionExpiresAt = Time.unscaledTime + TransmissionHoldSeconds;
+            isTransmitting.Value = true;
+        }
+
+        private void Update()
+        {
+            if (IsSpawned && IsServer && isTransmitting.Value &&
+                (!CanTransmit() || Time.unscaledTime >= transmissionExpiresAt))
+                isTransmitting.Value = false;
+        }
+
         private int sampleRate;
         private VoiceAudioBuffer radioBuffer;
 
@@ -97,13 +125,17 @@ namespace Player.Equipment
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        private void TogglePowerServerRpc()
+        private void TogglePowerServerRpc(RpcParams rpc = default)
         {
+            if (!IsHeldByClient(rpc.Receive.SenderClientId)) return;
             isOn.Value = !isOn.Value;
         }
 
         public override void TurnOffServer()
         {
+            if (!IsServer) return;
+            isTransmitting.Value = false;
+            localTransmissionExpiresAt = 0f;
             if (isOn.Value)
             {
                 isOn.Value = false;
@@ -182,7 +214,7 @@ namespace Player.Equipment
 
         #region Helpers & Save
 
-        public bool CanTransmit() => isCurrentlyHeld && isOn.Value;
+        public bool CanTransmit() => isCurrentlyHeld && IsEquipped && isOn.Value;
 
         public static bool IsLocalPlayerHoldingActiveRadio()
         {

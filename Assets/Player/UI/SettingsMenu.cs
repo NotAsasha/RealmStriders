@@ -25,6 +25,51 @@ namespace Assets.Player.UI
 
         public UnityEngine.Events.UnityEvent OnClose;
 
+        [Header("Categories")]
+        [SerializeField] private Category[] categories = Array.Empty<Category>();
+        [SerializeField] private Color categoryNormalColor = new(0.19f, 0.17f, 0.22f);
+        [SerializeField] private Color categoryActiveColor = new(0.40f, 0.30f, 0.20f);
+        [SerializeField] private Color categoryHoverColor = new(0.32f, 0.28f, 0.36f);
+        [SerializeField] private Color categoryActiveHoverColor = new(0.49f, 0.37f, 0.25f);
+        [SerializeField] private Color voiceSelectedColor = new(0.40f, 0.30f, 0.20f);
+        [SerializeField] private Color voiceNormalColor = new(0.19f, 0.17f, 0.22f);
+
+        [Serializable]
+        private sealed class Category
+        {
+            public GameObject panel;
+            public Button button;
+            public Image indicator;
+        }
+
+        public void SelectCategory(int index)
+        {
+            if (!IsValidIndex(index, categories.Length)) return;
+
+            // Dropdown lists live on their own canvas and must close with their page.
+            qualityDropdown?.Hide();
+            resolutionDropdown?.Hide();
+            windowModeDropdown?.Hide();
+            frameRateDropdown?.Hide();
+            shadowQualityDropdown?.Hide();
+
+            for (int i = 0; i < categories.Length; i++)
+            {
+                Category category = categories[i];
+                bool selected = i == index;
+                if (category.panel != null && category.panel.activeSelf != selected)
+                    category.panel.SetActive(selected);
+                if (category.indicator != null) category.indicator.enabled = selected;
+                if (category.button == null) continue;
+
+                ColorBlock colors = category.button.colors;
+                colors.normalColor = selected ? categoryActiveColor : categoryNormalColor;
+                colors.highlightedColor = selected ? categoryActiveHoverColor : categoryHoverColor;
+                colors.selectedColor = colors.highlightedColor;
+                category.button.colors = colors;
+            }
+        }
+
         private SettingsFile settingsFile;
         private bool isInitialized;
         private readonly List<ResolutionOption> resolutionOptions = new();
@@ -126,6 +171,7 @@ namespace Assets.Player.UI
 
         private void OnEnable()
         {
+            SelectCategory(0);
             if (isInitialized) Refresh();
         }
 
@@ -165,11 +211,11 @@ namespace Assets.Player.UI
 
             bool isButtonHold = settingsFile.save.voiceMode == VoiceMode.ButtonHold;
             buttonHoldVoiceModeBackground.color = isButtonHold
-                ? new Color(0.18f, 0.72f, 0.43f, 1f)
-                : new Color(0.18f, 0.18f, 0.18f, 1f);
+                ? voiceSelectedColor
+                : voiceNormalColor;
             voiceActivationModeBackground.color = isButtonHold
-                ? new Color(0.18f, 0.18f, 0.18f, 1f)
-                : new Color(0.18f, 0.72f, 0.43f, 1f);
+                ? voiceNormalColor
+                : voiceSelectedColor;
         }
 
         private void SelectGraphicsValues()

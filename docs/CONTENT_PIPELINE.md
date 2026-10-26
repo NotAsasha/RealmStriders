@@ -31,7 +31,11 @@ requires a different process, document the exception and its reason.
    If `clickSounds` is populated, add an enabled `AudioSource` to the same root
    GameObject as `Item`, with Play On Awake disabled. `Item` caches that source;
    an AudioSource on a child does not supply the default use click.
-6. Test stacking with other equipment and verify that capture timing remains
+6. Configure `GripPoint` on the physical handle and the `Held Poses` offsets
+   separately. Assign all `Inventory Presentation` arrays, including child
+   renderers, lights, canvases, audio sources and colliders. Never hide the
+   network root with `SetActive(false)`. See `HELD_ITEMS.md` for animation setup.
+7. Test stacking with other equipment and verify that capture timing remains
    understandable.
 
 ## Adding a world or mission

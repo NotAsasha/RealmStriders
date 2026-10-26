@@ -28,11 +28,16 @@ namespace Base
         public override void OnNetworkDespawn()
         {
             if (currentPreview != null) Destroy(currentPreview);
+            base.OnNetworkDespawn();
         }
 
         private void Update()
         {
-            if (!IsOwner || !IsSpawned ||!isCurrentlyHeld) return;
+            if (!IsOwner || !IsSpawned || !IsEquipped)
+            {
+                if (currentPreview != null) currentPreview.SetActive(false);
+                return;
+            }
 
             //only local
             HandlePreview();
@@ -77,7 +82,7 @@ namespace Base
 
         override public void Drop()
         {
-            currentPreview.SetActive(false);
+            if (currentPreview != null) currentPreview.SetActive(false);
             base.Drop();
         }
 

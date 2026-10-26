@@ -221,11 +221,30 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   isConsumable: 0
   sellPrice: 200
+  pitchVariation: 0.08
   clickSounds: []
   icon: {fileID: 21300000, guid: 0c04b8ab290e93f4690e70376fa58a44, type: 3}
   gripPoint: {fileID: 2095921017896120502}
   gripPositionOffset: {x: 0, y: 0, z: 0}
   gripRotationOffset: {x: 0, y: 0, z: 0}
+  viewPositionOffset: {x: 0, y: 0, z: 0}
+  viewRotationOffset: {x: 0, y: 0, z: 0}
+  remotePositionOffset: {x: 0, y: 0, z: 0}
+  remoteRotationOffset: {x: 0, y: 0, z: 0}
+  actionViewPositionOffset: {x: -0.08, y: 0.1, z: -0.08}
+  actionViewRotationOffset: {x: -10, y: -15, z: 0}
+  actionRemotePositionOffset: {x: -0.08, y: 0.22, z: -0.12}
+  actionRemoteRotationOffset: {x: -15, y: -15, z: 0}
+  poseBlendDuration: 0.2
+  holdAnimationOffset: {fileID: 0}
+  inventoryRenderers:
+  - {fileID: 2733935189069253551}
+  - {fileID: 369300985094014521}
+  inventoryLights: []
+  inventoryCanvases: []
+  inventoryAudioSources: []
+  inventoryColliders:
+  - {fileID: 2039614682227097194}
   prefabId: 23
   isCurrentlyHeld: 0
 --- !u!1001 &5045008135094828400
@@ -301,6 +320,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c9f18f2283baec2488c02fc9649ecc40, type: 3}
+--- !u!23 &369300985094014521 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4837848281817250633, guid: c9f18f2283baec2488c02fc9649ecc40,
+    type: 3}
+  m_PrefabInstance: {fileID: 5045008135094828400}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &2733935189069253551 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7202271454713460447, guid: c9f18f2283baec2488c02fc9649ecc40,
+    type: 3}
+  m_PrefabInstance: {fileID: 5045008135094828400}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4722518260123507355 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c9f18f2283baec2488c02fc9649ecc40,

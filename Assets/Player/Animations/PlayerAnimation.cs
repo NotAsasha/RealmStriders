@@ -35,34 +35,17 @@ namespace Player
 
         public override void OnNetworkSpawn()
         {
-            if (inventory != null)
-            {
-                if (IsOwner)
-                {
-                    inventory.itemChanged += OnItemChanged;
-                }
-                else
-                {
-                    inventory.isHoldingItem.OnValueChanged += OnHoldingItemNetworkChanged;
-
-                    ApplyHandWeight(inventory.isHoldingItem.Value);
-                }
-            }
+            if (inventory == null) return;
+            inventory.isHoldingItem.OnValueChanged += OnHoldingItemNetworkChanged;
+            ApplyHandWeight(inventory.isHoldingItem.Value);
         }
 
         public override void OnNetworkDespawn()
         {
             if (inventory != null)
-            {
-                if (IsOwner)
-                {
-                    inventory.itemChanged -= OnItemChanged;
-                }
-                else
-                {
-                    inventory.isHoldingItem.OnValueChanged -= OnHoldingItemNetworkChanged;
-                }
-            }
+                inventory.isHoldingItem.OnValueChanged -= OnHoldingItemNetworkChanged;
+            if (weightLerpCoroutine != null) StopCoroutine(weightLerpCoroutine);
+            weightLerpCoroutine = null;
         }
 
         private void Update()

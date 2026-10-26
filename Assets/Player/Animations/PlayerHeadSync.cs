@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
-[DefaultExecutionOrder(-50)]
+[DefaultExecutionOrder(100)]
 public class PlayerHeadSync : NetworkBehaviour
 {
     [Header("References")]
@@ -50,7 +50,6 @@ public class PlayerHeadSync : NetworkBehaviour
     private float currentAppliedPitch = 0f;
     public float CurrentPitch => currentAppliedPitch;
 
-    private Vector3 remoteGripOffsetFromShoulder;
     private Player.Inventory inventory;
     private ItemHolder itemHolder;
     private CameraMovement cachedCameraMovement;
@@ -64,8 +63,6 @@ public class PlayerHeadSync : NetworkBehaviour
     private Transform ikTarget;
     private Transform ikHint;
 
-    // Mixamo right-hand rotation offset relative to character forward (+Z forward, +Y up)
-    private Quaternion handBindRotationOffset = Quaternion.identity;
     private float maxArmReach = 0.594f;
     private float maxSafeArmReach = 0.575f;
     private float minSafeArmReach = 0.15f;
@@ -117,11 +114,6 @@ public class PlayerHeadSync : NetworkBehaviour
                 minSafeArmReach = Mathf.Abs(upperArmLen - forearmLen) + 0.03f;
             }
 
-            if (ikTip != null && playerRoot != null)
-            {
-                // Calibrate Mixamo hand bone space (+Y along fingers, +Z dorsal) relative to character root (+Z forward, +Y up)
-                handBindRotationOffset = Quaternion.Inverse(playerRoot.rotation) * ikTip.rotation;
-            }
         }
 
         // Disable secondary RigBuilder and empty Animator on Body so they never evaluate
@@ -138,20 +130,6 @@ public class PlayerHeadSync : NetworkBehaviour
             bodyAnimator.enabled = false;
         }
 
-        // Default ergonomic 3rd-person grip offset relative to right shoulder (strictly within 0.575m reach)
-        remoteGripOffsetFromShoulder = new Vector3(0.02f, -0.14f, 0.38f);
-        if (remoteHandTarget != null && ikRoot != null && playerRoot != null)
-        {
-            Vector3 initialOffset = playerRoot.InverseTransformVector(remoteHandTarget.position - ikRoot.position);
-            initialOffset.z = Mathf.Clamp(initialOffset.z, 0.25f, 0.42f);
-            initialOffset.y = Mathf.Clamp(initialOffset.y, -0.25f, 0.05f);
-            initialOffset.x = Mathf.Clamp(initialOffset.x, -0.15f, 0.15f);
-            if (initialOffset.magnitude > maxSafeArmReach * 0.92f)
-            {
-                initialOffset = initialOffset.normalized * (maxSafeArmReach * 0.92f);
-            }
-            remoteGripOffsetFromShoulder = initialOffset;
-        }
     }
 
     private void Update()
@@ -232,21 +210,16 @@ public class PlayerHeadSync : NetworkBehaviour
                 itemHolder.EvaluateViewModelAndIKTarget(ikRoot, minSafeArmReach, maxSafeArmReach);
             }
         }
-        else if (remoteHandTarget != null && ikRoot != null && playerRoot != null)
+        else if (itemHolder != null)
         {
-            Quaternion pitchRot = Quaternion.Euler(currentAppliedPitch, 0f, 0f);
-            Quaternion aimWorldRot = playerRoot.rotation * pitchRot;
-            Vector3 desiredWorldPos = ikRoot.position + aimWorldRot * remoteGripOffsetFromShoulder;
-
-            remoteHandTarget.position = ClampTargetToShoulderReach(desiredWorldPos, ikRoot.position);
-            remoteHandTarget.rotation = aimWorldRot;
+            itemHolder.EvaluateRemotePose(ikRoot, minSafeArmReach, maxSafeArmReach, currentAppliedPitch);
         }
 
         // 4. Solve Two-Bone IK directly on the animated skeleton
         ApplyRightHandIK();
 
-        // 5. Lock remote held item directly to the solved hand pose in the exact same LateUpdate
-        if (!IsOwner && inventory != null)
+        // 5. Both views attach the item to the solved palm, including the equip blend.
+        if (inventory != null)
         {
             Item activeItem = inventory.GetActiveItem();
             if (activeItem != null && activeItem.gameObject.activeInHierarchy)
@@ -293,7 +266,7 @@ public class PlayerHeadSync : NetworkBehaviour
         float hintWeight = Mathf.Clamp01(constraintWeight * (ikHint != null ? handIK.data.hintWeight : 1f));
 
         Vector3 targetWorldPos = ClampTargetToShoulderReach(ikTarget.position, ikRoot.position);
-        Quaternion targetWorldRot = ikTarget.rotation * handBindRotationOffset;
+        Quaternion targetWorldRot = ikTarget.rotation;
 
         // Provide an anatomical elbow pole vector even if no Hint transform is assigned in the prefab
         Transform rootRef = playerRoot != null ? playerRoot : transform;

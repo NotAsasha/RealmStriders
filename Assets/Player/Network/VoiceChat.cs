@@ -31,6 +31,7 @@ namespace Player.Network
         private int sampleRate;
         private VoiceAudioBuffer proximityBuffer;
         private SettingsFile settingsFile;
+        private Inventory inventory;
         private VoiceMode voiceMode = VoiceMode.ButtonHold;
         private bool isVoiceButtonHeld;
         private bool isRecording;
@@ -38,6 +39,7 @@ namespace Player.Network
 
         public override void OnNetworkSpawn()
         {
+            inventory = GetComponentInParent<Inventory>();
             SetVoiceIndicatorVisible(false);
 
             if (SteamClient.IsValid)
@@ -229,7 +231,9 @@ namespace Player.Network
                     if (voiceMode == VoiceMode.VoiceActivation && !isSpeaking)
                         continue;
 
-                    bool isTransmittingRadio = WalkieTalkie.IsLocalPlayerHoldingActiveRadio();
+                    WalkieTalkie radio = inventory != null ? inventory.GetActiveItem() as WalkieTalkie : null;
+                    bool isTransmittingRadio = radio != null && radio.CanTransmit();
+                    if (isTransmittingRadio) radio.NotifyLocalTransmission();
                     SendVoiceServerRpc(dataToSend, compressedBytesWritten, isTransmittingRadio, voiceLevel);
                 }
             }
@@ -281,9 +285,12 @@ namespace Player.Network
                 voiceSoundProducer.RefreshContinuousNoise();
             }
 
-            if (isRadio)
+            WalkieTalkie transmittingRadio = isRadio ? WalkieTalkie.GetTransmittingRadio(senderClientId) : null;
+            isRadio = transmittingRadio != null;
+            if (transmittingRadio != null)
             {
-                WalkieTalkie.GetTransmittingRadio(senderClientId)?.RefreshNoiseFromVoice();
+                transmittingRadio.RefreshTransmissionServer();
+                if (voiceLevel >= voiceNoiseThreshold) transmittingRadio.RefreshNoiseFromVoice();
             }
 
             ReceiveVoiceClientRpc(compressedData, length, isRadio, senderClientId);
@@ -330,15 +337,7 @@ namespace Player.Network
                         // Не можна використовувати radio.IsOwner — він вказує на NetworkObject-власника
                         // (сервер/хост), а не на гравця, що тримає рацію, через що хост
                         // некоректно пропускав би запис у всі рації.
-                        if (isMyOwnVoice && radio.isCurrentlyHeld && radio.IsOwner)
-                        {
-                            // IsOwner тут означає: ця рація спаунена локально (тобто ми — власник NetworkObject).
-                            // Для хоста IsOwner завжди true на його об'єктах, тому додаткова перевірка:
-                            // пропускаємо тільки якщо рація reально в руках і ми — локальний відправник.
-                            ulong localId = NetworkManager.Singleton.LocalClientId;
-                            if (senderClientId == localId)
-                                continue;
-                        }
+                        if (isMyOwnVoice && radio.IsHeldByClient(senderClientId)) continue;
 
                         radio.WriteVoiceData(rawBuffer, uncompressedWritten, playerVolume);
                     }

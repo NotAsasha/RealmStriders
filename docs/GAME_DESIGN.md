@@ -98,6 +98,10 @@ implemented today and may still need work.
 - The current inventory implementation has four configurable slots. The
   supplied GDD's two-hand model and fixed key bindings are not current
   requirements.
+- Held equipment uses the existing full-body character and a single right-hand
+  grip. Separate first-person arms and two-handed poses are outside the current
+  scope. A powered, equipped radio is raised while transmitting voice, then
+  lowered after transmission ends.
 - Enemy behaviour is specialized per monster and built on shared enemy
   functionality.
 - `LeafBlower` is the capture tool. Higher-danger monsters take longer to

@@ -35,6 +35,12 @@ operations. In particular:
   `QualitySettings`, `Screen.SetResolution`, `Screen.fullScreenMode`,
   VSync, frame-rate, and shadow-quality APIs. Post-processing is intentionally
   not toggled yet; its control can be added without changing the save boundary.
+- The shared Settings prefab presents horizontal Graphics, Sound, and Controls
+  tabs. Panel, button, and active-indicator references are serialized in
+  SettingsMenu; category buttons call SelectCategory with their index.
+  Opening the menu selects Graphics, and switching tabs preserves pending values.
+  Apply saves all categories; closing discards unapplied changes. Master volume
+  previews immediately over the full 0–100% range.
 - The host owns the save file; automatic saves happen after mission
   completion, while manual saves are allowed only outside active missions.
 - Mission-zone objects are transient; objects left outside the base are
@@ -48,6 +54,28 @@ When adding a networked feature, identify its authoritative owner before
 adding a `NetworkVariable`, RPC, or local cache.
 
 ## Scene flow
+
+The Menu scene uses left-aligned Host Lobby, Join Lobby, Settings, and Exit
+navigation managed by LobbyUiManager with serialized page references. Host Lobby
+opens the existing save selection and host flow. Join Lobby is a UI placeholder:
+public Steam lobby discovery and joining are not implemented yet. Exit quits the
+standalone application and stops Play Mode in the Editor. Main, Host, Join, and
+Settings follow the owner-authored Base and SaveSelector style: translucent dark
+backdrops, Cinzel Decorative headings, Syncopate buttons, Unica One technical
+labels, and Smooch Sans descriptions. File management dialogs use an opaque dark
+backdrop for readability and retain their separate confirmation step.
+Host Lobby requires an explicit save-slot selection on each menu session.
+The selected card is highlighted and labelled SELECTED; Create Lobby is disabled
+until selection. LobbyUiManager validates the selection before starting the host,
+assigns GameManager.currentSave, and runs scene/UI continuation only after NGO
+reports that the host started. Save reset is behind Manage Files and a separate
+confirmation dialog; cancel is the default focused action. Reset includes local
+settings as well as save slots, preserves the existing file reset behavior, and
+clears the selected slot.
+Page navigation crossfades over 0.32 seconds with a subtle title slide, using
+unscaled time. Serialized CanvasGroups block input during transitions.
+The Menu scene routes Settings' close event through LobbyUiManager so its
+unapplied settings are reverted only after the outgoing page finishes fading.
 
 The project has bootstrap, menu, lobby/base, mission, and end scenes. Local
 scene loading uses Unity's `SceneManager`; networked scene loading is
@@ -76,3 +104,12 @@ Before adding a new system:
 3. Define the public interaction or event boundary.
 4. Decide whether the state is transient, networked, or persistent.
 5. Add the smallest integration test or manual verification path available.
+
+## Held equipment presentation
+
+`Inventory` owns the replicated slot snapshot and selected item. `ItemHolder`
+composes camera/shoulder poses and action offsets; `PlayerHeadSync` solves the
+existing arm IK; `Item` aligns to the solved palm and manages stored presentation.
+WalkieTalkie uses voice transmission to drive a blended raised pose. The system
+uses one body and one network item, with a one-handed grip. See `HELD_ITEMS.md`
+for prefab authoring, animation and verification.

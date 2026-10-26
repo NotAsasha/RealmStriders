@@ -26,7 +26,8 @@ namespace Enemy
             return EntityInSight(transform.position + eyeLocalPosition, transform.forward, chaseEnemies);
         }
 
-        public GameObject EntityInSight(Vector3 eyePosition, Vector3 viewDirection, bool chaseEnemies = false)
+        public GameObject EntityInSight(Vector3 eyePosition, Vector3 viewDirection, bool chaseEnemies = false,
+            Transform ignoredRoot = null)
         {
             if (viewAngle == 0 || viewDistance == 0) return null;
 
@@ -45,6 +46,7 @@ namespace Enemy
             {
                 var collider = nearbyEntities[i];
                 if (collider == null) continue;
+                if (ignoredRoot != null && collider.transform.IsChildOf(ignoredRoot)) continue;
 
                 // Entity colliders commonly live on child bones, so resolve the networked root.
                 var entity = collider.GetComponentInParent<Entity>();

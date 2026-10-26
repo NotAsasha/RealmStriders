@@ -2,7 +2,6 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Animations;
-using static Unity.VisualScripting.Member;
 
 namespace Player.Equipment
 {
@@ -37,6 +36,76 @@ namespace Player.Equipment
         [SerializeField] public Vector3 gripRotationOffset;
 
         
+
+        [Header("Held Poses (relative to the player's grip pose)")]
+        [SerializeField] private Vector3 viewPositionOffset;
+        [SerializeField] private Vector3 viewRotationOffset;
+        [SerializeField] private Vector3 remotePositionOffset;
+        [SerializeField] private Vector3 remoteRotationOffset;
+        [SerializeField] private Vector3 actionViewPositionOffset = new(-0.08f, 0.10f, -0.08f);
+        [SerializeField] private Vector3 actionViewRotationOffset = new(-10f, -15f, 0f);
+        [SerializeField] private Vector3 actionRemotePositionOffset = new(-0.08f, 0.22f, -0.12f);
+        [SerializeField] private Vector3 actionRemoteRotationOffset = new(-15f, -15f, 0f);
+        [SerializeField, Min(0.01f)] private float poseBlendDuration = 0.2f;
+        [Tooltip("Optional additive pose animated by a dedicated Animator. Never written by ItemHolder.")]
+        [SerializeField] private Transform holdAnimationOffset;
+
+        public virtual bool IsHoldActionActive => false;
+        public float PoseBlendDuration => poseBlendDuration;
+        public bool IsEquipped => TryGetHolderInventory(out var inventory) && inventory.IsActiveItem(this);
+
+        public Pose GetHeldPoseOffset(bool firstPerson, float actionWeight)
+        {
+            Vector3 position = firstPerson ? viewPositionOffset : remotePositionOffset;
+            Vector3 rotation = firstPerson ? viewRotationOffset : remoteRotationOffset;
+            position += (firstPerson ? actionViewPositionOffset : actionRemotePositionOffset) * actionWeight;
+            Quaternion orientation = Quaternion.Euler(rotation) * Quaternion.Slerp(Quaternion.identity,
+                Quaternion.Euler(firstPerson ? actionViewRotationOffset : actionRemoteRotationOffset), actionWeight);
+            if (holdAnimationOffset != null)
+            {
+                position += orientation * holdAnimationOffset.localPosition;
+                orientation *= holdAnimationOffset.localRotation;
+            }
+            return new Pose(position, orientation);
+        }
+
+        [Header("Inventory Presentation (assign in the prefab)")]
+        [SerializeField] private Renderer[] inventoryRenderers = System.Array.Empty<Renderer>();
+        [SerializeField] private Light[] inventoryLights = System.Array.Empty<Light>();
+        [SerializeField] private Canvas[] inventoryCanvases = System.Array.Empty<Canvas>();
+        [SerializeField] private AudioSource[] inventoryAudioSources = System.Array.Empty<AudioSource>();
+        [SerializeField] private Collider[] inventoryColliders = System.Array.Empty<Collider>();
+        private bool[] lightStates;
+        private bool[] canvasStates;
+        private bool[] audioMuteStates;
+        private bool[] colliderStates;
+        private bool inventoryVisible = true;
+
+        public void SetInventoryVisible(bool visible)
+        {
+            if (inventoryVisible == visible) return;
+            inventoryVisible = visible;
+            for (int i = 0; i < inventoryRenderers.Length; i++)
+                if (inventoryRenderers[i] != null) inventoryRenderers[i].forceRenderingOff = !visible;
+            for (int i = 0; i < inventoryLights.Length; i++)
+            {
+                if (inventoryLights[i] == null) continue;
+                if (!visible) lightStates[i] = inventoryLights[i].enabled;
+                inventoryLights[i].enabled = visible && lightStates[i];
+            }
+            for (int i = 0; i < inventoryCanvases.Length; i++)
+            {
+                if (inventoryCanvases[i] == null) continue;
+                if (!visible) canvasStates[i] = inventoryCanvases[i].enabled;
+                inventoryCanvases[i].enabled = visible && canvasStates[i];
+            }
+            for (int i = 0; i < inventoryAudioSources.Length; i++)
+            {
+                if (inventoryAudioSources[i] == null) continue;
+                if (!visible) audioMuteStates[i] = inventoryAudioSources[i].mute;
+                inventoryAudioSources[i].mute = !visible || audioMuteStates[i];
+            }
+        }
 
         public (Vector3 translationOffset, Vector3 rotationOffset) GetGripOffsets()
         {
@@ -123,7 +192,7 @@ namespace Player.Equipment
 
         public bool IsHeldByClient(ulong clientId)
         {
-            return TryGetHolderInventory(out var inventory) && inventory.OwnerClientId == clientId;
+            return TryGetHolderInventory(out var inventory) && inventory.OwnerClientId == clientId && inventory.IsActiveItem(this);
         }
 
         public virtual Quaternion GetRemoteGripRotation(Inventory inventory)
@@ -138,25 +207,13 @@ namespace Player.Equipment
                 return;
             }
 
-            if (inventory.IsOwner && inventory.ItemHolder != null && inventory.ItemHolder.HeldItemSocket != null)
+            if (!inventory.IsActiveItem(this))
             {
+                // Stored items still follow their holder for mission cleanup and saving.
+                transform.SetPositionAndRotation(inventory.transform.position, inventory.transform.rotation);
                 return;
             }
-
-            Transform handAnchor = inventory.HandAnchor;
-            if (handAnchor == null)
-            {
-                return;
-            }
-
-            if (itemParentConstraint != null && itemParentConstraint.constraintActive)
-            {
-                // Disable ParentConstraint so it never snaps the item to the un-IK'd hand during InternalAnimationUpdate
-                itemParentConstraint.constraintActive = false;
-            }
-
-            Quaternion gripWorldRot = GetRemoteGripRotation(inventory);
-            AlignToGripPose(handAnchor.position, gripWorldRot);
+            inventory.ItemHolder?.AlignItemToHand(this);
         }
 
         #region Unity Lifecycle
@@ -179,6 +236,8 @@ namespace Player.Equipment
 
         public override void OnNetworkDespawn()
         {
+            if (holderInventory != null && holderInventory.IsSpawned)
+                holderInventory.ForgetItemServer(this);
             this.NetworkObject.UnRegister();
         }
 
@@ -219,10 +278,6 @@ namespace Player.Equipment
             if (inventory != null)
             {
                 inventory.ApplyParentConstraint(gameObject);
-                if (inventory.IsOwner && gameObject.activeSelf)
-                {
-                    inventory.ItemHolder?.SetActiveItem(this);
-                }
             }
         }
 
@@ -230,6 +285,7 @@ namespace Player.Equipment
         {
             holderInventory = null;
             isCurrentlyHeld = false;
+            SetInventoryVisible(true);
             SetPhysicsState(true);
             droppedItemHighlight?.Play();
 
@@ -263,6 +319,12 @@ namespace Player.Equipment
             itemParentConstraint = GetComponent<ParentConstraint>();
             audioSource = GetComponent<AudioSource>();
             TryGetComponent(out droppedItemHighlight);
+            lightStates = new bool[inventoryLights.Length];
+            canvasStates = new bool[inventoryCanvases.Length];
+            audioMuteStates = new bool[inventoryAudioSources.Length];
+            colliderStates = new bool[inventoryColliders.Length];
+            for (int i = 0; i < inventoryColliders.Length; i++)
+                colliderStates[i] = inventoryColliders[i] != null && inventoryColliders[i].enabled;
         }
 
         #endregion
@@ -293,16 +355,7 @@ namespace Player.Equipment
             Inventory inventory = player.GetComponentInParent<Inventory>();
             if (inventory == null) return;
 
-            bool wasAdded = inventory.AddItem(gameObject);
-            if (wasAdded)
-            {
-                isCurrentlyHeld = true;
-                SetPhysicsState(false);
-            }
-            else
-            {
-                Debug.Log("---Item: Inventory is full or cannot add item");
-            }
+            inventory.AddItem(gameObject);
         }
 
         virtual public void Drop()
@@ -318,6 +371,7 @@ namespace Player.Equipment
 
         virtual public void Use(GameObject player)
         {
+            if (!IsEquipped) return;
             if (player == null)
             {
                 Debug.LogWarning("Player is null in Use!");
@@ -339,8 +393,9 @@ namespace Player.Equipment
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void RequestTurnOffServerRpc()
+        public void RequestTurnOffServerRpc(RpcParams rpc = default)
         {
+            if (!IsHeldByClient(rpc.Receive.SenderClientId)) return;
             TurnOffServer();
         }
 
@@ -356,18 +411,6 @@ namespace Player.Equipment
 
         virtual protected void HandleSingleUseItem(GameObject player)
         {
-            Inventory inventory = player.GetComponentInParent<Inventory>();
-            if (inventory != null)
-            {
-                for (int i = 0; i < inventory.capacity; i++)
-                {
-                    if (inventory.GetItem(i)?.gameObject == gameObject)
-                    {
-                        inventory.RemoveItem(i);
-                        break;
-                    }
-                }
-            }
             DestroyItemServerRpc();
         }
 
@@ -399,9 +442,12 @@ namespace Player.Equipment
 
         private void SetPhysicsState(bool isPhysicsEnabled)
         {
+            for (int i = 0; i < inventoryColliders.Length; i++)
+                if (inventoryColliders[i] != null)
+                    inventoryColliders[i].enabled = isPhysicsEnabled && colliderStates[i];
             if (itemRigidbody != null)
             {
-                itemRigidbody.isKinematic = !isPhysicsEnabled;
+                itemRigidbody.isKinematic = !isPhysicsEnabled || (IsSpawned && !IsServer);
             }
             if (itemNetworkRigidbody != null)
             {

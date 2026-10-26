@@ -127,11 +127,29 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   isConsumable: 0
   sellPrice: 0
+  pitchVariation: 0.08
   clickSounds: []
   icon: {fileID: 21300000, guid: ea5dbe99d77c5c6459103e243cc22b99, type: 3}
   gripPoint: {fileID: 0}
   gripPositionOffset: {x: 0, y: 0, z: 0}
   gripRotationOffset: {x: 0, y: 0, z: 0}
+  viewPositionOffset: {x: 0, y: 0, z: 0}
+  viewRotationOffset: {x: 0, y: 0, z: 0}
+  remotePositionOffset: {x: 0, y: 0, z: 0}
+  remoteRotationOffset: {x: 0, y: 0, z: 0}
+  actionViewPositionOffset: {x: -0.08, y: 0.1, z: -0.08}
+  actionViewRotationOffset: {x: -10, y: -15, z: 0}
+  actionRemotePositionOffset: {x: -0.08, y: 0.22, z: -0.12}
+  actionRemoteRotationOffset: {x: -15, y: -15, z: 0}
+  poseBlendDuration: 0.2
+  holdAnimationOffset: {fileID: 0}
+  inventoryRenderers:
+  - {fileID: 2050589097623748319}
+  inventoryLights: []
+  inventoryCanvases: []
+  inventoryAudioSources: []
+  inventoryColliders:
+  - {fileID: 1535451381881149165}
   prefabId: 16
   isCurrentlyHeld: 0
 --- !u!114 &7134890470268953663
@@ -292,6 +310,12 @@ PrefabInstance:
 --- !u!4 &882154911422809520 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5736e8777e86981488109ac8eea97592,
+    type: 3}
+  m_PrefabInstance: {fileID: 843495063983252059}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &2050589097623748319 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 5736e8777e86981488109ac8eea97592,
     type: 3}
   m_PrefabInstance: {fileID: 843495063983252059}
   m_PrefabAsset: {fileID: 0}

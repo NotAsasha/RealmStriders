@@ -62,6 +62,9 @@ monster's danger or difficulty. Other equipment can weaken a monster before
 and during capture; multiple weaknesses can be combined and their effects
 stack, reducing the time required by the `LeafBlower`.
 
+While held, `LeafBlower` excludes its current holder and their child colliders
+from target detection. Dropping it removes this exclusion.
+
 The `LeafBlower` keeps the current target and capture progress when the target
 briefly leaves its view. While the target is lost, capture does not advance.
 After one second without reacquiring that same target, 20% of the required

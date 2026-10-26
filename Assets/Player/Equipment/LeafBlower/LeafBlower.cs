@@ -94,6 +94,7 @@ namespace Player.Equipment.LeafBlower
             isOn.OnValueChanged += SwitchState;
             Charge.OnValueChanged += UpdateChargeText;
             UpdateChargeText(0, Charge.Value);
+            if (isOn.Value) SwitchState(false, true);
         }
 
         public override void OnNetworkDespawn()
@@ -269,7 +270,8 @@ namespace Player.Equipment.LeafBlower
 
         private void ValidateTarget()
         {
-            GameObject entityObject = detector.EntityInSight(aimOrigin.Value, aimForward.Value, true);
+            Transform holderRoot = TryGetHolderInventory(out var inventory) ? inventory.transform : null;
+            GameObject entityObject = detector.EntityInSight(aimOrigin.Value, aimForward.Value, true, holderRoot);
             Entity detectedTarget = entityObject != null ? entityObject.GetComponent<Entity>() : null;
 
             if (detectedTarget == null || detectedTarget.isDead.Value)

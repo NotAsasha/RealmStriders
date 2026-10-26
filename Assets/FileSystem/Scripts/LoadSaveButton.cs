@@ -11,10 +11,18 @@ public class LoadSaveButton : MonoBehaviour
     public TMP_Text saveText;
 
 
-    private void Start()
-    {
-        saveText.text = $"Rating: {gameSave.save.teamRating}\n Money: {gameSave.save.teamMoney}";
-    }
+        private void Start()
+        {
+            RefreshText();
+        }
+
+        public void RefreshText()
+        {
+            if (saveText == null) return;
+            saveText.text = gameSave != null && gameSave.save != null
+                ? $"Rating: {gameSave.save.teamRating}\nMoney: {gameSave.save.teamMoney}"
+                : "Empty save";
+        }
 
     public void LoadSave()
     {

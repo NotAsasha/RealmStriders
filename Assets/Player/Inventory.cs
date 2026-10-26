@@ -1,10 +1,8 @@
 using Player.Equipment;
 using Player.Movement;
 using Player.UI;
-using System;
 using System.Collections;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.InputSystem;
@@ -46,11 +44,16 @@ namespace Player
         public readonly NetworkVariable<bool> isHoldingItem = new NetworkVariable<bool>(
             false,
             NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Owner
+            NetworkVariableWritePermission.Server
         );
 
-        public event Action<bool> itemChanged;
+        public event System.Action<bool> itemChanged;
 
+        private const ulong EmptySlot = ulong.MaxValue;
+        private NetworkList<ulong> slotIds;
+        private readonly NetworkVariable<int> selectedSlot = new(0);
+        private bool pendingResolution;
+        private Item presentedItem;
         private Item[] items;
         private UISlot[] slots;
         private Controls controls;
@@ -86,6 +89,7 @@ namespace Player
                 }
             }
 
+            slotIds = new NetworkList<ulong>();
             items = new Item[capacity];
             slots = new UISlot[capacity];
         }
@@ -107,6 +111,15 @@ namespace Player
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            slotIds.OnListChanged += OnSlotsChanged;
+            selectedSlot.OnValueChanged += OnSelectedSlotChanged;
+            if (IsServer && slotIds.Count == 0)
+            {
+                int initialSlot = Mathf.Clamp(activeSlotIndex, 0, capacity - 1);
+                for (int i = 0; i < capacity; i++) slotIds.Add(EmptySlot);
+                selectedSlot.Value = initialSlot;
+            }
+            RefreshReplicatedItems();
 
             if (human != null)
             {
@@ -135,6 +148,9 @@ namespace Player
             {
                 human.isDead.OnValueChanged -= OnDeathStateChange;
             }
+            slotIds.OnListChanged -= OnSlotsChanged;
+            selectedSlot.OnValueChanged -= OnSelectedSlotChanged;
+            itemHolder?.SetActiveItem(null);
             CleanupInputHandlers();
             base.OnNetworkDespawn();
         }
@@ -156,6 +172,7 @@ namespace Player
                 hideCoroutine = null;
             }
             CleanupInputHandlers();
+            base.OnDestroy();
         }
 
         #endregion
@@ -201,68 +218,82 @@ namespace Player
 
         public bool AddItem(GameObject itemToAdd, int targetSlot = -1)
         {
-            if (itemToAdd == null) return false;
-
-            Item takableComponent = itemToAdd.GetComponent<Item>();
-            if (takableComponent == null) return false;
-
-            if (targetSlot == -1)
-            {
-                targetSlot = FindEmptySlot();
-                if (targetSlot == -1) return false;
-            }
-
-            if (!IsValidSlot(targetSlot) || items[targetSlot] != null)
-                return false;
-
-            items[targetSlot] = takableComponent;
-            SetItemParentServerRpc(itemToAdd, gameObject);
-
-            if (targetSlot != activeSlotIndex)
-            {
-                SetItemActiveServerRpc(itemToAdd, false);
-            }
-            else
-            {
-                if (IsOwner)
-                {
-                    isHoldingItem.Value = true;
-                    itemHolder?.SetActiveItem(takableComponent);
-                }
-                itemChanged?.Invoke(true);
-            }
-
-            UpdateUI();
-            if (autoHideUI)
-            {
-                ShowInventoryUI();
-            }
+            if (!IsSpawned || !IsOwner || itemToAdd == null ||
+                !itemToAdd.TryGetComponent(out Item item) || !item.IsSpawned) return false;
+            if (targetSlot == -1) targetSlot = FindEmptySlot();
+            if (!IsValidSlot(targetSlot) || items[targetSlot] != null) return false;
+            RequestPickupRpc(new NetworkObjectReference(item.NetworkObject), targetSlot);
             return true;
         }
 
         public bool RemoveItem(int slot)
         {
-            if (!IsValidSlot(slot) || items[slot] == null)
-                return false;
-
-            items[slot] = null;
-
-            if (slot == activeSlotIndex)
-            {
-                if (IsOwner)
-                {
-                    isHoldingItem.Value = false;
-                    itemHolder?.SetActiveItem(null);
-                }
-                itemChanged?.Invoke(false);
-            }
-
-            UpdateUI();
-            if (autoHideUI)
-            {
-                ShowInventoryUI();
-            }
+            if (!IsServer || !IsValidSlot(slot) || slot >= slotIds.Count) return false;
+            slotIds[slot] = EmptySlot;
+            UpdateHoldingState();
             return true;
+        }
+
+        public bool IsActiveItem(Item item) => item != null && GetActiveItem() == item;
+
+        public void ForgetItemServer(Item item)
+        {
+            if (!IsServer || item == null || slotIds == null) return;
+            for (int i = 0; i < slotIds.Count; i++)
+            {
+                if (slotIds[i] == item.NetworkObjectId) slotIds[i] = EmptySlot;
+            }
+            UpdateHoldingState();
+        }
+
+        private void Update()
+        {
+            if (IsSpawned && pendingResolution) RefreshReplicatedItems();
+        }
+
+        private void OnSlotsChanged(NetworkListEvent<ulong> change) => RefreshReplicatedItems();
+        private void OnSelectedSlotChanged(int previous, int current) => RefreshReplicatedItems();
+
+        public void RefreshReplicatedItems()
+        {
+            if (!IsSpawned || items == null) return;
+            activeSlotIndex = selectedSlot.Value;
+            pendingResolution = false;
+            for (int i = 0; i < items.Length; i++)
+            {
+                Item previous = items[i];
+                Item resolved = null;
+                ulong id = i < slotIds.Count ? slotIds[i] : EmptySlot;
+                if (id != EmptySlot)
+                {
+                    if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(id, out var obj) &&
+                        obj.TryGetComponent(out resolved))
+                    {
+                        // Parent messages and list snapshots may arrive in either order.
+                        if (obj.transform.parent != transform) pendingResolution = true;
+                    }
+                    else pendingResolution = true;
+                }
+                items[i] = resolved;
+                if (previous != null && previous != resolved) previous.SetInventoryVisible(true);
+                if (resolved != null) resolved.SetInventoryVisible(i == activeSlotIndex);
+            }
+            Item active = GetActiveItem();
+            if (presentedItem != active)
+            {
+                presentedItem = active;
+                itemHolder?.SetActiveItem(active);
+                itemChanged?.Invoke(active != null);
+                if (IsOwner && autoHideUI) ShowInventoryUI();
+            }
+            if (IsOwner) UpdateUI();
+        }
+
+        private void UpdateHoldingState()
+        {
+            if (IsServer)
+                isHoldingItem.Value = selectedSlot.Value >= 0 && selectedSlot.Value < slotIds.Count &&
+                                      slotIds[selectedSlot.Value] != EmptySlot;
         }
 
         public Item GetActiveItem()
@@ -359,33 +390,15 @@ namespace Player
             if (IsPlayerInInteraction()) return;
 
             Item activeItem = GetActiveItem();
-            if (activeItem != null && activeItem.IsConsumable())
-                RemoveItem(activeSlotIndex);
-
             activeItem?.Use(gameObject);
         }
 
         private void OnDropItem(InputAction.CallbackContext context)
         {
-            Item itemToDrop = GetActiveItem();
-            if (itemToDrop == null) return;
-
-            items[activeSlotIndex] = null;
-            if (IsOwner)
-            {
-                isHoldingItem.Value = false;
-                itemHolder?.SetActiveItem(null);
-                itemChanged?.Invoke(false);
-            }
-
-            GetDropPose(out Vector3 dropOrigin, out Vector3 dropForward);
-            ReleaseItemVisual(itemToDrop.gameObject);
-            DropItemServerRpc(itemToDrop.gameObject, dropOrigin, dropForward);
-            UpdateUI();
-            if (autoHideUI)
-            {
-                ShowInventoryUI();
-            }
+            Item item = GetActiveItem();
+            if (item == null || IsPlayerInInteraction()) return;
+            GetDropPose(out Vector3 origin, out Vector3 forward);
+            DropItemServerRpc(new NetworkObjectReference(item.NetworkObject), origin, forward);
         }
 
         private void OnDeathStateChange(bool oldValue, bool isDead)
@@ -440,67 +453,19 @@ namespace Player
 
         private void ChangeActiveSlot(int newSlotIndex)
         {
-            if (newSlotIndex >= capacity) throw new ArgumentOutOfRangeException();
-
-            Item currentItem = GetActiveItem();
-            if (currentItem != null)
-            {
-                currentItem.OnUnequip();
-                SetItemActiveServerRpc(currentItem.gameObject, false);
-            }
-
-            activeSlotIndex = newSlotIndex;
-
-            Item newItem = GetActiveItem();
-            if (newItem != null)
-            {
-                SetItemActiveServerRpc(newItem.gameObject, true);
-                if (IsOwner)
-                {
-                    isHoldingItem.Value = true;
-                    itemHolder?.SetActiveItem(newItem);
-                }
-                itemChanged?.Invoke(true);
-            }
-            else
-            {
-                if (IsOwner)
-                {
-                    isHoldingItem.Value = false;
-                    itemHolder?.SetActiveItem(null);
-                }
-                itemChanged?.Invoke(false);
-            }
-            UpdateUI();
-            if (autoHideUI)
-            {
-                ShowInventoryUI();
-            }
+            if (IsOwner && IsValidSlot(newSlotIndex)) SelectSlotRpc(newSlotIndex);
         }
 
         private void DropEverything()
         {
-            if (items != null)
+            if (!IsServer) return;
+            for (int i = 0; i < items.Length; i++)
             {
-                for (int i = 0; i < capacity; ++i)
-                {
-                    if (items[i] == null) continue;
-                    Item itemToDrop = items[i];
-                    items[i] = null;
-
-                    itemToDrop.OnUnequip();
-                    GetDropPose(out Vector3 dropOrigin, out Vector3 dropForward);
-                    ReleaseItemVisual(itemToDrop.gameObject);
-                    DropItemServerRpc(itemToDrop.gameObject, dropOrigin, dropForward);
-                }
+                if (items[i] == null) continue;
+                Item item = items[i];
+                item.TurnOffServer();
+                DropItemServer(item, transform.position + Vector3.up, transform.forward);
             }
-            if (IsOwner)
-            {
-                isHoldingItem.Value = false;
-                itemHolder?.SetActiveItem(null);
-                itemChanged?.Invoke(false);
-            }
-            UpdateUI();
         }
 
         #endregion
@@ -620,159 +585,70 @@ namespace Player
 
         #region Network RPCs and Item Parenting
 
-        private void ToggleNetworkTransform(GameObject item, bool isEnabled)
-        {
-            if (item.TryGetComponent<NetworkTransform>(out var netTransform))
-            {
-                netTransform.enabled = isEnabled;
-            }
-        }
-
-        private void ReleaseItemVisual(GameObject item)
-        {
-            if (item == null) return;
-
-            if (item.TryGetComponent<NetworkObject>(out var networkObject))
-            {
-                networkObject.TryRemoveParent();
-            }
-
-            RemoveParentConstraint(item);
-            ToggleNetworkTransform(item, true);
-
-            if (!item.activeSelf)
-            {
-                item.SetActive(true);
-            }
-        }
-
         private void GetDropPose(out Vector3 origin, out Vector3 forward)
         {
-            if (CameraMovement.Instance != null)
+            if (IsOwner && CameraMovement.Instance != null)
             {
                 origin = CameraMovement.Instance.transform.position;
                 forward = CameraMovement.Instance.transform.forward;
                 return;
             }
-
             origin = transform.position + Vector3.up;
             forward = transform.forward;
         }
 
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void SetItemActiveServerRpc(NetworkObjectReference objRef, bool isActive)
-        {
-            if (objRef.TryGet(out NetworkObject networkObject))
-            {
-                networkObject.gameObject.SetActive(isActive);
-                if (isActive && networkObject.TryGetComponent<Item>(out var item))
-                {
-                    item.UpdateRemoteHeldPose();
-                }
-                SetItemActiveClientRpc(objRef, isActive);
-            }
-        }
+        private bool CanRequest(ulong sender) => sender == OwnerClientId &&
+            (human == null || !human.isDead.Value);
 
-        [ClientRpc]
-        public void SetItemActiveClientRpc(NetworkObjectReference objRef, bool isActive)
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        private void RequestPickupRpc(NetworkObjectReference reference, int slot, RpcParams rpc = default)
         {
-            if (IsServer) return;
-            if (objRef.TryGet(out NetworkObject networkObject))
-            {
-                networkObject.gameObject.SetActive(isActive);
-                if (isActive && networkObject.TryGetComponent<Item>(out var item))
-                {
-                    item.UpdateRemoteHeldPose();
-                }
-            }
+            if (!CanRequest(rpc.Receive.SenderClientId) || !IsValidSlot(slot) ||
+                slot >= slotIds.Count || slotIds[slot] != EmptySlot ||
+                !reference.TryGet(out var obj) || !obj.TryGetComponent(out Item item) ||
+                item.isCurrentlyHeld ||
+                (obj.transform.position - (transform.position + Vector3.up)).sqrMagnitude > 16f) return;
+            if (!obj.TrySetParent(NetworkObject)) return;
+            slotIds[slot] = obj.NetworkObjectId;
+            UpdateHoldingState();
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void SetItemParentServerRpc(NetworkObjectReference objRef, NetworkObjectReference newParentRef)
+        private void SelectSlotRpc(int slot, RpcParams rpc = default)
         {
-            if (!objRef.TryGet(out NetworkObject obj) || !newParentRef.TryGet(out NetworkObject newParent))
-                return;
-
-            obj.TrySetParent(newParent.transform);
-            ToggleNetworkTransform(obj.gameObject, false);
-            ApplyParentConstraint(obj.gameObject);
-
-            SetItemParentClientRpc(objRef, newParentRef);
-        }
-
-        [ClientRpc]
-        private void SetItemParentClientRpc(NetworkObjectReference objRef, NetworkObjectReference newParentRef)
-        {
-            if (IsServer) return;
-            if (objRef.TryGet(out NetworkObject obj) && newParentRef.TryGet(out NetworkObject newParent))
-            {
-                obj.TrySetParent(newParent.transform);
-                ToggleNetworkTransform(obj.gameObject, false);
-                ApplyParentConstraint(obj.gameObject);
-            }
+            if (!CanRequest(rpc.Receive.SenderClientId) || !IsValidSlot(slot) || slot == selectedSlot.Value) return;
+            GetActiveItem()?.TurnOffServer();
+            selectedSlot.Value = slot;
+            UpdateHoldingState();
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void DropItemServerRpc(
-            NetworkObjectReference objRef,
-            Vector3 requestedOrigin,
-            Vector3 requestedForward)
+        public void DropItemServerRpc(NetworkObjectReference reference, Vector3 origin, Vector3 forward,
+            RpcParams rpc = default)
         {
-            if (!objRef.TryGet(out NetworkObject networkObject)) return;
+            if (!CanRequest(rpc.Receive.SenderClientId) || !reference.TryGet(out var obj) ||
+                !obj.TryGetComponent(out Item item) || !IsActiveItem(item) ||
+                obj.transform.parent != transform || !IsFinite(origin) || !IsFinite(forward)) return;
+            DropItemServer(item, origin, forward);
+        }
 
+        private static bool IsFinite(Vector3 value) =>
+            !float.IsNaN(value.x) && !float.IsInfinity(value.x) &&
+            !float.IsNaN(value.y) && !float.IsInfinity(value.y) &&
+            !float.IsNaN(value.z) && !float.IsInfinity(value.z);
+
+        private void DropItemServer(Item item, Vector3 origin, Vector3 forward)
+        {
             Vector3 playerOrigin = transform.position + Vector3.up;
-            Vector3 dropOrigin = requestedOrigin;
-            if ((dropOrigin - playerOrigin).sqrMagnitude > 9f)
-            {
-                dropOrigin = playerOrigin;
-            }
-
-            Vector3 dropForward = requestedForward;
-            if (dropForward.sqrMagnitude < 0.0001f)
-            {
-                dropForward = transform.forward;
-            }
-            else
-            {
-                dropForward.Normalize();
-            }
-
-            Vector3 dropPos = dropOrigin + dropForward * 0.75f;
-            if (Physics.Raycast(dropOrigin, dropForward, out RaycastHit hit, 1f, layer))
-            {
-                dropPos = hit.point - dropForward * 0.2f;
-            }
-
-            networkObject.transform.position = dropPos;
-
-            networkObject.TryRemoveParent();
-            RemoveParentConstraint(networkObject.gameObject);
-            ToggleNetworkTransform(networkObject.gameObject, true);
-
-            if (!networkObject.gameObject.activeSelf)
-            {
-                networkObject.gameObject.SetActive(true);
-            }
-
-            Item takable = networkObject.GetComponent<Item>();
-            takable?.Drop();
-            itemChanged?.Invoke(false);
-            DropItemClientRpc(objRef);
-        }
-
-        [ClientRpc]
-        private void DropItemClientRpc(NetworkObjectReference objRef)
-        {
-            if (IsServer) return;
-            itemChanged?.Invoke(false);
-            if (objRef.TryGet(out NetworkObject networkObject))
-            {
-                if (networkObject.TryGetComponent<Item>(out var takable))
-                {
-                    takable.Drop();
-                }
-                ReleaseItemVisual(networkObject.gameObject);
-            }
+            if ((origin - playerOrigin).sqrMagnitude > 9f) origin = playerOrigin;
+            forward = forward.sqrMagnitude < 0.0001f ? transform.forward : forward.normalized;
+            Vector3 position = origin + forward * 0.75f;
+            if (Physics.Raycast(origin, forward, out RaycastHit hit, 1f, layer))
+                position = hit.point - forward * 0.2f;
+            item.transform.position = position;
+            if (!item.NetworkObject.TryRemoveParent()) return;
+            item.Drop();
+            ForgetItemServer(item);
         }
 
         public Quaternion GetRemoteAimRotation()
@@ -802,47 +678,11 @@ namespace Player
 
         public void ApplyParentConstraint(GameObject item, Transform customAnchor = null)
         {
-            if (item == null) return;
-
-            ParentConstraint constraint = item.GetComponent<ParentConstraint>();
-            if (constraint != null)
-            {
-                constraint.constraintActive = false;
-            }
-
-            if (item.TryGetComponent<Item>(out var itemComp))
-            {
-                itemComp.BindHolderInventory(this, constraint);
-
-                if (IsOwner && itemHolder != null)
-                {
-                    if (item.activeSelf)
-                    {
-                        itemHolder.SetActiveItem(itemComp);
-                    }
-                }
-                else
-                {
-                    itemComp.UpdateRemoteHeldPose();
-                }
-            }
-        }
-
-        private void RemoveParentConstraint(GameObject item)
-        {
-            if (item != null && item.TryGetComponent<Item>(out var itemComp))
-            {
-                itemComp.ClearHolderInventory();
-            }
-
-            ParentConstraint constraint = item != null ? item.GetComponent<ParentConstraint>() : null;
-            if (constraint == null) return;
-
-            while (constraint.sourceCount > 0)
-            {
-                constraint.RemoveSource(0);
-            }
-            constraint.constraintActive = false;
+            if (item == null || !item.TryGetComponent(out Item itemComp)) return;
+            item.TryGetComponent(out ParentConstraint constraint);
+            if (constraint != null) constraint.constraintActive = false;
+            itemComp.BindHolderInventory(this, constraint);
+            RefreshReplicatedItems();
         }
 
         #endregion

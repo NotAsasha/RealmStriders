@@ -1,436 +1,132 @@
 using Player.Movement;
 using UnityEngine;
-using UnityEngine.Animations.Rigging;
 
 namespace Player.Equipment
 {
-    [DefaultExecutionOrder(-80)]
+    // Presentation only; Inventory and PlayerHeadSync choose the owning peer's pose.
     public class ItemHolder : MonoBehaviour
     {
-        [Header("Camera Reference")]
-        [Tooltip("Camera transform used to anchor the held item.")]
+        [Header("References")]
+        [SerializeField] private Inventory inventory;
+        [SerializeField] private PlayerMovement movement;
+        [SerializeField] private CameraMovement cameraMovement;
         [SerializeField] private Transform cameraTransform;
+        [SerializeField] private Transform handTarget;
+        [SerializeField] private Transform heldItemSocket;
+
+        [Header("Palm calibration (in hand-bone space)")]
+        [SerializeField] private Vector3 palmPositionLocal = new(0f, 0.025f, -0.015f);
+        [Tooltip("Wrist orientation relative to the item's grip coordinate system. Shared by both views.")]
+        [SerializeField] private Vector3 handGripRotationOffset = new(0f, 50f, 90f);
 
         [Header("Hold Positioning")]
-        [Tooltip("Base position of the held item relative to the camera in local space.")]
-        [SerializeField] private Vector3 holdPositionLocal = new Vector3(0.18f, -0.20f, 0.18f);
-
-        [Tooltip("Base rotation Euler angles applied to the held item.")]
-        [SerializeField] private Vector3 holdRotationEuler = Vector3.zero;
-
-        [Header("Sway Settings (Phasmophobia Style)")]
-        [Tooltip("Enable subtle viewmodel sway when moving the mouse.")]
-        [SerializeField] private bool enableSway = true;
-
-        [Tooltip("Maximum positional sway offset (X = lateral, Y = vertical).")]
-        [SerializeField] private Vector2 swayMaxOffset = new Vector2(0.04f, 0.025f);
-
-        [Tooltip("Speed at which the sway offset returns to neutral.")]
-        [SerializeField] private float swayReturnSpeed = 6f;
-
-        [Tooltip("Multiplier for mouse movement to sway offset.")]
-        [SerializeField] private Vector2 swayAmount = new Vector2(0.002f, 0.001f);
-
-        [Header("Look Coupling")]
-        [Tooltip("Coupling factor adjusting item distance and height when looking vertically.")]
-        [SerializeField] private float verticalLookCoupling = 0.1f;
-
-        [Header("Pitch Limits")]
-        [Tooltip("Clamp item pitch rotation to prevent extreme twisting at camera limits.")]
+        [SerializeField] private Vector3 holdPositionLocal = new(0.20f, -0.12f, 0.38f);
+        [SerializeField] private Vector3 holdRotationEuler;
+        [SerializeField] private Vector3 remotePositionFromShoulder = new(0.02f, -0.14f, 0.38f);
         [SerializeField] private bool clampItemPitch = true;
-
-        [Tooltip("Maximum item pitch angle when looking UP in degrees (negative value, e.g. -45).")]
         [SerializeField] private float minItemPitch = -45f;
-
-        [Tooltip("Maximum item pitch angle when looking DOWN in degrees (positive value, e.g. 45).")]
         [SerializeField] private float maxItemPitch = 45f;
+
+        [Header("Sway")]
+        [SerializeField] private bool enableSway = true;
+        [SerializeField] private Vector2 swayMaxOffset = new(0.015f, 0.01f);
+        [SerializeField] private Vector2 swayAmount = new(0.001f, 0.0006f);
+        [SerializeField] private float swayReturnSpeed = 8f;
 
         public bool ClampItemPitch { get => clampItemPitch; set => clampItemPitch = value; }
         public float MinItemPitch { get => minItemPitch; set => minItemPitch = value; }
         public float MaxItemPitch { get => maxItemPitch; set => maxItemPitch = value; }
-
-        [Header("IK & Socket References")]
-        [Tooltip("Transform driving TwoBoneIKConstraint for the right hand.")]
-        [SerializeField] private Transform handTarget;
-
-        [Tooltip("Optional rotation offset for the hand on the grip.")]
-        [SerializeField] private Vector3 handGripRotationOffset = Vector3.zero;
-
-        [Tooltip("Intermediate socket transform to which the item is anchored.")]
-        [SerializeField] private Transform heldItemSocket;
-
-        public Transform HeldItemSocket
-        {
-            get
-            {
-                EnsureInitialized();
-                return heldItemSocket;
-            }
-        }
+        public Transform HeldItemSocket => heldItemSocket;
 
         private Item currentActiveItem;
         private Vector2 currentSway;
-        private TwoBoneIKConstraint handIKConstraint;
-        private CameraMovement cachedCameraMovement;
-        private PlayerHeadSync cachedHeadSync;
-        private bool isInitialized;
+        private float actionWeight;
         private bool wasInteracting;
-
-        private void Awake()
-        {
-            EnsureInitialized();
-        }
-
-        private void OnEnable()
-        {
-            if (PlayerMovement.Instance != null)
-            {
-                PlayerMovement.Instance.onInteractionStateChanged += OnInteractionStateChangedListener;
-            }
-        }
-
-        private void OnDisable()
-        {
-            if (PlayerMovement.Instance != null)
-            {
-                PlayerMovement.Instance.onInteractionStateChanged -= OnInteractionStateChangedListener;
-            }
-
-            if (wasInteracting && heldItemSocket != null && cameraTransform != null)
-            {
-                heldItemSocket.SetParent(cameraTransform, false);
-                heldItemSocket.localPosition = holdPositionLocal;
-                heldItemSocket.localRotation = Quaternion.Euler(holdRotationEuler);
-                heldItemSocket.localScale = Vector3.one;
-                wasInteracting = false;
-            }
-        }
-
-        private void OnInteractionStateChangedListener(bool isInteracting)
-        {
-            if (isInteracting != wasInteracting)
-            {
-                HandleInteractionStateChange(isInteracting);
-                wasInteracting = isInteracting;
-            }
-        }
-
-        private bool IsInteracting()
-        {
-            return PlayerMovement.Instance != null && PlayerMovement.Instance.isInInteraction;
-        }
-
-        private Transform GetBodyTransform()
-        {
-            if (CameraMovement.Instance != null && CameraMovement.Instance.playerBody != null)
-            {
-                return CameraMovement.Instance.playerBody;
-            }
-
-            return transform.root;
-        }
-
-        private void HandleInteractionStateChange(bool isInteracting)
-        {
-            if (heldItemSocket == null) return;
-
-            if (isInteracting)
-            {
-                Transform bodyTransform = GetBodyTransform();
-                if (bodyTransform != null)
-                {
-                    heldItemSocket.SetParent(bodyTransform, true);
-                    heldItemSocket.localScale = Vector3.one;
-                }
-            }
-            else
-            {
-                if (cameraTransform != null)
-                {
-                    heldItemSocket.SetParent(cameraTransform, false);
-                    heldItemSocket.localPosition = holdPositionLocal;
-                    heldItemSocket.localRotation = Quaternion.Euler(holdRotationEuler);
-                    heldItemSocket.localScale = Vector3.one;
-                }
-                currentSway = Vector2.zero;
-            }
-        }
-
-        public void EnsureInitialized()
-        {
-            if (isInitialized) return;
-
-            InitializeSocket();
-            ResolveReferences();
-        }
-
-        private void InitializeSocket()
-        {
-            if (cameraTransform == null)
-            {
-                Camera cam = GetComponentInChildren<Camera>();
-                if (cam == null) cam = Camera.main;
-                if (cam != null) cameraTransform = cam.transform;
-            }
-
-            if (heldItemSocket == null)
-            {
-                Transform existing = cameraTransform != null ? cameraTransform.Find("HeldItemSocket") : null;
-                if (existing == null) existing = transform.Find("HeldItemSocket");
-                if (existing != null)
-                {
-                    heldItemSocket = existing;
-                }
-                else
-                {
-                    GameObject socketObj = new GameObject("HeldItemSocket");
-                    Transform parentT = cameraTransform != null ? cameraTransform : transform;
-                    socketObj.transform.SetParent(parentT, false);
-                    socketObj.transform.localPosition = holdPositionLocal;
-                    socketObj.transform.localRotation = Quaternion.Euler(holdRotationEuler);
-                    heldItemSocket = socketObj.transform;
-                }
-            }
-
-            if (!IsInteracting() && cameraTransform != null && heldItemSocket != null && heldItemSocket.parent != cameraTransform)
-            {
-                heldItemSocket.SetParent(cameraTransform, false);
-                heldItemSocket.localPosition = holdPositionLocal;
-                heldItemSocket.localRotation = Quaternion.Euler(holdRotationEuler);
-            }
-        }
-
-        private void ResolveReferences()
-        {
-            if (cameraTransform == null)
-            {
-                Camera cam = GetComponentInChildren<Camera>();
-                if (cam == null) cam = Camera.main;
-                cameraTransform = cam != null ? cam.transform : transform;
-            }
-
-            if (cameraTransform != null)
-            {
-                cachedCameraMovement = cameraTransform.GetComponent<CameraMovement>();
-                if (cachedCameraMovement == null)
-                {
-                    cachedCameraMovement = cameraTransform.GetComponentInParent<CameraMovement>();
-                }
-            }
-
-            Transform root = transform.root;
-            if (cachedHeadSync == null)
-            {
-                cachedHeadSync = root.GetComponentInChildren<PlayerHeadSync>(true);
-            }
-
-            if (handIKConstraint == null)
-            {
-                handIKConstraint = root.GetComponentInChildren<TwoBoneIKConstraint>(true);
-            }
-
-            if (handIKConstraint != null && handTarget == null)
-            {
-                handTarget = handIKConstraint.data.target;
-            }
-
-            if (handTarget == null)
-            {
-                Transform[] allChildren = root.GetComponentsInChildren<Transform>(true);
-                foreach (var child in allChildren)
-                {
-                    if (child.name == "HandTarget")
-                    {
-                        handTarget = child;
-                        break;
-                    }
-                }
-            }
-
-            if (!IsInteracting() && cameraTransform != null && heldItemSocket != null)
-            {
-                if (heldItemSocket.parent != cameraTransform)
-                {
-                    heldItemSocket.SetParent(cameraTransform, false);
-                }
-                heldItemSocket.localPosition = holdPositionLocal;
-                heldItemSocket.localRotation = Quaternion.Euler(holdRotationEuler);
-            }
-
-            isInitialized = true;
-        }
+        private Pose interactionPose;
 
         public void SetActiveItem(Item item)
         {
+            if (currentActiveItem == item) return;
             currentActiveItem = item;
-            if (item != null)
-            {
-                SnapToTarget();
-            }
+            actionWeight = item != null && item.IsHoldActionActive ? 1f : 0f;
+            currentSway = Vector2.zero;
         }
 
-        public void SnapToTarget()
+        public void EvaluateViewModelAndIKTarget(Transform shoulder, float minReach, float maxReach)
         {
-            EnsureInitialized();
-            if (cameraTransform == null || heldItemSocket == null) return;
-
-            Transform shoulder = cachedHeadSync != null ? cachedHeadSync.ShoulderBone : null;
-            float minReach = cachedHeadSync != null ? cachedHeadSync.MinSafeArmReach : 0.15f;
-            float maxReach = cachedHeadSync != null ? cachedHeadSync.MaxSafeArmReach : 0.575f;
-
-            EvaluateViewModelAndIKTarget(shoulder, minReach, maxReach);
+            EvaluatePose(true, shoulder, minReach, maxReach, cameraMovement != null ? cameraMovement.CurrentPitch : 0f);
         }
 
-        private void Update()
+        public void EvaluateRemotePose(Transform shoulder, float minReach, float maxReach, float pitch)
         {
-            EnsureInitialized();
-            if (!isInitialized) return;
-
-            bool isInteracting = IsInteracting();
-            if (isInteracting != wasInteracting)
-            {
-                HandleInteractionStateChange(isInteracting);
-                wasInteracting = isInteracting;
-            }
-
-            SampleMouseSway();
+            EvaluatePose(false, shoulder, minReach, maxReach, pitch);
         }
 
-        /// <summary>
-        /// Called deterministically from PlayerHeadSync.LateUpdate() after spine/head rotation
-        /// and right before SolveTwoBoneIK() so the socket, item, and hand IK target are 100% in sync.
-        /// </summary>
-        public void EvaluateViewModelAndIKTarget(Transform shoulderBone, float minSafeReach, float maxSafeReach)
+        private void EvaluatePose(bool firstPerson, Transform shoulder, float minReach, float maxReach, float pitch)
         {
-            EnsureInitialized();
-            if (!isInitialized || cameraTransform == null || heldItemSocket == null) return;
+            if (inventory == null || inventory.HandAnchor == null || handTarget == null ||
+                currentActiveItem == null || shoulder == null || (firstPerson && cameraTransform == null)) return;
 
-            if (!IsInteracting())
+            actionWeight = Mathf.MoveTowards(actionWeight, currentActiveItem.IsHoldActionActive ? 1f : 0f,
+                Time.deltaTime / currentActiveItem.PoseBlendDuration);
+            float blend = Mathf.SmoothStep(0f, 1f, actionWeight);
+            Pose offset = currentActiveItem.GetHeldPoseOffset(firstPerson, blend);
+            float clampedPitch = clampItemPitch ? Mathf.Clamp(pitch, minItemPitch, maxItemPitch) : pitch;
+            Vector3 gripPosition;
+            Quaternion gripRotation;
+
+            if (firstPerson)
             {
-                UpdateSocketTransform();
-            }
-
-            UpdateHeldItemAndHand(shoulderBone, minSafeReach, maxSafeReach);
-        }
-
-        private void SampleMouseSway()
-        {
-            if (!IsInteracting() && enableSway && PlayerMovement.Instance != null && PlayerMovement.Instance.controls != null)
-            {
-                Vector2 lookInput = PlayerMovement.Instance.controls.Gameplay.Look.ReadValue<Vector2>();
-                Vector2 targetSway = new Vector2(
-                    Mathf.Clamp(-lookInput.x * swayAmount.x, -swayMaxOffset.x, swayMaxOffset.x),
-                    Mathf.Clamp(-lookInput.y * swayAmount.y, -swayMaxOffset.y, swayMaxOffset.y)
-                );
-                currentSway = Vector2.Lerp(currentSway, targetSway, Time.deltaTime * swayReturnSpeed * 2.5f);
-            }
-            else
-            {
-                currentSway = Vector2.Lerp(currentSway, Vector2.zero, Time.deltaTime * swayReturnSpeed);
-            }
-        }
-
-        private float GetCameraPitch()
-        {
-            if (CameraMovement.Instance != null)
-            {
-                return CameraMovement.Instance.CurrentPitch;
-            }
-
-            if (cachedCameraMovement != null)
-            {
-                return cachedCameraMovement.CurrentPitch;
-            }
-
-            if (cameraTransform != null)
-            {
-                float pitch = cameraTransform.localEulerAngles.x;
-                if (pitch > 180f) pitch -= 360f;
-                return pitch;
-            }
-
-            return 0f;
-        }
-
-        private void UpdateSocketTransform()
-        {
-            float camPitch = GetCameraPitch();
-            float clampedPitch = clampItemPitch ? Mathf.Clamp(camPitch, minItemPitch, maxItemPitch) : camPitch;
-            float pitchOffset = clampedPitch - camPitch;
-
-            Vector3 localPos = holdPositionLocal + new Vector3(currentSway.x, currentSway.y, 0f);
-            float pitchNorm = clampedPitch / 90f;
-
-            if (pitchNorm < 0f)
-            {
-                localPos.z += pitchNorm * verticalLookCoupling * 0.12f;
-                localPos.y += pitchNorm * verticalLookCoupling * 0.05f;
-            }
-            else
-            {
-                localPos.z -= pitchNorm * verticalLookCoupling * 0.03f;
-                localPos.y -= pitchNorm * verticalLookCoupling * 0.02f;
-            }
-
-            Quaternion swayTilt = Quaternion.identity;
-            if (enableSway)
-            {
-                swayTilt = Quaternion.Euler(
-                    currentSway.y * 100f,
-                    currentSway.x * 120f,
-                    -currentSway.x * 150f
-                );
-            }
-
-            Quaternion pitchOffsetRot = Quaternion.Euler(pitchOffset, 0f, 0f);
-            Quaternion targetLocalRot = pitchOffsetRot * Quaternion.Euler(holdRotationEuler) * swayTilt;
-
-            if (heldItemSocket.parent == cameraTransform)
-            {
-                heldItemSocket.localPosition = localPos;
-                heldItemSocket.localRotation = targetLocalRot;
-            }
-            else
-            {
-                heldItemSocket.position = cameraTransform.TransformPoint(localPos);
-                heldItemSocket.rotation = cameraTransform.rotation * targetLocalRot;
-            }
-        }
-
-        private void UpdateHeldItemAndHand(Transform shoulderBone, float minSafeReach, float maxSafeReach)
-        {
-            if (currentActiveItem == null || !currentActiveItem.gameObject.activeInHierarchy)
-            {
-                return;
-            }
-
-            Vector3 desiredGripPos = heldItemSocket.position;
-            Quaternion desiredGripRot = heldItemSocket.rotation;
-
-            // Clamp grip world position to the animated shoulder's physical reach envelope
-            // so the arm NEVER overstretches and the hand NEVER detaches from the item handle.
-            if (shoulderBone != null)
-            {
-                Vector3 shoulderToGrip = desiredGripPos - shoulderBone.position;
-                float dist = shoulderToGrip.magnitude;
-                if (dist > maxSafeReach && dist > 1e-5f)
+                bool interacting = movement != null && movement.isInInteraction;
+                if (interacting && !wasInteracting && heldItemSocket != null)
                 {
-                    desiredGripPos = shoulderBone.position + (shoulderToGrip / dist) * maxSafeReach;
+                    interactionPose = new Pose(inventory.transform.InverseTransformPoint(heldItemSocket.position),
+                        Quaternion.Inverse(inventory.transform.rotation) * heldItemSocket.rotation);
                 }
-                else if (dist < minSafeReach && dist > 1e-5f)
+                wasInteracting = interacting;
+                Vector2 targetSway = Vector2.zero;
+                if (!interacting && enableSway && movement != null && movement.controls != null)
                 {
-                    desiredGripPos = shoulderBone.position + (shoulderToGrip / dist) * minSafeReach;
+                    Vector2 look = movement.controls.Gameplay.Look.ReadValue<Vector2>();
+                    targetSway = new Vector2(Mathf.Clamp(-look.x * swayAmount.x, -swayMaxOffset.x, swayMaxOffset.x),
+                        Mathf.Clamp(-look.y * swayAmount.y, -swayMaxOffset.y, swayMaxOffset.y));
                 }
+                currentSway = Vector2.Lerp(currentSway, targetSway, 1f - Mathf.Exp(-swayReturnSpeed * Time.deltaTime));
+                gripPosition = cameraTransform.TransformPoint(holdPositionLocal + offset.position +
+                    new Vector3(currentSway.x, currentSway.y, 0f));
+                gripRotation = cameraTransform.rotation * Quaternion.Euler(clampedPitch - pitch, 0f, 0f) *
+                    Quaternion.Euler(holdRotationEuler) * offset.rotation *
+                    Quaternion.Euler(currentSway.y * 60f, currentSway.x * 60f, -currentSway.x * 80f);
+                if (interacting)
+                {
+                    gripPosition = inventory.transform.TransformPoint(interactionPose.position);
+                    gripRotation = inventory.transform.rotation * interactionPose.rotation;
+                }
+                if (heldItemSocket != null) heldItemSocket.SetPositionAndRotation(gripPosition, gripRotation);
             }
-
-            // Align item so its gripPoint (or grip offset) lands exactly on desiredGripPos / desiredGripRot
-            currentActiveItem.AlignToGripPose(desiredGripPos, desiredGripRot);
-
-            if (handTarget != null)
+            else
             {
-                handTarget.position = desiredGripPos;
-                handTarget.rotation = desiredGripRot * Quaternion.Euler(handGripRotationOffset);
+                Quaternion aim = inventory.transform.rotation * Quaternion.Euler(clampedPitch, 0f, 0f);
+                gripPosition = shoulder.position + aim * (remotePositionFromShoulder + offset.position);
+                gripRotation = aim * Quaternion.Euler(holdRotationEuler) * offset.rotation;
             }
+
+            Quaternion wristRotation = gripRotation * Quaternion.Euler(handGripRotationOffset);
+            Vector3 palmOffset = Vector3.Scale(palmPositionLocal, inventory.HandAnchor.lossyScale);
+            Vector3 wristPosition = gripPosition - wristRotation * palmOffset;
+            Vector3 reach = wristPosition - shoulder.position;
+            float distance = reach.magnitude;
+            if (distance > 0.00001f)
+                wristPosition = shoulder.position + reach * (Mathf.Clamp(distance, minReach, maxReach) / distance);
+            handTarget.SetPositionAndRotation(wristPosition, wristRotation);
+        }
+
+        public void AlignItemToHand(Item item)
+        {
+            if (inventory == null || inventory.HandAnchor == null || !inventory.IsActiveItem(item)) return;
+            Transform hand = inventory.HandAnchor;
+            Quaternion gripRotation = hand.rotation * Quaternion.Inverse(Quaternion.Euler(handGripRotationOffset));
+            item.AlignToGripPose(hand.TransformPoint(palmPositionLocal), gripRotation);
         }
     }
 }

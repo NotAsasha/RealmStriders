@@ -200,6 +200,34 @@ MonoBehaviour:
   gripPoint: {fileID: 5058141680258587100}
   gripPositionOffset: {x: 0, y: 0, z: 0}
   gripRotationOffset: {x: 0, y: 0, z: 0}
+  viewPositionOffset: {x: 0, y: 0, z: 0}
+  viewRotationOffset: {x: 0, y: 0, z: 0}
+  remotePositionOffset: {x: 0, y: 0, z: 0}
+  remoteRotationOffset: {x: 0, y: 0, z: 0}
+  actionViewPositionOffset: {x: -0.08, y: 0.1, z: -0.08}
+  actionViewRotationOffset: {x: -10, y: -15, z: 0}
+  actionRemotePositionOffset: {x: -0.08, y: 0.22, z: -0.12}
+  actionRemoteRotationOffset: {x: -15, y: -15, z: 0}
+  poseBlendDuration: 0.2
+  holdAnimationOffset: {fileID: 0}
+  inventoryRenderers:
+  - {fileID: 7818286556196203520}
+  - {fileID: 9148273758334635846}
+  - {fileID: 8342053653721925387}
+  - {fileID: 2845369878223205333}
+  - {fileID: 4202286509536835081}
+  - {fileID: 3402247104573777691}
+  - {fileID: 3379192084369766782}
+  - {fileID: 2360347046407163199}
+  - {fileID: 4857247994079492733}
+  - {fileID: 1194899808631408822}
+  inventoryLights: []
+  inventoryCanvases: []
+  inventoryAudioSources:
+  - {fileID: 5232007308353878842}
+  - {fileID: 3139778475051121661}
+  inventoryColliders:
+  - {fileID: 7737286886557379534}
   prefabId: 1
   isCurrentlyHeld: 0
   effectRadius: 30
@@ -5491,9 +5519,57 @@ MeshRenderer:
     type: 3}
   m_PrefabInstance: {fileID: 5531737615995834820}
   m_PrefabAsset: {fileID: 0}
+--- !u!23 &2360347046407163199 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1439730007547781893, guid: beafc24ce4a9baf4d9233db8107bd309,
+    type: 3}
+  m_PrefabInstance: {fileID: 5531737615995834820}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &2845369878223205333 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1461304994638716399, guid: beafc24ce4a9baf4d9233db8107bd309,
+    type: 3}
+  m_PrefabInstance: {fileID: 5531737615995834820}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &3379192084369766782 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7071182760956848314, guid: beafc24ce4a9baf4d9233db8107bd309,
+    type: 3}
+  m_PrefabInstance: {fileID: 5531737615995834820}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &3402247104573777691 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7202271454713460447, guid: beafc24ce4a9baf4d9233db8107bd309,
+    type: 3}
+  m_PrefabInstance: {fileID: 5531737615995834820}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &4202286509536835081 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -678588488315902003, guid: beafc24ce4a9baf4d9233db8107bd309,
+    type: 3}
+  m_PrefabInstance: {fileID: 5531737615995834820}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &4857247994079492733 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1129496810705857465, guid: beafc24ce4a9baf4d9233db8107bd309,
+    type: 3}
+  m_PrefabInstance: {fileID: 5531737615995834820}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5426300374432904751 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: beafc24ce4a9baf4d9233db8107bd309,
+    type: 3}
+  m_PrefabInstance: {fileID: 5531737615995834820}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &8342053653721925387 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -4683669308469848369, guid: beafc24ce4a9baf4d9233db8107bd309,
+    type: 3}
+  m_PrefabInstance: {fileID: 5531737615995834820}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &9148273758334635846 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3616844112969948802, guid: beafc24ce4a9baf4d9233db8107bd309,
     type: 3}
   m_PrefabInstance: {fileID: 5531737615995834820}
   m_PrefabAsset: {fileID: 0}

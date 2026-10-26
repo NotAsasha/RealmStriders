@@ -1056,6 +1056,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   isConsumable: 0
   sellPrice: 10
+  pitchVariation: 0.08
   clickSounds:
   - {fileID: 8300000, guid: 66a89853be2501b4ab1ecd91a44e09b8, type: 3}
   - {fileID: 8300000, guid: 2328c988986a795439f0d8292a9855bb, type: 3}
@@ -1063,6 +1064,35 @@ MonoBehaviour:
   gripPoint: {fileID: 5786666265718929252}
   gripPositionOffset: {x: 0, y: 0, z: 0}
   gripRotationOffset: {x: 0, y: 0, z: 0}
+  viewPositionOffset: {x: 0, y: 0, z: 0}
+  viewRotationOffset: {x: 0, y: 0, z: 0}
+  remotePositionOffset: {x: 0, y: 0, z: 0}
+  remoteRotationOffset: {x: 0, y: 0, z: 0}
+  actionViewPositionOffset: {x: -0.08, y: 0.1, z: -0.08}
+  actionViewRotationOffset: {x: -10, y: -15, z: 0}
+  actionRemotePositionOffset: {x: -0.08, y: 0.22, z: -0.12}
+  actionRemoteRotationOffset: {x: -15, y: -15, z: 0}
+  poseBlendDuration: 0.2
+  holdAnimationOffset: {fileID: 0}
+  inventoryRenderers:
+  - {fileID: 7641176799547698400}
+  - {fileID: 6532028267123265942}
+  - {fileID: 456470186716934534}
+  - {fileID: 542628557575352291}
+  - {fileID: 694437947651709858}
+  - {fileID: 5013367502251224876}
+  - {fileID: 142011093795484048}
+  - {fileID: 1433780364012711489}
+  - {fileID: 5262877534256329104}
+  - {fileID: 7273961689902957434}
+  - {fileID: 4940297478130441232}
+  inventoryLights: []
+  inventoryCanvases:
+  - {fileID: 4016703333972287530}
+  inventoryAudioSources:
+  - {fileID: 2426271837834936454}
+  inventoryColliders:
+  - {fileID: 6806743636886481717}
   prefabId: 4
   isCurrentlyHeld: 0
   danger: {fileID: 9184728869457863943}

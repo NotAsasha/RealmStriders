@@ -57,12 +57,34 @@ success rating increase.
   transmission refreshes a short-lived server-side noise window only when the
   decoded microphone RMS level exceeds the `VoiceChat` threshold (0.04 by
   default). This prevents microphone static from producing enemy reactions.
-- Held equipment uses a local camera socket for the owning player's
-  first-person view and the networked hand anchor on remote peers. Directional
-  equipment sends the owner's camera origin and direction to the server for
-  authoritative validation. Item drops send the requesting player's drop
-  pose; the server does not use the host's camera as a fallback for client
-  requests.
+- Inventory slots use a server-written `NetworkList<ulong>` of spawned object
+  IDs (`ulong.MaxValue` is empty). The selected slot and holding flag are
+  server-written NetworkVariables. Pickup, selection and drop RPCs validate the
+  sender; pickups also validate slot occupancy, existing holder and distance.
+- Every peer rebuilds its item references from that snapshot and retries unresolved
+  IDs/parents when spawn and parent messages arrive later. Parent changes belong
+  to the server; presentation no longer reparents NetworkObjects on clients.
+- Stored items keep their network roots active. Explicit prefab references hide
+  renderers, lights, canvases and audio; held colliders and physics are disabled.
+  Hidden items follow the holder so mission-boundary cleanup still uses their
+  current location. Despawn removes the server's slot entry.
+- Held poses use the existing full-body skeleton. The owner chooses a camera-space
+  grip pose; other peers use a shoulder-relative pose. Both compute a wrist target
+  from the same palm calibration, solve IK, then align the item to the actual palm.
+  `GripPoint` is independent of the first-person composition offsets.
+- WalkieTalkie transmission is a server-written NetworkVariable refreshed by
+  validated voice packets and cleared after a short packet gap. Local transmission
+  also starts the cosmetic raise immediately. Both views blend their own poses;
+  late joiners receive the ongoing transmission state. Unequip/power-off stops it.
+- Normal drops preserve equipment power (including a deployed Subwoofer and a
+  receiving radio). Death drops turn equipment off. Dropping ends the held radio
+  pose because the radio is no longer equipped.
+- Directional equipment keeps its existing aiming contract. Drop requests include
+  the owner's origin and forward vector; the server checks finite values and
+  bounds the origin. Cosmetic pose changes do not introduce new aiming RPCs.
+
+The repeatable loopback checks are documented in `docs/HELD_ITEMS.md`.
+
 
 ## Adding a networked interaction
 

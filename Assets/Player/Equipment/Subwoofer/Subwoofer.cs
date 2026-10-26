@@ -27,14 +27,16 @@ namespace Player.Equipment.Subwoofer
             NetworkVariableWritePermission.Server
         );
 
-        private void OnEnable()
+        public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             isOn.OnValueChanged += TurnOnEffects;
             TurnOnEffects(false, isOn.Value);
         }
-        private void OnDisable()
+        public override void OnNetworkDespawn()
         {
             isOn.OnValueChanged -= TurnOnEffects;
+            base.OnNetworkDespawn();
         }
 
         private void TurnOnEffects(bool _, bool newV)

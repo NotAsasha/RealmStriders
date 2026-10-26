@@ -1990,20 +1990,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9ca3f17966540fab6585855bb2e5806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.Equipment.ItemHolder
+  inventory: {fileID: 686128325295018672}
+  movement: {fileID: -5512805701076199633}
+  cameraMovement: {fileID: 3583324982144684415}
   cameraTransform: {fileID: 8896019179699647101}
-  holdPositionLocal: {x: 0.18, y: -0.2, z: 0.18}
+  handTarget: {fileID: 3228106327460071384}
+  heldItemSocket: {fileID: 5917440624796579222}
+  palmPositionLocal: {x: 0, y: 0.025, z: -0.015}
+  handGripRotationOffset: {x: 0, y: 50, z: 90}
+  holdPositionLocal: {x: 0.2, y: -0.12, z: 0.38}
   holdRotationEuler: {x: 0, y: 0, z: 0}
-  enableSway: 1
-  swayMaxOffset: {x: 0.04, y: 0.025}
-  swayReturnSpeed: 6
-  swayAmount: {x: 0.002, y: 0.001}
-  verticalLookCoupling: 0.1
+  remotePositionFromShoulder: {x: 0.02, y: -0.14, z: 0.38}
   clampItemPitch: 1
   minItemPitch: -45
   maxItemPitch: 45
-  handTarget: {fileID: 3228106327460071384}
-  handGripRotationOffset: {x: 0, y: 50, z: 90}
-  heldItemSocket: {fileID: 5917440624796579222}
+  enableSway: 1
+  swayMaxOffset: {x: 0.015, y: 0.01}
+  swayAmount: {x: 0.001, y: 0.0006}
+  swayReturnSpeed: 6
 --- !u!1 &3512777154750557659
 GameObject:
   m_ObjectHideFlags: 0

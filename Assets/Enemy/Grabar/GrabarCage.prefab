@@ -313,11 +313,29 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   isConsumable: 0
   sellPrice: 50
+  pitchVariation: 0.08
   clickSounds: []
   icon: {fileID: 21300000, guid: 22b37c015845579408dfb603a765603c, type: 3}
   gripPoint: {fileID: 0}
   gripPositionOffset: {x: 0, y: 0, z: 0}
   gripRotationOffset: {x: 0, y: 0, z: 0}
+  viewPositionOffset: {x: 0, y: 0, z: 0}
+  viewRotationOffset: {x: 0, y: 0, z: 0}
+  remotePositionOffset: {x: 0, y: 0, z: 0}
+  remoteRotationOffset: {x: 0, y: 0, z: 0}
+  actionViewPositionOffset: {x: -0.08, y: 0.1, z: -0.08}
+  actionViewRotationOffset: {x: -10, y: -15, z: 0}
+  actionRemotePositionOffset: {x: -0.08, y: 0.22, z: -0.12}
+  actionRemoteRotationOffset: {x: -15, y: -15, z: 0}
+  poseBlendDuration: 0.2
+  holdAnimationOffset: {fileID: 0}
+  inventoryRenderers:
+  - {fileID: 7063626133294990374}
+  inventoryLights: []
+  inventoryCanvases: []
+  inventoryAudioSources: []
+  inventoryColliders:
+  - {fileID: 1076373380013544634}
   prefabId: 18
   isCurrentlyHeld: 0
 --- !u!114 &7320632974485258231

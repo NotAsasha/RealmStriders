@@ -1592,7 +1592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2715824277
+  GlobalObjectIdHash: 3583913049
   InScenePlacedSourceGlobalObjectIdHash: 3583913049
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1691,6 +1691,25 @@ MonoBehaviour:
   gripPoint: {fileID: 0}
   gripPositionOffset: {x: 0, y: 0, z: 0}
   gripRotationOffset: {x: 0, y: 0, z: 0}
+  viewPositionOffset: {x: 0, y: 0, z: 0}
+  viewRotationOffset: {x: 0, y: 0, z: 0}
+  remotePositionOffset: {x: 0, y: 0, z: 0}
+  remoteRotationOffset: {x: 0, y: 0, z: 0}
+  actionViewPositionOffset: {x: -0.08, y: 0.1, z: -0.08}
+  actionViewRotationOffset: {x: -10, y: -15, z: 0}
+  actionRemotePositionOffset: {x: -0.08, y: 0.22, z: -0.12}
+  actionRemoteRotationOffset: {x: -15, y: -15, z: 0}
+  poseBlendDuration: 0.2
+  holdAnimationOffset: {fileID: 0}
+  inventoryRenderers:
+  - {fileID: 8379401215502226819}
+  inventoryLights: []
+  inventoryCanvases:
+  - {fileID: 9124229597744053503}
+  inventoryAudioSources:
+  - {fileID: 5702332700416167211}
+  inventoryColliders:
+  - {fileID: 159268654104959106}
   prefabId: 8
   isCurrentlyHeld: 0
   maxDistance: 5

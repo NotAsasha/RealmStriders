@@ -168,11 +168,33 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   isConsumable: 0
   sellPrice: 200
+  pitchVariation: 0.08
   clickSounds: []
   icon: {fileID: 21300000, guid: 103396d01c0ba504194287b8fdc24c29, type: 3}
   gripPoint: {fileID: 0}
   gripPositionOffset: {x: 0, y: 0, z: 0}
   gripRotationOffset: {x: 0, y: 0, z: 0}
+  viewPositionOffset: {x: 0, y: 0, z: 0}
+  viewRotationOffset: {x: 0, y: 0, z: 0}
+  remotePositionOffset: {x: 0, y: 0, z: 0}
+  remoteRotationOffset: {x: 0, y: 0, z: 0}
+  actionViewPositionOffset: {x: -0.08, y: 0.1, z: -0.08}
+  actionViewRotationOffset: {x: -10, y: -15, z: 0}
+  actionRemotePositionOffset: {x: -0.08, y: 0.22, z: -0.12}
+  actionRemoteRotationOffset: {x: -15, y: -15, z: 0}
+  poseBlendDuration: 0.2
+  holdAnimationOffset: {fileID: 0}
+  inventoryRenderers:
+  - {fileID: 6297483343835379733}
+  - {fileID: 835135787570812933}
+  - {fileID: 3761887973693405096}
+  - {fileID: 2896875243144637122}
+  - {fileID: 1901765117859680618}
+  inventoryLights: []
+  inventoryCanvases: []
+  inventoryAudioSources: []
+  inventoryColliders:
+  - {fileID: 5365730412749026862}
   prefabId: 24
   isCurrentlyHeld: 0
 --- !u!65 &5365730412749026862
@@ -307,6 +329,30 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1901765117859680618}
   m_SourcePrefab: {fileID: 100100000, guid: 7a98d7920c1d54b4fb0a511496b81a98, type: 3}
+--- !u!23 &835135787570812933 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7202271454713460447, guid: 7a98d7920c1d54b4fb0a511496b81a98,
+    type: 3}
+  m_PrefabInstance: {fileID: 7522528877290090202}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &2896875243144637122 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -4587302668392987624, guid: 7a98d7920c1d54b4fb0a511496b81a98,
+    type: 3}
+  m_PrefabInstance: {fileID: 7522528877290090202}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &3761887973693405096 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -2571118854743697038, guid: 7a98d7920c1d54b4fb0a511496b81a98,
+    type: 3}
+  m_PrefabInstance: {fileID: 7522528877290090202}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &6297483343835379733 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -4683669308469848369, guid: 7a98d7920c1d54b4fb0a511496b81a98,
+    type: 3}
+  m_PrefabInstance: {fileID: 7522528877290090202}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &7621508860665329463 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 117214286460000749, guid: 7a98d7920c1d54b4fb0a511496b81a98,
