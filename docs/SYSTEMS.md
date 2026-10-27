@@ -105,6 +105,59 @@ Before adding a new system:
 4. Decide whether the state is transient, networked, or persistent.
 5. Add the smallest integration test or manual verification path available.
 
+## Pause and shop presentation
+
+Pause uses the shared Settings prefab. Its close event returns to the crew panel;
+Resume restores gameplay input. Graphite surfaces and the existing menu fonts
+are shared with the main menu.
+Pause opens and closes through a shared CanvasGroup opacity fade (0.24s in,
+0.16s out), including Settings when closing. The transition uses unscaled
+time, reverses from its current opacity on repeated Escape, and disables
+menu interaction until the opening fade completes. The pause prefab no
+longer uses the screen-shatter effect.
+
+Shop has five star categories with rating thresholds 0, 4, 7, 10 and 13.
+The first category remains available at startup; later categories unlock at
+the first segment of their star. Existing item groupings and prices are kept.
+Categories four and five currently show an empty state. CategorySwitch owns
+page selection and hides an open item card when changing categories.
+Catalog tiles open item details; a separate BUY button beside each numeric
+price purchases directly without opening details. Shop updates quick-buy
+availability from money and rating changes during its network lifetime.
+Details retain their preview and purchase flow, with BACK left and BUY right.
+
+ItemCard holds its configured price, rating requirement and preview references.
+The server validates purchases against those catalog values, including the
+rating requirement; the client-supplied price is not used for charging.
+ShopItemPreview renders mesh-only assets in a separate local scene, rotates
+them with unscaled time and fades them in. Its camera stops rendering when
+the card closes or the local player leaves the terminal. No gameplay item,
+collider or NetworkObject is instantiated for the preview.
+
+## UI audio
+
+UI controls share local click feedback through `Game.UI.UIControlSound`.
+Button clicks use the first persistent callback so navigation cannot cut off
+the sound; non-button controls play on press/submit. Disabled controls stay
+silent; hovering and keyboard focus changes are also silent. `Resources/UIAudio`
+provides the configured clips and two 2D sources, persists across scenes,
+and respects master volume while remaining audible during listener pause.
+`tools/InstallUIAudio.cs` wires and verifies controls in game prefabs and
+scenes, including templates for dynamically created cards and dropdown items.
+
+## Base upgrade presentation
+
+BaseUpgrader presents all six existing upgrades in a graphite card grid using
+the menu fonts. Purchased cards have a brighter background, a light edge,
+PURCHASED status and an inactive OWNED button. Other cards show prerequisite
+or insufficient-credit states. Prices come from BaseUpgrader's existing
+serialized price fields; the Drone → Radar → Zeus strike dependency is kept.
+
+BaseUpgrader subscribes to BaseManager.baseUpgrades and team money in
+OnNetworkSpawn, refreshes the initial state immediately, and unsubscribes in
+OnNetworkDespawn. Resetting the Casino purchase flag also resets its card.
+The menu does not introduce separate purchase or save state.
+
 ## Held equipment presentation
 
 `Inventory` owns the replicated slot snapshot and selected item. `ItemHolder`

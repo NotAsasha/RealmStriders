@@ -43,6 +43,7 @@ public class CategoryBlocker : MonoBehaviour
     /// </summary>
     public void Refresh(int currentRating)
     {
+        if (button == null) button = GetComponent<Button>();
         button.interactable = currentRating >= requiredRating;
     }
 }

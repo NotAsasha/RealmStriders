@@ -4,6 +4,7 @@ using Steam;
 using Steamworks;
 using Steamworks.Data;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Netcode;
@@ -19,7 +20,42 @@ namespace Player.UI
         public GameObject settingsMenu;
         public Transform cardsParent;
         public GameObject playerCard;
-        public ScreenShatterEffect shatterEffect;
+        [SerializeField] private GameObject pauseContent;
+        [SerializeField] private CanvasGroup pauseCanvasGroup;
+        [SerializeField, Min(0f)] private float fadeInDuration = 0.24f;
+        [SerializeField, Min(0f)] private float fadeOutDuration = 0.16f;
+
+        private Coroutine pauseTransition;
+        private bool isMenuOpen;
+
+        private void Awake()
+        {
+            ResetPresentation();
+        }
+
+        public void OpenSettings()
+        {
+            pauseContent.SetActive(false);
+            settingsMenu.SetActive(true);
+        }
+
+        public void CloseSettings()
+        {
+            settingsMenu.SetActive(false);
+            pauseContent.SetActive(true);
+        }
+
+        public void Resume()
+        {
+            SetMenuOpen(false);
+            if (PlayerMovement.Instance != null)
+            {
+                PlayerMovement.Instance.isPaused = false;
+                PlayerMovement.Instance.SwitchToGameplayControls();
+            }
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
 
         private readonly List<PlayerCard> playerCards = new();
         private readonly HashSet<SteamId> removedMemberSteamIds = new();
@@ -42,6 +78,12 @@ namespace Player.UI
         private void OnDisable()
         {
             UnsubscribeEvents();
+            if (pauseTransition != null)
+            {
+                StopCoroutine(pauseTransition);
+                pauseTransition = null;
+            }
+            ResetPresentation();
         }
 
         private void OnDestroy()
@@ -240,20 +282,62 @@ namespace Player.UI
 
             if (pauseMenu == null) return;
 
-            bool opening = !pauseMenu.activeSelf;
+            SetMenuOpen(!isMenuOpen);
+        }
+
+        private void SetMenuOpen(bool opening)
+        {
+            if (isMenuOpen == opening) return;
+            isMenuOpen = opening;
+
+            if (pauseTransition != null)
+            {
+                StopCoroutine(pauseTransition);
+                pauseTransition = null;
+            }
 
             if (opening)
             {
+                pauseContent.SetActive(true);
+                settingsMenu.SetActive(false);
+                pauseMenu.SetActive(true);
                 RefreshPauseUI();
-                if (shatterEffect != null) shatterEffect.TriggerEffect(() => { pauseMenu.SetActive(true); });
-                else pauseMenu.SetActive(true);
             }
-            else
+
+            pauseCanvasGroup.interactable = false;
+            pauseCanvasGroup.blocksRaycasts = opening;
+            pauseTransition = StartCoroutine(FadePauseMenu(opening));
+        }
+
+        private IEnumerator FadePauseMenu(bool opening)
+        {
+            float startAlpha = pauseCanvasGroup.alpha;
+            float targetAlpha = opening ? 1f : 0f;
+            // Reverse from the visible opacity without restarting a full-length transition.
+            float duration = (opening ? fadeInDuration : fadeOutDuration) * Mathf.Abs(targetAlpha - startAlpha);
+            float elapsed = 0f;
+            while (elapsed < duration)
             {
-                pauseMenu.SetActive(false);
-                if (settingsMenu != null) settingsMenu.SetActive(false);
-                if (shatterEffect != null) shatterEffect.ResetEffect();
+                pauseCanvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, Mathf.SmoothStep(0f, 1f, elapsed / duration));
+                yield return null;
+                elapsed += Time.unscaledDeltaTime;
             }
+
+            pauseCanvasGroup.alpha = targetAlpha;
+            pauseCanvasGroup.interactable = opening;
+            if (!opening) ResetPresentation();
+            pauseTransition = null;
+        }
+
+        private void ResetPresentation()
+        {
+            isMenuOpen = false;
+            pauseCanvasGroup.alpha = 0f;
+            pauseCanvasGroup.interactable = false;
+            pauseCanvasGroup.blocksRaycasts = false;
+            pauseMenu.SetActive(false);
+            settingsMenu.SetActive(false);
+            pauseContent.SetActive(true);
         }
 
         public void UpdatePauseUI(Lobby lobby) => RefreshPauseUI();

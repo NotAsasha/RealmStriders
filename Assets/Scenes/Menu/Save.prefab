@@ -309,6 +309,7 @@ GameObject:
   - component: {fileID: 2232749756354231015}
   - component: {fileID: 2112694521471820281}
   - component: {fileID: 4264143374214692878}
+  - component: {fileID: 6306545036502946764}
   m_Layer: 5
   m_Name: LoadSave
   m_TagString: Untagged
@@ -418,13 +419,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5551728143053636276}
-        m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
-        m_MethodName: Play
-        m_Mode: 1
+      - m_Target: {fileID: 6306545036502946764}
+        m_TargetAssemblyTypeName: Game.UI.UIControlSound, Assembly-CSharp
+        m_MethodName: PlayClick
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgumentAssemblyTypeName: 
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -456,6 +457,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LoadSaveButton
   gameSave: {fileID: 11400000, guid: ed65c65b79af3984b96b22cab61da271, type: 2}
   saveText: {fileID: 2238061224886728359}
+--- !u!114 &6306545036502946764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4221703767367082890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7f5536486ec46e68edcdbdf87445c34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.UI.UIControlSound
+  control: {fileID: 2112694521471820281}
 --- !u!1 &5537280573557353900
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7328630078725977066}
   - component: {fileID: 5008481374652767870}
+  - component: {fileID: 2565007134008828597}
   m_Layer: 5
   m_Name: Item
   m_TagString: Untagged
@@ -87,6 +88,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
+--- !u!114 &2565007134008828597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105373196003194697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7f5536486ec46e68edcdbdf87445c34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.UI.UIControlSound
+  control: {fileID: 5008481374652767870}
 --- !u!1 &443783554255404836
 GameObject:
   m_ObjectHideFlags: 0
@@ -174,6 +188,7 @@ GameObject:
   - component: {fileID: 5212072191819397956}
   - component: {fileID: 4698783053231781301}
   - component: {fileID: 7937180539891757952}
+  - component: {fileID: 5921224963784930358}
   m_Layer: 5
   m_Name: QualityDrop
   m_TagString: Untagged
@@ -305,6 +320,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_AlphaFadeSpeed: 0.15
+--- !u!114 &5921224963784930358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1535266093402732699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7f5536486ec46e68edcdbdf87445c34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.UI.UIControlSound
+  control: {fileID: 7937180539891757952}
 --- !u!1 &2018105597646716476
 GameObject:
   m_ObjectHideFlags: 0

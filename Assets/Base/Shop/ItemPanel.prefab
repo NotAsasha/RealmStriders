@@ -515,6 +515,13 @@ MonoBehaviour:
   itemPrice: 100
   itemPrefab: {fileID: 6218979949589556287, guid: 252081321d2dabb448471f25b38bbe31,
     type: 3}
+  requiredRating: 0
+  shop: {fileID: 0}
+  preview: {fileID: 0}
+  previewModel: {fileID: 0}
+  previewImage: {fileID: 0}
+  buyButton: {fileID: 0}
+  catalog: {fileID: 0}
 --- !u!1 &5135742498180366035
 GameObject:
   m_ObjectHideFlags: 0
@@ -527,6 +534,7 @@ GameObject:
   - component: {fileID: 953238641004390045}
   - component: {fileID: 2283968899246558604}
   - component: {fileID: 225581212209471532}
+  - component: {fileID: 7756853614746586842}
   m_Layer: 10
   m_Name: Back
   m_TagString: Untagged
@@ -636,6 +644,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 7756853614746586842}
+        m_TargetAssemblyTypeName: Game.UI.UIControlSound, Assembly-CSharp
+        m_MethodName: PlayClick
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 4650806998330705628}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
@@ -648,6 +668,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &7756853614746586842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5135742498180366035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7f5536486ec46e68edcdbdf87445c34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.UI.UIControlSound
+  control: {fileID: 225581212209471532}
 --- !u!1 &5947668575905531469
 GameObject:
   m_ObjectHideFlags: 0
@@ -798,6 +831,7 @@ GameObject:
   - component: {fileID: 5892350063083320029}
   - component: {fileID: 253506862077868169}
   - component: {fileID: 8820160995954663960}
+  - component: {fileID: 592932246351145569}
   m_Layer: 10
   m_Name: Buy
   m_TagString: Untagged
@@ -907,6 +941,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 592932246351145569}
+        m_TargetAssemblyTypeName: Game.UI.UIControlSound, Assembly-CSharp
+        m_MethodName: PlayClick
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 3689439645031618335}
         m_TargetAssemblyTypeName: ItemCard, Assembly-CSharp
         m_MethodName: BuyItem
@@ -919,6 +965,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &592932246351145569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6542178374289375129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7f5536486ec46e68edcdbdf87445c34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.UI.UIControlSound
+  control: {fileID: 8820160995954663960}
 --- !u!1 &7459126909756166151
 GameObject:
   m_ObjectHideFlags: 0

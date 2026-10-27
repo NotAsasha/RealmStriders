@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
@@ -12,6 +13,16 @@ namespace Base.Shop
         [SerializeField] ParticleSystem TubeParticle;
         
         [SerializeField] List<ItemCard> cards;
+
+        [Serializable]
+        private sealed class QuickBuy
+        {
+            public ItemCard item;
+            public UnityEngine.UI.Button button;
+        }
+
+        [SerializeField] private QuickBuy[] quickBuyButtons = Array.Empty<QuickBuy>();
+        private GameManager gameManager;
 
         public static Shop Instance { get; private set; }
 
@@ -35,6 +46,13 @@ namespace Base.Shop
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            gameManager = GameManager.Instance;
+            if (gameManager != null)
+            {
+                gameManager.teamMoney.OnValueChanged += RefreshQuickBuyButtons;
+                gameManager.teamRating.OnValueChanged += RefreshQuickBuyButtons;
+            }
+            RefreshQuickBuyButtons(0, 0);
             if (IsServer)
             {
                 StartCoroutine(DelayedInitialCheck());
@@ -48,15 +66,37 @@ namespace Base.Shop
             EnsureFreeLeafBlowerServer();
         }
 
+        public override void OnNetworkDespawn()
+        {
+            if (gameManager != null)
+            {
+                gameManager.teamMoney.OnValueChanged -= RefreshQuickBuyButtons;
+                gameManager.teamRating.OnValueChanged -= RefreshQuickBuyButtons;
+            }
+            gameManager = null;
+            RefreshQuickBuyButtons(0, 0);
+            base.OnNetworkDespawn();
+        }
+
+        private void RefreshQuickBuyButtons(int previous, int current)
+        {
+            foreach (QuickBuy entry in quickBuyButtons)
+                entry.button.interactable = IsSpawned && IsClient && gameManager != null &&
+                    gameManager.teamMoney.Value >= entry.item.Price &&
+                    gameManager.teamRating.Value >= entry.item.RequiredRating;
+        }
+
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void BuyItemServerRpc(string name, int price)
         {
-            if (GameManager.Instance.teamMoney.Value < price) return;
+            if (!IsServer || GameManager.Instance == null) return;
+            var card = cards.Find(c => c != null && c.itemName == name);
+            if (card == null || card.itemPrefab == null || card.Price < 0 ||
+                GameManager.Instance.teamRating.Value < card.RequiredRating ||
+                GameManager.Instance.teamMoney.Value < card.Price) return;
+            NetworkObject item = card.itemPrefab;
 
-            NetworkObject item = cards.Find(c => c != null && c.itemName == name)?.itemPrefab;
-            if (item == null) return;
-
-            GameManager.Instance.teamMoney.Value -= price;
+            GameManager.Instance.teamMoney.Value -= card.Price;
             PlaySpawnSoundRpc();
             item.InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, spawnPosition);
             Debug.Log($"---Shop: Item bought: {item.name}");

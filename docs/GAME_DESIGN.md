@@ -112,6 +112,10 @@ implemented today and may still need work.
   A mission ending after the whole team dies decreases it by one. The rating
   unlocks shop items and influences harder enemy rolls.
 - Money is earned by selling captured `EnemyCage` items at the base.
+- Shop categories correspond to five stars. Category 1 is available from
+  rating 0; categories 2–5 unlock at ratings 4, 7, 10 and 13, respectively
+  (the first segment of each subsequent star). Existing item grouping and
+  prices are unchanged; the last two categories currently have no stock.
 - After the portal opens, enemies may enter the base. The base is not
   guaranteed to be safe, and players may intentionally lure enemies there.
 - The game supports networked play through Netcode for GameObjects and a

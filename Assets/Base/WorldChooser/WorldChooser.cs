@@ -1,4 +1,5 @@
 using Enemy;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -75,6 +76,9 @@ namespace Base.WorldChooser
         [SerializeField] private AudioSource audioSource;
 
         private NetworkList<MissionData> availableMissions;
+        private readonly List<WorldCard> visibleCards = new();
+        private readonly NetworkVariable<int> selectedMissionIndex = new(-1,
+            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         private readonly NetworkVariable<FixedString64Bytes> selectedMissionName = new(
             default,
@@ -91,6 +95,7 @@ namespace Base.WorldChooser
         {
             availableMissions.OnListChanged += OnMissionsListChanged;
             selectedMissionName.OnValueChanged += OnSelectedMissionChanged;
+            selectedMissionIndex.OnValueChanged += OnSelectedIndexChanged;
 
             if (GameManager.Instance != null)
             {
@@ -100,8 +105,7 @@ namespace Base.WorldChooser
 
             if (IsServer)
             {
-                // a bit scary.. TODO
-                GameManager.Instance.teamRating.OnValueChanged += (int _, int __) => GenerateMissions(missionNumber);
+                GameManager.Instance.teamRating.OnValueChanged += OnRatingChanged;
                 GenerateMissions(missionNumber);
             }
 
@@ -113,16 +117,25 @@ namespace Base.WorldChooser
         {
             availableMissions.OnListChanged -= OnMissionsListChanged;
             selectedMissionName.OnValueChanged -= OnSelectedMissionChanged;
+            selectedMissionIndex.OnValueChanged -= OnSelectedIndexChanged;
 
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.hasStartedMission.OnValueChanged -= ReactToMissionState;
+                GameManager.Instance.teamRating.OnValueChanged -= OnRatingChanged;
             }
         }
 
         private void OnMissionsListChanged(NetworkListEvent<MissionData> changeEvent)
         {
             RebuildCardsUI();
+        }
+
+        private void OnRatingChanged(int previous, int current) => GenerateMissions(missionNumber);
+
+        private void OnSelectedIndexChanged(int previous, int current)
+        {
+            foreach (WorldCard card in visibleCards) card.RefreshSelection(current);
         }
 
         private void OnSelectedMissionChanged(FixedString64Bytes previousValue, FixedString64Bytes newValue)
@@ -175,12 +188,15 @@ namespace Base.WorldChooser
                 if (cardObj.TryGetComponent<WorldCard>(out var card))
                 {
                     card.Setup(this, i, mission.missionName, mission.EnemiesCount, mission.AverageDanger);
+                    card.RefreshSelection(selectedMissionIndex.Value);
+                    visibleCards.Add(card);
                 }
             }
         }
 
         private void ClearUI()
         {
+            visibleCards.Clear();
             for (int i = cardParent.childCount - 1; i >= 0; i--)
             {
                 Destroy(cardParent.GetChild(i).gameObject);
@@ -195,6 +211,7 @@ namespace Base.WorldChooser
                 return;
             }
 
+            selectedMissionIndex.Value = -1;
             availableMissions.Clear();
 
             int currentRating = GameManager.Instance != null ? GameManager.Instance.teamRating.Value : 1;
@@ -236,6 +253,7 @@ namespace Base.WorldChooser
             GameManager.Instance.missionName = mission.missionName.ToString();
             GameManager.Instance.dangerLevels = mission.dangerLevels;
             selectedMissionName.Value = mission.missionName;
+            selectedMissionIndex.Value = missionIndex;
         }
     }
 }

@@ -1,5 +1,20 @@
 # Content Pipeline
 
+## Shop item previews
+
+Shop item cards reference mesh-only prefabs in `Assets/Base/Shop/Previews/`.
+Assign the card's Shop, catalog, Buy button, shared ShopItemPreview, preview
+RawImage and preview model in the Inspector. Set its rating requirement to
+match its category (0, 4, 7, 10 or 13). Purchases use the card's server-side
+price and rating requirement.
+
+After changing an equipment mesh, run `UpdatePauseAndShop.RebuildPreviews`
+from `tools/UpdatePauseAndShop.cs` through Unity MCP `run_script` in Edit Mode.
+It copies mesh renderers and materials, centers and scales them, and bakes
+ProBuilder geometry when necessary. Gameplay scripts, particles, colliders,
+lights and NetworkObjects are excluded. This entry point preserves the UI
+layout and item catalog.
+
 This is the default workflow for adding gameplay content. If a new feature
 requires a different process, document the exception and its reason.
 
