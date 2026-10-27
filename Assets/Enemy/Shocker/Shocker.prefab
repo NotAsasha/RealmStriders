@@ -34836,6 +34836,9 @@ MonoBehaviour:
   defaultSpeed: 8
   chaseSpeed: 10
   thinkCooldown: 0.3
+  fleeDistance: 12
+  fleeDirectionSamples: 5
+  navMeshSampleDistance: 4
   stepSoundCooldown: 0.3
   chaseStepSoundCooldown: 0.15
   stepSoundRadius: 25
@@ -35205,11 +35208,31 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: -1526964690268444965, guid: 0145ba4c57e728d4a8a945ea11e7fdd6,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 1110b537b479fe24e954371104a6426e, type: 2}
     - target: {fileID: 919132149155446097, guid: 0145ba4c57e728d4a8a945ea11e7fdd6,
         type: 3}
       propertyPath: m_Name
       value: shockEnemy
       objectReference: {fileID: 0}
+    - target: {fileID: 2509532258370234060, guid: 0145ba4c57e728d4a8a945ea11e7fdd6,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 35ee8dd17bb184a72a4eede329373443, type: 2}
+    - target: {fileID: 2985478084322739907, guid: 0145ba4c57e728d4a8a945ea11e7fdd6,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 1110b537b479fe24e954371104a6426e, type: 2}
+    - target: {fileID: 8417361359673230750, guid: 0145ba4c57e728d4a8a945ea11e7fdd6,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 1110b537b479fe24e954371104a6426e, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

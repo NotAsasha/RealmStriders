@@ -34290,6 +34290,9 @@ MonoBehaviour:
   defaultSpeed: 10
   chaseSpeed: 8
   thinkCooldown: 0.3
+  fleeDistance: 12
+  fleeDirectionSamples: 5
+  navMeshSampleDistance: 4
   stepSoundCooldown: 0.2
   chaseStepSoundCooldown: 0.18
   stepSoundRadius: 15
@@ -34303,9 +34306,6 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 3
-  fleeDistance: 12
-  fleeDirectionSamples: 5
-  navMeshSampleDistance: 4
 --- !u!114 &-6363728834847499910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34811,6 +34811,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 5074512353664290214, guid: 942bea86d651eb545a9e1a1752597615,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2100000, guid: dca68838f31bb43288c8d9f3293e0b91, type: 2}
     - target: {fileID: 5085253192099150428, guid: 942bea86d651eb545a9e1a1752597615,
         type: 3}
       propertyPath: m_Layer

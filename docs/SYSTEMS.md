@@ -134,6 +134,35 @@ them with unscaled time and fades them in. Its camera stops rendering when
 the card closes or the local player leaves the terminal. No gameplay item,
 collider or NetworkObject is instantiated for the preview.
 
+## Painterly camera rendering
+
+`Assets/Shaders/PainterlyFullscreen.shader` and
+`Assets/Materials/PainterlyFullscreen.mat` provide local, full-screen painterly
+stylization. Each of the three quality renderers has a `Painterly Fullscreen`
+Full Screen Pass feature, with Fetch Color Buffer enabled and injection after
+post-processing. It uses the existing URP feature and works in Scene View too.
+The original PainterlyLit object shaders and materials remain independent.
+
+The filter combines four low-variance color regions into brush-like patches,
+with luminance quantization and static screen-space texture. It uses a fixed
+25-sample neighborhood plus the original pixel; larger strokes do not increase
+the sample count. This adds a full-resolution color copy and filter pass;
+GPU cost still needs profiling on target hardware, especially at 4K.
+
+Tune the shared material in the Inspector: `Intensity` blends the effect,
+`Stroke Radius` is measured in pixels at 1080p, `Stroke Stretch` elongates the
+brush, and `Tone Simplification`, `Brush Color Variation`, and `Canvas Texture`
+control the finish. Intensity zero preserves the source; disable the renderer
+feature to remove its rendering cost. The effect processes the camera image,
+including transparent surfaces and fog. Screen Space Overlay UI renders later
+and stays unaffected. Camera stacks and render-texture cameras using these
+renderers also need a visual check when introducing new camera setups.
+
+Verify in Game View with the feature enabled/disabled, including dark rooms,
+bright lights, transparent objects, and camera motion. Switch all three quality
+levels and check that the effect persists. It approximates a painted image;
+it cannot reproduce PainterlyLit's per-object lighting/normal changes exactly.
+
 ## UI audio
 
 UI controls share local click feedback through `Game.UI.UIControlSound`.

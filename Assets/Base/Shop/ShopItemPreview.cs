@@ -9,6 +9,7 @@ namespace Base.Shop
     {
         [SerializeField] private Canvas shopCanvas;
         [SerializeField, Min(1f)] private float degreesPerSecond = 22f;
+        [SerializeField, Min(1f)] private Vector2 imageSize = new(100, 100);
         private Scene previewScene;
         private GameObject rig;
         private Transform pivot;
@@ -70,7 +71,7 @@ namespace Base.Shop
             data.renderPostProcessing = false;
             data.renderShadows = false;
             data.volumeLayerMask = 0;
-            texture = new RenderTexture(640, 640, 24, RenderTextureFormat.ARGB32) { name = "Shop item preview" };
+            texture = new RenderTexture((int)imageSize.x, (int)imageSize.y, 24, RenderTextureFormat.ARGB32) { name = "Shop item preview" };
             texture.Create();
             previewCamera.targetTexture = texture;
             AddLight(new Vector3(35f, -30f, 0f), 1.8f);

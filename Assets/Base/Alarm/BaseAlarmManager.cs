@@ -210,10 +210,12 @@ namespace Base.Alarm
 
         private void ExecuteAlarmConsequence()
         {
-            KillAllInBase();
+            if (!IsServer) return;
 
+            // Death callbacks must not cancel this coroutine or overwrite its overlap results.
             isAlarmActive.Value = false;
             alarmTimeRemaining.Value = 0f;
+            KillAllInBase();
 
             // End the mission if one is active
             if (GameManager.Instance != null && GameManager.Instance.hasStartedMission.Value)
@@ -223,7 +225,18 @@ namespace Base.Alarm
         }
 
         // Reused buffer for Physics.OverlapSphereNonAlloc — avoids per-frame heap allocation.
-        private readonly Collider[] _overlapBuffer = new Collider[64];
+        private Collider[] _overlapBuffer = new Collider[64];
+
+        private int FindBaseColliders(Vector3 center, float radius)
+        {
+            int count;
+            while ((count = Physics.OverlapSphereNonAlloc(center, radius, _overlapBuffer)) == _overlapBuffer.Length)
+            {
+                // A full buffer may omit the intruder among the base's environment colliders.
+                System.Array.Resize(ref _overlapBuffer, _overlapBuffer.Length * 2);
+            }
+            return count;
+        }
 
         private void KillAllInBase()
         {
@@ -234,14 +247,15 @@ namespace Base.Alarm
 
             // Use OverlapSphere to find active enemies in the base radius — including static
             // scene enemies (e.g. an awake CasinoMonster) that are not in activeEnemies.
-            int count = Physics.OverlapSphereNonAlloc(center, radius, _overlapBuffer);
+            int count = FindBaseColliders(center, radius);
             for (int i = 0; i < count; i++)
             {
                 var enemy = _overlapBuffer[i].GetComponentInParent<Enemy.Enemy>();
                 if (!IsActiveIntruder(enemy)) continue;
                 // Drive through AddHealth so the full KillEntity pipeline fires
                 // (e.g. CasinoMonster.KillEntity → DespawnAfterDelay).
-                enemy.AddHealth(-enemy.GetHealth() - 1f);
+                // GetHealth includes capture weaknesses, not the actual remaining hit points.
+                enemy.AddHealth(-enemy.entityHealth.Value - 1f);
             }
 
             // Kill all players inside the base
@@ -264,7 +278,7 @@ namespace Base.Alarm
             float radius = GameManager.Instance.baseRadius;
             Vector3 center = GameManager.Instance.spawnPoint;
 
-            int count = Physics.OverlapSphereNonAlloc(center, radius, _overlapBuffer);
+            int count = FindBaseColliders(center, radius);
             for (int i = 0; i < count; i++)
             {
                 var enemy = _overlapBuffer[i].GetComponentInParent<Enemy.Enemy>();
