@@ -95,7 +95,7 @@ public static class BaseUpgraderChecks
         Require(casinoStatus.color==normal,"Disabled hover did not clear its highlight");
         upgrader.BuyCasinoServerRpc();Require((state.baseUpgrades.Value&8)==0,"Unaffordable purchase accepted");
         state.baseUpgrades.Value=1|8|32;game.teamMoney.Value=1200;
-        var camera=new GameObject("Upgrade check camera",typeof(Camera)).GetComponent<Camera>();camera.tag="MainCamera";
+        var camera=new GameObject("Upgrade check camera",typeof(Camera),typeof(AudioListener)).GetComponent<Camera>();camera.tag="MainCamera";
         var point=root.transform.Find("CameraPoint");camera.transform.SetPositionAndRotation(point.position,point.rotation);
         camera.nearClipPlane=.01f;camera.farClipPlane=20;camera.fieldOfView=60;
         camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=new Color(.025f,.025f,.035f);

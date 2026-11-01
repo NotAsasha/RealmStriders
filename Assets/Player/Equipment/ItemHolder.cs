@@ -23,6 +23,7 @@ namespace Player.Equipment
         [SerializeField] private Vector3 holdPositionLocal = new(0.20f, -0.12f, 0.38f);
         [SerializeField] private Vector3 holdRotationEuler;
         [SerializeField] private Vector3 remotePositionFromShoulder = new(0.02f, -0.14f, 0.38f);
+        [SerializeField, Min(0.01f)] private float cameraClearance = 0.12f;
         [SerializeField] private bool clampItemPitch = true;
         [SerializeField] private float minItemPitch = -45f;
         [SerializeField] private float maxItemPitch = 45f;
@@ -37,6 +38,7 @@ namespace Player.Equipment
         public float MinItemPitch { get => minItemPitch; set => minItemPitch = value; }
         public float MaxItemPitch { get => maxItemPitch; set => maxItemPitch = value; }
         public Transform HeldItemSocket => heldItemSocket;
+        public bool RequiresFirstPersonReach { get; private set; }
 
         private Item currentActiveItem;
         private Vector2 currentSway;
@@ -48,6 +50,7 @@ namespace Player.Equipment
         {
             if (currentActiveItem == item) return;
             currentActiveItem = item;
+            RequiresFirstPersonReach = false;
             actionWeight = item != null && item.IsHoldActionActive ? 1f : 0f;
             currentSway = Vector2.zero;
         }
@@ -64,6 +67,7 @@ namespace Player.Equipment
 
         private void EvaluatePose(bool firstPerson, Transform shoulder, float minReach, float maxReach, float pitch)
         {
+            RequiresFirstPersonReach = false;
             if (inventory == null || inventory.HandAnchor == null || handTarget == null ||
                 currentActiveItem == null || shoulder == null || (firstPerson && cameraTransform == null)) return;
 
@@ -116,8 +120,22 @@ namespace Player.Equipment
             Vector3 wristPosition = gripPosition - wristRotation * palmOffset;
             Vector3 reach = wristPosition - shoulder.position;
             float distance = reach.magnitude;
-            if (distance > 0.00001f)
+            bool protectCamera = firstPerson && (movement == null || !movement.isInInteraction);
+            if (!protectCamera && distance > 0.00001f)
                 wristPosition = shoulder.position + reach * (Mathf.Clamp(distance, minReach, maxReach) / distance);
+
+            if (protectCamera)
+            {
+                // Keep the whole item ahead of the camera; the local arm solve follows
+                // the corrected grip without detaching the handle.
+                Vector3 actualGrip = wristPosition + wristRotation * palmOffset;
+                float depth = Vector3.Dot(actualGrip - cameraTransform.position, cameraTransform.forward);
+                float minimumDepth = currentActiveItem.GetMinimumGripCameraDepth(gripRotation, cameraTransform.forward, cameraClearance);
+                wristPosition += cameraTransform.forward * Mathf.Max(0f, minimumDepth - depth);
+                RequiresFirstPersonReach = true;
+                if (heldItemSocket != null)
+                    heldItemSocket.SetPositionAndRotation(wristPosition + wristRotation * palmOffset, gripRotation);
+            }
             handTarget.SetPositionAndRotation(wristPosition, wristRotation);
         }
 

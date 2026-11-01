@@ -14,6 +14,7 @@ namespace Assets.Player.UI
         [SerializeField] private Slider sensSlider;
         [SerializeField] private Slider masterVolumeSlider;
         [SerializeField] private InputActionAsset inputActions;
+        [SerializeField] private TMP_Dropdown crouchModeDropdown;
 
         [Header("Graphics settings")]
         [SerializeField] private TMP_Dropdown qualityDropdown;
@@ -52,6 +53,7 @@ namespace Assets.Player.UI
             windowModeDropdown?.Hide();
             frameRateDropdown?.Hide();
             shadowQualityDropdown?.Hide();
+            crouchModeDropdown?.Hide();
 
             for (int i = 0; i < categories.Length; i++)
             {
@@ -114,6 +116,7 @@ namespace Assets.Player.UI
 
             BuildResolutionOptions();
             ConfigureGraphicsDropdowns();
+            SetOptions(crouchModeDropdown, new[] { "Hold", "Toggle" });
             buttonHoldVoiceModeButton.onClick.AddListener(() => SetVoiceMode(VoiceMode.ButtonHold));
             voiceActivationModeButton.onClick.AddListener(() => SetVoiceMode(VoiceMode.VoiceActivation));
             isInitialized = true;
@@ -194,6 +197,13 @@ namespace Assets.Player.UI
 
             SelectGraphicsValues();
             RefreshVoiceModeControls();
+            crouchModeDropdown?.SetValueWithoutNotify((int)settingsFile.save.crouchMode);
+        }
+
+        public void UpdateCrouchMode(int value)
+        {
+            if (settingsFile == null || value < 0 || value > 1) return;
+            settingsFile.save.crouchMode = (CrouchMode)value;
         }
 
         private void SetVoiceMode(VoiceMode voiceMode)
@@ -313,6 +323,8 @@ namespace Assets.Player.UI
                 : settingsFile.save.masterVolume;
 
             SyncGraphicsSettingsFromControls();
+            if (crouchModeDropdown != null)
+                settingsFile.save.crouchMode = (CrouchMode)Mathf.Clamp(crouchModeDropdown.value, 0, 1);
             settingsFile.ApplyRuntimeSettings();
 
             if (!settingsFile.Save())

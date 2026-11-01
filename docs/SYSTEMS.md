@@ -95,6 +95,45 @@ increase.
 - Do not put transient mission state into save files unless the design
   explicitly requires persistence.
 
+## Casino gate
+
+`Assets/Scripts/CasinoCagePedestal.cs` owns the network interaction on the
+CasinoPedistal scene root. `CasinoDoorPresentation` starts an authored Animator
+state once, seeking from replicated server time for late joins. It never moves
+door transforms itself. `ChipPoint` defines the mounted CasinoCage pose.
+All runtime references are serialized. The owner authors the animation and VFX.
+
+On CasinoDoorPresentation, assign `Door Animator`, `Closed State` and
+`Opening State` (full paths, default `Base Layer.Closed` / `Base Layer.Opening`).
+`Door.controller` has one layer/state machine named `Base Layer` containing
+`Closed` and `Opening` states, not separate layers with those state paths.
+Closed holds frame zero of the owner's Opening clip at state speed zero;
+Opening plays that same clip at speed one (5.033333 seconds). The authored
+clip is unchanged. `tools/CasinoAnimatorRepair.cs` Verify checks the actual
+prefab/controller, bindings, opening, final hold, reset and late-join pose
+in an isolated preview scene.
+Use a non-looping opening clip that holds the open pose; do not transition it
+back to Closed. Set `Opening Duration` to the actual duration including Animator
+state speed. Animate the leaves with their colliders. Animator culling should
+be Always Animate so offscreen doors still update collision.
+Add lights to `Activation Lights` and particle systems to `Activation Particles`.
+Keep their GameObjects active, disable particle Play On Awake, and author colors,
+intensities and particle settings in the Inspector. Activation enables lights
+and plays particles once; reset disables lights and clears particles. Late joins
+enable lights and looping particles without replaying bursts or opening audio.
+All presentation references are optional until configured. `tools/CasinoGateSetup.cs`
+disables the previous generated light/ring objects and validates pedestal wiring.
+
+Verification through Unity MCP `run_script`: `tools/CasinoGateChecks.cs`
+Prepare in Edit Mode, enter Play Mode, Run, stop Play Mode, Restore. The
+isolated host/client fixture tests rejection of empty/wrong items, distance
+and sender ownership, remote placement, duplicate requests, inventory
+removal, mounted presentation, a temporary test Animator, light/particle activation,
+collision passage and late joining. The fixture animation does not author the
+actual Casino door animation. It does
+not load game saves. Existing `SubwooferShaderWarmup` can log an unrelated
+shader-pass exception when entering Play Mode.
+
 ## Adding a system
 
 Before adding a new system:
@@ -121,6 +160,27 @@ The first category remains available at startup; later categories unlock at
 the first segment of their star. Existing item groupings and prices are kept.
 Categories four and five currently show an empty state. CategorySwitch owns
 page selection and hides an open item card when changing categories.
+The Shop follows a classic Windows 95/98 reference: cool gray window surfaces,
+gray title bars, a teal screen border, raised buttons and inset white fields.
+Text uses the existing Liberation Sans SDF font for smooth, readable letters
+on angled world-space screens. `tools/ClassicShopStyle.cs` applies this
+presentation after the hardware setup and renders an isolated Editor preview.
+Item-card Back/Buy captions are assigned from the button identity, so applying
+the style repeatedly preserves the Back caption and callback.
+Transparent world-space UI hit areas align with the model's five existing
+hardware keys. ShopCategoryButton depresses the original mesh and uses a
+material property block for selection lighting. Locked keys and status plates
+are dark gray with light text. OPEN, READY and LOCKED/STAR labels
+distinguish selection from availability. Team balance occupies the
+wide hardware display to their right; the catalog header shows team rating.
+ShopPanelMotion lowers the physical MainPanel and its canvas, changes the page,
+then raises them together using unscaled time. Catalog input is blocked during
+travel; hardware keys remain responsive and replace pending navigation.
+The same transition handles item details and Back. All hardware and canvas
+references are serialized, and Shop binds rating updates during its network
+lifetime. The moving terminal is excluded from static batching.
+`tools/AnalogShopChecks.cs` exercises the actual Lobby instance in an isolated
+loopback fixture, including pointer hit alignment and purchases.
 Catalog tiles open item details; a separate BUY button beside each numeric
 price purchases directly without opening details. Shop updates quick-buy
 availability from money and rating changes during its network lifetime.
@@ -176,8 +236,9 @@ scenes, including templates for dynamically created cards and dropdown items.
 
 ## Base upgrade presentation
 
-BaseUpgrader presents all six existing upgrades in a graphite card grid using
-the menu fonts. Purchased cards have a brighter background, a light edge,
+BaseUpgrader presents all six existing upgrades in the same classic Windows
+style as Shop, with smooth text, inset white cards and raised gray controls.
+Purchased cards have a pale teal background, a teal edge,
 PURCHASED status and an inactive OWNED button. Other cards show prerequisite
 or insufficient-credit states. Prices come from BaseUpgrader's existing
 serialized price fields; the Drone → Radar → Zeus strike dependency is kept.
@@ -186,6 +247,15 @@ BaseUpgrader subscribes to BaseManager.baseUpgrades and team money in
 OnNetworkSpawn, refreshes the initial state immediately, and unsubscribes in
 OnNetworkDespawn. Resetting the Casino purchase flag also resets its card.
 The menu does not introduce separate purchase or save state.
+Available, purchased, disabled and status colors are serialized so network
+refreshes preserve the light theme. Blocked status text turns dark red on hover.
+
+WorldChooser uses the same window frame, a selected-realm field and three
+destination cards. The WorldCard prefab styles generated cards as well as
+the authored preview: selected cards have a pale teal background, a teal stripe
+and SELECTED text. Current-realm colors are serialized for readable dark red
+and dark green states. `tools/ClassicBaseMenus.cs` styles these two terminals;
+`tools/ClassicMenuPreview.cs` renders previews and reports text overflow.
 
 ## Held equipment presentation
 
@@ -195,3 +265,51 @@ existing arm IK; `Item` aligns to the solved palm and manages stored presentatio
 WalkieTalkie uses voice transmission to drive a blended raised pose. The system
 uses one body and one network item, with a one-handed grip. See `HELD_ITEMS.md`
 for prefab authoring, animation and verification.
+The owner's grip stays ahead of the camera using each item's authored mesh
+bounds and a 0.12 m clearance. Local IK adjusts shoulder reach while preserving
+arm lengths and palm contact, including the first equip frame. Remote arm reach
+and terminal interaction poses retain their existing behaviour.
+
+## Crouching
+
+`PlayerMovement` owns the local crouch request and replicated stance. Its
+CharacterController changes height and center together to preserve foot position.
+Standing checks only the capsule volume above the crouch pose, ignores triggers
+and the player's own hierarchy, and retries until there is clearance. Pause and
+terminal interactions preserve stance. Freeze blocks stance input; death clears
+it, and teleport resets it where there is room to stand.
+
+The Player prefab uses 2.5 m/s crouch walking and 3.25 m/s crouch running. Noise
+radii are 35% and 100% of `walkNoiseRadius`, respectively. Crouch height is 1.6 m
+to cover the supplied walking clip, whose posture is higher than the idle clip.
+CameraMovement blends a separate 0.65 m camera drop and 0.4 m forward offset so
+the viewpoint stays ahead of the crouching torso, remains stable through the
+animation cycle and returns correctly after terminal interaction.
+All these values are serialized for tuning.
+
+The owner camera's explicit `firstPersonHiddenRenderers` list contains only the
+helmet/head mesh. It casts shadows but is hidden in first person, preserving the
+same body's visible hands, legs and equipment. Its original rendering mode is
+restored after the camera reaches a terminal, on spectator entry and on despawn;
+returning to gameplay hides it again. Remote copies retain the complete model.
+`tools/CrouchCameraChecks.cs` configures the reference and renders comparisons
+using crouch idle/walk poses with forward/up/down look, including spine pitch.
+
+`SettingsSave.crouchMode` persists Hold/Toggle and defaults to Hold for older
+settings files. The shared Settings prefab exposes Crouch binding and Crouch Mode
+under Controls, using the existing Apply/discard behavior. Runtime movement caches
+the mode when settings are applied, so unapplied menu edits do not affect play.
+
+`PlayerAnimation` supplies Crouched/Moving and per-state speed parameters to
+SpacemanBody. Animator's global speed stays at one (zero when frozen), allowing
+transitions from stationary standing. The two crouch FBXs use Humanoid retargeting,
+looping clips and baked root motion; CharacterController owns translation.
+
+Checks through Unity MCP `run_script`:
+- `tools/CrouchChecks.cs`: Prepare in Edit Mode, enter Play Mode, Run, stop Play
+  Mode, then Restore. The isolated client-owned fixture checks hold/toggle,
+  capsule clearance, speeds/noise, jump blocking, pause, lifecycle resets,
+  server replication and late joining without touching saves or gameplay scenes.
+- `tools/CrouchPoseChecks.cs`: Run in Edit Mode checks the actual character's
+  Animator transitions, the settings callback and binding serialization. It
+  writes pose previews. CrouchChecks.Preview renders the Controls page.

@@ -74,6 +74,8 @@ namespace Base.WorldChooser
         [SerializeField] private GameObject cardPrefab;
         [SerializeField] private TMP_Text currentMissionText;
         [SerializeField] private AudioSource audioSource;
+        [SerializeField] private Color noMissionColor = Color.red;
+        [SerializeField] private Color selectedMissionColor = Color.green;
 
         private NetworkList<MissionData> availableMissions;
         private readonly List<WorldCard> visibleCards = new();
@@ -168,12 +170,12 @@ namespace Base.WorldChooser
             if (missionName.IsEmpty)
             {
                 currentMissionText.text = "NONE";
-                currentMissionText.color = Color.red;
+                currentMissionText.color = noMissionColor;
             }
             else
             {
                 currentMissionText.text = missionName.ToString();
-                currentMissionText.color = Color.green;
+                currentMissionText.color = selectedMissionColor;
             }
         }
 

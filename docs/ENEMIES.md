@@ -101,6 +101,21 @@ A cage already brought into the base remains safe.
 
 ## Shocker
 
+`ShockerCage` automatically discharges at a uniformly random living, spawned
+entity within 6 m every 4–9 seconds. Players (including its carrier) and monsters
+are eligible; dead, capturing and invincible entities are excluded. It remains
+active on the ground, held, or stored in inventory, without consuming charge.
+Like Taser, it applies 2 seconds of Freeze and refreshes weakness slot 3 for
+6 seconds when the target is wet; it does not deal health damage. Range and
+timing are Inspector settings on `ShockerCageDischarge`. Detection uses entity
+root distance and does not require line of sight.
+
+The server owns timing, selection and effects. A transient RPC plays the coil's
+lightning bolt and spatial Taser shot sound on clients; Entity's existing
+NetworkVariables replicate Freeze and weakness. Despawn stops the timers and
+presentation. `tools/ShockerCageSetup.cs` configures and validates the prefab.
+Host/client gameplay and mission-end despawn still need a multiplayer playtest.
+
 The Shocker implementation and its related prefab, energy field, and sound
 components are the source of truth for current behaviour. Its design
 description, counterplay, and balance targets still need to be confirmed and

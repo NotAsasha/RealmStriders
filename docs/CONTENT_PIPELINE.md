@@ -50,6 +50,9 @@ requires a different process, document the exception and its reason.
    separately. Assign all `Inventory Presentation` arrays, including child
    renderers, lights, canvases, audio sources and colliders. Never hide the
    network root with `SetActive(false)`. See `HELD_ITEMS.md` for animation setup.
+   Set `heldCameraBounds` from the physical mesh in item-root space, excluding
+   effect volumes. Rebuild bounds after mesh changes using
+   `HeldItemCrouchChecks.Configure` through Unity MCP, then run its `Run` check.
 7. Test stacking with other equipment and verify that capture timing remains
    understandable.
 

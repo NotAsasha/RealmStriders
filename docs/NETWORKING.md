@@ -46,6 +46,13 @@ success rating increase.
 - Use `NetworkVariable<T>` for persistent replicated state that late-joining
   clients need.
 - Use RPCs for requests and transient events.
+- Player stance follows the existing owner-authoritative movement contract:
+  `PlayerMovement.isCrouching` is an owner-written NetworkVariable. Every peer
+  applies its initial value and changes to the capsule, including late joiners;
+  PlayerAnimation reads it for the full-body pose. Speed and footstep noise are
+  calculated by the owner, using the existing replicated `currentNoiseRadius`
+  consumed by enemy detection on the server. This preserves the movement trust
+  model; it does not introduce server-side movement/clearance validation.
 - Flashbang validates the requesting holder, active inventory item, charge,
   and pulse cooldown on the server. Charge is a server-written NetworkVariable;
   successful uses broadcast a visual pulse at the authoritative effect origin.
@@ -85,6 +92,19 @@ success rating increase.
 
 The repeatable loopback checks are documented in `docs/HELD_ITEMS.md`.
 
+
+## Casino gate
+
+`CasinoCagePedestal` validates the requesting inventory's owner, living state,
+distance, active item and CasinoCage prefab hash on the server. It consumes
+the item with the existing inventory/despawn path exactly once.
+A server-written activation timestamp drives the installed mesh and starts the
+authored Animator opening state. Late joiners seek into that state using the
+configured opening duration, enable lights and looping particles, and do not
+replay old audio or particle bursts.
+The mounted cage is authored mesh-only scene content, with no Item or
+NetworkObject, so it cannot be picked up or saved as loot. Gate state lasts
+only for the loaded mission scene.
 
 ## Adding a networked interaction
 

@@ -29,15 +29,25 @@ evaluated locally.
 6. Assign `inventoryRenderers`, `inventoryLights`, `inventoryCanvases`,
    `inventoryAudioSources`, and `inventoryColliders` explicitly. Include particle
    renderers and all child colliders. Runtime code never searches for these.
+7. Set `heldCameraBounds` to the physical mesh bounds in item-root coordinates,
+   excluding particles and effect volumes. After mesh changes, regenerate these
+   bounds through Unity MCP with `HeldItemCrouchChecks.Configure` in
+   `tools/HeldItemCrouchChecks.cs` (updates all carried item prefabs).
 
 PlayerHeadSync evaluates after camera effects, then solves the wrist, then locks
 the item to the actual palm. The final attachment follows the solved hand even
 during the equip-weight transition. The owner and remote views may have different
 screen/world poses; neither requires streaming item transforms while held.
 
-Full-body arm reach remains a physical constraint. Very large items and extreme
-up/down camera angles can still extend outside the frame. Use per-item pose
-offsets for composition rather than displacing the handle from the hand.
+The owner uses the authored camera-relative grip, with an additional forward
+correction when the item's oriented bounds enter `ItemHolder.cameraClearance`
+(0.12 m). The local shoulder extends only as far as needed to reach this grip;
+arm segment lengths and palm contact are preserved. The shoulder offset is
+restored before the next animation pass and on despawn. Local grip IK applies
+fully from the first equipped frame; remote equip blending and arm reach remain
+unchanged. Terminal interaction keeps its existing frozen world-space pose.
+Very large items and extreme look angles can still extend outside the frame.
+Use per-item pose offsets for composition rather than moving the handle.
 
 ## Inventory lifecycle
 
@@ -55,6 +65,12 @@ offsets for composition rather than displacing the handle from the hand.
   promotion can temporarily remove/reapply parenting without losing slot IDs.
 
 ## Repeatable checks via Unity MCP
+
+`HeldItemCrouchChecks.Run(0.4f, true)` checks all 21 carried item prefabs against
+the real Player rig in a preview scene: standing/crouch idle/crouch walk, four
+animation phases, five look pitches and four equip weights (5,040 combinations).
+It asserts camera clearance, palm contact, unchanged arm segment lengths,
+shoulder restoration and separation from remote poses, and renders sample views.
 
 Use `run_script` with `tools/HeldItemChecks.cs`:
 

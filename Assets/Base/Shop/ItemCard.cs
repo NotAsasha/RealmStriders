@@ -16,9 +16,13 @@ namespace Base.Shop
         [SerializeField] private RawImage previewImage;
         [SerializeField] private Button buyButton;
         [SerializeField] private GameObject catalog;
+        [SerializeField] private ShopPanelMotion panelMotion;
 
         public int Price => itemPrice;
         public int RequiredRating => requiredRating;
+
+        public void Open() => panelMotion.Show(gameObject);
+        public void Close() => panelMotion.Show(catalog);
 
         private void OnEnable()
         {

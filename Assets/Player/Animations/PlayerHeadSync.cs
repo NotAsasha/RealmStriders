@@ -66,6 +66,7 @@ public class PlayerHeadSync : NetworkBehaviour
     private float maxArmReach = 0.594f;
     private float maxSafeArmReach = 0.575f;
     private float minSafeArmReach = 0.15f;
+    private Vector3 firstPersonShoulderOffset;
 
     public Transform ShoulderBone => ikRoot;
     public float MaxSafeArmReach => maxSafeArmReach;
@@ -134,6 +135,7 @@ public class PlayerHeadSync : NetworkBehaviour
 
     private void Update()
     {
+        RestoreFirstPersonShoulder();
         if (!IsOwner) return;
 
         if (PlayerMovement.Instance != null && (PlayerMovement.Instance.isInInteraction || PlayerMovement.Instance.isPaused))
@@ -148,6 +150,18 @@ public class PlayerHeadSync : NetworkBehaviour
         {
             headPitch.Value = clampedPitch;
         }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        RestoreFirstPersonShoulder();
+    }
+
+    private void RestoreFirstPersonShoulder()
+    {
+        if (ikRoot != null && firstPersonShoulderOffset != Vector3.zero)
+            ikRoot.localPosition -= firstPersonShoulderOffset;
+        firstPersonShoulderOffset = Vector3.zero;
     }
 
     private float GetOwnerRawPitch()
@@ -255,16 +269,32 @@ public class PlayerHeadSync : NetworkBehaviour
             ? handRig.weight
             : ((inventory != null && inventory.isHoldingItem.Value) ? 1f : 0f);
         float constraintWeight = rigWeight * handIK.weight;
-        if (constraintWeight <= 0.0001f)
+        bool firstPersonHold = itemHolder != null && itemHolder.RequiresFirstPersonReach;
+        if (!firstPersonHold && constraintWeight <= 0.0001f)
         {
             return;
         }
 
         // When holding an item, enforce full position & rotation lock so walking animation never leaks into fingers
-        float posWeight = Mathf.Clamp01(constraintWeight * Mathf.Max(0.999f, handIK.data.targetPositionWeight));
-        float rotWeight = Mathf.Clamp01(constraintWeight * Mathf.Max(0.999f, handIK.data.targetRotationWeight));
+        // The visible local item needs a safe grip from the first equip frame.
+        float posWeight = firstPersonHold ? 1f : Mathf.Clamp01(constraintWeight * Mathf.Max(0.999f, handIK.data.targetPositionWeight));
+        float rotWeight = firstPersonHold ? 1f : Mathf.Clamp01(constraintWeight * Mathf.Max(0.999f, handIK.data.targetRotationWeight));
         float hintWeight = Mathf.Clamp01(constraintWeight * (ikHint != null ? handIK.data.hintWeight : 1f));
 
+        if (firstPersonHold)
+        {
+            Vector3 reach = ikTarget.position - ikRoot.position;
+            float distance = reach.magnitude;
+            if (distance > maxSafeArmReach)
+            {
+                // Local presentation may need shoulder extension after camera clearance.
+                // Preserve arm segment lengths, and restore before the next animation pass.
+                Vector3 offset = reach * ((distance - maxSafeArmReach) / distance);
+                Vector3 before = ikRoot.localPosition;
+                ikRoot.position += offset;
+                firstPersonShoulderOffset += ikRoot.localPosition - before;
+            }
+        }
         Vector3 targetWorldPos = ClampTargetToShoulderReach(ikTarget.position, ikRoot.position);
         Quaternion targetWorldRot = ikTarget.rotation;
 

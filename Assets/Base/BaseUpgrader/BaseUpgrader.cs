@@ -36,6 +36,9 @@ public class BaseUpgrader : NetworkBehaviour
     [SerializeField] private UpgradeCard[] upgradeCards = Array.Empty<UpgradeCard>();
     [SerializeField] private Color availableColor = new(.12f, .12f, .14f);
     [SerializeField] private Color purchasedColor = new(.24f, .25f, .28f);
+    [SerializeField] private Color disabledColor = new(.075f, .075f, .09f);
+    [SerializeField] private Color statusColor = new(.60f, .61f, .63f);
+    [SerializeField] private Color purchasedStatusColor = new(.922f, .914f, .878f);
 
     public override void OnNetworkSpawn()
     {
@@ -72,12 +75,12 @@ public class BaseUpgrader : NetworkBehaviour
             card.buyButton.interactable = IsSpawned && baseObj != null && gameManager != null &&
                 !purchased && unlocked && money >= price;
             var colors = card.buyButton.colors;
-            colors.disabledColor = purchased ? purchasedColor : new Color(.075f, .075f, .09f);
+            colors.disabledColor = purchased ? purchasedColor : disabledColor;
             card.buyButton.colors = colors;
             card.buttonLabel.text = purchased ? "OWNED" : "BUY";
             card.priceLabel.text = price + " CR";
             card.hoverFeedback.SetStatus(!purchased && (!unlocked || money < price),
-                purchased ? new Color(.922f, .914f, .878f) : new Color(.60f, .61f, .63f));
+                purchased ? purchasedStatusColor : statusColor);
             card.statusLabel.text = purchased ? "PURCHASED" : !unlocked
                 ? prerequisite == BaseUpgrades.IsTerminalBought ? "REQUIRES DRONE" : "REQUIRES RADAR"
                 : money < price ? "NOT ENOUGH MONEY" : "AVAILABLE";

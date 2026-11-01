@@ -18,6 +18,14 @@ namespace Player.Movement
         [SerializeField] private float gravity = Physics.gravity.y;
         [SerializeField] private float jumpHeight = 1f;
 
+        [Header("Crouching")]
+        [SerializeField, Min(0.1f)] private float crouchHeight = 1.6f;
+        [SerializeField, Min(0f)] private float crouchCameraDrop = 0.65f;
+        [SerializeField, Min(0f)] private float crouchSpeed = 2.5f;
+        [SerializeField, Min(0f)] private float crouchRunSpeed = 3.25f;
+        [SerializeField, Range(0f, 1f)] private float crouchNoiseMultiplier = 0.35f;
+        [SerializeField] private LayerMask standingObstructions = ~0;
+
         [Header("Fall Damage")]
         [SerializeField] private bool enableFallDamage = true;
         [SerializeField] private float safeFallSpeed = 12f;
@@ -46,8 +54,21 @@ namespace Player.Movement
         public Human human;
 
         public Vector3 CurrentInputMove => controls.Gameplay.Movement.ReadValue<Vector3>();
-        public bool IsRunning => controls.Gameplay.Run.IsPressed();
+        public bool IsRunning => controls != null && controls.Gameplay.Run.IsPressed();
+        public bool IsCrouching => isCrouching.Value;
+        public float CrouchCameraOffset => IsCrouching ? -crouchCameraDrop : 0f;
         public bool IsGrounded => player.isGrounded;
+
+        private readonly NetworkVariable<bool> isCrouching = new(false,
+            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private readonly Collider[] standingHits = new Collider[32];
+        private float standingHeight;
+        private Vector3 standingCenter;
+        private float standingStepOffset;
+        private bool crouchRequested;
+        private bool suppressCrouchToggle;
+        private CrouchMode crouchMode;
+        private float EffectiveCrouchHeight => Mathf.Clamp(crouchHeight, player.radius * 2f, standingHeight);
 
         private CharacterController player;
         private Vector3 velocity;
@@ -75,11 +96,16 @@ namespace Player.Movement
             player = GetComponent<CharacterController>();
             human = GetComponent<Human>();
             playerTransform = transform;
-            playerCamera = GetComponentInChildren<Camera>();
+            standingHeight = player.height;
+            standingCenter = player.center;
+            standingStepOffset = player.stepOffset;
         }
 
         public override void OnNetworkSpawn()
         {
+            isCrouching.OnValueChanged += OnCrouchChanged;
+            if (human != null) human.isDead.OnValueChanged += OnDeathChanged;
+            ApplyCrouch(IsCrouching);
             if (!IsOwner)
             {
                 enabled = false;
@@ -102,8 +128,14 @@ namespace Player.Movement
         }
         public override void OnNetworkDespawn()
         {
+            isCrouching.OnValueChanged -= OnCrouchChanged;
+            if (human != null) human.isDead.OnValueChanged -= OnDeathChanged;
+            ApplyCrouch(false);
+            crouchRequested = false;
+            suppressCrouchToggle = false;
             if (settingsFile != null) SettingsFile.OnSettingsChanged -= LoadBindings;
             CleanupInputHandlers();
+            if (Instance == this) Instance = null;
         }
 
         #endregion
@@ -120,8 +152,10 @@ namespace Player.Movement
 
         private void LoadBindings()
         {
+            crouchMode = settingsFile.save.crouchMode;
+            crouchRequested = IsCrouching;
             string rebinds = settingsFile.save.rebinds;
-            if (rebinds.Length < 5) { }
+            controls.RemoveAllBindingOverrides();
             if (!string.IsNullOrEmpty(rebinds))
             {
                 try { controls.LoadBindingOverridesFromJson(rebinds); }
@@ -144,6 +178,7 @@ namespace Player.Movement
                 controls.Gameplay.Jump.performed -= OnJump;
                 controls.System.Pause.performed -= OnPause;
                 controls.Disable();
+                controls.Dispose();
             }
 
             controls = null;
@@ -157,7 +192,8 @@ namespace Player.Movement
 
         private void OnJump(InputAction.CallbackContext ctx)
         {
-            if (ctx.performed)
+            if (ctx.performed && !IsCrouching && !isPaused && !isInInteraction &&
+                (human == null || !human.IsEffectActive(EffectType.Freeze)))
                 jumpRequested = true;
         }
 
@@ -185,6 +221,15 @@ namespace Player.Movement
         public void SwitchToGameplayControls()
         {
             if (controls == null) return;
+            suppressCrouchToggle = false;
+            foreach (InputControl control in controls.Gameplay.Crouch.controls)
+            {
+                if (control is UnityEngine.InputSystem.Controls.ButtonControl button && button.isPressed)
+                {
+                    suppressCrouchToggle = true;
+                    break;
+                }
+            }
             controls.Gameplay.Enable();
             controls.UI.Disable();
         }
@@ -193,6 +238,8 @@ namespace Player.Movement
         {
             if (controls == null) return;
             controls.Gameplay.Disable();
+            jumpRequested = false;
+            suppressCrouchToggle = true;
             controls.Gameplay.Interact.Enable();
             controls.UI.Enable();
         }
@@ -209,11 +256,74 @@ namespace Player.Movement
             previousMove = Vector3.zero;
             jumpRequested = false;
             maxFallSpeedThisFlight = 0f;
+            crouchRequested = false;
+            if (IsSpawned && IsOwner && (!player.enabled || CanStand())) isCrouching.Value = false;
+        }
+
+        private void OnCrouchChanged(bool previous, bool current) => ApplyCrouch(current);
+
+        private void ApplyCrouch(bool crouched)
+        {
+            float height = crouched ? EffectiveCrouchHeight : standingHeight;
+            player.stepOffset = Mathf.Min(standingStepOffset, height * 0.5f);
+            player.height = height;
+            // Keep the feet fixed while the capsule's upper half shrinks.
+            player.center = standingCenter + Vector3.up * ((height - standingHeight) * 0.5f);
+        }
+
+        private void OnDeathChanged(bool previous, bool dead)
+        {
+            if (!IsOwner || !dead) return;
+            crouchRequested = false;
+            jumpRequested = false;
+            isCrouching.Value = false;
+            currentNoiseRadius.Value = 0f;
+        }
+
+        private void UpdateCrouch()
+        {
+            if (isPaused || isInInteraction) return;
+            InputAction action = controls.Gameplay.Crouch;
+            if (!action.IsPressed()) suppressCrouchToggle = false;
+            if (crouchMode == CrouchMode.Toggle)
+            {
+                if (!suppressCrouchToggle && action.WasPressedThisFrame()) crouchRequested = !crouchRequested;
+            }
+            else crouchRequested = action.IsPressed();
+
+            if (crouchRequested == IsCrouching) return;
+            if (!crouchRequested && !CanStand()) return;
+            isCrouching.Value = crouchRequested;
+            jumpRequested = false;
+        }
+
+        private bool CanStand()
+        {
+            Vector3 scale = playerTransform.lossyScale;
+            float radius = player.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z));
+            float fullHeight = Mathf.Max(standingHeight * Mathf.Abs(scale.y), radius * 2f);
+            float lowHeight = Mathf.Max(EffectiveCrouchHeight * Mathf.Abs(scale.y), radius * 2f);
+            Vector3 bottom = playerTransform.TransformPoint(standingCenter) - playerTransform.up * (fullHeight * 0.5f);
+            Vector3 from = bottom + playerTransform.up * (lowHeight - radius);
+            Vector3 to = bottom + playerTransform.up * (fullHeight - radius);
+            int count = Physics.OverlapCapsuleNonAlloc(from, to, Mathf.Max(0.01f, radius - 0.01f),
+                standingHits, standingObstructions, QueryTriggerInteraction.Ignore);
+            if (count == standingHits.Length) return false;
+            for (int i = 0; i < count; i++)
+            {
+                Collider hit = standingHits[i];
+                if (hit.transform.IsChildOf(playerTransform) ||
+                    Physics.GetIgnoreLayerCollision(gameObject.layer, hit.gameObject.layer) ||
+                    Physics.GetIgnoreCollision(player, hit)) continue;
+                return false;
+            }
+            return true;
         }
 
         private void Update()
         {
-            if (!player.enabled) return;
+            if (!IsSpawned || !IsOwner || controls == null || !player.enabled) return;
+            if (human != null && human.isDead.Value) return;
 
             // Не застосовувати гравітацію та рух, поки ще не завантажилась ігрова сцена (Lobby)
             string activeSceneName = SceneManager.GetActiveScene().name;
@@ -236,6 +346,7 @@ namespace Player.Movement
             float dt = Mathf.Min(Time.deltaTime, 0.05f);
 
             bool wasGrounded = player.isGrounded;
+            UpdateCrouch();
             InputAction movementControls = controls.Gameplay.Movement;
 
 
@@ -245,7 +356,7 @@ namespace Player.Movement
 
 
             //Jump
-            if (jumpRequested && player.isGrounded)
+            if (jumpRequested && player.isGrounded && !IsCrouching)
             {
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
                 jumpRequested = false;
@@ -254,7 +365,8 @@ namespace Player.Movement
 
             //Running
             bool isRunning = controls.Gameplay.Run.IsPressed();
-            currentSpeed = isRunning ? runSpeed : moveSpeed;
+            currentSpeed = IsCrouching ? (isRunning ? crouchRunSpeed : crouchSpeed) :
+                (isRunning ? runSpeed : moveSpeed);
 
 
             //Steps sound
@@ -264,8 +376,9 @@ namespace Player.Movement
 
             if (player.isGrounded && horizontalVelocity.magnitude > 0.3f)
             {
-                PlayStepsSound(isRunning ? 0.3f : 0.5f);
-                targetNoise = isRunning ? runNoiseRadius : walkNoiseRadius;
+                PlayStepsSound(IsCrouching ? (isRunning ? 0.5f : 0.7f) : (isRunning ? 0.3f : 0.5f));
+                targetNoise = IsCrouching ? (isRunning ? walkNoiseRadius : walkNoiseRadius * crouchNoiseMultiplier) :
+                    (isRunning ? runNoiseRadius : walkNoiseRadius);
             }
 
             if (currentNoiseRadius.Value != targetNoise)

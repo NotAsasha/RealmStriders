@@ -2,6 +2,7 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using Player.Movement;
 
 namespace Player
 {
@@ -12,6 +13,8 @@ namespace Player
         [SerializeField] private CharacterController characterController;
         [SerializeField] private Rig handWeight;
         [SerializeField] private Inventory inventory;
+        [SerializeField] private PlayerMovement movement;
+        [SerializeField] private Human human;
 
         [Header("Settings")]
         [Tooltip("Швидкість підняття/опускання рук")]
@@ -20,6 +23,11 @@ namespace Player
         [SerializeField] private float speedModifier = 0.25f;
 
         private Coroutine weightLerpCoroutine;
+        private static readonly int Crouched = Animator.StringToHash("Crouched");
+        private static readonly int Moving = Animator.StringToHash("Moving");
+        private static readonly int StandingSpeed = Animator.StringToHash("StandingSpeed");
+        private static readonly int CrouchMoveSpeed = Animator.StringToHash("CrouchMoveSpeed");
+        private float standingAnimationSpeed;
 
         private readonly NetworkVariable<float> netSpeed = new NetworkVariable<float>(
             0f,
@@ -50,12 +58,14 @@ namespace Player
 
         private void Update()
         {
+            if (!IsSpawned) return;
             if (IsOwner)
             {
                 float currentVelocity = 0f;
                 if (characterController != null && characterController.enabled)
                 {
-                    currentVelocity = characterController.velocity.magnitude;
+                    Vector3 velocity = characterController.velocity;
+                    currentVelocity = new Vector2(velocity.x, velocity.z).magnitude;
                 }
 
                 netSpeed.Value = currentVelocity;
@@ -68,8 +78,15 @@ namespace Player
         {
             if (animator == null) return;
 
+            bool frozen = human != null && human.IsEffectActive(EffectType.Freeze);
+            animator.speed = frozen ? 0f : 1f;
+            if (frozen) return;
             float targetAnimationSpeed = Mathf.Max(0f, netSpeed.Value * speedModifier);
-            animator.speed = Mathf.Max(0f, Mathf.Lerp(animator.speed, targetAnimationSpeed, Time.deltaTime * 15f));
+            standingAnimationSpeed = Mathf.Lerp(standingAnimationSpeed, targetAnimationSpeed, Time.deltaTime * 15f);
+            animator.SetFloat(StandingSpeed, standingAnimationSpeed);
+            animator.SetFloat(CrouchMoveSpeed, Mathf.Max(0.1f, netSpeed.Value / 2.5f));
+            animator.SetBool(Crouched, movement != null && movement.IsCrouching);
+            animator.SetBool(Moving, netSpeed.Value > 0.1f);
         }
 
         #region Item Rig Weight Lerping

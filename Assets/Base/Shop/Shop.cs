@@ -23,6 +23,7 @@ namespace Base.Shop
 
         [SerializeField] private QuickBuy[] quickBuyButtons = Array.Empty<QuickBuy>();
         private GameManager gameManager;
+        [SerializeField] private CategorySwitch categorySwitch;
 
         public static Shop Instance { get; private set; }
 
@@ -47,6 +48,7 @@ namespace Base.Shop
         {
             base.OnNetworkSpawn();
             gameManager = GameManager.Instance;
+            if (categorySwitch != null) categorySwitch.Bind(gameManager);
             if (gameManager != null)
             {
                 gameManager.teamMoney.OnValueChanged += RefreshQuickBuyButtons;
@@ -68,6 +70,7 @@ namespace Base.Shop
 
         public override void OnNetworkDespawn()
         {
+            if (categorySwitch != null) categorySwitch.Bind(null);
             if (gameManager != null)
             {
                 gameManager.teamMoney.OnValueChanged -= RefreshQuickBuyButtons;

@@ -1930,6 +1930,10 @@ MonoBehaviour:
   mouseSensitivity: 500
   hitDistance: 2
   startPosition: {x: 0, y: 0.75, z: 0}
+  crouchCameraSpeed: 4
+  crouchCameraForward: 0.4
+  firstPersonHiddenRenderers:
+  - {fileID: 1857395326106563855}
   moveDuration: 0.5
 --- !u!114 &4274922025663217724
 MonoBehaviour:
@@ -2824,6 +2828,8 @@ MonoBehaviour:
   characterController: {fileID: 9155629318535776824}
   handWeight: {fileID: 2601586620473009399}
   inventory: {fileID: 686128325295018672}
+  movement: {fileID: -5512805701076199633}
+  human: {fileID: 7142264790690856648}
   handAnimationSpeed: 10
   speedModifier: 0.25
 --- !u!114 &3971763082489559414
@@ -37186,6 +37192,14 @@ MonoBehaviour:
   runSpeed: 7.5
   gravity: -9.81
   jumpHeight: 1
+  crouchHeight: 1.6
+  crouchCameraDrop: 0.65
+  crouchSpeed: 2.5
+  crouchRunSpeed: 3.25
+  crouchNoiseMultiplier: 0.35
+  standingObstructions:
+    serializedVersion: 2
+    m_Bits: 4294967295
   enableFallDamage: 1
   safeFallSpeed: 20
   damageMultiplier: 0.1
@@ -37202,10 +37216,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: e64eac18257a7004f944ef3c91520d1b, type: 3}
   - {fileID: 8300000, guid: 8107dc939c211fe4c8069d6a30846cc1, type: 3}
   - {fileID: 8300000, guid: 5f7ce3e3e3fb9d14c8945e531026aa76, type: 3}
-  playerCamera: {fileID: 0}
+  playerCamera: {fileID: 7821530433008171447}
   isPaused: 0
   isInInteraction: 0
-  human: {fileID: 0}
+  human: {fileID: 7142264790690856648}
   currentNoiseRadius:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -37555,7 +37569,23 @@ MonoBehaviour:
   m_Animator: {fileID: 5017923243239964587}
   TransitionStateInfoList: []
   AnimatorParameterEntries:
-    ParameterEntries: []
+    ParameterEntries:
+    - name: Crouched
+      NameHash: 1280700803
+      Synchronize: 1
+      ParameterType: 4
+    - name: Moving
+      NameHash: 949806512
+      Synchronize: 1
+      ParameterType: 4
+    - name: StandingSpeed
+      NameHash: -895836416
+      Synchronize: 1
+      ParameterType: 1
+    - name: CrouchMoveSpeed
+      NameHash: 1617568617
+      Synchronize: 1
+      ParameterType: 1
   AnimatorParametersExpanded: 0
 --- !u!114 &900000000000000003
 MonoBehaviour:

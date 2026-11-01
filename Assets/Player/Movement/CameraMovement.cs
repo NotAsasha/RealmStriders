@@ -24,6 +24,16 @@ namespace Player.Movement
         public float mouseSensitivity = 1f;
         public float hitDistance = 2.0f;
         public Vector3 startPosition;
+        [SerializeField, Min(0.1f)] private float crouchCameraSpeed = 4f;
+        [SerializeField, Min(0f)] private float crouchCameraForward = 0.4f;
+
+        [Header("First-person visibility")]
+        [SerializeField] private Renderer[] firstPersonHiddenRenderers = System.Array.Empty<Renderer>();
+        private UnityEngine.Rendering.ShadowCastingMode[] originalShadowModes;
+
+        private Vector3 GameplayPosition => startPosition + (movement != null
+            ? new Vector3(0f, movement.CrouchCameraOffset, movement.IsCrouching ? crouchCameraForward : 0f)
+            : Vector3.zero);
 
         [Header("Interaction")]
         public float moveDuration = 0.5f;
@@ -61,6 +71,8 @@ namespace Player.Movement
 
             //terrible architecture, but hard to remake, TODO ?
             human = PlayerMovement.Instance.human;
+            CacheFirstPersonVisibility();
+            SetFirstPersonVisibility(true);
 
             SettingsFile file = (SettingsFile)GameFileHandler.Instance.SearchForFileByName("Settings");
             mouseSensitivity = file.save.sensValue;
@@ -85,6 +97,7 @@ namespace Player.Movement
             }
 
             SettingsFile.OnSettingsChanged -= UpdateSensitivity;
+            SetFirstPersonVisibility(false);
             CleanupInputHandlers();
             UnityEngine.Cursor.lockState = CursorLockMode.None;
             UnityEngine.Cursor.visible = true;
@@ -104,6 +117,29 @@ namespace Player.Movement
         #endregion
 
         #region Initialization
+
+        private void CacheFirstPersonVisibility()
+        {
+            originalShadowModes = new UnityEngine.Rendering.ShadowCastingMode[firstPersonHiddenRenderers.Length];
+            for (int i = 0; i < firstPersonHiddenRenderers.Length; i++)
+            {
+                if (firstPersonHiddenRenderers[i] != null)
+                    originalShadowModes[i] = firstPersonHiddenRenderers[i].shadowCastingMode;
+            }
+        }
+
+        private void SetFirstPersonVisibility(bool firstPerson)
+        {
+            if (originalShadowModes == null) return;
+            for (int i = 0; i < firstPersonHiddenRenderers.Length; i++)
+            {
+                if (firstPersonHiddenRenderers[i] == null) continue;
+                // Keep the complete shadow and the rig used by the hands and held equipment.
+                firstPersonHiddenRenderers[i].shadowCastingMode = firstPerson
+                    ? UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly
+                    : originalShadowModes[i];
+            }
+        }
 
         private void SetupSingleton()
         {
@@ -162,6 +198,7 @@ namespace Player.Movement
             if (human.isDead.Value)
             {
                 if (movement != null && movement.isInInteraction) StopInteraction();
+                SetFirstPersonVisibility(true);
                 SetSpectatorCursor(true);
 
                 if (!ragdollHead) return;
@@ -181,11 +218,12 @@ namespace Player.Movement
                     spectatorTransition = null;
                 }
                 if (spectatorController) spectatorController.StopSpectating();
+                SetFirstPersonVisibility(true);
                 this.enabled = true; // Вмикаємо назад FPS камеру
                 UpdateCursorState();
 
                 transform.parent = playerBody;
-                transform.localPosition = startPosition;
+                transform.localPosition = GameplayPosition;
                 transform.localEulerAngles = Vector3.zero;
             }
             transform.localScale = new Vector3(1f, 1f, 1f);
@@ -250,6 +288,7 @@ namespace Player.Movement
 
             transform.position = cameraPoint.position;
             transform.rotation = cameraPoint.rotation;
+            SetFirstPersonVisibility(false);
         }
 
         public void StopInteraction()
@@ -265,7 +304,7 @@ namespace Player.Movement
             if (cameraAnimation != null) StopCoroutine(cameraAnimation);
             cameraAnimation = null;
 
-            transform.localPosition = startPosition;
+            transform.localPosition = GameplayPosition;
             transform.localScale = new Vector3(1f, 1f, 1f);
             ToggleInteractionUI(false);
         }
@@ -274,6 +313,7 @@ namespace Player.Movement
         {
             if (movement == null) return;
             movement.isInInteraction = isInteracting;
+            if (!isInteracting) SetFirstPersonVisibility(true);
             movement.onInteractionStateChanged?.Invoke(isInteracting);
             if (isInteracting)
                 movement.SwitchToInteractionControls();
@@ -320,6 +360,7 @@ namespace Player.Movement
             // Вмикаємо менеджер спостереження
             if (spectatorController != null)
             {
+                SetFirstPersonVisibility(false);
                 spectatorController.StartSpectating(this.transform);
             }
         }
@@ -332,6 +373,8 @@ namespace Player.Movement
         {
             if (movement == null || human == null || movement.controls == null) return;
             if (movement.isPaused || movement.isInInteraction || human.isDead.Value || human.IsEffectActive(EffectType.Freeze)) return;
+            transform.localPosition = Vector3.MoveTowards(transform.localPosition, GameplayPosition,
+                crouchCameraSpeed * Time.deltaTime);
 
             // Checks if there is a Player Body attached
             if (!playerBody)

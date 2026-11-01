@@ -40,6 +40,8 @@ namespace Player.Equipment
         [Header("Held Poses (relative to the player's grip pose)")]
         [SerializeField] private Vector3 viewPositionOffset;
         [SerializeField] private Vector3 viewRotationOffset;
+        [Tooltip("Physical mesh bounds in item-root space, excluding effect volumes. Used to keep held geometry ahead of the owner camera.")]
+        [SerializeField] private Bounds heldCameraBounds;
         [SerializeField] private Vector3 remotePositionOffset;
         [SerializeField] private Vector3 remoteRotationOffset;
         [SerializeField] private Vector3 actionViewPositionOffset = new(-0.08f, 0.10f, -0.08f);
@@ -52,6 +54,30 @@ namespace Player.Equipment
 
         public virtual bool IsHoldActionActive => false;
         public float PoseBlendDuration => poseBlendDuration;
+
+        public float GetMinimumGripCameraDepth(Quaternion gripRotation, Vector3 cameraForward, float clearance)
+        {
+            Quaternion rootRotation;
+            Vector3 rootOffset;
+            if (gripPoint != null)
+            {
+                Quaternion fromGrip = Quaternion.Inverse(gripPoint.rotation);
+                rootRotation = gripRotation * fromGrip * transform.rotation;
+                rootOffset = gripRotation * (fromGrip * (transform.position - gripPoint.position));
+            }
+            else
+            {
+                rootRotation = gripRotation * Quaternion.Euler(gripRotationOffset);
+                rootOffset = gripRotation * gripPositionOffset;
+            }
+
+            Vector3 center = rootOffset + rootRotation * Vector3.Scale(heldCameraBounds.center, transform.lossyScale);
+            Vector3 extents = Vector3.Scale(heldCameraBounds.extents, transform.lossyScale);
+            float projectedRadius = Mathf.Abs(Vector3.Dot(cameraForward, rootRotation * Vector3.right) * extents.x) +
+                Mathf.Abs(Vector3.Dot(cameraForward, rootRotation * Vector3.up) * extents.y) +
+                Mathf.Abs(Vector3.Dot(cameraForward, rootRotation * Vector3.forward) * extents.z);
+            return clearance + projectedRadius - Vector3.Dot(cameraForward, center);
+        }
         public bool IsEquipped => TryGetHolderInventory(out var inventory) && inventory.IsActiveItem(this);
 
         public Pose GetHeldPoseOffset(bool firstPerson, float actionWeight)

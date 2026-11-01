@@ -3,6 +3,12 @@ using UnityEngine;
 
 namespace FileSystem.Scripts
 {
+    public enum CrouchMode
+    {
+        Hold = 0,
+        Toggle = 1
+    }
+
     public enum VoiceMode
     {
         ButtonHold = 0,
@@ -78,5 +84,6 @@ namespace FileSystem.Scripts
         public int frameRate = 144;
         public int shadowQuality = (int)ShadowQuality.All;
         public VoiceMode voiceMode = VoiceMode.ButtonHold;
+        public CrouchMode crouchMode = CrouchMode.Hold;
     }
 }

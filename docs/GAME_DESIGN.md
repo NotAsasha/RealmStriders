@@ -120,6 +120,15 @@ implemented today and may still need work.
   guaranteed to be safe, and players may intentionally lure enemies there.
 - The game supports networked play through Netcode for GameObjects and a
   Facepunch Steam transport.
+- In the Casino scene, interacting with the pedestal while holding CasinoCage
+  installs it permanently and opens the gate. The cage leaves the inventory
+  and cannot be retrieved or sold. Other items do not activate the pedestal.
+  The gate stays open for that mission scene's lifetime.
+- Players can crouch using a rebindable key (Left Ctrl by default). Controls
+  settings select Hold or Toggle; Hold is the default. Crouch walking is slower
+  and quieter than standing walking. Holding Run while crouched moves slightly
+  faster and emits the same noise radius as standing walking. Crouched players
+  cannot jump or stand up beneath an obstruction.
 
 ## Design decision rule
 
