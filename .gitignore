@@ -9,6 +9,8 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
+/[Pp]rofilerCaptures/
+/tools/
 # Textures asset
 /[Ww]orld[Mm]aterialsFree/
 /[Aa]ssets/[Ww]orld[Mm]aterialsFree/
@@ -18,11 +20,29 @@
 /[Aa]ssets/**/*.CellData.bytes
 /[Aa]ssets/**/*.CellOptionalData.bytes
 /[Aa]ssets/**/*.CellSupportData.bytes
+/[Aa]ssets/**/*.CellBricksData.bytes
+/[Aa]ssets/**/*.CellSharedData.bytes
+/[Aa]ssets/**/*.CellProbeOcclusionData.bytes
 /[Aa]ssets/**/*[Ll]ighting[Dd]ata.asset.meta
 /[Aa]ssets/**/*.CellData.bytes.meta
 /[Aa]ssets/**/*.CellOptionalData.bytes.meta
 /[Aa]ssets/**/*.CellSupportData.bytes.meta
+/[Aa]ssets/**/*.CellBricksData.bytes.meta
+/[Aa]ssets/**/*.CellSharedData.bytes.meta
+/[Aa]ssets/**/*.CellProbeOcclusionData.bytes.meta
 /[Aa]ssets/**/ProbeVolume*
+
+# Generated Casino art reviews and bake reports
+/tools/casino-art/**/*.png
+/tools/casino-art/**/asset-report.json
+/tools/casino-art/**/export-report.json
+/tools/casino-art/**/validation-report.json
+/tools/casino-art/**/preservation-audit.json
+/tools/casino-art/**/structural-review.json
+/tools/casino-art/**/summary.json
+/tools/casino-art/**/unity-lighting-report.json
+/tools/casino-art/**/lamp-*-report.json
+/tools/casino-art/**/source-state.json
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
