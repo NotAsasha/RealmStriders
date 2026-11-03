@@ -313,3 +313,29 @@ Checks through Unity MCP `run_script`:
 - `tools/CrouchPoseChecks.cs`: Run in Edit Mode checks the actual character's
   Animator transitions, the settings callback and binding serialization. It
   writes pose previews. CrouchChecks.Preview renders the Controls page.
+
+## Crafter
+
+`Assets/Base/Crafter/Crafter.cs` is a server-authoritative two-input crafting
+station. Add recipes to the `Recipes` array in the Crafter Inspector; each
+recipe references two input `Item` prefabs and one output `Item` prefab. Input
+order is not significant, so separate prefabs can represent upgraded versions
+of an existing item without adding special-case stat logic.
+
+`LeftBox` and `RightBox` use `CrafterInputSocket` trigger colliders. The
+Crafter validates both dropped network items on the server, despawns the inputs,
+waits for `Craft Duration`, and spawns the output at `Output Spawn Point`.
+While a slot is occupied, the server periodically validates the cached socket
+references, clearing a slot when its item is picked up, parented to an
+inventory, or despawned. The validation stops when both slots are empty, so it
+does not add per-frame work while the Crafter is idle.
+Indicator renderers are red when their socket is empty or not used by any
+recipe, and green for a valid ingredient. Door transforms, the shared `Server`
+noise AudioSource, and the Tube output point are serialized references on the
+Crafter instance.
+The Crafter's world-space Canvas displays the server-selected recipe preview.
+Each recipe has an Inspector-configured `Craft Text` field that is displayed
+on the Canvas, allowing a custom description instead of the prefab names.
+Empty slots show `INSERT TWO ITEMS`, while two occupied slots without a
+matching recipe show `NO RECIPE` and `ERROR`. If `Craft Text` is empty, the
+legacy `Input + Input = Output` preview is used.

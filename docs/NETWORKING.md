@@ -89,6 +89,16 @@ success rating increase.
 - Directional equipment keeps its existing aiming contract. Drop requests include
   the owner's origin and forward vector; the server checks finite values and
   bounds the origin. Cosmetic pose changes do not introduce new aiming RPCs.
+- `Teleporter` validates the active holder on the server, selects a safe
+  destination through the same `EnemySpawner.RandomMapPoint` NavMesh sampling
+  used for mission enemies, outside the base exclusion radius,
+  and only works while `GameManager.hasStartedMission` is true. It teleports
+  the owning `Human` and consumes the item only after a valid
+  destination is found. Teleport audio/VFX and the button animation are
+  transient client presentation.
+- `ReturnTeleporter` validates the active holder on the server, teleports the
+  owning `Human` to `GameManager.spawnPoint` from any loaded location, and
+  consumes the item after the server applies the teleport.
 
 The repeatable loopback checks are documented in `docs/HELD_ITEMS.md`.
 
@@ -115,6 +125,25 @@ only for the loaded mission scene.
    object.
 5. Use an RPC only for a transient notification or presentation event.
 6. Handle despawn, scene changes, and late joining.
+
+The Crafter's `TryStartCraft` is the public callback for the physical Button's
+UnityEvent. On the server it validates and starts the craft directly; on a
+client it sends `TryStartCraftServerRpc`. The server remains the only peer that
+can consume input items, start the craft timer, or spawn the output.
+Valid ingredients entering a socket trigger the server-owned
+`PlayItemDetectedSoundRpc`, so the detection signal is synchronized for all
+clients.
+After the output is spawned, the server broadcasts
+`PlayTubeSpawnPresentationRpc`, which plays the Crafter Tube's AudioSource and
+ParticleSystem using the same presentation pattern as Shop.
+The server also replicates occupied-slot state and the matching recipe index.
+The Crafter UI therefore shows the same recipe or `NO RECIPE` error on every
+client without allowing clients to select or validate recipes locally.
+The replicated recipe index selects the same Inspector-configured `Craft Text`
+on every peer; the text is presentation data and does not affect validation.
+While a socket is occupied, the server periodically clears its cached item
+when the network object is despawned or parented to an inventory. The check is
+disabled when both sockets are empty, avoiding per-frame stale-state polling.
 
 Mission scene objects brought into the base must be promoted to runtime network
 objects before the mission scene is unloaded. Otherwise NGO removes them with

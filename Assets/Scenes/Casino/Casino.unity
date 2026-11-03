@@ -10677,7 +10677,7 @@ MonoBehaviour:
   version: 2
   globalVolume: 0
   mode: 1
-  size: {x: 119.91617, y: 30.379667, z: 167.7509}
+  size: {x: 119.91616, y: 30.379667, z: 167.7509}
   overrideRendererFilters: 0
   minRendererVolumeSize: 0.1
   objectLayerMask:
@@ -10715,7 +10715,7 @@ Transform:
   m_GameObject: {fileID: 1100339019}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.358086, y: 13.660169, z: 50.37545}
+  m_LocalPosition: {x: 12.358082, y: 13.660169, z: 50.37545}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -22084,6 +22084,16 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[3]'
       value: 
       objectReference: {fileID: 2100000, guid: 5f86483cae840354cb0af05b7d9781cd, type: 2}
+    - target: {fileID: 2322601780955072157, guid: 3797f26290c34e843ad04dda295f9d47,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.0000005
+      objectReference: {fileID: 0}
+    - target: {fileID: 2322601780955072157, guid: 3797f26290c34e843ad04dda295f9d47,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.00000047683716
+      objectReference: {fileID: 0}
     - target: {fileID: 6140852319405148187, guid: 3797f26290c34e843ad04dda295f9d47,
         type: 3}
       propertyPath: m_Color.b
@@ -22160,7 +22170,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1961126827386736409, guid: 3797f26290c34e843ad04dda295f9d47, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3797f26290c34e843ad04dda295f9d47, type: 3}

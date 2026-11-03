@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace Base.SellPoint
@@ -13,6 +14,7 @@ namespace Base.SellPoint
     {
         [Header("Visual Components")]
         [SerializeField] private MeshRenderer screenRenderer;
+        [SerializeField] private TMP_Text saleTotalText;
 
         [Header("Audio")]
         [SerializeField] private AudioSource audioSource;
@@ -21,10 +23,12 @@ namespace Base.SellPoint
         [Header("Animation Settings")]
         [SerializeField, Range(0.2f, 1.0f)] private float sequenceDuration = 0.4f;
         [SerializeField, Range(0.1f, 0.9f)] private float collapseProgressThreshold = 0.6f;
+        [SerializeField, Min(0.1f)] private float saleTextFadeDuration = 3f;
 
         private MaterialPropertyBlock propertyBlock;
         private static readonly int ProgressPropertyId = Shader.PropertyToID("_Progress");
         private Coroutine currentSequence;
+        private Coroutine saleTextFade;
         private bool isPlayingSequence;
 
         public bool IsPlayingSequence => isPlayingSequence;
@@ -44,6 +48,7 @@ namespace Base.SellPoint
 
             propertyBlock = new MaterialPropertyBlock();
             SetProgress(0f);
+            ClearSaleTotalText();
         }
 
         private void OnDisable()
@@ -54,24 +59,37 @@ namespace Base.SellPoint
                 currentSequence = null;
             }
 
+            if (saleTextFade != null)
+            {
+                StopCoroutine(saleTextFade);
+                saleTextFade = null;
+            }
+
             isPlayingSequence = false;
             SetProgress(0f);
+            ClearSaleTotalText();
         }
 
         /// <summary>
-        /// Plays the CRT TV shutdown sequence.
-        /// Visually hides the sold items at the moment of line collapse (~0.6 progress).
+        /// Plays the CRT TV shutdown sequence and shows the total value of the sold items.
         /// </summary>
         /// <param name="soldItems">List of GameObjects being sold to visually hide during collapse.</param>
+        /// <param name="totalValue">Total team money gained from the sale.</param>
         /// <param name="onComplete">Optional callback invoked after the CRT screen returns to transparency.</param>
-        public void PlaySellSequence(List<GameObject> soldItems, Action onComplete = null)
+        public void PlaySellSequence(List<GameObject> soldItems, int totalValue, Action onComplete = null)
         {
             if (currentSequence != null)
             {
                 StopCoroutine(currentSequence);
             }
 
+            ShowSaleTotal(totalValue);
             currentSequence = StartCoroutine(SellSequenceRoutine(soldItems, onComplete));
+        }
+
+        public void PlaySellSequence(List<GameObject> soldItems, Action onComplete = null)
+        {
+            PlaySellSequence(soldItems, 0, onComplete);
         }
 
         private IEnumerator SellSequenceRoutine(List<GameObject> soldItems, Action onComplete)
@@ -145,6 +163,47 @@ namespace Base.SellPoint
             propertyBlock.SetFloat(ProgressPropertyId, value);
             screenRenderer.SetPropertyBlock(propertyBlock);
         }
+
+        private void ShowSaleTotal(int totalValue)
+        {
+            if (saleTextFade != null)
+            {
+                StopCoroutine(saleTextFade);
+            }
+
+            if (saleTotalText == null || totalValue <= 0)
+            {
+                ClearSaleTotalText();
+                return;
+            }
+
+            saleTotalText.text = totalValue.ToString();
+            saleTotalText.alpha = 1f;
+            saleTextFade = StartCoroutine(FadeSaleTotalText());
+        }
+
+        private IEnumerator FadeSaleTotalText()
+        {
+            yield return new WaitForSeconds(sequenceDuration);
+
+            float elapsed = 0f;
+            while (elapsed < saleTextFadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                saleTotalText.alpha = Mathf.Lerp(1f, 0f, elapsed / saleTextFadeDuration);
+                yield return null;
+            }
+
+            ClearSaleTotalText();
+            saleTextFade = null;
+        }
+
+        private void ClearSaleTotalText()
+        {
+            if (saleTotalText == null) return;
+
+            saleTotalText.text = string.Empty;
+            saleTotalText.alpha = 0f;
+        }
     }
 }
-

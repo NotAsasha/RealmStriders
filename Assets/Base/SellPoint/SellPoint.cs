@@ -111,7 +111,7 @@ namespace Base.SellPoint
             isSelling = true;
 
             // Broadcast CRT shutdown effect to all clients
-            PlaySellSequenceClientRpc(itemNetworkIds.ToArray());
+            PlaySellSequenceClientRpc(itemNetworkIds.ToArray(), sum);
 
             // Server-side timing: collapse happens at 0.6 of sequence duration
             float duration = sellScreen != null ? sellScreen.SequenceDuration : 0.4f;
@@ -120,7 +120,7 @@ namespace Base.SellPoint
         }
 
         [Rpc(SendTo.Everyone)]
-        private void PlaySellSequenceClientRpc(ulong[] itemNetIds)
+        private void PlaySellSequenceClientRpc(ulong[] itemNetIds, int totalValue)
         {
             List<GameObject> soldItemObjects = new List<GameObject>();
 
@@ -140,7 +140,7 @@ namespace Base.SellPoint
 
             if (sellScreen != null)
             {
-                sellScreen.PlaySellSequence(soldItemObjects);
+                sellScreen.PlaySellSequence(soldItemObjects, totalValue);
             }
         }
 
