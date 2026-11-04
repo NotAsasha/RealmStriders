@@ -21,7 +21,7 @@ public class GameSavedText : MonoBehaviour
 
     private void GameSavedAnimation(bool isSaved)
     {
-        text.text = isSaved ? "saved" : "Saving is unavailable.";
+        text.text = isSaved ? "saved" : "Cannot save, mission in progress.";
         animator.SetTrigger("SaveTriggered");
     }
 }

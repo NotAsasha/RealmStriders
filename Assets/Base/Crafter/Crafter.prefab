@@ -32,10 +32,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 5450285693721813649}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.08, y: 0.38}
-  m_AnchorMax: {x: 0.92, y: 0.72}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 124}
+  m_SizeDelta: {x: 1000, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &562047586642600253
 CanvasRenderer:
@@ -93,12 +93,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 98.1
+  m_fontSize: 92.3
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 167.93
+  m_fontSizeMax: 92.3
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -110,7 +110,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -713,13 +713,39 @@ MonoBehaviour:
   recipes:
   - firstInput: {fileID: 464452778466763374, guid: 252081321d2dabb448471f25b38bbe31,
       type: 3}
-    secondInput: {fileID: 564215051070423846, guid: 23fed63beb2a54e47aecd03aa2e99fa4,
+    secondInput: {fileID: 6772741228636626627, guid: 04d3474b6aa52b8438e6881ed13300c5,
+      type: 3}
+    output: {fileID: 7732846486691657571, guid: 2e751e4a819c7574c91d11e00b074ba4,
+      type: 3}
+    craftText: Increases capture range by 50%
+  - firstInput: {fileID: 464452778466763374, guid: 252081321d2dabb448471f25b38bbe31,
+      type: 3}
+    secondInput: {fileID: 5512341275959933783, guid: fc52f54fcc9527943b93bb0c425bda33,
+      type: 3}
+    output: {fileID: 7732846486691657571, guid: c46bb939e0f42a14e84b7d93dcff1659,
+      type: 3}
+    craftText: Increases battery capacity to 200%
+  - firstInput: {fileID: 6980002636788170861, guid: a428306e6cdaaf34ea56e45268656a69,
+      type: 3}
+    secondInput: {fileID: 6772741228636626627, guid: 04d3474b6aa52b8438e6881ed13300c5,
+      type: 3}
+    output: {fileID: 2340895189754874915, guid: e9a66bd6bdc771c4da84ed52d735bd86,
+      type: 3}
+    craftText: Increases shock range by 50%
+  - firstInput: {fileID: 6980002636788170861, guid: a428306e6cdaaf34ea56e45268656a69,
+      type: 3}
+    secondInput: {fileID: 5512341275959933783, guid: fc52f54fcc9527943b93bb0c425bda33,
+      type: 3}
+    output: {fileID: 2340895189754874915, guid: a88e660da2fa4624ebe30d3363c617f0,
+      type: 3}
+    craftText: Increases battery capacity to 200%
+  - firstInput: {fileID: 3324009340866459180, guid: 85ac4c5912f230644bab32477aaf37bb,
+      type: 3}
+    secondInput: {fileID: 6772741228636626627, guid: b3ba6cd654906ab4fb5868d0ab25fada,
       type: 3}
     output: {fileID: 9192015305699896306, guid: 3c83141112ed7334994c7c56d1eb8deb,
       type: 3}
-    craftText: 'Test Craft
-
-      Do smth'
+    craftText: Calibrates teleporter to the base location
   craftDuration: 3
   outputSpawnPoint: {fileID: 2409705442975202365}
   leftIndicator: {fileID: 2633866658836807957}
@@ -1833,7 +1859,7 @@ PrefabInstance:
     - target: {fileID: 7713035077862606558, guid: 6d491b0deee3116468d4bfa2b14af8eb,
         type: 3}
       propertyPath: cooldown
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7713035077862606558, guid: 6d491b0deee3116468d4bfa2b14af8eb,
         type: 3}

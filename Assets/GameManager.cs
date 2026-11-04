@@ -153,11 +153,17 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void StopMissionServerRpc()
     {
-        if (stopMissionRoutine != null) return;
-        stopMissionRoutine = StartCoroutine(StopMissionClock());
+        BeginStopMission(false);
     }
 
-    private IEnumerator StopMissionClock()
+    private void BeginStopMission(bool timeExpired)
+    {
+        if (!IsServer) return;
+        if (stopMissionRoutine != null) return;
+        stopMissionRoutine = StartCoroutine(StopMissionClock(timeExpired));
+    }
+
+    private IEnumerator StopMissionClock(bool timeExpired)
     {
         //revive if died in lobby
         if (!hasStartedMission.Value)
@@ -177,7 +183,7 @@ public class GameManager : NetworkBehaviour
         //stop the mission (turn off the portals)
         missionName = ""; // ---- Mission stays the same, can be changed on world chooser; -- UPD: nah, changed
         hasStartedMission.Value = false;
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(4f);
 
 
         teamRating.Value = tempRating;
@@ -203,7 +209,7 @@ public class GameManager : NetworkBehaviour
         //kill players out of base
         if (alivePlayers > 0)
         {
-            KillOutOfRangePlayers();
+            KillOutOfRangePlayers(timeExpired);
         }
 
         DestroyOutOfRangeItems();
@@ -352,7 +358,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    private void KillOutOfRangePlayers()
+    private void KillOutOfRangePlayers(bool timeExpired)
     {
         foreach (var player in NetworkManager.Singleton.ConnectedClientsList)
         {
@@ -360,7 +366,7 @@ public class GameManager : NetworkBehaviour
             if (human.isDead.Value) continue;
 
             float distanceToSpawn = Vector3.Distance(human.transform.position, spawnPoint);
-            if (distanceToSpawn > baseRadius) human.isDead.Value = true;
+            if (distanceToSpawn > baseRadius) human.KillForMissionEnd(timeExpired);
         }
     }
     private void DestroyOutOfRangeItems()
@@ -478,7 +484,7 @@ public class GameManager : NetworkBehaviour
         missionDuration -= 1;
         if (missionDuration <= 0)
         {
-            StopMissionServerRpc();
+            BeginStopMission(true);
         }
     }
 

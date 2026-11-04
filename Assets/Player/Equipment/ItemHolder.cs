@@ -28,6 +28,12 @@ namespace Player.Equipment
         [SerializeField] private float minItemPitch = -45f;
         [SerializeField] private float maxItemPitch = 45f;
 
+        [Header("Equip Animation")]
+        [SerializeField, Min(0.01f)] private float equipDuration = 0.32f;
+        [Tooltip("Starting grip offset in camera space for the owner, aim space for other players.")]
+        [SerializeField] private Vector3 equipPositionOffset = new(0.03f, -0.24f, 0f);
+        [SerializeField] private Vector3 equipRotationOffset = new(25f, -10f, -12f);
+
         [Header("Sway")]
         [SerializeField] private bool enableSway = true;
         [SerializeField] private Vector2 swayMaxOffset = new(0.015f, 0.01f);
@@ -43,6 +49,7 @@ namespace Player.Equipment
         private Item currentActiveItem;
         private Vector2 currentSway;
         private float actionWeight;
+        private float equipStartedAt;
         private bool wasInteracting;
         private Pose interactionPose;
 
@@ -50,6 +57,7 @@ namespace Player.Equipment
         {
             if (currentActiveItem == item) return;
             currentActiveItem = item;
+            equipStartedAt = Time.time;
             RequiresFirstPersonReach = false;
             actionWeight = item != null && item.IsHoldActionActive ? 1f : 0f;
             currentSway = Vector2.zero;
@@ -75,6 +83,12 @@ namespace Player.Equipment
                 Time.deltaTime / currentActiveItem.PoseBlendDuration);
             float blend = Mathf.SmoothStep(0f, 1f, actionWeight);
             Pose offset = currentActiveItem.GetHeldPoseOffset(firstPerson, blend);
+            // Apply before reach/camera correction so the hand and handle stay together.
+            float equipProgress = Mathf.Clamp01((Time.time - equipStartedAt) / Mathf.Max(0.01f, equipDuration));
+            float loweredWeight = 1f - Mathf.SmoothStep(0f, 1f, equipProgress);
+            offset.position += equipPositionOffset * loweredWeight;
+            offset.rotation = Quaternion.Slerp(Quaternion.identity,
+                Quaternion.Euler(equipRotationOffset), loweredWeight) * offset.rotation;
             float clampedPitch = clampItemPitch ? Mathf.Clamp(pitch, minItemPitch, maxItemPitch) : pitch;
             Vector3 gripPosition;
             Quaternion gripRotation;

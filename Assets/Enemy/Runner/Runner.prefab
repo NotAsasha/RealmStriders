@@ -34266,7 +34266,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy.Runner.Runner
   ShowTopMostFoldoutHeaderGroup: 1
   dangerLevel: 2
-  glassCage: {fileID: 707610815179461094, guid: de46285eca51e2d4c9e0994d3b25a964,
+  glassCage: {fileID: 5905689161742161627, guid: b3ba6cd654906ab4fb5868d0ab25fada,
     type: 3}
   captureSequenceDuration: 0.85
   captureLift: 1.1
@@ -34686,6 +34686,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: -4587302668392987624, guid: 942bea86d651eb545a9e1a1752597615,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 35ee8dd17bb184a72a4eede329373443, type: 2}
     - target: {fileID: -4492567329539465040, guid: 942bea86d651eb545a9e1a1752597615,
         type: 3}
       propertyPath: m_Layer
@@ -34815,7 +34820,7 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[2]'
       value: 
-      objectReference: {fileID: 2100000, guid: dca68838f31bb43288c8d9f3293e0b91, type: 2}
+      objectReference: {fileID: 2100000, guid: adc190a0488840549968e5136db5a5cc, type: 2}
     - target: {fileID: 5085253192099150428, guid: 942bea86d651eb545a9e1a1752597615,
         type: 3}
       propertyPath: m_Layer

@@ -62,7 +62,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.2, y: 0.45, z: 0.1}
+  m_Size: {x: 0.2, y: 0.45, z: 0.16}
   m_Center: {x: 0, y: 0.125, z: 0}
 --- !u!54 &6739882099549823555
 Rigidbody:
@@ -90,7 +90,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &742197212546932466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -192,7 +192,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.Equipment.Teleporter.Teleporter
   ShowTopMostFoldoutHeaderGroup: 1
-  isConsumable: 1
+  isConsumable: 0
   sellPrice: 35
   pitchVariation: 0.08
   clickSounds:
@@ -239,6 +239,7 @@ MonoBehaviour:
   destinationVfx: {fileID: 923806195489441581}
   teleportAudio: {fileID: 6039384330410812876}
   teleportSound: {fileID: 8300000, guid: fa19536e6ab931c478429c63b64f2e06, type: 3}
+  indicator: {fileID: 2727181719101561310}
 --- !u!95 &6623511593081785428
 Animator:
   serializedVersion: 7

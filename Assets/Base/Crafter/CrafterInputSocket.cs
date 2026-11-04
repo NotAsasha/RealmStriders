@@ -17,10 +17,12 @@ namespace Base.Crafting
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!TryGetItem(other, out Item item))
-                return;
+            RegisterItem(other);
+        }
 
-            crafter?.RegisterItem(socketIndex, item);
+        private void OnTriggerStay(Collider other)
+        {
+            RegisterItem(other);
         }
 
         private void OnTriggerExit(Collider other)
@@ -29,6 +31,14 @@ namespace Base.Crafting
                 return;
 
             crafter?.UnregisterItem(socketIndex, item);
+        }
+
+        private void RegisterItem(Collider other)
+        {
+            if (!TryGetItem(other, out Item item))
+                return;
+
+            crafter?.RegisterItem(socketIndex, item);
         }
 
         private static bool TryGetItem(Collider collider, out Item item)

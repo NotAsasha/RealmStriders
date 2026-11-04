@@ -13,6 +13,27 @@ namespace Player
         public CharacterController characterController;
         public AudioSource source;
         private PlayerMovement playerMovement;
+        [SerializeField] private UI.PortalClosedNotice portalClosedNotice;
+
+        public void KillForMissionEnd(bool timeExpired)
+        {
+            if (!IsServer || !IsSpawned || isDead.Value) return;
+            isDead.Value = true;
+            if (timeExpired) ShowPortalClosedRpc();
+        }
+
+        [Rpc(SendTo.Owner, InvokePermission = RpcInvokePermission.Server)]
+        private void ShowPortalClosedRpc()
+        {
+            // Mission cleanup can revive us in the same tick; keep this transient notice readable.
+            if (IsClient && IsOwner && portalClosedNotice != null) portalClosedNotice.Show();
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (portalClosedNotice != null) portalClosedNotice.Hide();
+            base.OnNetworkDespawn();
+        }
 
         protected override void Awake()
         {

@@ -53,11 +53,26 @@ namespace Base.Crafting
         {
             prefabHash = 0;
             if (item == null || !item.TryGetComponent(out NetworkObject networkObject) ||
-                networkObject == null || networkObject.PrefabIdHash == 0)
+                networkObject == null)
                 return false;
 
+            // Scene objects have instance hashes; the save registry identifies their prefab.
+            if (networkObject.IsSceneObject == true)
+            {
+                NetworkSaveables database = NetworkItemsHandler.Instance != null
+                    ? NetworkItemsHandler.Instance.database
+                    : null;
+                if (database == null || database.prefabs == null ||
+                    item.PrefabId < 0 || item.PrefabId >= database.prefabs.Count)
+                    return false;
+
+                networkObject = database.prefabs[item.PrefabId];
+                if (networkObject == null)
+                    return false;
+            }
+
             prefabHash = networkObject.PrefabIdHash;
-            return true;
+            return prefabHash != 0;
         }
 
         private static string GetItemName(Item item)

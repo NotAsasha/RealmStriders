@@ -51,6 +51,15 @@ Use per-item pose offsets for composition rather than moving the handle.
 
 ## Inventory lifecycle
 
+Selecting a different item starts a 0.32-second procedural hand raise in
+`ItemHolder`, with a small wrist turn. `equipDuration`, `equipPositionOffset`
+and `equipRotationOffset` configure it in the Inspector. The offset blends to
+the item's normal/action pose before camera clearance and IK, for both owner
+and remote views. Rapid selection restarts the raise for the latest item;
+selecting the same item does not restart it. Empty slots clear the held item
+and use the existing arm release. The animation follows acknowledged inventory
+state and does not delay use, change authority, or send additional RPCs.
+
 - `AddItem` requests pickup; its return value means a request was submitted,
   not that the server accepted it. Presentation follows the acknowledged state.
 - Slot changes and pickup/drop requests are validated on the server. The slot

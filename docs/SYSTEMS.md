@@ -86,6 +86,17 @@ The mission can end from the base at any time, when its timer expires, or when
 all players are dead. A complete capture set is required for the rating
 increase.
 
+When the mission timer expires, the server records that cause before mission
+cleanup. Living players killed outside the base receive an owner-only
+`PORTAL CLOSED` notice explaining that mission time expired and they were left
+outside the safe zone. Manual closure and earlier deaths do not show this notice.
+`Human` sends the transient notification at the actual cleanup kill; the Player
+prefab's `PortalClosedNotice` keeps it visible across the immediate revival.
+The orange terminal panel fades using unscaled time, does not intercept input,
+and clears on despawn. Its Inspector exposes Display Seconds (6) and Fade
+Seconds (0.4). `tools/PortalClosedNoticeSetup.cs` installs the prefab UI and checks
+wiring, show/hide behavior and text fit with an isolated Editor preview.
+
 ## Dependency rules
 
 - Keep gameplay rules separate from presentation where practical.
@@ -225,6 +236,13 @@ it cannot reproduce PainterlyLit's per-object lighting/normal changes exactly.
 
 ## UI audio
 
+Casino's `Telephone` uses `Game.Casino.MissionWarningAudio` with an explicitly
+assigned AudioSource and a 30-second warning threshold. The server checks the
+remaining mission duration and replicates the warning window; clients play the
+existing clip once on entry and stop it when the mission ends. Play On Awake is
+disabled. The component uses NGO spawn/despawn callbacks for subscriptions and
+cleanup; a client spawning during the warning window also receives the warning.
+
 UI controls share local click feedback through `Game.UI.UIControlSound`.
 Button clicks use the first persistent callback so navigation cannot cut off
 the sound; non-button controls play on press/submit. Disabled controls stay
@@ -321,6 +339,14 @@ station. Add recipes to the `Recipes` array in the Crafter Inspector; each
 recipe references two input `Item` prefabs and one output `Item` prefab. Input
 order is not significant, so separate prefabs can represent upgraded versions
 of an existing item without adding special-case stat logic.
+
+Recipe matching uses NGO prefab hashes for dynamically spawned items. Spawned
+scene items have scene-instance hashes, so Crafter resolves their `Item.PrefabId`
+through `NetworkItemsHandler.database` (`NetworkSaveables`) before comparing.
+Scene ingredients must have a valid registered prefab ID; missing registry data
+rejects the ingredient. Keep upgraded variants registered with distinct IDs.
+`tools/CraftRecipeChecks.cs` checks the authored recipes in Edit Mode through
+Unity MCP `run_script`, including simulated scene identities and variant rejection.
 
 `LeftBox` and `RightBox` use `CrafterInputSocket` trigger colliders. The
 Crafter validates both dropped network items on the server, despawns the inputs,
