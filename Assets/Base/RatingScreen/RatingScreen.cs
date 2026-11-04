@@ -8,6 +8,7 @@ namespace Base.RatingScreen
     public class RatingScreen : MonoBehaviour
     {
         private const int MaxPointsPerStar = 3;
+        [SerializeField] private bool followTeamRating = true;
 
         [SerializeField] private Sprite[] starTextures; // 0 = пуста, 1 = 1/3, 2 = 2/3, 3 = повна
         [SerializeField] private Image[] stars;
@@ -25,7 +26,7 @@ namespace Base.RatingScreen
 
         private void OnEnable()
         {
-            if (GameManager.Instance == null) return;
+            if (!followTeamRating || GameManager.Instance == null) return;
 
             GameManager.Instance.teamRating.OnValueChanged += UpdateCounter;
 
@@ -41,7 +42,7 @@ namespace Base.RatingScreen
         {
             StopLoadingSound();
 
-            if (GameManager.Instance != null)
+            if (followTeamRating && GameManager.Instance != null)
             {
                 GameManager.Instance.teamRating.OnValueChanged -= UpdateCounter;
             }
@@ -49,7 +50,7 @@ namespace Base.RatingScreen
 
         private void RefreshUI()
         {
-            if (GameManager.Instance != null)
+            if (followTeamRating && GameManager.Instance != null)
             {
                 ApplyRating(GameManager.Instance.teamRating.Value);
             }
@@ -63,6 +64,12 @@ namespace Base.RatingScreen
             }
 
             ratingAnimation = StartCoroutine(AnimateRating(oldRating, rating));
+        }
+
+        public void ShowDifficulty(int starsCount)
+        {
+            if (followTeamRating) return;
+            ApplyRating(Mathf.Clamp(starsCount, 0, stars.Length) * MaxPointsPerStar);
         }
 
         private IEnumerator AnimateRating(int oldRating, int newRating)

@@ -145,6 +145,70 @@ actual Casino door animation. It does
 not load game saves. Existing `SubwooferShaderWarmup` can log an unrelated
 shader-pass exception when entering Play Mode.
 
+## Tutorial simulation
+
+`Assets/Scripts/Tutorial/` owns the isolated singleplayer training flow.
+`TutorialSession` loads services through SteamBoot when opened directly, clears
+the selected campaign save before starting the local NGO host, and sets the
+player spawn to the authored room marker. The menu callback loads Tutorial
+before starting networking. Exiting uses the existing shutdown/bootstrap path.
+
+`TutorialDirector` runs five server-owned tapes. Capture, shop purchase and sale
+completion come from instance events on Entity, Shop and SellPoint after their
+authoritative actions. Selling must consume the exact training cage; the cage
+prefab uses `Item`, not the unused `EnemyCage` subclass. The director tracks and
+despawns all spawned training items, including held items and purchases.
+Scene prop references are Inspector-assigned. Each prop's NetworkObject is
+explicitly spawned/despawned and activated/deactivated because NGO may detach
+it from a non-networked stage parent. Retry replenishes the current tape.
+
+`TutorialDummy` extends Entity without AI and uses production capture and status
+effects. The scene's physical RatingScreen above the mannequin has
+`followTeamRating` disabled and displays effective difficulty as full stars;
+ordinary RatingScreens retain their team-rating subscription. Short mesh-text
+signs show the purchase/combo tools. The hard-capture sign shows the configured
+Drop binding and refreshes on SettingsFile.OnSettingsChanged.
+`TutorialOverlay` contains only the cassette/grain transition. Its Inspector-assigned
+URP Volume blends FilmGrain with transition opacity and has zero weight during
+gameplay. The profile is `Training/TransitionGrain.asset` (Medium1, intensity 0.8);
+the former RawImage noise layer is removed. Optional cassette visuals may be absent.
+Its Inspector-assigned
+AudioSource plays once at the start of each transition, including the final return
+to Menu. Assign the clip on Cassette Transition in the Tutorial scene; an empty
+clip stays silent. The completion
+delay is 3.3 seconds. The final transition persists through SteamBoot, fades out
+over Menu and destroys itself. SteamManager queues `tutorial completed` until
+Menu loads and uses the existing host-left notification renderer for five seconds,
+timed with realtime so synchronous scene loading cannot consume its lifetime.
+The authored First mannequin and initial LeafBlower are placement references
+explicitly hidden by TutorialSession before networking starts, even when enabled
+for editing. Second remains the owner's sale booth. Training/TrainingDummy is
+registered in DefaultNetworkPrefabs. The added shop instance disables emergency
+LeafBlower spawning; ordinary shops keep it enabled.
+
+The final WaterGun + Taser tape also activates a scene Charger. Its
+`requiresBaseUpgrade` is disabled only on this training instance, allowing
+normal server-authoritative charging without campaign base upgrades. Other
+Chargers still require the purchased base upgrade. The training Charger is
+despawned and hidden outside the final tape.
+
+Training starts with 500 temporary credits and rating 4 to unlock WaterGun.
+Current LeafBlower prefab settings give 25 seconds for a three-star target and
+5 seconds while the wet + Taser weakness is active. The normal LeafBlower
+provides capture feedback; there is no extra progress or timing HUD.
+No campaign save is assigned or written.
+
+Unity MCP `run_script`, `tools/TutorialChecks.cs`: Prepare (direct Tutorial) or
+PrepareMenu, enter Play Mode, ShowGame, optionally MenuEntry, then FirstCapture,
+optionally RetrySale, SellAndBuy, CheckStageCleanup, CheckWorldPresentation,
+DifficultCapture, ComboCapture (including automatic menu return and notification).
+FinishTransition checks the final overlay's survival across bootstrap and its
+removal in Menu. Stop Play Mode and Restore to verify campaign
+save bytes and restore the prior Play Mode start scene. These checks use the
+actual player, inventory, equipment, selling and shop purchase paths.
+The pre-existing SubwooferShaderWarmup pass-type exception can appear when
+entering Play Mode independently of the tutorial.
+
 ## Adding a system
 
 Before adding a new system:

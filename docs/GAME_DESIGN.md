@@ -130,6 +130,33 @@ implemented today and may still need work.
   faster and emits the same noise radius as standing walking. Crouched players
   cannot jump or stand up beneath an obstruction.
 
+## Tutorial
+
+**Status: Confirmed design; implemented**
+
+The main menu's Tutorial button opens an isolated singleplayer simulation in
+the Tutorial scene. It uses one room whose contents change between five tapes:
+capture a one-star mannequin with LeafBlower, sell its EnemyCage, buy Taser and
+WaterGun, capture an unweakened three-star mannequin, then capture another
+three-star mannequin using WaterGun followed by Taser and LeafBlower.
+
+The difficult-target comparison teaches weakening through equipment combinations,
+not crafting or upgrading LeafBlower. A physical RatingScreen above the mannequin
+shows its effective difficulty in whole stars using the production equipment rules.
+Taser on a wet target removes one effective star temporarily; the base danger
+rating does not change. The final tape requires both the combo and a capture.
+
+There is no additional tutorial HUD except the cassette-change transition.
+Short physical signs identify the tools to buy/combine; the difficult capture
+tape has a sign reading `Drop Item: <configured key>`, refreshed after rebinding.
+Each tape waits 3.3 seconds after completion, then removes previous equipment
+and props beneath the cassette/grain overlay. The first captured cage is retained
+for the selling tape. F5 repeats the current tape with fresh equipment.
+The last tape returns automatically to Menu with `tutorial completed`, using the
+same notification presentation as `host left the game`. Training credits,
+rating and items never enter campaign saves.
+Mannequins do not attack, and the training selling booth's kill zone is disabled.
+
 ## Design decision rule
 
 When gameplay intent is unclear, preserve existing behaviour and record the

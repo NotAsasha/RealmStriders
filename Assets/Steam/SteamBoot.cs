@@ -26,7 +26,8 @@ namespace Steam
         {
             yield return new WaitForSeconds(1f);
 
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneToLoad);  
+            string destination = Game.Tutorial.TutorialSession.Requested ? "Tutorial" : sceneToLoad;
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(destination);
 
             while (!asyncLoad.isDone)
             { 

@@ -31,6 +31,8 @@ namespace Steam
         private UnityTransport cachedUnityTransport;
         private bool clientConnectedToHost;
         private string notificationMessage;
+        private string pendingMenuNotification;
+        private bool notificationMenuOnly;
         private float notificationExpiresAt;
 
         private FacepunchTransport Transport
@@ -131,6 +133,12 @@ namespace Steam
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            if (notificationMenuOnly && scene.name != "Menu") notificationMessage = null;
+            if (scene.name == "Menu" && !string.IsNullOrEmpty(pendingMenuNotification))
+            {
+                ShowNotification(pendingMenuNotification, menuOnly: true);
+                pendingMenuNotification = null;
+            }
             if (scene.name == "Menu" || scene.name == "SteamBoot")
             {
                 Cursor.lockState = CursorLockMode.None;
@@ -503,18 +511,22 @@ namespace Steam
             SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);
         }
 
-        private void ShowNotification(string message)
+        public void NotifyOnMenu(string message) => pendingMenuNotification = message;
+
+        private void ShowNotification(string message, bool menuOnly = false)
         {
             notificationMessage = message;
-            notificationExpiresAt = Time.unscaledTime + 5f;
+            notificationMenuOnly = menuOnly;
+            notificationExpiresAt = Time.realtimeSinceStartup + 10f;
         }
 
         private void OnGUI()
         {
-            if (string.IsNullOrEmpty(notificationMessage) || Time.unscaledTime > notificationExpiresAt)
+            if (string.IsNullOrEmpty(notificationMessage) || Time.realtimeSinceStartup > notificationExpiresAt)
             {
                 return;
             }
+            if (notificationMenuOnly && SceneManager.GetActiveScene().name != "Menu") return;
 
             const float width = 420f;
             const float height = 60f;

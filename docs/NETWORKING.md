@@ -75,6 +75,10 @@ success rating increase.
   renderers, lights, canvases and audio; held colliders and physics are disabled.
   Hidden items follow the holder so mission-boundary cleanup still uses their
   current location. Despawn removes the server's slot entry.
+- Charger selects targets on the server. Dropped items are detected through
+  physics; equipped items are read from inventories registered for their network
+  lifetime because held colliders are disabled. Only the active slot is eligible,
+  with the same item layer, range, wall occlusion and nearest-target checks.
 - Held poses use the existing full-body skeleton. The owner chooses a camera-space
   grip pose; other peers use a shoulder-relative pose. Both compute a wrist target
   from the same palm calibration, solve IK, then align the item to the actual palm.
@@ -148,6 +152,15 @@ disabled when both sockets are empty, avoiding per-frame stale-state polling.
 Mission scene objects brought into the base must be promoted to runtime network
 objects before the mission scene is unloaded. Otherwise NGO removes them with
 the scene even though they are inside the base.
+
+## Tutorial
+
+Tutorial starts an isolated local host through SteamManager's singleplayer
+transport path after loading its scene. It does not create a Steam lobby or
+load a campaign save. TutorialDirector is a NetworkBehaviour; only the server
+spawns training content, accepts successful capture/sale/purchase events and
+advances its Stage NetworkVariable. Its UI is local to this singleplayer mode.
+Equipment and transactions use their normal production server paths.
 
 ## Known areas to verify
 

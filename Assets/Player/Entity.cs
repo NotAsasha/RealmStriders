@@ -61,6 +61,7 @@ namespace Player
         private Dictionary<EffectType, Coroutine> activeCoroutines = new();
 
         public bool IsBeingCaptured => isCapturingNet.Value;
+        public event System.Action<Entity, NetworkObject> CapturedServer;
 
         #region Initialization
 
@@ -188,6 +189,7 @@ namespace Player
 
             var glass = Instantiate(glassCage, collapsePoint, Quaternion.identity);
             glass.Spawn();
+            CapturedServer?.Invoke(this, glass);
 
             // Keep existing death-dependent systems consistent until this entity is removed.
             isDead.Value = true;

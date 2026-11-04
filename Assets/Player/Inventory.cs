@@ -2,6 +2,7 @@ using Player.Equipment;
 using Player.Movement;
 using Player.UI;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -11,6 +12,9 @@ namespace Player
 {
     public class Inventory : NetworkBehaviour
     {
+        private static readonly List<Inventory> spawnedInventories = new();
+        public static IReadOnlyList<Inventory> SpawnedInventories => spawnedInventories;
+
         [Header("References")]
         [Tooltip("Link to inventory ui")]
         [SerializeField] public Transform userInterface;
@@ -111,6 +115,7 @@ namespace Player
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            spawnedInventories.Add(this);
             slotIds.OnListChanged += OnSlotsChanged;
             selectedSlot.OnValueChanged += OnSelectedSlotChanged;
             if (IsServer && slotIds.Count == 0)
@@ -144,6 +149,7 @@ namespace Player
 
         public override void OnNetworkDespawn()
         {
+            spawnedInventories.Remove(this);
             if (human != null)
             {
                 human.isDead.OnValueChanged -= OnDeathStateChange;

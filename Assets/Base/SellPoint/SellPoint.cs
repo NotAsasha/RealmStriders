@@ -31,6 +31,7 @@ namespace Base.SellPoint
         [SerializeField] private CRTSellScreen sellScreen;
 
         private bool isSelling;
+        public event System.Action<Item> SoldServer;
 
         public override void OnNetworkSpawn()
         {
@@ -169,6 +170,7 @@ namespace Base.SellPoint
                 if (item != null && item.NetworkObject != null && item.NetworkObject.IsSpawned)
                 {
                     Debug.Log($"---SellPoint: Sold {item.name} for {item.sellPrice}");
+                    SoldServer?.Invoke(item);
                     item.DestroyItemServerRpc();
                 }
             }

@@ -1,4 +1,5 @@
 using Base.BaseUpgrader;
+using Player;
 using Player.Equipment;
 using Unity.Netcode;
 using UnityEngine;
@@ -9,6 +10,7 @@ public class Charger : NetworkBehaviour, IPowerConsumer
     [SerializeField] private float chargeDistance = 5.0f;
     [SerializeField] private float chargeInterval = 0.5f;
     [SerializeField] private int chargePerTick = 10;
+    [SerializeField] private bool requiresBaseUpgrade = true;
 
     [Header("Detection & Layers")]
     [SerializeField] private Transform beamOrigin;
@@ -93,8 +95,8 @@ public class Charger : NetworkBehaviour, IPowerConsumer
         }
 
         // Do nothing until the upgrade has been purchased
-        if (BaseManager.Instance == null) return;
-        bool isChargerBought = (BaseManager.Instance.baseUpgrades.Value & (int)BaseUpgrades.IsChargerBought) != 0;
+        bool isChargerBought = !requiresBaseUpgrade || (BaseManager.Instance != null &&
+            (BaseManager.Instance.baseUpgrades.Value & (int)BaseUpgrades.IsChargerBought) != 0);
         if (!isChargerBought)
         {
             currentTargetNetRef.Value = default;
@@ -160,6 +162,29 @@ public class Charger : NetworkBehaviour, IPowerConsumer
                 bestItem = item;
                 bestNetObj = netObj;
             }
+        }
+
+        // Inventory disables held colliders, so physics queries cannot find equipped items.
+        var inventories = Inventory.SpawnedInventories;
+        for (int i = 0; i < inventories.Count; i++)
+        {
+            Inventory inventory = inventories[i];
+            if (inventory == null || !inventory.IsSpawned || !inventory.isActiveAndEnabled ||
+                inventory.NetworkManager != NetworkManager) continue;
+
+            Item heldItem = inventory.GetActiveItem();
+            if (heldItem == null || !heldItem.IsSpawned || !heldItem.isActiveAndEnabled ||
+                heldItem is not IChargeable chargeable || chargeable.IsFullyCharged) continue;
+            if ((itemLayer.value & (1 << heldItem.gameObject.layer)) == 0) continue;
+
+            Vector3 direction = heldItem.transform.position - originPos;
+            float distanceSqr = direction.sqrMagnitude;
+            if (distanceSqr > chargeDistance * chargeDistance || distanceSqr >= closestDistanceSqr) continue;
+            if (Physics.Raycast(originPos, direction.normalized, Mathf.Sqrt(distanceSqr), wallLayer)) continue;
+
+            closestDistanceSqr = distanceSqr;
+            bestItem = chargeable;
+            bestNetObj = heldItem.NetworkObject;
         }
 
         return bestItem;

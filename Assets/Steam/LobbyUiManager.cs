@@ -128,6 +128,7 @@ namespace Steam
         public void ShowHostLobby() => ShowPage(hostPage);
         public void ShowJoinLobby() => ShowPage(joinPage);
         public void ShowSettings() => ShowPage(settingsPage);
+        public void StartTutorial() => Game.Tutorial.TutorialSession.Open();
 
         private void ShowPage(GameObject page)
         {

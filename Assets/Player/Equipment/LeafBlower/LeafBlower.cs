@@ -308,7 +308,7 @@ namespace Player.Equipment.LeafBlower
             targetIsValid = true;
         }
 
-        private float CalculateRequiredHoldTime(Entity target)
+        public float CalculateRequiredHoldTime(Entity target)
         {
             int stars = Mathf.RoundToInt(target.dangerLevel);
 

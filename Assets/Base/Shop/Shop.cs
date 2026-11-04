@@ -24,8 +24,10 @@ namespace Base.Shop
         [SerializeField] private QuickBuy[] quickBuyButtons = Array.Empty<QuickBuy>();
         private GameManager gameManager;
         [SerializeField] private CategorySwitch categorySwitch;
+        [SerializeField] private bool provideEmergencyLeafBlower = true;
 
         public static Shop Instance { get; private set; }
+        public event Action<NetworkObject> PurchasedServer;
 
         private void Awake()
         {
@@ -101,7 +103,8 @@ namespace Base.Shop
 
             GameManager.Instance.teamMoney.Value -= card.Price;
             PlaySpawnSoundRpc();
-            item.InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, spawnPosition);
+            NetworkObject purchased = item.InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, spawnPosition);
+            if (purchased != null) PurchasedServer?.Invoke(purchased);
             Debug.Log($"---Shop: Item bought: {item.name}");
         }
 
@@ -118,7 +121,7 @@ namespace Base.Shop
         /// </summary>
         public void EnsureFreeLeafBlowerServer()
         {
-            if (!IsServer) return;
+            if (!IsServer || !provideEmergencyLeafBlower) return;
 
             if (HasAnyLeafBlower())
             {

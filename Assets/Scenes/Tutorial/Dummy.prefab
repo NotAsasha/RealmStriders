@@ -70,14 +70,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 0
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 2248600860
+  InScenePlacedSourceGlobalObjectIdHash: 4118005866
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
@@ -289,13 +289,13 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 3019647536304392061, guid: 4151dea3afcc94c44a26a9105b279364,
+      objectReference: {fileID: -3846018093981099296, guid: cd27c776d3161e4439f174fc2cc9ded8,
         type: 3}
     - target: {fileID: -4683669308469848369, guid: db2da4d53b90a39488902c77aded2e23,
         type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: 1110b537b479fe24e954371104a6426e, type: 2}
+      objectReference: {fileID: 2100000, guid: f3057fa1b4955fa4ebc93735fa04e2fc, type: 2}
     - target: {fileID: -1461304994638716399, guid: db2da4d53b90a39488902c77aded2e23,
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -310,7 +310,7 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 1110b537b479fe24e954371104a6426e, type: 2}
+      objectReference: {fileID: 2100000, guid: c5c180fc3e054e040bb3764474a6c741, type: 2}
     - target: {fileID: 4083501151425157549, guid: db2da4d53b90a39488902c77aded2e23,
         type: 3}
       propertyPath: m_LocalPosition.y
@@ -355,7 +355,8 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: cac04de2c190f5442bd349a89b6f5bb1, type: 2}
+      objectReference: {fileID: -876546973899608171, guid: db2da4d53b90a39488902c77aded2e23,
+        type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
