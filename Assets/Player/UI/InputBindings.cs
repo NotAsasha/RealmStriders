@@ -46,7 +46,7 @@ namespace Assets.Player.UI
             rebindingOperation?.Dispose();
         }
 
-        private void RefreshText()
+        public void RefreshText()
         {
             buttonText.text = actionToBind.action.GetBindingDisplayString(0);
         }
@@ -98,6 +98,8 @@ namespace Assets.Player.UI
         {
             rebindingOperation?.Cancel();
         }
+
+        public void CancelPendingRebind() => CancelRebind();
 
         private void CleanUpRebind()
         {

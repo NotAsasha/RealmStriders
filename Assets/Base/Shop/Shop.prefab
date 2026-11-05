@@ -11616,6 +11616,7 @@ MonoBehaviour:
   - item: {fileID: 8663576972915268671}
     button: {fileID: 4936457581700431768}
   categorySwitch: {fileID: 5294856239611771504}
+  provideEmergencyLeafBlower: 1
 --- !u!65 &8682987328136725793
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -73958,6 +73959,16 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -0.032
       objectReference: {fileID: 0}
+    - target: {fileID: 2857707763473419342, guid: db6cf33d988ac794dadcefb6361f9a51,
+        type: 3}
+      propertyPath: audioSource
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857707763473419342, guid: db6cf33d988ac794dadcefb6361f9a51,
+        type: 3}
+      propertyPath: loadingAudioSource
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3056028615603058480, guid: db6cf33d988ac794dadcefb6361f9a51,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -74092,6 +74103,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -31.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7712345678901234567, guid: db6cf33d988ac794dadcefb6361f9a51,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7712345678901234568, guid: db6cf33d988ac794dadcefb6361f9a51,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

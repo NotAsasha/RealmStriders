@@ -41,6 +41,12 @@ operations. In particular:
   Opening the menu selects Graphics, and switching tabs preserves pending values.
   Apply saves all categories; closing discards unapplied changes. Master volume
   previews immediately over the full 0–100% range.
+  Restore Defaults resets all categories and key bindings as pending edits;
+  Apply persists them and closing discards them. Graphics defaults use the
+  highest quality tier and the current display's native resolution.
+  The main menu offers a separate Delete button for each save slot, with
+  confirmation naming the slot. Deletion resets only that slot's progression
+  and preserves other slots and local settings.
 - The host owns the save file; automatic saves happen after mission
   completion, while manual saves are allowed only outside active missions.
 - Mission-zone objects are transient; objects left outside the base are

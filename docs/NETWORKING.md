@@ -122,6 +122,17 @@ only for the loaded mission scene.
 
 ## Adding a networked interaction
 
+`NetworkRandomAudio` owns its interval timer and random clip/pitch selection on
+the server. Its ClientRpc sends a clip index, pitch, and future server timestamp;
+clients wait for that timestamp and seek forward if delivery is late. Playback
+alignment is limited by clock synchronization and frame timing. All peers must
+use the same Inspector clip list. Assign a dedicated AudioSource with Play On
+Awake disabled; volume, spatial blend and mixer routing use that source's settings.
+The first sound follows one randomized interval plus the synchronization delay.
+Intervals are clamped to at least 0.1 seconds. A new sound interrupts the previous
+sound on that source. Disable/despawn cancels pending and active audio; late
+joiners hear future events only. This component does not emit gameplay noise.
+
 1. Decide which peer owns the authoritative state.
 2. Define the client request and its server-side validation.
 3. Apply the result only on the authoritative peer.

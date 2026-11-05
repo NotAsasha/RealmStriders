@@ -14,6 +14,7 @@ namespace Assets.Player.UI
         [SerializeField] private Slider sensSlider;
         [SerializeField] private Slider masterVolumeSlider;
         [SerializeField] private InputActionAsset inputActions;
+        [SerializeField] private InputBindings[] bindingControls = Array.Empty<InputBindings>();
         [SerializeField] private TMP_Dropdown crouchModeDropdown;
 
         [Header("Graphics settings")]
@@ -305,6 +306,23 @@ namespace Assets.Player.UI
             if (!IsValidIndex(value, ShadowQualities.Length)) return;
 
             settingsFile.save.shadowQuality = (int)ShadowQualities[value];
+        }
+
+        public void RestoreDefaults()
+        {
+            Initialize();
+            if (!isInitialized) return;
+            foreach (InputBindings binding in bindingControls) binding.CancelPendingRebind();
+            settingsFile.save = new SettingsSave
+            {
+                qualityLevel = Mathf.Max(0, QualitySettings.names.Length - 1),
+                resolutionWidth = Screen.currentResolution.width,
+                resolutionHeight = Screen.currentResolution.height,
+                refreshRate = Mathf.RoundToInt((float)Screen.currentResolution.refreshRateRatio.value)
+            };
+            inputActions?.RemoveAllBindingOverrides();
+            foreach (InputBindings binding in bindingControls) binding.RefreshText();
+            Refresh();
         }
 
         public void ApplySettings()

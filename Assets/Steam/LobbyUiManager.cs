@@ -35,6 +35,8 @@ namespace Steam
         [SerializeField] private Selectable managementCancel;
         [SerializeField] private Selectable confirmationCancel;
         private int selectedSave = -1;
+        private int pendingDelete = -1;
+        [SerializeField] private TMP_Text deleteConfirmationTitle;
 
         [Serializable]
         private sealed class SaveSlot
@@ -77,14 +79,25 @@ namespace Steam
 
         public void RequestDeleteFiles()
         {
-            if (!fileManagementDialog.activeInHierarchy) return;
+            RequestDeleteSave(selectedSave);
+        }
+
+        public void RequestDeleteSave(int index)
+        {
+            if (transition != null || !hostPage.activeInHierarchy ||
+                deleteConfirmationDialog.activeSelf || index < 0 || index >= saveSlots.Length ||
+                saveSlots[index].source.gameSave == null) return;
+            pendingDelete = index;
+            SetHostInteraction(false);
             fileManagementDialog.SetActive(false);
+            deleteConfirmationTitle.text = "DELETE SAVE " + (index + 1).ToString("00") + "?";
             deleteConfirmationDialog.SetActive(true);
             confirmationCancel.Select();
         }
 
         public void CloseFileManagement()
         {
+            pendingDelete = -1;
             if (fileManagementDialog != null) fileManagementDialog.SetActive(false);
             if (deleteConfirmationDialog != null) deleteConfirmationDialog.SetActive(false);
             SetHostInteraction(true);
@@ -291,11 +304,24 @@ namespace Steam
         public void DeleteFiles()
         {
             if (deleteConfirmationDialog == null || !deleteConfirmationDialog.activeInHierarchy) return;
-            if (GameFileHandler.Instance == null) return;
-            GameFileHandler.Instance.DeleteAvaible();
-            selectedSave = -1;
-            if (GameManager.Instance != null) GameManager.Instance.currentSave = null;
-            foreach (SaveSlot slot in saveSlots) slot.source.RefreshText();
+            if (pendingDelete < 0 || pendingDelete >= saveSlots.Length) return;
+            SaveFile save = saveSlots[pendingDelete].source.gameSave;
+            if (save == null) return;
+            try
+            {
+                save.Delete();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Could not delete save {pendingDelete + 1}: {ex}");
+                CloseFileManagement();
+                if (hostStatus != null) hostStatus.text = "Could not delete the save. Please try again.";
+                return;
+            }
+            if (selectedSave == pendingDelete) selectedSave = -1;
+            if (GameManager.Instance != null && GameManager.Instance.currentSave == save)
+                GameManager.Instance.currentSave = null;
+            saveSlots[pendingDelete].source.RefreshText();
             RefreshSaveSelection();
             CloseFileManagement();
         }

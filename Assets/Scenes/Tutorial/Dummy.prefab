@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7669639236593360212}
   - component: {fileID: 678356413102549028}
   - component: {fileID: 2327757574922601294}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Dummy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -70,7 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2248600860
+  GlobalObjectIdHash: 4118005866
   InScenePlacedSourceGlobalObjectIdHash: 4118005866
   DeferredDespawnTick: 0
   Ownership: 1
@@ -146,10 +146,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: ParticteAttractor
       objectReference: {fileID: 0}
+    - target: {fileID: 3385984690830650853, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4212175677951149353, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_Parameters.m_Shape
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4212175677951149353, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_Parameters.m_Length
+      value: 3.67
+      objectReference: {fileID: 0}
     - target: {fileID: 4212175677951149353, guid: bdc319b310a3c5544a53d9d7355939c4,
         type: 3}
       propertyPath: m_Parameters.m_EndRange
-      value: 1.5
+      value: 0.87
+      objectReference: {fileID: 0}
+    - target: {fileID: 4212175677951149353, guid: bdc319b310a3c5544a53d9d7355939c4,
+        type: 3}
+      propertyPath: m_Parameters.m_StartRange
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5550582152637944281, guid: bdc319b310a3c5544a53d9d7355939c4,
         type: 3}
@@ -285,6 +305,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: db2da4d53b90a39488902c77aded2e23,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -5568371526223589888, guid: db2da4d53b90a39488902c77aded2e23,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: -4683669308469848369, guid: db2da4d53b90a39488902c77aded2e23,
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -301,10 +331,20 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 2f0d1b6dc2062b24ea5f4b36033284c0, type: 2}
+    - target: {fileID: -516098083770646512, guid: db2da4d53b90a39488902c77aded2e23,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: db2da4d53b90a39488902c77aded2e23,
         type: 3}
       propertyPath: m_Name
       value: dummy
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: db2da4d53b90a39488902c77aded2e23,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3616844112969948802, guid: db2da4d53b90a39488902c77aded2e23,
         type: 3}
@@ -357,6 +397,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -876546973899608171, guid: db2da4d53b90a39488902c77aded2e23,
         type: 3}
+    - target: {fileID: 7715626668051313982, guid: db2da4d53b90a39488902c77aded2e23,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
