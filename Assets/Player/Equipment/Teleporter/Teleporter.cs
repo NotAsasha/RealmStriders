@@ -134,7 +134,7 @@ namespace Player.Equipment.Teleporter
 
             if (teleportSound != null)
             {
-                AudioSource.PlayClipAtPoint(teleportSound, origin);
+                Game.Audio.ItemAcoustics.PlayAt(teleportSound, origin, teleportAudio);
             }
             else if (teleportAudio != null)
             {

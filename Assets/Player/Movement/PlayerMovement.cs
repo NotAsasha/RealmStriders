@@ -3,7 +3,6 @@ using System.Collections;
 using FileSystem.Scripts;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
@@ -42,8 +41,7 @@ namespace Player.Movement
         public LayerMask whatIsGround;
 
         [Header("Sounds")]
-        public AudioSource audioSource;
-        public AudioClip[] stepSounds;
+        [SerializeField] private PlayerAudio playerAudio;
 
         public Camera playerCamera;
 
@@ -376,7 +374,7 @@ namespace Player.Movement
 
             if (player.isGrounded && horizontalVelocity.magnitude > 0.3f)
             {
-                PlayStepsSound(IsCrouching ? (isRunning ? 0.5f : 0.7f) : (isRunning ? 0.3f : 0.5f));
+                playerAudio.PlayFootstep(IsCrouching ? (isRunning ? 0.5f : 0.7f) : (isRunning ? 0.3f : 0.5f));
                 targetNoise = IsCrouching ? (isRunning ? walkNoiseRadius : walkNoiseRadius * crouchNoiseMultiplier) :
                     (isRunning ? runNoiseRadius : walkNoiseRadius);
             }
@@ -430,22 +428,6 @@ namespace Player.Movement
                     velocity.y += gravity * dt; // Летимо вгору зі звичайною швидкістю
                 }
             }
-        }
-
-        private float nextStepTime = 0;
-
-        private void PlayStepsSound(float cooldown)
-        {
-            if (Time.time < nextStepTime) return;
-            if (stepSounds.Length <= 0)
-            {
-                Debug.LogWarning($"---Player: {name} has no movement sounds.");
-                return;
-            }
-
-            audioSource.pitch = 1 + UnityEngine.Random.Range(-0.2f, 0.2f);
-            audioSource.PlayOneShot(stepSounds[UnityEngine.Random.Range(0, stepSounds.Length)]);
-            nextStepTime = Time.time + cooldown;
         }
 
         private void ApplyFallDamage(float speedAtImpact)

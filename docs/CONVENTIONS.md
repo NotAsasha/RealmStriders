@@ -43,3 +43,13 @@ Update the relevant document when a change affects:
 - how to add a monster, item, or other content.
 
 Use `TODO` for an unresolved design decision rather than guessing.
+
+Keep each rule or workflow in one owning document and link to it from others.
+Game Design owns confirmed intent; Systems records implementation gaps without
+turning them into new rules. Update the README index when adding/removing docs.
+
+Do not retain completed task diaries, obsolete alternatives, fixed scene counts
+or benchmark snapshots as current guidance. Document repeatable validation and
+its limits. Local helpers/reports under the ignored `tools/` directory are not
+prerequisites for a fresh checkout; durable authoring commands belong in the
+versioned project.

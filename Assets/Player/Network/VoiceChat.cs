@@ -30,6 +30,7 @@ namespace Player.Network
 
         private int sampleRate;
         private VoiceAudioBuffer proximityBuffer;
+        private AudioClip proximityClip;
         private SettingsFile settingsFile;
         private Inventory inventory;
         private VoiceMode voiceMode = VoiceMode.ButtonHold;
@@ -39,6 +40,7 @@ namespace Player.Network
 
         public override void OnNetworkSpawn()
         {
+            if (!IsClient) return;
             inventory = GetComponentInParent<Inventory>();
             SetVoiceIndicatorVisible(false);
 
@@ -101,12 +103,8 @@ namespace Player.Network
         {
             if (proximityAudioSource != null)
             {
-                proximityAudioSource.clip = AudioClip.Create("Voice_Proximity", sampleRate, 1, sampleRate, true, OnAudioRead);
-                proximityAudioSource.loop = true;
-                proximityAudioSource.spatialBlend = 1.0f;
-                proximityAudioSource.rolloffMode = AudioRolloffMode.Linear;
-                proximityAudioSource.minDistance = 2f;
-                proximityAudioSource.maxDistance = 18f;
+                proximityClip = AudioClip.Create("Voice_Proximity", sampleRate, 1, sampleRate, true, OnAudioRead);
+                proximityAudioSource.clip = proximityClip;
                 proximityAudioSource.Play();
             }
         }
@@ -381,6 +379,20 @@ namespace Player.Network
             if (IsOwner) SetRecording(false);
             isVoiceButtonHeld = false;
             SetVoiceIndicatorVisible(false);
+            if (proximityAudioSource != null)
+            {
+                proximityAudioSource.Stop();
+                proximityAudioSource.clip = null;
+            }
+            if (proximityClip != null) Destroy(proximityClip);
+            proximityClip = null;
+            proximityBuffer = null;
+            voiceInputStream?.Dispose();
+            voiceOutputStream?.Dispose();
+            voiceAnalysisStream?.Dispose();
+            voiceInputStream = null;
+            voiceOutputStream = null;
+            voiceAnalysisStream = null;
             base.OnNetworkDespawn();
         }
 
@@ -389,6 +401,7 @@ namespace Player.Network
             voiceInputStream?.Dispose();
             voiceOutputStream?.Dispose();
             voiceAnalysisStream?.Dispose();
+            base.OnDestroy();
         }
     }
 }

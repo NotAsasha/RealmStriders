@@ -1,9 +1,8 @@
 # Game Design
 
-This is the resolved project context based on the current implementation and
-the supplied GDD. The GDD is a source of intended design, but it contains
-outdated alternatives. Where the GDD and the decisions below differ, this
-document is the current design reference.
+This is the current design reference, after explicit owner decisions.
+Implementation details are documented in [Systems](SYSTEMS.md); code that
+disagrees with these confirmed rules is an implementation gap.
 
 ## High concept
 
@@ -45,7 +44,7 @@ has a limited safe operating time, which can vary by mission.
 
 ## Mission success and failure
 
-**Status: Confirmed design; implementation must be verified**
+**Status: Confirmed design; known implementation gaps in [Systems](SYSTEMS.md#known-implementation-gaps)**
 
 A mission may be ended from the base at any time. It is successful only when
 all target monsters have been captured. Killing monsters is not a gameplay
@@ -95,9 +94,7 @@ implemented today and may still need work.
   its 100 charge, and the item remains when empty. Its indicator is green at
   100%, yellow at 50–99%, and red below 50%. Each activation repels enemies
   within 30 m and displays a brief expanding pulse matching that radius.
-- The current inventory implementation has four configurable slots. The
-  supplied GDD's two-hand model and fixed key bindings are not current
-  requirements.
+- The current inventory implementation has four configurable slots.
 - Held equipment uses the existing full-body character and a single right-hand
   grip. Separate first-person arms and two-handed poses are outside the current
   scope. A powered, equipped radio is raised while transmitting voice, then

@@ -390,42 +390,52 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 873290868}
     m_Modifications:
     - target: {fileID: 212354313440050220, guid: baf790c173712e54497105c6afacafbc,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.19999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 212354313440050220, guid: baf790c173712e54497105c6afacafbc,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.19999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 212354313440050220, guid: baf790c173712e54497105c6afacafbc,
+        type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.924
+      value: -4.726
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: baf790c173712e54497105c6afacafbc,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -48.542
+      value: 1.4580002
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: baf790c173712e54497105c6afacafbc,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -7.447
+      value: 5.667
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: baf790c173712e54497105c6afacafbc,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.4740632
+      value: 0.5246562
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: baf790c173712e54497105c6afacafbc,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.4740632
+      value: -0.5246562
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: baf790c173712e54497105c6afacafbc,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.5246562
+      value: -0.4740632
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: baf790c173712e54497105c6afacafbc,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.5246562
+      value: 0.4740632
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: baf790c173712e54497105c6afacafbc,
         type: 3}
@@ -457,6 +467,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: baf790c173712e54497105c6afacafbc, type: 3}
+--- !u!4 &84507095 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 212354313440050220, guid: baf790c173712e54497105c6afacafbc,
+    type: 3}
+  m_PrefabInstance: {fileID: 84507094}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &102974702
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9072,6 +9088,256 @@ MonoBehaviour:
   source: {fileID: 718112513}
   clip:
   - {fileID: 8300000, guid: 83e0f13b9ff832846ac2496a627bf1de, type: 3}
+--- !u!1 &755450453
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 755450454}
+  - component: {fileID: 755450456}
+  - component: {fileID: 755450455}
+  - component: {fileID: 755450458}
+  - component: {fileID: 755450457}
+  m_Layer: 0
+  m_Name: RatingAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &755450454
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755450453}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1610358828}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &755450455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755450453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c3684b22f00604a97bb68037fcf4cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioSource
+  directBinaural: 1
+  interpolation: 1
+  perspectiveCorrection: 0
+  distanceAttenuation: 1
+  distanceAttenuationInput: 0
+  distanceAttenuationValue: 1
+  airAbsorption: 0
+  airAbsorptionInput: 0
+  airAbsorptionLow: 1
+  airAbsorptionMid: 1
+  airAbsorptionHigh: 1
+  directivity: 0
+  directivityInput: 0
+  dipoleWeight: 0
+  dipolePower: 0
+  directivityValue: 1
+  occlusion: 1
+  occlusionInput: 0
+  occlusionType: 0
+  occlusionRadius: 1
+  occlusionSamples: 16
+  occlusionValue: 1
+  transmission: 1
+  transmissionType: 1
+  transmissionInput: 0
+  transmissionLow: 1
+  transmissionMid: 1
+  transmissionHigh: 1
+  maxTransmissionSurfaces: 1
+  directMixLevel: 1
+  reflections: 0
+  reflectionsType: 0
+  useDistanceCurveForReflections: 0
+  currentBakedSource: {fileID: 0}
+  reverbTimeLow: 0
+  reverbTimeMid: 0
+  reverbTimeHigh: 0
+  hybridReverbEQLow: 1
+  hybridReverbEQMid: 1
+  hybridReverbEQHigh: 1
+  hybridReverbDelay: 0
+  applyHRTFToReflections: 0
+  reflectionsMixLevel: 1
+  pathing: 1
+  pathingProbeBatch: {fileID: 1915958022}
+  pathValidation: 0
+  findAlternatePaths: 0
+  pathingEQ:
+  - 1
+  - 1
+  - 1
+  pathingSH:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  applyHRTFToPathing: 1
+  pathingMixLevel: 2
+  normalizePathingEQ: 1
+--- !u!82 &755450456
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755450453}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 0ef2dd6f20bbc0248bdbbabb6f013117, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 1
+  SpatializePostEffects: 1
+  Priority: 128
+  DopplerLevel: 0
+  MinDistance: 1
+  MaxDistance: 20
+  Pan2D: 0
+  rolloffMode: 1
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!169 &755450457
+AudioLowPassFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755450453}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_LowpassResonanceQ: 1
+  lowpassLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.17235106
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!165 &755450458
+AudioHighPassFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755450453}
+  m_Enabled: 1
+  m_CutoffFrequency: 1200
+  m_HighpassResonanceQ: 1
 --- !u!1 &873290867
 GameObject:
   m_ObjectHideFlags: 0
@@ -9129,6 +9395,10 @@ Transform:
   - {fileID: 1266389442}
   - {fileID: 66332175}
   - {fileID: 1188024073}
+  - {fileID: 7365185210368069260}
+  - {fileID: 8036921397793187786}
+  - {fileID: 84507095}
+  - {fileID: 1325321561}
   m_Father: {fileID: 4467047981919304941}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &880424290
@@ -9182,6 +9452,254 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &884884095
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 884884096}
+  - component: {fileID: 884884099}
+  - component: {fileID: 884884098}
+  - component: {fileID: 884884097}
+  m_Layer: 0
+  m_Name: FanAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &884884096
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884884095}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.9000015, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1637603024}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &884884097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884884095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9f03f215762e74479ad95b0fa23f9de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Audio.SpatialLoopEmitter
+  audioSource: {fileID: 884884099}
+  acousticSource: {fileID: 884884098}
+  environment: {fileID: 1915958021}
+  startOffsetSeconds: 2.3
+--- !u!114 &884884098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884884095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c3684b22f00604a97bb68037fcf4cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioSource
+  directBinaural: 1
+  interpolation: 1
+  perspectiveCorrection: 0
+  distanceAttenuation: 1
+  distanceAttenuationInput: 0
+  distanceAttenuationValue: 1
+  airAbsorption: 0
+  airAbsorptionInput: 0
+  airAbsorptionLow: 1
+  airAbsorptionMid: 1
+  airAbsorptionHigh: 1
+  directivity: 0
+  directivityInput: 0
+  dipoleWeight: 0
+  dipolePower: 0
+  directivityValue: 1
+  occlusion: 1
+  occlusionInput: 0
+  occlusionType: 0
+  occlusionRadius: 1
+  occlusionSamples: 16
+  occlusionValue: 1
+  transmission: 1
+  transmissionType: 1
+  transmissionInput: 0
+  transmissionLow: 1
+  transmissionMid: 1
+  transmissionHigh: 1
+  maxTransmissionSurfaces: 2
+  directMixLevel: 1
+  reflections: 0
+  reflectionsType: 0
+  useDistanceCurveForReflections: 0
+  currentBakedSource: {fileID: 0}
+  reverbTimeLow: 0
+  reverbTimeMid: 0
+  reverbTimeHigh: 0
+  hybridReverbEQLow: 1
+  hybridReverbEQMid: 1
+  hybridReverbEQHigh: 1
+  hybridReverbDelay: 0
+  applyHRTFToReflections: 0
+  reflectionsMixLevel: 1
+  pathing: 1
+  pathingProbeBatch: {fileID: 1915958022}
+  pathValidation: 1
+  findAlternatePaths: 1
+  pathingEQ:
+  - 1
+  - 1
+  - 1
+  pathingSH:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  applyHRTFToPathing: 1
+  pathingMixLevel: 2
+  normalizePathingEQ: 0
+--- !u!82 &884884099
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884884095}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 0ef2dd6f20bbc0248bdbbabb6f013117, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 1
+  SpatializePostEffects: 1
+  Priority: 128
+  DopplerLevel: 0
+  MinDistance: 1
+  MaxDistance: 10
+  Pan2D: 0
+  rolloffMode: 1
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.23119791
+      value: 0.9947853
+      inSlope: -7.002809
+      outSlope: -7.002809
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.3351833
+      value: 0.5625534
+      inSlope: -1.7507023
+      outSlope: -1.7507023
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.60676795
+      value: 0.17700195
+      inSlope: -0.43767557
+      outSlope: -0.43767557
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -0.14291406
+      outSlope: -0.14291406
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &894351538
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9539,6 +10057,10 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c31f220cbd56a8845b115434dd7f0a7a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1685707336}
     - targetCorrespondingSourceObject: {fileID: -8961359253771211100, guid: c31f220cbd56a8845b115434dd7f0a7a,
         type: 3}
       insertIndex: -1
@@ -9700,6 +10222,300 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 468041446480506660}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1112300152
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1112300154}
+  - component: {fileID: 1112300153}
+  m_Layer: 0
+  m_Name: SteamAudioStaticMesh
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1112300153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1112300152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8173b2a8dbe2d2d48995bb2ba9a49ff1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioStaticMesh
+  asset: {fileID: 11400000, guid: 5139ccbf72ce866458a2fac03ec6b46b, type: 2}
+  sceneNameWhenExported: Lobby
+--- !u!4 &1112300154
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1112300152}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -50, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1116200216
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1116200217}
+  - component: {fileID: 1116200220}
+  - component: {fileID: 1116200219}
+  - component: {fileID: 1116200218}
+  m_Layer: 0
+  m_Name: FanAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1116200217
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116200216}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.9000015, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1646931086}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1116200218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116200216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9f03f215762e74479ad95b0fa23f9de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Audio.SpatialLoopEmitter
+  audioSource: {fileID: 1116200220}
+  acousticSource: {fileID: 1116200219}
+  environment: {fileID: 1915958021}
+  startOffsetSeconds: 33.1
+--- !u!114 &1116200219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116200216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c3684b22f00604a97bb68037fcf4cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioSource
+  directBinaural: 1
+  interpolation: 1
+  perspectiveCorrection: 0
+  distanceAttenuation: 1
+  distanceAttenuationInput: 0
+  distanceAttenuationValue: 1
+  airAbsorption: 0
+  airAbsorptionInput: 0
+  airAbsorptionLow: 1
+  airAbsorptionMid: 1
+  airAbsorptionHigh: 1
+  directivity: 0
+  directivityInput: 0
+  dipoleWeight: 0
+  dipolePower: 0
+  directivityValue: 1
+  occlusion: 1
+  occlusionInput: 0
+  occlusionType: 0
+  occlusionRadius: 1
+  occlusionSamples: 16
+  occlusionValue: 1
+  transmission: 1
+  transmissionType: 1
+  transmissionInput: 0
+  transmissionLow: 1
+  transmissionMid: 1
+  transmissionHigh: 1
+  maxTransmissionSurfaces: 2
+  directMixLevel: 1
+  reflections: 0
+  reflectionsType: 0
+  useDistanceCurveForReflections: 0
+  currentBakedSource: {fileID: 0}
+  reverbTimeLow: 0
+  reverbTimeMid: 0
+  reverbTimeHigh: 0
+  hybridReverbEQLow: 1
+  hybridReverbEQMid: 1
+  hybridReverbEQHigh: 1
+  hybridReverbDelay: 0
+  applyHRTFToReflections: 0
+  reflectionsMixLevel: 1
+  pathing: 1
+  pathingProbeBatch: {fileID: 1915958022}
+  pathValidation: 1
+  findAlternatePaths: 1
+  pathingEQ:
+  - 1
+  - 1
+  - 1
+  pathingSH:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  applyHRTFToPathing: 1
+  pathingMixLevel: 2
+  normalizePathingEQ: 0
+--- !u!82 &1116200220
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116200216}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 0ef2dd6f20bbc0248bdbbabb6f013117, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 1
+  SpatializePostEffects: 1
+  Priority: 128
+  DopplerLevel: 0
+  MinDistance: 1
+  MaxDistance: 10
+  Pan2D: 0
+  rolloffMode: 1
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.23119791
+      value: 0.9947853
+      inSlope: -7.002809
+      outSlope: -7.002809
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.3351833
+      value: 0.5625534
+      inSlope: -1.7507023
+      outSlope: -1.7507023
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.60676795
+      value: 0.17700195
+      inSlope: -0.43767557
+      outSlope: -0.43767557
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -0.14291406
+      outSlope: -0.14291406
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &1123947193
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10595,42 +11411,57 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 873290868}
     m_Modifications:
     - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.19999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.19999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.20000005
+      objectReference: {fileID: 0}
+    - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
+        type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.49
+      value: -19.14
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -48.177
+      value: 1.8230019
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 10.995
+      value: -12.775
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0.74197584
-      objectReference: {fileID: 0}
-    - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
-        type: 3}
-      propertyPath: m_LocalRotation.y
       value: 0.67042667
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
         type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
+        type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: 0.74197584
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
         type: 3}
@@ -10662,6 +11493,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7cdf367874103344b94a204f329f18be, type: 3}
+--- !u!4 &1325321561 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 212354313440050220, guid: 7cdf367874103344b94a204f329f18be,
+    type: 3}
+  m_PrefabInstance: {fileID: 1325321560}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1345802322
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10670,6 +11507,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 873290868}
     m_Modifications:
+    - target: {fileID: 1069717816478264256, guid: 7dc41343ea1dfab4eab2914f45e7e097,
+        type: 3}
+      propertyPath: Spatialize
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1069717816478264256, guid: 7dc41343ea1dfab4eab2914f45e7e097,
+        type: 3}
+      propertyPath: SpatializePostEffects
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1865583676559979100, guid: 7dc41343ea1dfab4eab2914f45e7e097,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -10760,9 +11607,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -1.008
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1069717816478264256, guid: 7dc41343ea1dfab4eab2914f45e7e097, type: 3}
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 1865583676559979100, guid: 7dc41343ea1dfab4eab2914f45e7e097,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1515869649}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7dc41343ea1dfab4eab2914f45e7e097, type: 3}
 --- !u!4 &1345802323 stripped
@@ -10827,6 +11679,256 @@ Transform:
   m_Children: []
   m_Father: {fileID: 474728137}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1368664674
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1368664675}
+  - component: {fileID: 1368664677}
+  - component: {fileID: 1368664676}
+  - component: {fileID: 1368664679}
+  - component: {fileID: 1368664678}
+  m_Layer: 0
+  m_Name: LoadingAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1368664675
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368664674}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1610358828}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1368664676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368664674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c3684b22f00604a97bb68037fcf4cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioSource
+  directBinaural: 1
+  interpolation: 1
+  perspectiveCorrection: 0
+  distanceAttenuation: 1
+  distanceAttenuationInput: 0
+  distanceAttenuationValue: 1
+  airAbsorption: 0
+  airAbsorptionInput: 0
+  airAbsorptionLow: 1
+  airAbsorptionMid: 1
+  airAbsorptionHigh: 1
+  directivity: 0
+  directivityInput: 0
+  dipoleWeight: 0
+  dipolePower: 0
+  directivityValue: 1
+  occlusion: 1
+  occlusionInput: 0
+  occlusionType: 0
+  occlusionRadius: 1
+  occlusionSamples: 16
+  occlusionValue: 1
+  transmission: 1
+  transmissionType: 1
+  transmissionInput: 0
+  transmissionLow: 1
+  transmissionMid: 1
+  transmissionHigh: 1
+  maxTransmissionSurfaces: 1
+  directMixLevel: 0.5
+  reflections: 0
+  reflectionsType: 0
+  useDistanceCurveForReflections: 0
+  currentBakedSource: {fileID: 0}
+  reverbTimeLow: 0
+  reverbTimeMid: 0
+  reverbTimeHigh: 0
+  hybridReverbEQLow: 1
+  hybridReverbEQMid: 1
+  hybridReverbEQHigh: 1
+  hybridReverbDelay: 0
+  applyHRTFToReflections: 0
+  reflectionsMixLevel: 1
+  pathing: 1
+  pathingProbeBatch: {fileID: 1915958022}
+  pathValidation: 0
+  findAlternatePaths: 0
+  pathingEQ:
+  - 1
+  - 1
+  - 1
+  pathingSH:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  applyHRTFToPathing: 1
+  pathingMixLevel: 2
+  normalizePathingEQ: 1
+--- !u!82 &1368664677
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368664674}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 0ef2dd6f20bbc0248bdbbabb6f013117, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0.45
+  m_Pitch: 3
+  Loop: 1
+  Mute: 0
+  Spatialize: 1
+  SpatializePostEffects: 1
+  Priority: 128
+  DopplerLevel: 0
+  MinDistance: 1
+  MaxDistance: 20
+  Pan2D: 0
+  rolloffMode: 1
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!169 &1368664678
+AudioLowPassFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368664674}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_LowpassResonanceQ: 1
+  lowpassLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.17235106
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!165 &1368664679
+AudioHighPassFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368664674}
+  m_Enabled: 1
+  m_CutoffFrequency: 1200
+  m_HighpassResonanceQ: 1
 --- !u!43 &1369228013
 Mesh:
   m_ObjectHideFlags: 0
@@ -11210,6 +12312,254 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1510841149}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1515869648
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1515869649}
+  - component: {fileID: 1515869652}
+  - component: {fileID: 1515869651}
+  - component: {fileID: 1515869650}
+  m_Layer: 0
+  m_Name: FanAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1515869649
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1515869648}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.9000015, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1345802323}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1515869650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1515869648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9f03f215762e74479ad95b0fa23f9de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Audio.SpatialLoopEmitter
+  audioSource: {fileID: 1515869652}
+  acousticSource: {fileID: 1515869651}
+  environment: {fileID: 1915958021}
+  startOffsetSeconds: 17.7
+--- !u!114 &1515869651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1515869648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c3684b22f00604a97bb68037fcf4cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioSource
+  directBinaural: 1
+  interpolation: 1
+  perspectiveCorrection: 0
+  distanceAttenuation: 1
+  distanceAttenuationInput: 0
+  distanceAttenuationValue: 1
+  airAbsorption: 0
+  airAbsorptionInput: 0
+  airAbsorptionLow: 1
+  airAbsorptionMid: 1
+  airAbsorptionHigh: 1
+  directivity: 0
+  directivityInput: 0
+  dipoleWeight: 0
+  dipolePower: 0
+  directivityValue: 1
+  occlusion: 1
+  occlusionInput: 0
+  occlusionType: 0
+  occlusionRadius: 1
+  occlusionSamples: 16
+  occlusionValue: 1
+  transmission: 1
+  transmissionType: 1
+  transmissionInput: 0
+  transmissionLow: 1
+  transmissionMid: 1
+  transmissionHigh: 1
+  maxTransmissionSurfaces: 2
+  directMixLevel: 1
+  reflections: 0
+  reflectionsType: 0
+  useDistanceCurveForReflections: 0
+  currentBakedSource: {fileID: 0}
+  reverbTimeLow: 0
+  reverbTimeMid: 0
+  reverbTimeHigh: 0
+  hybridReverbEQLow: 1
+  hybridReverbEQMid: 1
+  hybridReverbEQHigh: 1
+  hybridReverbDelay: 0
+  applyHRTFToReflections: 0
+  reflectionsMixLevel: 1
+  pathing: 1
+  pathingProbeBatch: {fileID: 1915958022}
+  pathValidation: 1
+  findAlternatePaths: 1
+  pathingEQ:
+  - 1
+  - 1
+  - 1
+  pathingSH:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  applyHRTFToPathing: 1
+  pathingMixLevel: 2
+  normalizePathingEQ: 0
+--- !u!82 &1515869652
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1515869648}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 0ef2dd6f20bbc0248bdbbabb6f013117, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 1
+  SpatializePostEffects: 1
+  Priority: 128
+  DopplerLevel: 0
+  MinDistance: 1
+  MaxDistance: 10
+  Pan2D: 0
+  rolloffMode: 1
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.23119791
+      value: 0.9947853
+      inSlope: -7.002809
+      outSlope: -7.002809
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.3351833
+      value: 0.5625534
+      inSlope: -1.7507023
+      outSlope: -1.7507023
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.60676795
+      value: 0.17700195
+      inSlope: -0.43767557
+      outSlope: -0.43767557
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -0.14291406
+      outSlope: -0.14291406
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &1595158294
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11454,6 +12804,16 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
+    - target: {fileID: 2857707763473419342, guid: db6cf33d988ac794dadcefb6361f9a51,
+        type: 3}
+      propertyPath: audioSource
+      value: 
+      objectReference: {fileID: 755450456}
+    - target: {fileID: 2857707763473419342, guid: db6cf33d988ac794dadcefb6361f9a51,
+        type: 3}
+      propertyPath: loadingAudioSource
+      value: 
+      objectReference: {fileID: 1368664677}
     - target: {fileID: 3056028615603058480, guid: db6cf33d988ac794dadcefb6361f9a51,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -11606,13 +12966,33 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7712345678901234567, guid: db6cf33d988ac794dadcefb6361f9a51,
         type: 3}
+      propertyPath: Spatialize
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7712345678901234567, guid: db6cf33d988ac794dadcefb6361f9a51,
+        type: 3}
       propertyPath: MaxDistance
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 7712345678901234567, guid: db6cf33d988ac794dadcefb6361f9a51,
+        type: 3}
+      propertyPath: SpatializePostEffects
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7712345678901234568, guid: db6cf33d988ac794dadcefb6361f9a51,
+        type: 3}
+      propertyPath: Spatialize
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7712345678901234568, guid: db6cf33d988ac794dadcefb6361f9a51,
         type: 3}
       propertyPath: MaxDistance
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 7712345678901234568, guid: db6cf33d988ac794dadcefb6361f9a51,
+        type: 3}
+      propertyPath: SpatializePostEffects
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8899465413180582559, guid: db6cf33d988ac794dadcefb6361f9a51,
         type: 3}
@@ -11624,18 +13004,20 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7712345678901234567, guid: db6cf33d988ac794dadcefb6361f9a51, type: 3}
+    - {fileID: 7712345678901234568, guid: db6cf33d988ac794dadcefb6361f9a51, type: 3}
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 230716538970514776, guid: db6cf33d988ac794dadcefb6361f9a51,
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 3056028615603058480, guid: db6cf33d988ac794dadcefb6361f9a51,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1610358831}
-    - targetCorrespondingSourceObject: {fileID: 230716538970514776, guid: db6cf33d988ac794dadcefb6361f9a51,
+      addedObject: {fileID: 755450454}
+    - targetCorrespondingSourceObject: {fileID: 3056028615603058480, guid: db6cf33d988ac794dadcefb6361f9a51,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1610358830}
+      addedObject: {fileID: 1368664675}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: db6cf33d988ac794dadcefb6361f9a51, type: 3}
 --- !u!4 &1610358828 stripped
 Transform:
@@ -11643,47 +13025,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1610358827}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1610358829 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 230716538970514776, guid: db6cf33d988ac794dadcefb6361f9a51,
-    type: 3}
-  m_PrefabInstance: {fileID: 1610358827}
-  m_PrefabAsset: {fileID: 0}
---- !u!169 &1610358830
-AudioLowPassFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1610358829}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_LowpassResonanceQ: 1
-  lowpassLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.17235106
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
---- !u!165 &1610358831
-AudioHighPassFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1610358829}
-  m_Enabled: 1
-  m_CutoffFrequency: 1200
-  m_HighpassResonanceQ: 1
 --- !u!1001 &1637603023
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11692,6 +13033,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 873290868}
     m_Modifications:
+    - target: {fileID: 1069717816478264256, guid: 7dc41343ea1dfab4eab2914f45e7e097,
+        type: 3}
+      propertyPath: Spatialize
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1069717816478264256, guid: 7dc41343ea1dfab4eab2914f45e7e097,
+        type: 3}
+      propertyPath: SpatializePostEffects
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1865583676559979100, guid: 7dc41343ea1dfab4eab2914f45e7e097,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -11767,9 +13118,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -0.897
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1069717816478264256, guid: 7dc41343ea1dfab4eab2914f45e7e097, type: 3}
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 1865583676559979100, guid: 7dc41343ea1dfab4eab2914f45e7e097,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 884884096}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7dc41343ea1dfab4eab2914f45e7e097, type: 3}
 --- !u!4 &1637603024 stripped
@@ -11786,6 +13142,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 873290868}
     m_Modifications:
+    - target: {fileID: 1069717816478264256, guid: 7dc41343ea1dfab4eab2914f45e7e097,
+        type: 3}
+      propertyPath: Spatialize
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1069717816478264256, guid: 7dc41343ea1dfab4eab2914f45e7e097,
+        type: 3}
+      propertyPath: SpatializePostEffects
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1069717816478264256, guid: 7dc41343ea1dfab4eab2914f45e7e097,
         type: 3}
       propertyPath: rolloffCustomCurve.m_Curve.Array.data[3].time
@@ -11866,9 +13232,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -0.85
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1069717816478264256, guid: 7dc41343ea1dfab4eab2914f45e7e097, type: 3}
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 1865583676559979100, guid: 7dc41343ea1dfab4eab2914f45e7e097,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1116200217}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7dc41343ea1dfab4eab2914f45e7e097, type: 3}
 --- !u!4 &1646931086 stripped
@@ -11877,6 +13248,27 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1646931085}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1685707335 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c31f220cbd56a8845b115434dd7f0a7a,
+    type: 3}
+  m_PrefabInstance: {fileID: 949919496}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1685707336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1685707335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e829c87dc2a2ed2419c5f67848317fe4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioGeometry
+  material: {fileID: 11400000, guid: 2a011bab5de11df4c81c68931509f73a, type: 2}
+  exportAllChildren: 1
+  terrainSimplificationLevel: 0
 --- !u!1 &1723982438
 GameObject:
   m_ObjectHideFlags: 0
@@ -12164,6 +13556,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.x
       value: -6.651
+      objectReference: {fileID: 0}
+    - target: {fileID: 4667931983332077196, guid: fe1d03bbfddff204fb447eb89fbace9b,
+        type: 3}
+      propertyPath: m_Volume
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 4711617067124522529, guid: fe1d03bbfddff204fb447eb89fbace9b,
         type: 3}
@@ -12575,6 +13972,2602 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 474728137}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1915958020
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1915958023}
+  - component: {fileID: 1915958022}
+  - component: {fileID: 1915958021}
+  m_Layer: 0
+  m_Name: Steam Audio Probe Batch
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1915958021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1915958020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a9558415f1321e439ba1b2bb3cdccc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Audio.SceneAcoustics
+  probeBatch: {fileID: 1915958022}
+--- !u!114 &1915958022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1915958020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 286962cac82a4fa4e9ec38ab663c9578, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioProbeBatch
+  placementStrategy: 1
+  horizontalSpacing: 1
+  heightAboveFloor: 1.5
+  asset: {fileID: 11400000, guid: 14dd471bfd88ab1489576e30340d150c, type: 2}
+  probeDataSize: 1241632
+  mProbeSpheres:
+  - center:
+      x: -12
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: -12
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: -12
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: -12
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: -12
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: -12
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: -11
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: -11
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: -11
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: -11
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: -11
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: -11
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -45.3
+      z: -8.5
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: 9.5
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: 10.5
+    radius: 1
+  - center:
+      x: -9.999999
+      y: -48.5
+      z: 11.499999
+    radius: 1
+  - center:
+      x: -9
+      y: -45.3
+      z: -8.5
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: 9.5
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: 10.5
+    radius: 1
+  - center:
+      x: -9
+      y: -48.5
+      z: 11.499999
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -45.3
+      z: -8.5
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: 9.5
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: 10.5
+    radius: 1
+  - center:
+      x: -7.9999995
+      y: -48.5
+      z: 11.499999
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -45.3
+      z: -8.5
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: 9.5
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: 10.5
+    radius: 1
+  - center:
+      x: -6.9999995
+      y: -48.5
+      z: 11.499999
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -45.3
+      z: -8.5
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: 9.5
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: 10.5
+    radius: 1
+  - center:
+      x: -5.9999995
+      y: -48.5
+      z: 11.499999
+    radius: 1
+  - center:
+      x: -4.9999995
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: -4.9999995
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: -4.9999995
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: -4.9999995
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: -4.9999995
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: -4.9999995
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: -4.9999995
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: -4.9999995
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: -4.9999995
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: -3.9999998
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: -3.9999998
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: -3.9999998
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: -3.9999998
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: -2.9999998
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: -2.9999998
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: -2.9999998
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: -2.9999998
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: -2.9999998
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: -2.9999998
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: -2.9999998
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: -2.9999998
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: -1.9999999
+      y: -48.5
+      z: 9.5
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -45.780003
+      z: -8.5
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -45.780003
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: -0.99999994
+      y: -48.5
+      z: 9.5
+    radius: 1
+  - center:
+      x: 0
+      y: -45.780003
+      z: -8.5
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 0
+      y: -45.780003
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: 0
+      y: -48.5
+      z: 9.5
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -45.780003
+      z: -8.5
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -45.780003
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: 1.0000008
+      y: -48.5
+      z: 9.5
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: 1.9999999
+      y: -48.5
+      z: 9.5
+    radius: 1
+  - center:
+      x: 3.0000007
+      y: -48.5
+      z: -10.5
+    radius: 1
+  - center:
+      x: 3.0000007
+      y: -48.5
+      z: -9.5
+    radius: 1
+  - center:
+      x: 3.0000007
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 3.0000007
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 3.0000007
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 3.0000007
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 3.0000007
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 3.0000007
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 3.9999998
+      y: -48.5
+      z: -10.5
+    radius: 1
+  - center:
+      x: 3.9999998
+      y: -48.5
+      z: -9.5
+    radius: 1
+  - center:
+      x: 3.9999998
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 3.9999998
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 3.9999998
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 3.9999998
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 3.9999998
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 3.9999998
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -48.5
+      z: -10.5
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -48.5
+      z: -9.5
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -45.62
+      z: -4.5
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -45.62
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -45.62
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 5.0000005
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -48.5
+      z: -10.5
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -48.5
+      z: -9.5
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -45.62
+      z: -4.5
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -45.62
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -45.62
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 5.9999995
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 7.0000005
+      y: -48.5
+      z: -10.5
+    radius: 1
+  - center:
+      x: 7.0000005
+      y: -48.5
+      z: -9.5
+    radius: 1
+  - center:
+      x: 7.0000005
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 7.0000005
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 7.0000005
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 7.0000005
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 7.0000005
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 7.0000005
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 7.9999995
+      y: -48.5
+      z: -10.5
+    radius: 1
+  - center:
+      x: 7.9999995
+      y: -48.5
+      z: -9.5
+    radius: 1
+  - center:
+      x: 7.9999995
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 7.9999995
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 7.9999995
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 7.9999995
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 7.9999995
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 7.9999995
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 9
+      y: -48.5
+      z: -10.5
+    radius: 1
+  - center:
+      x: 9
+      y: -48.5
+      z: -9.5
+    radius: 1
+  - center:
+      x: 9
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 9
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 9
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 9
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 9
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 9
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: -10.5
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: -9.5
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: 9.999999
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: -10.5
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: -9.5
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: 11
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: -10.5
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: -9.5
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: 11.999999
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: -10.5
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: -9.5
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: 13
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: -10.5
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: -9.5
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: -8.5
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: -7.5000005
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: -6.5
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: -5.5
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: -4.5
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: -3.4999995
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: -2.4999998
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: -1.5
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: -0.50000024
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: 0.49999952
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: 1.5
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: 2.5000005
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: 3.4999995
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: 4.5
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: 5.500001
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: 6.5
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: 7.5000005
+    radius: 1
+  - center:
+      x: 13.999999
+      y: -48.5
+      z: 8.499999
+    radius: 1
+  - center:
+      x: -8.333333
+      y: -48.449905
+      z: 11.666667
+    radius: 1
+  - center:
+      x: -6.6666665
+      y: -48.449905
+      z: 8.888888
+    radius: 1
+  - center:
+      x: -7
+      y: -48.449905
+      z: 9.333333
+    radius: 1
+  - center:
+      x: -8.166667
+      y: -48.449905
+      z: 8.5
+    radius: 1
+  - center:
+      x: -9
+      y: -48.449905
+      z: 6.888889
+    radius: 1
+  - center:
+      x: -7.8333335
+      y: -48.449905
+      z: 11.055554
+    radius: 1
+  - center:
+      x: -8.5
+      y: -48.449905
+      z: 10.722221
+    radius: 1
+  - center:
+      x: -2.9444444
+      y: -48.449905
+      z: 5.1666665
+    radius: 1
+  - center:
+      x: -4.888889
+      y: -48.449905
+      z: 4.3333335
+    radius: 1
+  - center:
+      x: -8.833333
+      y: -48.449905
+      z: 10.555554
+    radius: 1
+  - center:
+      x: -8.166667
+      y: -48.449905
+      z: 9.722221
+    radius: 1
+  - center:
+      x: -2.0555553
+      y: -48.449905
+      z: 0.9999997
+    radius: 1
+  - center:
+      x: -1.4444443
+      y: -48.449905
+      z: 0.55555534
+    radius: 1
+  - center:
+      x: -7.6666665
+      y: -48.449905
+      z: 4.444444
+    radius: 1
+  - center:
+      x: -6.722222
+      y: -48.449905
+      z: 5.2777777
+    radius: 1
+  - center:
+      x: -0.5
+      y: -48.449905
+      z: 8.5
+    radius: 1
+  - center:
+      x: -1
+      y: -48.449905
+      z: 8
+    radius: 1
+  - center:
+      x: -5.722222
+      y: -48.449905
+      z: 1.111111
+    radius: 1
+  - center:
+      x: -7.277777
+      y: -48.449905
+      z: 1.111111
+    radius: 1
+  - center:
+      x: -9.166667
+      y: -48.449905
+      z: 0.5
+    radius: 1
+  - center:
+      x: -11.277778
+      y: -48.449905
+      z: 1
+    radius: 1
+  - center:
+      x: -7.277777
+      y: -48.449905
+      z: 3.3888886
+    radius: 1
+  - center:
+      x: -8.611111
+      y: -48.449905
+      z: 2.833333
+    radius: 1
+  - center:
+      x: -7.388889
+      y: -48.449905
+      z: 2.2777774
+    radius: 1
+  - center:
+      x: -8.722222
+      y: -48.449905
+      z: 1.722222
+    radius: 1
+  - center:
+      x: -2.4999998
+      y: -48.449905
+      z: 0.88888866
+    radius: 1
+  - center:
+      x: -1.111111
+      y: -48.449905
+      z: 4.222222
+    radius: 1
+  - center:
+      x: -1
+      y: -48.449905
+      z: 1.6111107
+    radius: 1
+  - center:
+      x: -0.5
+      y: -48.449905
+      z: 3.0555553
+    radius: 1
+  - center:
+      x: 1
+      y: -48.449905
+      z: 8
+    radius: 1
+  - center:
+      x: 0.5
+      y: -48.449905
+      z: 8.5
+    radius: 1
+  - center:
+      x: 10.666667
+      y: -48.449905
+      z: 8.055554
+    radius: 1
+  - center:
+      x: 10.833333
+      y: -48.449905
+      z: 7.944444
+    radius: 1
+  - center:
+      x: 11.277779
+      y: -48.449905
+      z: 8.222221
+    radius: 1
+  - center:
+      x: 12.388889
+      y: -48.449905
+      z: 8.111111
+    radius: 1
+  - center:
+      x: 13.111112
+      y: -48.449905
+      z: 8.444444
+    radius: 1
+  - center:
+      x: 11.166667
+      y: -48.449905
+      z: 7.944444
+    radius: 1
+  - center:
+      x: 10.722222
+      y: -48.449905
+      z: 2.7777774
+    radius: 1
+  - center:
+      x: 10.722222
+      y: -48.449905
+      z: 7.722222
+    radius: 1
+  - center:
+      x: 10.611112
+      y: -48.449905
+      z: 4.388889
+    radius: 1
+  - center:
+      x: 10.555556
+      y: -48.449905
+      z: 6
+    radius: 1
+  - center:
+      x: 14.111112
+      y: -48.449905
+      z: 2.944444
+    radius: 1
+  - center:
+      x: 12.555556
+      y: -48.116573
+      z: 7.722222
+    radius: 1
+  - center:
+      x: 12.5
+      y: -47.47768
+      z: 5.0555553
+    radius: 1
+  - center:
+      x: 14.277779
+      y: -48.449905
+      z: 4.6666665
+    radius: 1
+  - center:
+      x: 14.111112
+      y: -48.116573
+      z: 5.0555553
+    radius: 1
+  - center:
+      x: 11.111112
+      y: -48.449905
+      z: 0.22222202
+    radius: 1
+  - center:
+      x: 12.944446
+      y: -48.449905
+      z: 0.22222202
+    radius: 1
+  - center:
+      x: 11.777779
+      y: -48.449905
+      z: 1.9999994
+    radius: 1
+  - center:
+      x: 12.888889
+      y: -48.449905
+      z: 1.2222217
+    radius: 1
+  - center:
+      x: 10.666667
+      y: -48.449905
+      z: 1.9999994
+    radius: 1
+  - center:
+      x: 14.166667
+      y: -48.449905
+      z: 1.8888884
+    radius: 1
+  - center:
+      x: 11.666667
+      y: -48.449905
+      z: 0.44444403
+    radius: 1
+  - center:
+      x: 1
+      y: -48.449905
+      z: 4.4999995
+    radius: 1
+  - center:
+      x: 0.5
+      y: -48.449905
+      z: 2.5555553
+    radius: 1
+  - center:
+      x: 7.722223
+      y: -48.449905
+      z: 0.11111101
+    radius: 1
+  - center:
+      x: 1.1111112
+      y: -48.449905
+      z: 0.9999997
+    radius: 1
+  - center:
+      x: 6.3888893
+      y: -48.449905
+      z: 0.9999997
+    radius: 1
+  - center:
+      x: 3.5555556
+      y: -48.449905
+      z: 0.55555534
+    radius: 1
+  - center:
+      x: -9.333333
+      y: -48.449905
+      z: -4.5000005
+    radius: 1
+  - center:
+      x: -9.5
+      y: -48.449905
+      z: -4.055556
+    radius: 1
+  - center:
+      x: -5.722222
+      y: -48.449905
+      z: -2.1111112
+    radius: 1
+  - center:
+      x: -7.8333335
+      y: -48.449905
+      z: -1.1111112
+    radius: 1
+  - center:
+      x: -9.388888
+      y: -48.449905
+      z: -2.1111112
+    radius: 1
+  - center:
+      x: -8.722221
+      y: -48.449905
+      z: -3.2222223
+    radius: 1
+  - center:
+      x: -7.666666
+      y: -48.449905
+      z: -4.8333335
+    radius: 1
+  - center:
+      x: -7.0555553
+      y: -48.449905
+      z: -4.055556
+    radius: 1
+  - center:
+      x: -8.277778
+      y: -48.449905
+      z: -3.777778
+    radius: 1
+  - center:
+      x: -11.277778
+      y: -48.449905
+      z: -2
+    radius: 1
+  - center:
+      x: -2.4999998
+      y: -48.449905
+      z: -1.2222222
+    radius: 1
+  - center:
+      x: -0.55555534
+      y: -48.449905
+      z: -7.6666675
+    radius: 1
+  - center:
+      x: -2.0555553
+      y: -48.449905
+      z: -1.3333334
+    radius: 1
+  - center:
+      x: -1.4444443
+      y: -48.449905
+      z: -0.72222227
+    radius: 1
+  - center:
+      x: -0.5
+      y: -48.449905
+      z: -3.5000002
+    radius: 1
+  - center:
+      x: -0.7777777
+      y: -48.449905
+      z: -5.611111
+    radius: 1
+  - center:
+      x: -1.2777777
+      y: -48.449905
+      z: -4.8333335
+    radius: 1
+  - center:
+      x: 10.444445
+      y: -48.449905
+      z: -0.7777777
+    radius: 1
+  - center:
+      x: 5.6666665
+      y: -48.449905
+      z: -0.38888884
+    radius: 1
+  - center:
+      x: 0.55555564
+      y: -48.449905
+      z: -7.6666675
+    radius: 1
+  - center:
+      x: 1.2777778
+      y: -48.449905
+      z: -4.611111
+    radius: 1
+  - center:
+      x: 11.666667
+      y: -48.449905
+      z: -8.277778
+    radius: 1
+  - center:
+      x: 3.5
+      y: -48.449905
+      z: -1.6111112
+    radius: 1
+  - center:
+      x: 4.722223
+      y: -48.449905
+      z: -1.6111112
+    radius: 1
+  - center:
+      x: 12.944446
+      y: -48.449905
+      z: -1.6111112
+    radius: 1
+  - center:
+      x: 9.055556
+      y: -48.449905
+      z: -1.3888888
+    radius: 1
+  - center:
+      x: 6.5
+      y: -48.449905
+      z: -1.6111112
+    radius: 1
+  - center:
+      x: 5.555556
+      y: -48.449905
+      z: -1.9444447
+    radius: 1
+  - center:
+      x: 6.055556
+      y: -48.449905
+      z: -2.0555556
+    radius: 1
+  - center:
+      x: 5.555556
+      y: -48.449905
+      z: -3.277778
+    radius: 1
+  - center:
+      x: 5.9444447
+      y: -48.449905
+      z: -2.7222223
+    radius: 1
+  - center:
+      x: 11.666667
+      y: -48.449905
+      z: -1.9444447
+    radius: 1
+  - center:
+      x: 11.777779
+      y: -48.449905
+      z: -3.6666667
+    radius: 1
+  - center:
+      x: 13.055556
+      y: -48.449905
+      z: -6.4444447
+    radius: 1
+  - center:
+      x: 1.1111112
+      y: -48.449905
+      z: -0.88888884
+    radius: 1
+  - center:
+      x: 0.77777785
+      y: -48.449905
+      z: -2.6111112
+    radius: 1
+  - center:
+      x: 0.27777782
+      y: -48.449905
+      z: -4.8888893
+    radius: 1
+  - center:
+      x: 7.834644
+      y: -48.449905
+      z: -10.435383
+    radius: 1
+  - center:
+      x: 7.5274606
+      y: -48.449905
+      z: -9.973506
+    radius: 1
+  - center:
+      x: 9.35374
+      y: -48.449905
+      z: -8.982568
+    radius: 1
+  - center:
+      x: 3.5204055
+      y: -48.449905
+      z: -8.539979
+    radius: 1
+  - center:
+      x: 1.5000001
+      y: -48.449905
+      z: -0.7777777
+    radius: 1
+  - center:
+      x: 4.2669578
+      y: -48.449905
+      z: -7.4998894
+    radius: 1
+  - center:
+      x: 3.9038842
+      y: -48.449905
+      z: -8.093567
+    radius: 1
+  - center:
+      x: 4.8373632
+      y: -48.449905
+      z: -8.260123
+    radius: 1
+  - center:
+      x: 7.58918
+      y: -48.449905
+      z: -7.4998894
+    radius: 1
+  - center:
+      x: 6.676107
+      y: -48.449905
+      z: -8.093568
+    radius: 1
+  mBakedDataLayerInfo:
+  - gameObject: {fileID: 1915958020}
+    identifier:
+      type: 1
+      variation: 3
+      endpointInfluence:
+        center:
+          x: 0
+          y: 0
+          z: 0
+        radius: 0
+    dataSize: 1218004
+--- !u!4 &1915958023
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1915958020}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -50, z: 0}
+  m_LocalScale: {x: 30, y: 10, z: 25}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1945166428
 PrefabInstance:
@@ -13886,10 +17879,29 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: dca68838f31bb43288c8d9f3293e0b91, type: 2}
+    - target: {fileID: 8046526922966292782, guid: fdef7fa48cba93d40a1f224eb37e9458,
+        type: 3}
+      propertyPath: Spatialize
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8046526922966292782, guid: fdef7fa48cba93d40a1f224eb37e9458,
+        type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8046526922966292782, guid: fdef7fa48cba93d40a1f224eb37e9458,
+        type: 3}
+      propertyPath: SpatializePostEffects
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3203657884476727673, guid: fdef7fa48cba93d40a1f224eb37e9458,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 529356165015476513}
   m_SourcePrefab: {fileID: 100100000, guid: fdef7fa48cba93d40a1f224eb37e9458, type: 3}
 --- !u!4 &529356165015476509 stripped
 Transform:
@@ -13909,6 +17921,95 @@ AudioSource:
     type: 3}
   m_PrefabInstance: {fileID: 529356165015476508}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &529356165015476512 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3203657884476727673, guid: fdef7fa48cba93d40a1f224eb37e9458,
+    type: 3}
+  m_PrefabInstance: {fileID: 529356165015476508}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &529356165015476513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529356165015476512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c3684b22f00604a97bb68037fcf4cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioSource
+  directBinaural: 1
+  interpolation: 1
+  perspectiveCorrection: 0
+  distanceAttenuation: 1
+  distanceAttenuationInput: 0
+  distanceAttenuationValue: 1
+  airAbsorption: 0
+  airAbsorptionInput: 0
+  airAbsorptionLow: 1
+  airAbsorptionMid: 1
+  airAbsorptionHigh: 1
+  directivity: 0
+  directivityInput: 0
+  dipoleWeight: 0
+  dipolePower: 0
+  directivityValue: 1
+  occlusion: 1
+  occlusionInput: 0
+  occlusionType: 0
+  occlusionRadius: 1
+  occlusionSamples: 16
+  occlusionValue: 1
+  transmission: 1
+  transmissionType: 1
+  transmissionInput: 0
+  transmissionLow: 1
+  transmissionMid: 1
+  transmissionHigh: 1
+  maxTransmissionSurfaces: 1
+  directMixLevel: 1
+  reflections: 0
+  reflectionsType: 0
+  useDistanceCurveForReflections: 0
+  currentBakedSource: {fileID: 0}
+  reverbTimeLow: 0
+  reverbTimeMid: 0
+  reverbTimeHigh: 0
+  hybridReverbEQLow: 1
+  hybridReverbEQMid: 1
+  hybridReverbEQHigh: 1
+  hybridReverbDelay: 0
+  applyHRTFToReflections: 0
+  reflectionsMixLevel: 1
+  pathing: 1
+  pathingProbeBatch: {fileID: 1915958022}
+  pathValidation: 1
+  findAlternatePaths: 1
+  pathingEQ:
+  - 1
+  - 1
+  - 1
+  pathingSH:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  applyHRTFToPathing: 1
+  pathingMixLevel: 0.8
+  normalizePathingEQ: 0
 --- !u!1001 &1953840732283008798
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14519,6 +18620,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4541833886248733512, guid: 6d491b0deee3116468d4bfa2b14af8eb,
         type: 3}
+      propertyPath: Spatialize
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4541833886248733512, guid: 6d491b0deee3116468d4bfa2b14af8eb,
+        type: 3}
       propertyPath: rolloffMode
       value: 2
       objectReference: {fileID: 0}
@@ -14526,6 +18632,16 @@ PrefabInstance:
         type: 3}
       propertyPath: DopplerLevel
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4541833886248733512, guid: 6d491b0deee3116468d4bfa2b14af8eb,
+        type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4541833886248733512, guid: 6d491b0deee3116468d4bfa2b14af8eb,
+        type: 3}
+      propertyPath: SpatializePostEffects
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4541833886248733512, guid: 6d491b0deee3116468d4bfa2b14af8eb,
         type: 3}
@@ -14774,6 +18890,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 3038008699010712293}
+    - targetCorrespondingSourceObject: {fileID: 1342259252811450014, guid: 6d491b0deee3116468d4bfa2b14af8eb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3038008699010712295}
   m_SourcePrefab: {fileID: 100100000, guid: 6d491b0deee3116468d4bfa2b14af8eb, type: 3}
 --- !u!4 &3038008699010712289 stripped
 Transform:
@@ -14834,6 +18954,89 @@ AudioLowPassFilter:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3038008699010712295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3038008699010712292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c3684b22f00604a97bb68037fcf4cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioSource
+  directBinaural: 1
+  interpolation: 1
+  perspectiveCorrection: 0
+  distanceAttenuation: 1
+  distanceAttenuationInput: 0
+  distanceAttenuationValue: 1
+  airAbsorption: 0
+  airAbsorptionInput: 0
+  airAbsorptionLow: 1
+  airAbsorptionMid: 1
+  airAbsorptionHigh: 1
+  directivity: 0
+  directivityInput: 0
+  dipoleWeight: 0
+  dipolePower: 0
+  directivityValue: 1
+  occlusion: 1
+  occlusionInput: 0
+  occlusionType: 0
+  occlusionRadius: 1
+  occlusionSamples: 16
+  occlusionValue: 1
+  transmission: 1
+  transmissionType: 1
+  transmissionInput: 0
+  transmissionLow: 1
+  transmissionMid: 1
+  transmissionHigh: 1
+  maxTransmissionSurfaces: 1
+  directMixLevel: 1
+  reflections: 0
+  reflectionsType: 0
+  useDistanceCurveForReflections: 0
+  currentBakedSource: {fileID: 0}
+  reverbTimeLow: 0
+  reverbTimeMid: 0
+  reverbTimeHigh: 0
+  hybridReverbEQLow: 1
+  hybridReverbEQMid: 1
+  hybridReverbEQHigh: 1
+  hybridReverbDelay: 0
+  applyHRTFToReflections: 0
+  reflectionsMixLevel: 1
+  pathing: 1
+  pathingProbeBatch: {fileID: 1915958022}
+  pathValidation: 1
+  findAlternatePaths: 1
+  pathingEQ:
+  - 1
+  - 1
+  - 1
+  pathingSH:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  applyHRTFToPathing: 1
+  pathingMixLevel: 0.8
+  normalizePathingEQ: 0
 --- !u!1001 &3393537409043820868
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15482,6 +19685,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 2970828451077991447, guid: f230b9b5eb1656349bff4b529d1ded0c,
+        type: 3}
+      propertyPath: m_Volume
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 4304831680806086201, guid: f230b9b5eb1656349bff4b529d1ded0c,
         type: 3}
       propertyPath: m_Layer
@@ -15560,7 +19768,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 873290868}
     m_Modifications:
     - target: {fileID: 2756908203001947208, guid: 12720f525ed95244b9f1a94d4607f1fb,
         type: 3}
@@ -15569,38 +19777,53 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 3630bf2183930294a82a143950ace563, type: 2}
     - target: {fileID: 3893834374903586599, guid: 12720f525ed95244b9f1a94d4607f1fb,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.19999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 3893834374903586599, guid: 12720f525ed95244b9f1a94d4607f1fb,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.19999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 3893834374903586599, guid: 12720f525ed95244b9f1a94d4607f1fb,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.19999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 3893834374903586599, guid: 12720f525ed95244b9f1a94d4607f1fb,
+        type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.913
+      value: -15.563
       objectReference: {fileID: 0}
     - target: {fileID: 3893834374903586599, guid: 12720f525ed95244b9f1a94d4607f1fb,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -48.563
+      value: 1.4370003
       objectReference: {fileID: 0}
     - target: {fileID: 3893834374903586599, guid: 12720f525ed95244b9f1a94d4607f1fb,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.688
+      value: -8.468
       objectReference: {fileID: 0}
     - target: {fileID: 3893834374903586599, guid: 12720f525ed95244b9f1a94d4607f1fb,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.67042667
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3893834374903586599, guid: 12720f525ed95244b9f1a94d4607f1fb,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0.74197584
       objectReference: {fileID: 0}
     - target: {fileID: 3893834374903586599, guid: 12720f525ed95244b9f1a94d4607f1fb,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0.67042667
       objectReference: {fileID: 0}
     - target: {fileID: 3893834374903586599, guid: 12720f525ed95244b9f1a94d4607f1fb,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.74197584
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3893834374903586599, guid: 12720f525ed95244b9f1a94d4607f1fb,
         type: 3}
@@ -15627,6 +19850,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 12720f525ed95244b9f1a94d4607f1fb, type: 3}
+--- !u!4 &7365185210368069260 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3893834374903586599, guid: 12720f525ed95244b9f1a94d4607f1fb,
+    type: 3}
+  m_PrefabInstance: {fileID: 7365185210368069259}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7504649456591212104
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16147,22 +20376,22 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 873290868}
     m_Modifications:
     - target: {fileID: 212354313440050220, guid: c3e6b2e6226891b40ba246d38faf2214,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 9.988
+      value: -16.638
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: c3e6b2e6226891b40ba246d38faf2214,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -48.158
+      value: 1.841999
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: c3e6b2e6226891b40ba246d38faf2214,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.069
+      value: 0.28900003
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: c3e6b2e6226891b40ba246d38faf2214,
         type: 3}
@@ -16172,12 +20401,12 @@ PrefabInstance:
     - target: {fileID: 212354313440050220, guid: c3e6b2e6226891b40ba246d38faf2214,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.5246561
+      value: -0.5246561
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: c3e6b2e6226891b40ba246d38faf2214,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.47406325
+      value: -0.47406325
       objectReference: {fileID: 0}
     - target: {fileID: 212354313440050220, guid: c3e6b2e6226891b40ba246d38faf2214,
         type: 3}
@@ -16214,6 +20443,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3e6b2e6226891b40ba246d38faf2214, type: 3}
+--- !u!4 &8036921397793187786 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 212354313440050220, guid: c3e6b2e6226891b40ba246d38faf2214,
+    type: 3}
+  m_PrefabInstance: {fileID: 8036921397793187785}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -16222,7 +20457,5 @@ SceneRoots:
   - {fileID: 474728137}
   - {fileID: 4467047981919304941}
   - {fileID: 880424292}
-  - {fileID: 7365185210368069259}
-  - {fileID: 8036921397793187785}
-  - {fileID: 84507094}
-  - {fileID: 1325321560}
+  - {fileID: 1112300154}
+  - {fileID: 1915958023}

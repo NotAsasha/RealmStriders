@@ -20,6 +20,10 @@ namespace Player.Movement
         [Header("Spectator References")]
         [SerializeField] private SpectatorController spectatorController;
 
+        [Header("Audio")]
+        [SerializeField] private AudioListener audioListener;
+        public Transform AudioListenerTransform => audioListener != null ? audioListener.transform : null;
+
         [Header("Settings")]
         public float mouseSensitivity = 1f;
         public float hitDistance = 2.0f;
@@ -66,6 +70,12 @@ namespace Player.Movement
 
             SetupSingleton();
 
+#if STEAMAUDIO_ENABLED
+            // The owner camera appears after scene load, when Steam Audio searches for its listener.
+            if (audioListener != null && SteamAudio.SteamAudioManager.Singleton != null)
+                SteamAudio.SteamAudioManager.NotifyAudioListenerChangedTo(audioListener.transform);
+#endif
+
             startPosition = transform.localPosition;
             movement = PlayerMovement.Instance;
 
@@ -97,6 +107,10 @@ namespace Player.Movement
             }
 
             SettingsFile.OnSettingsChanged -= UpdateSensitivity;
+#if STEAMAUDIO_ENABLED
+            if (SteamAudio.SteamAudioManager.Singleton != null)
+                SteamAudio.SteamAudioManager.NotifyAudioListenerChangedTo(null);
+#endif
             SetFirstPersonVisibility(false);
             CleanupInputHandlers();
             UnityEngine.Cursor.lockState = CursorLockMode.None;

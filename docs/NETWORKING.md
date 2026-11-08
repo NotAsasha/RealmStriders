@@ -1,181 +1,112 @@
 # Networking
 
-## Technology
+Netcode for GameObjects replicates gameplay over Facepunch Steam transport.
+Network-aware gameplay components inherit from `NetworkBehaviour`.
 
-- Netcode for GameObjects is used for replicated gameplay.
-- Facepunch Steam transport is used for online connectivity.
-- Network-aware gameplay components should inherit from `NetworkBehaviour`.
+## Authority
 
-## Authority rules
+The server owns shared outcomes. Clients submit requests; the server validates
+and applies them. Never trust client prices, rewards, damage, capture results
+or inventory changes. Subscribe/apply initial state in `OnNetworkSpawn` and
+unsubscribe/clean up in `OnNetworkDespawn`.
 
-The server owns shared gameplay outcomes. Clients may request actions, but the
-server validates and applies the result.
+Use `NetworkVariable<T>` or networked objects for durable state needed by late
+joiners. Use RPCs for requests and transient events. Local presentation must
+not be used as proof that an authoritative action succeeded.
 
-Examples in the current code:
+| System | Authority and replication |
+| --- | --- |
+| Mission/spawning | Server loads/unloads NGO scenes and spawns enemies from the selected danger list |
+| Purchases | Server resolves the configured catalog entry, price and rating requirement; client price is ignored |
+| Inventory | Server-written slot-ID `NetworkList<ulong>`, selected slot and holding flag; `ulong.MaxValue` means empty |
+| Movement/crouch | Existing owner authority; owner-written stance and `currentNoiseRadius` |
+| Capture/status | Server resolves capture, damage, Freeze and weaknesses; Entity state is replicated |
+| Crafter | Server selects recipe, consumes inputs and spawns output; slot validity/occupancy, recipe index and crafting state are replicated |
+| Casino gate | Server validates/consumes CasinoCage once; activation timestamp supports late-join animation seeking |
+| Tutorial | Local singleplayer host; server-owned stages and training transactions; no campaign save or Steam lobby |
 
-- `EnemySpawner.SpawnEnemies` exits unless `IsServer` is true.
-- The shop receives a purchase request on the server, validates shared money,
-  subtracts the price, and spawns the item.
-- Network scene changes are initiated by the server.
+## Session and persistence
 
-Do not trust client-provided prices, rewards, damage, capture results, or
-inventory changes.
+The player host owns the campaign save. A lost host returns clients through
+SteamBoot to Menu with `host left the game`; there is no host migration.
+Automatic saving follows mission completion. Manual saving is allowed only
+outside active missions. Mission completion/rating and disconnect gaps are
+listed in [Systems](SYSTEMS.md#known-implementation-gaps); do not infer intended
+rules from the legacy loss-threshold branch.
 
-## Host and save ownership
+Before unloading a mission, scene items brought into the base are promoted to
+runtime NetworkObjects so NGO does not remove them with their original scene.
+Inventory parenting and slot IDs must survive this promotion.
 
-The game uses Steamworks lobbies with a player host. The host owns the game's
-save file. If the host leaves, the networked game shuts down and the host can
-later load the last save.
+## Inventory and equipment
 
-Clients detect a lost host through the local NGO disconnect callback, show
-`host left the game`, and return to the main menu instead of remaining in a
-stalled network session.
+Pickup, selection and drop requests validate the requesting player. Pickup also
+checks range, slot occupancy and existing holder. Every peer resolves the slot
+snapshot and retries when spawn/parent messages arrive out of order. Network
+parent changes belong to the server. Stored roots remain active; explicit
+presentation arrays hide visuals/audio and disable held physics/colliders.
+Stored items follow the holder for mission-boundary cleanup.
 
-The save is written automatically after a mission completes. Manual saving is
-allowed only while no mission is active.
+`AddItem` reports request submission, not acceptance. Presentation follows the
+replicated result. Despawn removes the slot. Normal drops preserve powered
+equipment; selection changes and death turn it off. Held poses and IK are local
+presentation; see [Held items](HELD_ITEMS.md). Directional drop requests include
+the owner's origin/forward; the server checks finite values and bounds the
+origin. Cosmetic poses do not add an aiming protocol.
 
-If all living players disconnect and only a dead host remains, the mission
-ends and all unreturned mission loot is lost.
+- Flashbang checks holder, active item, charge and cooldown on the server;
+  replicated charge and a transient pulse represent the accepted use.
+- Teleporter and ReturnTeleporter both implement `IChargeable`, retain the item
+  and spend 50 of 100 charge per successful use, with a 0.75-second cooldown.
+  Both validate the active holder and living Human. Teleporter requires an
+  active mission and chooses a safe NavMesh destination outside the base;
+  ReturnTeleporter returns to `GameManager.spawnPoint` without that mission
+  requirement. Audio/VFX/button animation are transient presentation.
+- WalkieTalkie's server-written transmission state is refreshed by validated
+  voice packets and cleared after a packet gap. The owner starts its cosmetic
+  raised pose immediately; late joiners receive ongoing transmission state.
+  Unequip/power-off ends it.
+- Charger detects dropped items through physics and active held items through
+  network-lifetime inventory registration. Both paths use the same range,
+  layer, occlusion and nearest-target checks.
 
-The mission can also be ended by the base, by the mission timer, or by the
-whole team dying. Only a mission with every target captured receives the
-success rating increase.
+## Voice, footsteps and gameplay noise
 
-## State versus events
+Movement remains owner-authoritative; crouch replication applies the initial
+capsule on every peer, including late joiners. Current movement does not add
+server validation of displacement, grounded state or head clearance.
 
-- Use `NetworkVariable<T>` for persistent replicated state that late-joining
-  clients need.
-- Use RPCs for requests and transient events.
-- Player stance follows the existing owner-authoritative movement contract:
-  `PlayerMovement.isCrouching` is an owner-written NetworkVariable. Every peer
-  applies its initial value and changes to the capsule, including late joiners;
-  PlayerAnimation reads it for the full-body pose. Speed and footstep noise are
-  calculated by the owner, using the existing replicated `currentNoiseRadius`
-  consumed by enemy detection on the server. This preserves the movement trust
-  model; it does not introduce server-side movement/clearance validation.
-- Flashbang validates the requesting holder, active inventory item, charge,
-  and pulse cooldown on the server. Charge is a server-written NetworkVariable;
-  successful uses broadcast a visual pulse at the authoritative effect origin.
-- Keep presentation-only effects local unless every client must observe them.
-- Subscribe and unsubscribe to network lifecycle events in
-  `OnNetworkSpawn`/`OnNetworkDespawn`.
-- Noise that affects enemy behaviour is emitted and resolved on the server.
-  Continuous equipment noise is driven by server-owned state, while voice
-  transmission refreshes a short-lived server-side noise window only when the
-  decoded microphone RMS level exceeds the `VoiceChat` threshold (0.04 by
-  default). This prevents microphone static from producing enemy reactions.
-- Inventory slots use a server-written `NetworkList<ulong>` of spawned object
-  IDs (`ulong.MaxValue` is empty). The selected slot and holding flag are
-  server-written NetworkVariables. Pickup, selection and drop RPCs validate the
-  sender; pickups also validate slot occupancy, existing holder and distance.
-- Every peer rebuilds its item references from that snapshot and retries unresolved
-  IDs/parents when spawn and parent messages arrive later. Parent changes belong
-  to the server; presentation no longer reparents NetworkObjects on clients.
-- Stored items keep their network roots active. Explicit prefab references hide
-  renderers, lights, canvases and audio; held colliders and physics are disabled.
-  Hidden items follow the holder so mission-boundary cleanup still uses their
-  current location. Despawn removes the server's slot entry.
-- Charger selects targets on the server. Dropped items are detected through
-  physics; equipped items are read from inventories registered for their network
-  lifetime because held colliders are disabled. Only the active slot is eligible,
-  with the same item layer, range, wall occlusion and nearest-target checks.
-- Held poses use the existing full-body skeleton. The owner chooses a camera-space
-  grip pose; other peers use a shoulder-relative pose. Both compute a wrist target
-  from the same palm calibration, solve IK, then align the item to the actual palm.
-  `GripPoint` is independent of the first-person composition offsets.
-- WalkieTalkie transmission is a server-written NetworkVariable refreshed by
-  validated voice packets and cleared after a short packet gap. Local transmission
-  also starts the cosmetic raise immediately. Both views blend their own poses;
-  late joiners receive the ongoing transmission state. Unequip/power-off stops it.
-- Normal drops preserve equipment power (including a deployed Subwoofer and a
-  receiving radio). Death drops turn equipment off. Dropping ends the held radio
-  pose because the radio is no longer equipped.
-- Directional equipment keeps its existing aiming contract. Drop requests include
-  the owner's origin and forward vector; the server checks finite values and
-  bounds the origin. Cosmetic pose changes do not introduce new aiming RPCs.
-- `Teleporter` validates the active holder on the server, selects a safe
-  destination through the same `EnemySpawner.RandomMapPoint` NavMesh sampling
-  used for mission enemies, outside the base exclusion radius,
-  and only works while `GameManager.hasStartedMission` is true. It teleports
-  the owning `Human` and consumes the item only after a valid
-  destination is found. Teleport audio/VFX and the button animation are
-  transient client presentation.
-- `ReturnTeleporter` validates the active holder on the server, teleports the
-  owning `Human` to `GameManager.spawnPoint` from any loaded location, and
-  consumes the item after the server applies the teleport.
+`PlayerAudio` predicts the owner's footsteps and submits unreliable owner-only
+RPCs carrying clip index and pitch. The server checks living/unfrozen/uncaptured
+state, valid clip, finite pitch in 0.8–1.2 and a 0.24-second minimum interval.
+It broadcasts accepted events; the owner ignores the echo and late joiners hear
+future steps only. Cadence comes from PlayerMovement.
 
-The repeatable loopback checks are documented in `docs/HELD_ITEMS.md`.
+AI hearing and acoustic playback are separate. Continuous equipment noise is
+driven by server-owned state. Voice refreshes a short-lived server noise window
+only above the decoded microphone RMS threshold (default 0.04), avoiding static
+triggering enemy reactions. Steam Audio results do not change these rules.
 
+`PlayerAudio` binds four independent sources (steps, voice, death, shock).
+Owner feedback is 2D; remote sources use Steam Audio. Persistent players resolve
+registered acoustic volumes by position when entering additive scenes.
+`EnemyAcoustics` binds explicit sources to its scene's environment. Despawn clears
+bindings; `VoiceChat` also stops/releases its dedicated streaming clip/buffers.
+Authoring and scene coverage are documented in [Steam Audio](STEAM_AUDIO.md).
 
-## Casino gate
+## Timed presentation and late joins
 
-`CasinoCagePedestal` validates the requesting inventory's owner, living state,
-distance, active item and CasinoCage prefab hash on the server. It consumes
-the item with the existing inventory/despawn path exactly once.
-A server-written activation timestamp drives the installed mesh and starts the
-authored Animator opening state. Late joiners seek into that state using the
-configured opening duration, enable lights and looping particles, and do not
-replay old audio or particle bursts.
-The mounted cage is authored mesh-only scene content, with no Item or
-NetworkObject, so it cannot be picked up or saved as loot. Gate state lasts
-only for the loaded mission scene.
+`CasinoDoorPresentation` seeks the authored opening clip from the replicated
+activation time. Late joins enable lights/looping particles without replaying
+opening audio or bursts. The mounted cage has no Item/NetworkObject and is not
+saveable loot; state lasts for that mission scene only.
 
-## Adding a networked interaction
+`NetworkRandomAudio` selects interval, clip and pitch on the server and sends a
+future server timestamp. Clients wait or seek forward after late delivery.
+All peers need the same Inspector clip list and a dedicated AudioSource with
+Play On Awake disabled. Disable/despawn cancels playback; a new event interrupts
+the previous clip. It emits no gameplay noise and stores no event history.
 
-`NetworkRandomAudio` owns its interval timer and random clip/pitch selection on
-the server. Its ClientRpc sends a clip index, pitch, and future server timestamp;
-clients wait for that timestamp and seek forward if delivery is late. Playback
-alignment is limited by clock synchronization and frame timing. All peers must
-use the same Inspector clip list. Assign a dedicated AudioSource with Play On
-Awake disabled; volume, spatial blend and mixer routing use that source's settings.
-The first sound follows one randomized interval plus the synchronization delay.
-Intervals are clamped to at least 0.1 seconds. A new sound interrupts the previous
-sound on that source. Disable/despawn cancels pending and active audio; late
-joiners hear future events only. This component does not emit gameplay noise.
-
-1. Decide which peer owns the authoritative state.
-2. Define the client request and its server-side validation.
-3. Apply the result only on the authoritative peer.
-4. Replicate durable state with a `NetworkVariable` or a suitable networked
-   object.
-5. Use an RPC only for a transient notification or presentation event.
-6. Handle despawn, scene changes, and late joining.
-
-The Crafter's `TryStartCraft` is the public callback for the physical Button's
-UnityEvent. On the server it validates and starts the craft directly; on a
-client it sends `TryStartCraftServerRpc`. The server remains the only peer that
-can consume input items, start the craft timer, or spawn the output.
-Valid ingredients entering a socket trigger the server-owned
-`PlayItemDetectedSoundRpc`, so the detection signal is synchronized for all
-clients.
-After the output is spawned, the server broadcasts
-`PlayTubeSpawnPresentationRpc`, which plays the Crafter Tube's AudioSource and
-ParticleSystem using the same presentation pattern as Shop.
-The server also replicates occupied-slot state and the matching recipe index.
-The Crafter UI therefore shows the same recipe or `NO RECIPE` error on every
-client without allowing clients to select or validate recipes locally.
-The replicated recipe index selects the same Inspector-configured `Craft Text`
-on every peer; the text is presentation data and does not affect validation.
-While a socket is occupied, the server periodically clears its cached item
-when the network object is despawned or parented to an inventory. The check is
-disabled when both sockets are empty, avoiding per-frame stale-state polling.
-
-Mission scene objects brought into the base must be promoted to runtime network
-objects before the mission scene is unloaded. Otherwise NGO removes them with
-the scene even though they are inside the base.
-
-## Tutorial
-
-Tutorial starts an isolated local host through SteamManager's singleplayer
-transport path after loading its scene. It does not create a Steam lobby or
-load a campaign save. TutorialDirector is a NetworkBehaviour; only the server
-spawns training content, accepts successful capture/sale/purchase events and
-advances its Stage NetworkVariable. Its UI is local to this singleplayer mode.
-Equipment and transactions use their normal production server paths.
-
-## Known areas to verify
-
-The network contract is not yet documented for every player equipment item,
-save operation, and monster. When changing one of these areas, inspect the
-existing implementation and update this document if the authority model
-becomes clear.
+For any new interaction, check sender/ownership, authoritative validation,
+initial state, late joining, despawn and scene transitions with a host and a
+client. UDP loopback checks do not verify Steam transport or microphone capture.

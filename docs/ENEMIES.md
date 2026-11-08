@@ -1,131 +1,94 @@
 # Enemies
 
-## Shared model
+Enemy content lives under `Assets/Enemy/`. `Enemy`, `EntityDetector`, movement,
+`EnemySounds` and `EnemySpawner` provide shared behaviour. Current specialized
+areas are Casino, Grabar, InvisiMan, LureMan, Runner and Shocker.
 
-Enemy content lives under `Assets/Enemy/`. Shared components provide common
-enemy behaviour, movement, sensing, sounds, animation, and spawning. Each
-specialized monster extends that foundation with its own rules.
+## Spawning
 
-Current specialized enemy areas include:
+The server spawns the mission's pre-rolled danger list. `EnemySpawner` chooses
+from Inspector-configured pools, samples a map position, moves the instance to
+the mission scene and spawns its NetworkObject.
 
-- `Casino`
-- `Grabar`
-- `InvisiMan`
-- `LureMan`
-- `Runner`
-- `Shocker`
+| Team rating | Maximum danger |
+| --- | --- |
+| 0–3 | 2 (Grabar, Runner) |
+| 4–6 | 3 (adds LureMan, Shocker) |
+| 7–9 | 4 (adds CasinoMonster) |
+| 10+ | 5 (adds InvisiMan) |
 
-### Sound conventions
+Within the allowed tiers, weights form a smooth bell curve around the rating's
+target danger. Placement excludes the configured portal area and low positions.
+This does not make the base safe: enemies may enter it during an active mission.
 
-- `EnemySounds` handles vocal presentation (idle breathing, chase roars, jumpscares, death).
-- Idle sounds play periodically with randomized intervals while roaming (`minIdleInterval` to `maxIdleInterval`).
-- Angry sounds trigger on detection and repeat periodically during chase (`minAngryInterval` to `maxAngryInterval`).
-- Vocal audio uses a dedicated `AudioSource` to avoid conflicting with movement footstep attenuation or pitch modulation.
-- Vocals are guarded: suppressed while dead, asleep (e.g. music box, static sleep state), frozen, or during capture.
-- Attack/jumpscare sounds trigger automatically on player bite via `Enemy.onBite`.
+## Capture and counterplay
 
-## Spawn model
+Confirmed rules: LeafBlower captures every target; higher danger takes longer.
+Other equipment weakens monsters, and stacked weaknesses shorten capture time.
+Capture produces an EnemyCage. Killing is not an alternative objective. Cages
+must reach the base before mission cleanup to remain available.
 
-The enemy spawner runs on the server. Mission selection can provide a
-pre-rolled list of danger levels. Danger tiers are gated by the team rating / star level:
-- Star 1 (Rating 1–3): Danger 1–2 only (Grabar, Runner). Higher tiers (3–5) are strictly prohibited.
-- Star 2 (Rating 4–6): up to Danger 3 (LureMan, Shocker).
-- Star 3 (Rating 7–9): up to Danger 4 (CasinoMonster).
-- Star 4–5 (Rating 10+): up to Danger 5 (InvisiMan).
+Current LeafBlower behaviour:
 
-Within the allowed tiers, danger probability follows a smooth bell curve centered
-around the target danger for the current rating.
+- The holder and their child colliders are excluded from target detection;
+  dropping removes that exclusion.
+- Losing sight retains the target/progress but pauses capture. After one second
+  without reacquiring that target, progress loses 20% of the required capture
+  time, repeating each second until reacquired or empty.
 
-The spawner selects a prefab from the configured danger pool, chooses a map position,
-moves the object to the mission scene, and spawns its `NetworkObject`.
+Mission success/rating follows [Game Design](GAME_DESIGN.md). The current
+`isDead`-based completion calculation has a documented
+[implementation gap](SYSTEMS.md#known-implementation-gaps).
 
-The current placement logic excludes the portal area and low positions.
-However, once a mission is active, enemies are intentionally allowed to
-enter the base; the base is not a guaranteed safe zone.
+Equipment noise is server-owned: running LeafBlower and grounded Subwoofer
+continuously lure, radio lures while voice is transmitted, and Flashbang/Taser
+emit activation noise. Audible spatialization does not determine AI hearing.
 
-## Monster contract
+`Enemy.Run(sourcePosition)` finds a reachable NavMesh destination away from the
+source, preferring the farthest valid point and trying shorter distances in
+confined spaces. Only complete paths using the agent's navigation type/areas
+qualify; failure preserves movement. Fleeing takes priority over pursuit until
+the escape path finishes. Flashbang supplies its pulse origin.
 
-Before adding or changing a monster, document:
+Runner treats every lure as a threat and uses that same escape path. Continuous
+noise can update the destination. Its parameterless damage response uses a
+visible/heard threat or retreats backwards. Tune `fleeDistance`,
+`fleeDirectionSamples` and `navMeshSampleDistance` in the Inspector.
 
-- its role and intended player experience;
-- how it detects and tracks players;
-- movement and attack states;
-- equipment interactions and counterplay;
-- capture/defeat conditions;
-- server authority and replicated state;
-- required prefab, animation, sound, and test-scene changes.
+## Sounds
 
-## Capture model
+`EnemySounds` owns idle, angry, jumpscare and death vocal presentation. Idle
+intervals apply while roaming; detection starts angry playback with chase
+intervals. Vocals are suppressed when dead, asleep, frozen or capturing.
+`Enemy.onBite` triggers the attack/jumpscare cue.
 
-`LeafBlower` is the canonical capture tool. Capture time increases with the
-monster's danger or difficulty. Other equipment can weaken a monster before
-and during capture; multiple weaknesses can be combined and their effects
-stack, reducing the time required by the `LeafBlower`.
+Keep vocals separate from footstep pitch/range changes. Assign vocal sources
+explicitly, including separate music/vocals on LureMan. `EnemyAcoustics` binds
+configured source pairs on spawn and clears them on despawn. Scene data and
+source authoring are in [Steam Audio](STEAM_AUDIO.md).
 
-While held, `LeafBlower` excludes its current holder and their child colliders
-from target detection. Dropping it removes this exclusion.
+## Shocker cage
 
-The `LeafBlower` keeps the current target and capture progress when the target
-briefly leaves its view. While the target is lost, capture does not advance.
-After one second without reacquiring that same target, 20% of the required
-capture time is removed from progress; this penalty repeats once per second
-until the target is reacquired or the progress reaches zero.
+`ShockerCageDischarge` selects a uniformly random living, spawned entity within
+6 m every 4–9 seconds. Players (including the carrier) and monsters qualify;
+dead, capturing and invincible entities do not. Root distance is used without
+line of sight. The cage stays active dropped, held or stored, without charge.
 
-Equipment noise is server-authoritative. A running `LeafBlower` or grounded
-`Subwoofer` continuously lures nearby enemies, while a walkie-talkie only
-lures them while voice data is actively transmitted. `Flashbang` and `Taser`
-create one-shot noise when they activate.
+It applies 2 seconds of Freeze and, on a wet target, refreshes weakness slot 3
+for 6 seconds; it deals no health damage. Range/timing are Inspector settings.
+The server owns selection/effects, a transient RPC plays lightning/audio, and
+Entity replicates Freeze/weakness. Despawn stops timers and presentation.
 
-`Enemy.Run(sourcePosition)` selects a reachable NavMesh point away from the
-source on the server, preferring the point farthest from that source. It checks
-shorter escape distances when space is limited and only accepts complete paths
-using the enemy agent's navigation type and allowed areas. If no escape point
-exists, it preserves the current movement instead of picking a random point.
-Running takes priority over normal pursuit until the escape path finishes.
-Flashbang passes its pulse origin to this shared behaviour.
+Shocker's wider role, counterplay and balance targets still need owner
+confirmation. Do not invent them from its current implementation. Host/client
+playtesting must include a stored cage and mission-end despawn.
 
-`Runner` treats every lure as a threat and calls the same `Run` method.
-Repeated continuous noise can update its escape destination. Its damage
-notification does not include an attacker position, so parameterless `Run()`
-uses a visible/heard threat when available and otherwise retreats backwards.
-The shared Inspector fields `fleeDistance`, `fleeDirectionSamples`, and
-`navMeshSampleDistance` retain Runner's existing settings.
+## Adding or changing a monster
 
-A successful capture produces an `EnemyCage`. All target monsters must be
-captured for a successful mission; killing is not an alternative objective.
-The mission may still be ended early from the base, but it gives no rating
-increase unless every target was captured.
+Define role, detection/tracking, movement/attack states, equipment interactions,
+capture conditions and failure cases before implementation. Reuse shared enemy
+abstractions, document authority/replicated state and explicitly configure the
+prefab, animations, audio and spawn pool. See [Content Pipeline](CONTENT_PIPELINE.md).
 
-Items and cages left in the mission zone are destroyed when the mission ends.
-A cage already brought into the base remains safe.
-
-## Shocker
-
-`ShockerCage` automatically discharges at a uniformly random living, spawned
-entity within 6 m every 4–9 seconds. Players (including its carrier) and monsters
-are eligible; dead, capturing and invincible entities are excluded. It remains
-active on the ground, held, or stored in inventory, without consuming charge.
-Like Taser, it applies 2 seconds of Freeze and refreshes weakness slot 3 for
-6 seconds when the target is wet; it does not deal health damage. Range and
-timing are Inspector settings on `ShockerCageDischarge`. Detection uses entity
-root distance and does not require line of sight.
-
-The server owns timing, selection and effects. A transient RPC plays the coil's
-lightning bolt and spatial Taser shot sound on clients; Entity's existing
-NetworkVariables replicate Freeze and weakness. Despawn stops the timers and
-presentation. `tools/ShockerCageSetup.cs` configures and validates the prefab.
-Host/client gameplay and mission-end despawn still need a multiplayer playtest.
-
-The Shocker implementation and its related prefab, energy field, and sound
-components are the source of truth for current behaviour. Its design
-description, counterplay, and balance targets still need to be confirmed and
-should not be invented by an agent.
-
-## Validation checklist
-
-- Test spawning with a host and at least one client.
-- Verify that clients cannot create or resolve an enemy encounter locally.
-- Check scene ownership and despawn when the mission ends.
-- Test the monster against relevant equipment, movement, and player death
-  paths.
-- Update this document when the intended behaviour changes.
+Verify host/client spawn, counterplay, player death, capture and mission-end
+cleanup. Clients must not create or resolve encounters locally.

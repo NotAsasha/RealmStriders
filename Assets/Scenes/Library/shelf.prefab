@@ -86,6 +86,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1954787306838318554}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 702348d3ea33dc941a94ca33ab32740f,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4188292625059621923}
   m_SourcePrefab: {fileID: 100100000, guid: 702348d3ea33dc941a94ca33ab32740f, type: 3}
 --- !u!1 &2905536375474788915 stripped
 GameObject:
@@ -114,3 +118,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 15, y: 15, z: 3}
   m_Center: {x: -7.5, y: 7.5, z: -1.5}
+--- !u!114 &4188292625059621923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2905536375474788915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e829c87dc2a2ed2419c5f67848317fe4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioGeometry
+  material: {fileID: 11400000, guid: a086f686223eed942816c70be67841b0, type: 2}
+  exportAllChildren: 1
+  terrainSimplificationLevel: 0

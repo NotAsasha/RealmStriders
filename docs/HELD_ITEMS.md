@@ -1,116 +1,76 @@
 # Held items
 
-The system keeps one full-body rig and one network object per item. Only the
-right hand is used. Inventory state is authoritative on the server; poses are
-evaluated locally.
+The system uses one full-body rig, the right hand and one NetworkObject per
+item. Inventory state is server-owned; poses are evaluated locally.
+
+## Ownership
+
+| Component | Responsibility |
+| --- | --- |
+| `Inventory` | Replicated slot snapshot and selected item |
+| `ItemHolder` | Camera/shoulder poses, action offsets and equip transition |
+| `PlayerHeadSync` | Arm IK after camera effects |
+| `Item` | Aligning to the solved palm and hiding stored presentation |
 
 ## Authoring
 
-1. Set `Item.gripPoint` on the physical contact point of the handle. Its axes
-   describe the grip's coordinate system. Do not move it to fix screen framing.
-2. `ItemHolder.palmPositionLocal` locates the palm in hand-bone coordinates.
-   `handGripRotationOffset` converts grip orientation to wrist orientation. Both
-   apply to owner and remote views. The wrist target compensates for the palm
-   offset and skeleton scale before reach clamping.
-3. Adjust the item's `viewPositionOffset` / `viewRotationOffset` for first-person
-   composition, and `remotePositionOffset` / `remoteRotationOffset` for the world
-   pose. These offsets change the target of the whole hand-and-item assembly.
-4. `actionView*` / `actionRemote*` and `poseBlendDuration` describe an alternate
-   held pose. Override `IsHoldActionActive` for an equipment action. WalkieTalkie
-   uses validated voice transmission, with a 0.35-second release grace period
-   to avoid flicker between packets. Push-to-talk sends packets while recording;
-   voice activation sends packets above the existing RMS threshold.
-5. For authored clips, create an identity child `HoldAnimationOffset` in the item
-   prefab, assign it to `holdAnimationOffset`, and animate that child's local
-   position/rotation with a dedicated Animator. It is an additive pose input;
-   ItemHolder does not write to it. Do not animate the network root, GripPoint or
-   the player's IK target directly. The body's locomotion Animator changes its
-   speed with movement, so it should not drive item actions.
-6. Assign `inventoryRenderers`, `inventoryLights`, `inventoryCanvases`,
-   `inventoryAudioSources`, and `inventoryColliders` explicitly. Include particle
-   renderers and all child colliders. Runtime code never searches for these.
-7. Set `heldCameraBounds` to the physical mesh bounds in item-root coordinates,
-   excluding particles and effect volumes. After mesh changes, regenerate these
-   bounds through Unity MCP with `HeldItemCrouchChecks.Configure` in
-   `tools/HeldItemCrouchChecks.cs` (updates all carried item prefabs).
+1. Set `Item.gripPoint` at the physical handle contact, with axes describing the
+   grip coordinate system. Use pose offsets to adjust framing rather than moving
+   the handle.
+2. Calibrate `ItemHolder.palmPositionLocal` in hand-bone coordinates and
+   `handGripRotationOffset` for grip-to-wrist orientation. Both views share this
+   calibration, including skeleton scale compensation.
+3. Set `viewPositionOffset` / `viewRotationOffset` for first person and
+   `remotePositionOffset` / `remoteRotationOffset` for the world pose. These move
+   the whole hand/item assembly.
+4. Use `actionView*`, `actionRemote*` and `poseBlendDuration` for an alternate
+   pose, with `IsHoldActionActive` supplying the action state. WalkieTalkie uses
+   voice transmission with a 0.35-second release grace period between packets.
+5. For clips, create an identity child `HoldAnimationOffset`, assign
+   `holdAnimationOffset` and animate that child's local transform with a dedicated
+   Animator. Do not animate the network root, GripPoint or player IK target.
+   The body locomotion Animator must not drive item actions.
+6. Explicitly assign `inventoryRenderers`, `inventoryLights`, `inventoryCanvases`,
+   `inventoryAudioSources` and `inventoryColliders`, including particle renderers
+   and child colliders. No runtime hierarchy searches supply missing references.
+7. Set `heldCameraBounds` to physical mesh bounds in item-root coordinates,
+   excluding particles/effect volumes. Recompute after geometry changes.
 
-PlayerHeadSync evaluates after camera effects, then solves the wrist, then locks
-the item to the actual palm. The final attachment follows the solved hand even
-during the equip-weight transition. The owner and remote views may have different
-screen/world poses; neither requires streaming item transforms while held.
+The wrist is solved before the item locks to the actual palm, including the
+first equip frame. Owner poses use a camera-relative grip with forward correction
+when bounds enter `ItemHolder.cameraClearance` (0.12 m). Local shoulder extension
+preserves arm lengths and palm contact and is restored before the next animation
+pass/on despawn. Remote reach remains separate. Terminal interaction retains its
+frozen world-space pose. Extreme angles/large items still need visual review.
 
-The owner uses the authored camera-relative grip, with an additional forward
-correction when the item's oriented bounds enter `ItemHolder.cameraClearance`
-(0.12 m). The local shoulder extends only as far as needed to reach this grip;
-arm segment lengths and palm contact are preserved. The shoulder offset is
-restored before the next animation pass and on despawn. Local grip IK applies
-fully from the first equipped frame; remote equip blending and arm reach remain
-unchanged. Terminal interaction keeps its existing frozen world-space pose.
-Very large items and extreme look angles can still extend outside the frame.
-Use per-item pose offsets for composition rather than moving the handle.
+## Lifecycle
 
-## Inventory lifecycle
+- Selection starts ItemHolder's procedural raise/wrist turn. Tune `equipDuration`
+  (0.32 s), `equipPositionOffset` and `equipRotationOffset` in the Inspector.
+  Rapid switching restarts for the latest item; selecting the same slot does not.
+  Empty slots release the arm. Animation does not delay use or add RPCs.
+- `AddItem` returns request submission, not server acceptance. Display follows
+  acknowledged inventory state; see [Networking](NETWORKING.md).
+- Stored roots remain active and parented to the player. Presentation hides
+  graphics/audio and disables colliders/physics. Hidden items follow the holder
+  for mission cleanup.
+- Slot and parent messages may arrive in either order; reference resolution
+  retries. Mission promotion can remove/reapply parents without losing slot IDs.
+- Despawn removes its slot. Death drops all items on the server and turns them
+  off. Normal drops preserve powered devices; changing slots turns them off.
+- An equipped powered radio raises while transmitting and lowers after the
+  packet grace period. Unequip, drop or power-off ends that pose. Voice activation
+  uses the existing RMS threshold; push-to-talk sends while recording.
 
-Selecting a different item starts a 0.32-second procedural hand raise in
-`ItemHolder`, with a small wrist turn. `equipDuration`, `equipPositionOffset`
-and `equipRotationOffset` configure it in the Inspector. The offset blends to
-the item's normal/action pose before camera clearance and IK, for both owner
-and remote views. Rapid selection restarts the raise for the latest item;
-selecting the same item does not restart it. Empty slots clear the held item
-and use the existing arm release. The animation follows acknowledged inventory
-state and does not delay use, change authority, or send additional RPCs.
+## Verification
 
-- `AddItem` requests pickup; its return value means a request was submitted,
-  not that the server accepted it. Presentation follows the acknowledged state.
-- Slot changes and pickup/drop requests are validated on the server. The slot
-  list and selected slot are durable state, so no replay of old RPCs is needed.
-- Spawned roots stay active in stored slots. Graphics and audio are hidden,
-  colliders are disabled, and the network parent remains the player.
-- Both the slot list and item parent callbacks may arrive first. Resolution is
-  retried until referenced items and their parents exist locally.
-- Item despawn removes its slot; death drops all slots on the server. Normal
-  drops preserve powered devices; slot changes and death turn them off.
-- Stored items still update their world location with the player. Mission item
-  promotion can temporarily remove/reapply parenting without losing slot IDs.
+Check the real Player rig and item prefab in standing/crouch idle/crouch walk,
+several animation phases, look pitches and equip weights. Confirm camera
+clearance, palm contact, unchanged arm lengths and restored shoulder pose.
+Inspect first-person and remote views, including terminal entry/exit.
 
-## Repeatable checks via Unity MCP
-
-`HeldItemCrouchChecks.Run(0.4f, true)` checks all 21 carried item prefabs against
-the real Player rig in a preview scene: standing/crouch idle/crouch walk, four
-animation phases, five look pitches and four equip weights (5,040 combinations).
-It asserts camera clearance, palm contact, unchanged arm segment lengths,
-shoulder restoration and separation from remote poses, and renders sample views.
-
-Use `run_script` with `tools/HeldItemChecks.cs`:
-
-- `ValidatePrefabs(string[] paths)` checks presentation arrays and Player holder
-  references for the supplied item prefab paths.
-- `CheckGripAndPresentation()` checks exact grip alignment at multiple scales
-  and verifies that hiding/restoring presentation keeps the network root active.
-- `PreviewRig(itemPath, imagePath, firstPerson)` solves the real Player arm in
-  a temporary preview scene, checks palm contact and renders a preview. Lights
-  and particles on the copied item are disabled to inspect geometry clearly.
-
-For a network integration check, use `tools/HeldItemNetworkChecks.cs`:
-
-1. Run `Prepare` in Edit Mode. It creates temporary assets under
-   `Assets/Temporary/HeldItemNetworkChecks` and assigns an isolated Play Mode
-   start scene, leaving existing unsaved scenes untouched.
-2. Enter Play Mode using Unity MCP, then run `Run` (timeout 55 seconds).
-3. Exit Play Mode and run `Restore`, including after a failed check.
-
-The integration check uses the production Inventory/Item RPCs with a local host
-and two UDP clients in one Editor process. It checks late-join slots, parenting,
-visibility, an ongoing radio transmission snapshot, powered LeafBlower/Subwoofer
-effects, rejection of foreign player
-requests, empty-slot selection, death-drop logic, client pickup/drop, powered
-radio drops and despawn cleanup. It does not test Steam voice capture or Steam
-transport, nor does it simulate the full mission scene transition.
-
-Manual follow-up: Steam host/client voice in both input modes; walking/crouching
-and extreme look angles; terminals; drop/unequip during transmission; mission
-return and cleanup with stored and equipped items.
-
-Observed unrelated Editor issue: Play Mode initialization reports an unsupported
-shader pass in `SubwooferShaderWarmup.WarmUpShaders`. The loopback checks can run
-despite this; this change does not alter that shader warmup.
+With a host and client, verify pickup, rapid/empty-slot selection, late-join slot
+and radio state, parent/visibility order, rejection of foreign-player requests,
+powered drops, death drops, despawn and mission return with stored/equipped items.
+Test Steam voice in both input modes separately; local loopback does not verify
+microphone capture or Steam transport.

@@ -1,71 +1,81 @@
 # Content Pipeline
 
-## Shop item previews
+Read the relevant [design](GAME_DESIGN.md), [systems](SYSTEMS.md) and local
+`AGENTS.md` before authoring. Use Unity MCP for scenes, prefabs and serialized
+data. Keep assets paired with their `.meta` files.
 
-Shop item cards reference mesh-only prefabs in `Assets/Base/Shop/Previews/`.
-Assign the card's Shop, catalog, Buy button, shared ShopItemPreview, preview
-RawImage and preview model in the Inspector. Set its rating requirement to
-match its category (0, 4, 7, 10 or 13). Purchases use the card's server-side
-price and rating requirement.
+## Monsters
 
-After changing an equipment mesh, run `UpdatePauseAndShop.RebuildPreviews`
-from `tools/UpdatePauseAndShop.cs` through Unity MCP `run_script` in Edit Mode.
-It copies mesh renderers and materials, centers and scales them, and bakes
-ProBuilder geometry when necessary. Gameplay scripts, particles, colliders,
-lights and NetworkObjects are excluded. This entry point preserves the UI
-layout and item catalog.
+1. Define role, danger, detection, attacks, equipment counterplay and failure
+   cases in [Enemies](ENEMIES.md). Every target must be capturable by LeafBlower;
+   killing is not a mission objective.
+2. Reuse shared enemy abstractions and implement specialized behaviour in the
+   monster's folder. Identify stackable weaknesses and server-owned state.
+3. Configure the prefab, navigation, animation, effects and separate step/vocal
+   sources. Register it in NGO and the appropriate enemy danger pool.
+4. Configure explicit EnemyAcoustics emitter pairs as described in
+   [Steam Audio](STEAM_AUDIO.md#вороги-та-нові-джерела).
+5. Test host/client spawn, capture, player death and mission-end despawn.
 
-This is the default workflow for adding gameplay content. If a new feature
-requires a different process, document the exception and its reason.
+## Equipment
 
-## Adding a monster
+1. Define whether it captures, weakens, detects or supports, and which enemies
+   it affects. Reuse existing item/equipment interfaces.
+2. Validate requests on the server before applying gameplay effects. Configure
+   the network prefab and saveable registration where applicable.
+3. Assign visuals, effects and the `Item.icon` inventory sprite. If `clickSounds`
+   is populated, assign an enabled AudioSource on the Item root with Play On
+   Awake disabled; a child source does not supply Item's default use click.
+4. Set GripPoint at the physical handle, then author held poses and root-space
+   `heldCameraBounds` from physical meshes, excluding effect volumes. Assign
+   all inventory presentation arrays, including children. Never hide a network
+   root with `SetActive(false)`. See [Held items](HELD_ITEMS.md).
+5. Test stacking/capture timing, charge if applicable, pickup/selection/drop,
+   stored presentation, death, late joining and mission return/cleanup.
 
-1. Define the monster's role, danger level, detection, attack, capture
-   behaviour, counterplay, and failure cases in `docs/ENEMIES.md`. Every
-   target monster must be capturable by `LeafBlower`; killing is not an
-   alternative mission objective.
-2. Identify which equipment weakens it and whether those weaknesses stack.
-3. Implement shared behaviour in the existing enemy abstractions where
-   possible; keep monster-specific rules in the monster's folder.
-4. Create or update the prefab, animation, sounds, and required effects,
-   preserving `.meta` files.
-5. Register the prefab in the appropriate enemy spawn pool.
-6. Verify server-authoritative spawn, capture, despawn, and mission-end
-   behaviour with a host and a client.
-7. Update the design and systems documentation if the player loop or
-   authority model changed.
+Preserve existing `NetworkSaveables` registry indices: save files use them as
+prefab IDs. New variants need distinct registered identities.
 
-## Adding equipment
+## Shop previews
 
-1. Define the player's intended use and the monsters it can affect.
-2. Decide whether it directly captures, weakens, detects, or supports the
-   team.
-3. Reuse the existing equipment interfaces and item flow.
-4. Validate client requests on the server before applying gameplay effects.
-5. Create the prefab, visuals, audio, and UI entry as needed (assign the item sprite in `Item`'s `icon` field for inventory slot display).
-   If `clickSounds` is populated, add an enabled `AudioSource` to the same root
-   GameObject as `Item`, with Play On Awake disabled. `Item` caches that source;
-   an AudioSource on a child does not supply the default use click.
-6. Configure `GripPoint` on the physical handle and the `Held Poses` offsets
-   separately. Assign all `Inventory Presentation` arrays, including child
-   renderers, lights, canvases, audio sources and colliders. Never hide the
-   network root with `SetActive(false)`. See `HELD_ITEMS.md` for animation setup.
-   Set `heldCameraBounds` from the physical mesh in item-root space, excluding
-   effect volumes. Rebuild bounds after mesh changes using
-   `HeldItemCrouchChecks.Configure` through Unity MCP, then run its `Run` check.
-7. Test stacking with other equipment and verify that capture timing remains
-   understandable.
+Item cards use mesh-only prefabs under `Assets/Base/Shop/Previews/`. Assign Shop,
+catalog, Buy button, shared ShopItemPreview, preview RawImage and model explicitly.
+Set the category's required rating to 0, 4, 7, 10 or 13. Server purchases use the
+card's configured price and requirement.
 
-## Adding a world or mission
+After a mesh change, update the preview with centered/scaled mesh renderers and
+materials. Bake ProBuilder geometry if needed. Exclude gameplay scripts,
+particles, colliders, lights and NetworkObjects. Verify detail and quick-buy
+flows, preview shutdown and the locked-category state.
 
-1. Define the mission objective and return-to-base outcome.
-2. Add the scene and required spawn, portal, and navigation references.
-3. Verify local and networked scene loading.
-4. Test enemy placement outside the base and portal exclusion areas.
-5. Test a successful return, a failed mission, player death, and disconnect
-   behaviour.
+## Crafting recipes
 
-## Definition of done
+Add an entry to `Crafter.Recipes` with two input Item prefabs and one output
+prefab. Input order does not matter. Configure `Craft Text` for the preview;
+empty text falls back to input/output names. Upgraded variants must retain
+distinct identities; do not match ingredients by display name.
 
-Content is not complete until implementation, prefab/scene references,
-network authority, player-facing counterplay, and documentation agree.
+Dynamic inputs use NGO prefab hashes. Scene inputs resolve `Item.PrefabId`
+through `NetworkItemsHandler.database`; missing registry data rejects them.
+Assign socket triggers, output point, doors, indicators, audio, particles and
+preview labels explicitly. Connect the physical button to `TryStartCraft`.
+Check both ingredient orders, wrong variants, pickup from an occupied socket,
+output spawn and consistent host/client preview/effects.
+
+## Worlds and missions
+
+1. Define the objective and return outcome within the confirmed mission rules.
+2. Configure the scene, spawn references, portal, navigation and mission selection;
+   add the scene to the enabled build list.
+3. Verify server additive loading, enemy placement outside excluded portal/base
+   areas and unloading with a host and a client.
+4. Test capture/return, early closure, timer expiry, team death and disconnects,
+   including both returned and unreturned held/stored items.
+5. For acoustic geometry, probes and rebaking follow
+   [Steam Audio](STEAM_AUDIO.md#геометрія-та-повторне-запікання). Review only
+   structural meshes; decor/furniture stay outside the acoustic export.
+6. Casino art changes also follow [Casino art](CASINO_ART.md).
+
+Content is complete when implementation, authored references, authority,
+player-facing counterplay and documentation agree. Record any remaining design
+or implementation gap explicitly.
