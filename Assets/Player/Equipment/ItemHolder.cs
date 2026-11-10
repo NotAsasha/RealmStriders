@@ -40,6 +40,16 @@ namespace Player.Equipment
         [SerializeField] private Vector2 swayAmount = new(0.001f, 0.0006f);
         [SerializeField] private float swayReturnSpeed = 8f;
 
+        [Header("Walking Bob")]
+        [SerializeField] private bool enableWalkBob = true;
+        [SerializeField] private Vector3 walkBobPosition = new(0.006f, 0.008f, 0.003f);
+        [SerializeField] private Vector3 walkBobRotation = new(0.35f, 0.45f, 0.65f);
+        [Tooltip("Distance travelled for a full left/right sway cycle, in metres.")]
+        [SerializeField, Min(0.1f)] private float walkBobStrideLength = 7.5f;
+        [Tooltip("Additional bob frequency multiplier while running; blends without restarting the stride.")]
+        [SerializeField, Min(1f)] private float runBobFrequencyMultiplier = 1.45f;
+        [SerializeField, Min(0.01f)] private float walkBobBlendSpeed = 10f;
+
         public bool ClampItemPitch { get => clampItemPitch; set => clampItemPitch = value; }
         public float MinItemPitch { get => minItemPitch; set => minItemPitch = value; }
         public float MaxItemPitch { get => maxItemPitch; set => maxItemPitch = value; }
@@ -48,6 +58,10 @@ namespace Player.Equipment
 
         private Item currentActiveItem;
         private Vector2 currentSway;
+        private Vector3 currentWalkPosition;
+        private Vector3 currentWalkRotation;
+        private float walkPhase;
+        private float currentBobFrequencyMultiplier = 1f;
         private float actionWeight;
         private float equipStartedAt;
         private bool wasInteracting;
@@ -61,6 +75,55 @@ namespace Player.Equipment
             RequiresFirstPersonReach = false;
             actionWeight = item != null && item.IsHoldActionActive ? 1f : 0f;
             currentSway = Vector2.zero;
+            ResetWalkBob();
+        }
+
+        private void OnDisable()
+        {
+            ResetWalkBob();
+        }
+
+        private void ResetWalkBob()
+        {
+            currentWalkPosition = Vector3.zero;
+            currentWalkRotation = Vector3.zero;
+            walkPhase = 0f;
+            currentBobFrequencyMultiplier = 1f;
+        }
+
+        private void EvaluateWalkBob(bool interacting, float heldActionWeight)
+        {
+            Vector3 targetPosition = Vector3.zero;
+            Vector3 targetRotation = Vector3.zero;
+            bool canBob = enableWalkBob && movement != null && movement.isActiveAndEnabled &&
+                !movement.isPaused && !interacting && movement.IsGrounded &&
+                (movement.human == null || (!movement.human.isDead.Value &&
+                    !movement.human.IsBeingCaptured && !movement.human.IsEffectActive(EffectType.Freeze)));
+            float smoothing = 1f - Mathf.Exp(-walkBobBlendSpeed * Time.deltaTime);
+            float targetFrequencyMultiplier = canBob && movement.IsRunning ? Mathf.Max(1f, runBobFrequencyMultiplier) : 1f;
+            currentBobFrequencyMultiplier = Mathf.Lerp(currentBobFrequencyMultiplier, targetFrequencyMultiplier, smoothing);
+            if (canBob)
+            {
+                Vector3 velocity = movement.Velocity;
+                float speed = new Vector2(velocity.x, velocity.z).magnitude;
+                if (speed > 0.15f)
+                {
+                    // Actual travel keeps pushing against a wall from playing a walk cycle.
+                    walkPhase = (walkPhase + speed * currentBobFrequencyMultiplier * Time.deltaTime * Mathf.PI * 2f /
+                        Mathf.Max(0.1f, walkBobStrideLength)) % (Mathf.PI * 2f);
+                    float weight = Mathf.Clamp(speed / 7.5f, 0f, 1.2f) *
+                        (movement.IsCrouching ? 0.55f : 1f) * Mathf.Lerp(1f, 0.35f, heldActionWeight);
+                    float lateral = Mathf.Sin(walkPhase);
+                    float step = Mathf.Sin(walkPhase * 2f);
+                    targetPosition = new Vector3(lateral * walkBobPosition.x,
+                        step * walkBobPosition.y, -step * walkBobPosition.z) * weight;
+                    targetRotation = new Vector3(step * walkBobRotation.x,
+                        lateral * walkBobRotation.y, -lateral * walkBobRotation.z) * weight;
+                }
+            }
+
+            currentWalkPosition = Vector3.Lerp(currentWalkPosition, targetPosition, smoothing);
+            currentWalkRotation = Vector3.Lerp(currentWalkRotation, targetRotation, smoothing);
         }
 
         public void EvaluateViewModelAndIKTarget(Transform shoulder, float minReach, float maxReach)
@@ -110,11 +173,13 @@ namespace Player.Equipment
                         Mathf.Clamp(-look.y * swayAmount.y, -swayMaxOffset.y, swayMaxOffset.y));
                 }
                 currentSway = Vector2.Lerp(currentSway, targetSway, 1f - Mathf.Exp(-swayReturnSpeed * Time.deltaTime));
+                EvaluateWalkBob(interacting, blend);
                 gripPosition = cameraTransform.TransformPoint(holdPositionLocal + offset.position +
-                    new Vector3(currentSway.x, currentSway.y, 0f));
+                    new Vector3(currentSway.x, currentSway.y, 0f) + currentWalkPosition);
                 gripRotation = cameraTransform.rotation * Quaternion.Euler(clampedPitch - pitch, 0f, 0f) *
                     Quaternion.Euler(holdRotationEuler) * offset.rotation *
-                    Quaternion.Euler(currentSway.y * 60f, currentSway.x * 60f, -currentSway.x * 80f);
+                    Quaternion.Euler(currentSway.y * 60f, currentSway.x * 60f, -currentSway.x * 80f) *
+                    Quaternion.Euler(currentWalkRotation);
                 if (interacting)
                 {
                     gripPosition = inventory.transform.TransformPoint(interactionPose.position);

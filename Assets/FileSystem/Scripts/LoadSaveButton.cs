@@ -9,20 +9,20 @@ public class LoadSaveButton : MonoBehaviour
     public SaveFile gameSave;
 
     public TMP_Text saveText;
+    [SerializeField] private GameObject completedStar;
 
+    private void Start() => RefreshText();
+    private void OnEnable() => RefreshText();
 
-        private void Start()
-        {
-            RefreshText();
-        }
-
-        public void RefreshText()
-        {
-            if (saveText == null) return;
-            saveText.text = gameSave != null && gameSave.save != null
-                ? $"Rating: {gameSave.save.teamRating}\nMoney: {gameSave.save.teamMoney}"
-                : "Empty save";
-        }
+    public void RefreshText()
+    {
+        if (completedStar != null)
+            completedStar.SetActive(gameSave != null && gameSave.save != null && gameSave.save.campaignCompleted);
+        if (saveText == null) return;
+        saveText.text = gameSave != null && gameSave.save != null
+            ? $"Rating: {gameSave.save.teamRating}\nMoney: {gameSave.save.teamMoney}"
+            : "Empty save";
+    }
 
     public void LoadSave()
     {

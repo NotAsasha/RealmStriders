@@ -32,6 +32,7 @@ namespace Portals
         [Header("Hierarchy & Renderers")]
         [FormerlySerializedAs("PortalParent")] [SerializeField] GameObject portalParent;
         [SerializeField] private MeshRenderer[] portalRenderers;
+        [SerializeField] private GameObject returnPortalRoot;
 
         [Header("CRT Animation Settings")]
         [SerializeField, Range(0.2f, 2.0f)] private float openDuration = 0.8f;
@@ -84,6 +85,7 @@ namespace Portals
         private bool isPowerGridRegistered;
         private bool isPortalOpen;
         private bool monsterPassBlocked;
+        private GameManager missionManager;
 
         private MaterialPropertyBlock propertyBlock;
         private static readonly int ProgressPropertyId = Shader.PropertyToID("_Progress");
@@ -156,15 +158,31 @@ namespace Portals
         public override void OnNetworkSpawn()
         {
             TryRegisterPowerGrid();
+            missionManager = GameManager.Instance;
+            if (missionManager != null)
+            {
+                missionManager.endReturnLocked.OnValueChanged += OnReturnLockChanged;
+                OnReturnLockChanged(false, missionManager.endReturnLocked.Value);
+            }
         }
 
         public override void OnNetworkDespawn()
         {
+            if (missionManager != null)
+                missionManager.endReturnLocked.OnValueChanged -= OnReturnLockChanged;
+            missionManager = null;
+            if (returnPortalRoot != null) returnPortalRoot.SetActive(true);
+
             if (isPowerGridRegistered)
             {
                 powerGrid.UnregisterConsumer(this);
                 isPowerGridRegistered = false;
             }
+        }
+
+        private void OnReturnLockChanged(bool previous, bool locked)
+        {
+            if (returnPortalRoot != null) returnPortalRoot.SetActive(!locked);
         }
 
         private void Update()

@@ -14,7 +14,7 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
-  m_Fog: 1
+  m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
   m_FogDensity: 0.01
@@ -23,7 +23,7 @@ RenderSettings:
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 0
+  m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 0}
+  m_Sun: {fileID: 427524376}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -68,7 +68,7 @@ LightmapSettings:
     m_TextureCompression: 1
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
-    m_BakeBackend: 2
+    m_BakeBackend: 1
     m_PVRSampling: 1
     m_PVRDirectSampleCount: 32
     m_PVRSampleCount: 512
@@ -85,17 +85,17 @@ LightmapSettings:
     m_PVREnvironmentMIS: 1
     m_PVRCulling: 1
     m_PVRFilteringGaussRadiusDirect: 1
-    m_PVRFilteringGaussRadiusIndirect: 1
-    m_PVRFilteringGaussRadiusAO: 1
+    m_PVRFilteringGaussRadiusIndirect: 5
+    m_PVRFilteringGaussRadiusAO: 2
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: e33a5debe05b8064ea6229f49976ebba,
+  m_LightingDataAsset: {fileID: 112000000, guid: 8cb6d8c99b0731c458e068f9104f961e,
     type: 2}
-  m_LightingSettings: {fileID: 4890085278179872738, guid: 74226cd74abeda24db927a4afca93b4d,
+  m_LightingSettings: {fileID: 4890085278179872738, guid: fd1fcf94be845224c8d3411647d171c9,
     type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -121,185 +121,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!43 &44979912
-Mesh:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-14594
-  serializedVersion: 12
-  m_SubMeshes:
-  - serializedVersion: 2
-    firstByte: 0
-    indexCount: 36
-    topology: 0
-    baseVertex: 0
-    firstVertex: 0
-    vertexCount: 24
-    localAABB:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 20, y: 10, z: 20}
-  m_Shapes:
-    vertices: []
-    shapes: []
-    channels: []
-    fullWeights: []
-  m_BindPose: []
-  m_BoneNameHashes: 
-  m_RootBoneNameHash: 0
-  m_BonesAABB: []
-  m_VariableBoneCountWeights:
-    m_Data: 
-  m_MeshCompression: 0
-  m_IsReadable: 1
-  m_KeepVertices: 1
-  m_KeepIndices: 1
-  m_IndexFormat: 0
-  m_IndexBuffer: 000001000200000002000300040005000600040006000700080009000a0008000a000b000c000d000e000c000e000f00100011001200100012001300140015001600140016001700
-  m_VertexData:
-    serializedVersion: 3
-    m_VertexCount: 24
-    m_Channels:
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 3
-    - stream: 0
-      offset: 12
-      format: 0
-      dimension: 3
-    - stream: 0
-      offset: 24
-      format: 0
-      dimension: 4
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 40
-      format: 0
-      dimension: 2
-    - stream: 0
-      offset: 48
-      format: 0
-      dimension: 2
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    m_DataSize: 1344
-    _typelessdata: 0000a0c1000020410000a0410000000000000000000080bf0000803f0000000000000000000080bf000000000000803fcf4ef43e6fca393f0000a041000020410000a0410000000000000000000080bf0000803f0000000000000000000080bf000020420000803f35d7a33c6fca393f0000a041000020c10000a0410000000000000000000080bf0000803f0000000000000000000080bf00002042000098c10bd7a33c368cfe3e0000a0c1000020c10000a0410000000000000000000080bf0000803f0000000000000000000080bf00000000000098c1cc4ef43e368cfe3e0000a041000020410000a041000080bf00000000000000000000000000000000000080bf000080bf000000000000803fcf4e743f6fca393f0000a041000020410000a0c1000080bf00000000000000000000000000000000000080bf000080bf000020420000803f428cfe3e6fca393f0000a041000020c10000a0c1000080bf00000000000000000000000000000000000080bf000080bf00002042000098c13f8cfe3e368cfe3e0000a041000020c10000a041000080bf00000000000000000000000000000000000080bf000080bf00000000000098c1cd4e743f368cfe3e0000a041000020410000a0c100000000000000000000803f000080bf0000000000000000000080bf000000000000803fcf4ef43e7b6d793f0000a0c1000020410000a0c100000000000000000000803f000080bf0000000000000000000080bf000020420000803f35d7a33c7b6d793f0000a0c1000020c10000a0c100000000000000000000803f000080bf0000000000000000000080bf00002042000098c10bd7a33c27e93e3f0000a041000020c10000a0c100000000000000000000803f000080bf0000000000000000000080bf00000000000098c1cc4ef43e27e93e3f0000a0c1000020410000a0c10000803f000000000000000000000000000000000000803f000080bf000000000000803fcf4e743f7b6d793f0000a0c1000020410000a0410000803f000000000000000000000000000000000000803f000080bf000020420000803f428cfe3e7b6d793f0000a0c1000020c10000a0410000803f000000000000000000000000000000000000803f000080bf00002042000098c13f8cfe3e27e93e3f0000a0c1000020c10000a0c10000803f000000000000000000000000000000000000803f000080bf00000000000098c1cd4e743f27e93e3f0000a0c1000020410000a0c100000000000080bf00000000000080bf0000000000000000000080bf0000204200001cc2df4ef43ed0d7a33c0000a041000020410000a0c100000000000080bf00000000000080bf0000000000000000000080bf0000000000001cc2d24ef43ec54ef43e0000a041000020410000a04100000000000080bf00000000000080bf0000000000000000000080bf000000000000803f0bd7a33cb94ef43e0000a0c1000020410000a04100000000000080bf00000000000080bf0000000000000000000080bf000020420000803fd5d7a33c0bd7a33c0000a0c1000020c10000a041000000000000803f000000000000803f0000000000000000000080bf000000000000803fd94e743f0bd7a33c0000a041000020c10000a041000000000000803f000000000000803f0000000000000000000080bf000020420000803fd84e743fb94ef43e0000a041000020c10000a0c1000000000000803f000000000000803f0000000000000000000080bf0000204200001cc24f8cfe3eb94ef43e0000a0c1000020c10000a0c1000000000000803f000000000000803f0000000000000000000080bf0000000000001cc2508cfe3e0bd7a33c
-  m_CompressedMesh:
-    m_Vertices:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_UV:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Normals:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Tangents:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Weights:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_NormalSigns:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_TangentSigns:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_FloatColors:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_BoneIndices:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Triangles:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_UVInfo: 0
-  m_LocalAABB:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 20, y: 10, z: 20}
-  m_MeshUsageFlags: 0
-  m_CookingOptions: 30
-  m_BakedConvexCollisionMesh: 
-  m_BakedTriangleCollisionMesh: 
-  'm_MeshMetrics[0]': 1
-  'm_MeshMetrics[1]': 7655.56
-  m_MeshOptimizationFlags: 1
-  m_StreamData:
-    serializedVersion: 2
-    offset: 0
-    size: 0
-    path: 
-  m_MeshLodInfo:
-    serializedVersion: 2
-    m_LodSelectionCurve:
-      serializedVersion: 1
-      m_LodSlope: 0
-      m_LodBias: 0
-    m_NumLevels: 1
-    m_SubMeshes:
-    - serializedVersion: 2
-      m_Levels:
-      - serializedVersion: 1
-        m_IndexStart: 0
-        m_IndexCount: 0
---- !u!1 &493210630
+--- !u!1 &64987164
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -307,93 +129,175 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 493210631}
+  - component: {fileID: 64987166}
+  - component: {fileID: 64987165}
+  - component: {fileID: 64987167}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: NavMesh Surface
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &493210631
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 493210630}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &596917273
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 596917276}
-  - component: {fileID: 596917275}
-  - component: {fileID: 596917274}
-  - component: {fileID: 596917277}
-  m_Layer: 0
-  m_Name: Area Light
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &596917274
+--- !u!114 &64987165
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 596917273}
+  m_GameObject: {fileID: 64987164}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
-  m_UsePipelineSettings: 1
-  m_AdditionalLightsShadowResolutionTier: 2
-  m_CustomShadowLayers: 0
-  m_LightCookieSize: {x: 1, y: 1}
-  m_LightCookieOffset: {x: 0, y: 0}
-  m_SoftShadowQuality: 0
-  m_RenderingLayersMask:
-    serializedVersion: 0
-    m_Bits: 1
-  m_ShadowRenderingLayersMask:
-    serializedVersion: 0
-    m_Bits: 1
-  m_Version: 4
-  m_LightLayerMask: 1
-  m_ShadowLayerMask: 1
-  m_RenderingLayers: 1
-  m_ShadowRenderingLayers: 1
---- !u!108 &596917275
+  m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 8c33579647fc3af489b3d0736f979e38, type: 2}
+  m_BuildHeightMesh: 0
+--- !u!4 &64987166
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64987164}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.9882, y: 1.52461, z: 5.77131}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &64987167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64987164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: -1372625422
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.59999996
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 0901f48713a7343479fc11e6e0806fce, type: 2}
+  m_BuildHeightMesh: 0
+--- !u!1 &315838886
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 315838888}
+  - component: {fileID: 315838887}
+  m_Layer: 0
+  m_Name: SteamAudioStaticMesh
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &315838887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 315838886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8173b2a8dbe2d2d48995bb2ba9a49ff1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioStaticMesh
+  asset: {fileID: 11400000, guid: 8cc0dd5c0f174aa4e92dc1de16a584d3, type: 2}
+  sceneNameWhenExported: World2
+--- !u!4 &315838888
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 315838886}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 24.19088, y: 20.5, z: 30.52134}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &427524375
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 427524377}
+  - component: {fileID: 427524376}
+  - component: {fileID: 427524378}
+  m_Layer: 0
+  m_Name: Directional Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!108 &427524376
 Light:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 596917273}
+  m_GameObject: {fileID: 427524375}
   m_Enabled: 1
   serializedVersion: 12
-  m_Type: 3
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 4
-  m_Range: 30
+  m_Type: 1
+  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
+  m_Intensity: 1
+  m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
-  m_CookieSize2D: {x: 0.5, y: 0.5}
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 2
     m_Resolution: -1
@@ -430,7 +334,7 @@ Light:
   m_RenderingLayerMask: 1
   m_Lightmapping: 2
   m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 10.96, y: 5.65}
+  m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
@@ -443,37 +347,51 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
---- !u!4 &596917276
+--- !u!4 &427524377
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 596917273}
+  m_GameObject: {fileID: 427524375}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 19, z: 0}
+  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!114 &596917277
+  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &427524378
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 596917273}
+  m_GameObject: {fileID: 427524375}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c8bca95f7c947b4db5fb152a0d693d8, type: 3}
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: com.cqf.urpvolumetricfog.runtime::VolumetricAdditionalLight
-  anisotropy: 0.25
-  scattering: 1
-  radius: 0.2
---- !u!1 &865633593
+  m_EditorClassIdentifier: 
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
+--- !u!1 &866508788
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -481,64 +399,75 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 865633595}
-  - component: {fileID: 865633594}
+  - component: {fileID: 866508790}
+  - component: {fileID: 866508789}
   m_Layer: 0
-  m_Name: Reflection Probe
+  m_Name: Adaptive Probe Volume
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!215 &865633594
-ReflectionProbe:
+--- !u!114 &866508789
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 865633593}
+  m_GameObject: {fileID: 866508788}
   m_Enabled: 1
-  serializedVersion: 2
-  m_Type: 0
-  m_Mode: 0
-  m_RefreshMode: 0
-  m_TimeSlicingMode: 0
-  m_Resolution: 128
-  m_UpdateFrequency: 0
-  m_BoxSize: {x: 41, y: 21, z: 41}
-  m_BoxOffset: {x: 0, y: 0, z: 0}
-  m_NearClip: 0.3
-  m_FarClip: 1000
-  m_ShadowDistance: 100
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
-  m_CullingMask:
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cded085d155cde949b60f67a11dbc3bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.ProbeVolume
+  version: 2
+  globalVolume: 0
+  mode: 1
+  size: {x: 259.01, y: 146.39035, z: 259.01}
+  overrideRendererFilters: 0
+  minRendererVolumeSize: 0.1
+  objectLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IntensityMultiplier: 1
-  m_BlendDistance: 1
-  m_HDR: 1
-  m_BoxProjection: 0
-  m_RenderDynamicObjects: 0
-  m_UseOcclusionCulling: 1
-  m_Importance: 1
-  m_CustomBakedTexture: {fileID: 0}
---- !u!4 &865633595
+  lowestSubdivLevelOverride: 0
+  highestSubdivLevelOverride: 3
+  overridesSubdivLevels: 0
+  mightNeedRebaking: 1
+  cachedTransform:
+    e00: 1
+    e01: 0
+    e02: 0
+    e03: -0
+    e10: 0
+    e11: 1
+    e12: 0
+    e13: -61.690178
+    e20: 0
+    e21: 0
+    e22: 1
+    e23: -0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 1
+  cachedHashCode: 1609645586
+  fillEmptySpaces: 0
+--- !u!4 &866508790
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 865633593}
+  m_GameObject: {fileID: 866508788}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalPosition: {x: 0, y: 71.69018, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1112146605
+--- !u!1 &1000557645
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -546,26 +475,227 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1112146611}
-  - component: {fileID: 1112146610}
-  - component: {fileID: 1112146609}
-  - component: {fileID: 1112146608}
-  - component: {fileID: 1112146607}
-  - component: {fileID: 1112146606}
+  - component: {fileID: 1000557648}
+  - component: {fileID: 1000557647}
+  - component: {fileID: 1000557646}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Box Volume
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!64 &1112146606
-MeshCollider:
+--- !u!114 &1000557646
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1112146605}
+  m_GameObject: {fileID: 1000557645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 0
+  priority: 0
+  blendDistance: 1
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 79592d6580e98f8499f36d706db52311, type: 2}
+--- !u!65 &1000557647
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000557645}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 256, y: 50, z: 256}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!4 &1000557648
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000557645}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 25, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1022245072
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 482650612888711487, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 922853
+      objectReference: {fileID: 0}
+    - target: {fileID: 2202642313957818515, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: MaxDistance
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 4488315605980803184, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_Name
+      value: BasicEffects
+      objectReference: {fileID: 0}
+    - target: {fileID: 5227188715079320035, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -59.44
+      objectReference: {fileID: 0}
+    - target: {fileID: 5227188715079320035, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 8.27
+      objectReference: {fileID: 0}
+    - target: {fileID: 5227188715079320035, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -50.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 5777353598774433425, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1022342421
+      objectReference: {fileID: 0}
+    - target: {fileID: 6703877597150506840, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 21.31298
+      objectReference: {fileID: 0}
+    - target: {fileID: 6703877597150506840, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6703877597150506840, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 36.40255
+      objectReference: {fileID: 0}
+    - target: {fileID: 6703877597150506840, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6703877597150506840, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6703877597150506840, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6703877597150506840, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6703877597150506840, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6703877597150506840, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6703877597150506840, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7508101714553673754, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -59.440002
+      objectReference: {fileID: 0}
+    - target: {fileID: 7508101714553673754, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 8.27
+      objectReference: {fileID: 0}
+    - target: {fileID: 7508101714553673754, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -50.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 7744039644213594398, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7744039644213594398, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7744039644213594398, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -54
+      objectReference: {fileID: 0}
+    - target: {fileID: 8384564003793356505, guid: 5367ddefaa19ce045a84ddb3f0e846ad,
+        type: 3}
+      propertyPath: MaxDistance
+      value: 150
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5367ddefaa19ce045a84ddb3f0e846ad, type: 3}
+--- !u!1 &1227337777
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1227337780}
+  - component: {fileID: 1227337779}
+  - component: {fileID: 1227337778}
+  m_Layer: 0
+  m_Name: NavMesh Modifier Volume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &1227337778
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1227337777}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -577,324 +707,5818 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 44979912}
---- !u!33 &1112146607
-MeshFilter:
-  m_ObjectHideFlags: 10
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1112146605}
-  m_Mesh: {fileID: 44979912}
---- !u!23 &1112146608
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1112146605}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: c22777d6e868e4f2fb421913386b154e, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 2
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1112146609
+  serializedVersion: 3
+  m_Size: {x: 256, y: 148, z: 256}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1227337779
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1112146605}
+  m_GameObject: {fileID: 1227337777}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ca002da428252441b92f28d83c8a65f, type: 3}
+  m_Script: {fileID: 11500000, guid: 35e95dc5ff2b64380880dd7ac5922847, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.ProBuilder::UnityEngine.ProBuilder.Shapes.ProBuilderShape
-  m_Shape:
-    rid: 536358595136847885
-  m_ShapeRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_UnmodifiedMeshVersion: 23
-  m_Size: {x: 40, y: 20, z: 40}
-  m_LocalCenter: {x: 0, y: 0, z: 0}
-  references:
-    version: 2
-    RefIds:
-    - rid: 536358595136847885
-      type: {class: Cube, ns: UnityEngine.ProBuilder.Shapes, asm: Unity.ProBuilder}
-      data: 
---- !u!114 &1112146610
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1112146605}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8233d90336aea43098adf6dbabd606a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.ProBuilder::UnityEngine.ProBuilder.ProBuilderMesh
-  m_MeshFormatVersion: 2
-  m_Faces:
-  - m_Indexes: 020000000300000001000000020000000100000000000000
-    m_SmoothingGroup: 0
-    m_Uv:
-      m_UseWorldSpace: 0
-      m_FlipU: 0
-      m_FlipV: 0
-      m_SwapUV: 0
-      m_Fill: 1
-      m_Scale: {x: 1, y: 1}
-      m_Offset: {x: 0, y: 0}
-      m_Rotation: 0
-      m_Anchor: 0
-    m_Material: {fileID: 0}
-    m_SubmeshIndex: 0
-    m_ManualUV: 0
-    elementGroup: -1
-    m_TextureGroup: -1
-  - m_Indexes: 060000000700000005000000060000000500000004000000
-    m_SmoothingGroup: 0
-    m_Uv:
-      m_UseWorldSpace: 0
-      m_FlipU: 0
-      m_FlipV: 0
-      m_SwapUV: 0
-      m_Fill: 1
-      m_Scale: {x: 1, y: 1}
-      m_Offset: {x: 0, y: 0}
-      m_Rotation: 0
-      m_Anchor: 0
-    m_Material: {fileID: 0}
-    m_SubmeshIndex: 0
-    m_ManualUV: 0
-    elementGroup: -1
-    m_TextureGroup: -1
-  - m_Indexes: 0a0000000b000000090000000a0000000900000008000000
-    m_SmoothingGroup: 0
-    m_Uv:
-      m_UseWorldSpace: 0
-      m_FlipU: 0
-      m_FlipV: 0
-      m_SwapUV: 0
-      m_Fill: 1
-      m_Scale: {x: 1, y: 1}
-      m_Offset: {x: 0, y: 0}
-      m_Rotation: 0
-      m_Anchor: 0
-    m_Material: {fileID: 0}
-    m_SubmeshIndex: 0
-    m_ManualUV: 0
-    elementGroup: -1
-    m_TextureGroup: -1
-  - m_Indexes: 0e0000000f0000000d0000000e0000000d0000000c000000
-    m_SmoothingGroup: 0
-    m_Uv:
-      m_UseWorldSpace: 0
-      m_FlipU: 0
-      m_FlipV: 0
-      m_SwapUV: 0
-      m_Fill: 1
-      m_Scale: {x: 1, y: 1}
-      m_Offset: {x: 0, y: 0}
-      m_Rotation: 0
-      m_Anchor: 0
-    m_Material: {fileID: 0}
-    m_SubmeshIndex: 0
-    m_ManualUV: 0
-    elementGroup: -1
-    m_TextureGroup: -1
-  - m_Indexes: 120000001300000011000000120000001100000010000000
-    m_SmoothingGroup: 0
-    m_Uv:
-      m_UseWorldSpace: 0
-      m_FlipU: 0
-      m_FlipV: 0
-      m_SwapUV: 0
-      m_Fill: 1
-      m_Scale: {x: 1, y: 1}
-      m_Offset: {x: 0, y: 0}
-      m_Rotation: 0
-      m_Anchor: 0
-    m_Material: {fileID: 0}
-    m_SubmeshIndex: 0
-    m_ManualUV: 0
-    elementGroup: -1
-    m_TextureGroup: -1
-  - m_Indexes: 160000001700000015000000160000001500000014000000
-    m_SmoothingGroup: 0
-    m_Uv:
-      m_UseWorldSpace: 0
-      m_FlipU: 0
-      m_FlipV: 0
-      m_SwapUV: 0
-      m_Fill: 1
-      m_Scale: {x: 1, y: 1}
-      m_Offset: {x: 0, y: 0}
-      m_Rotation: 0
-      m_Anchor: 0
-    m_Material: {fileID: 0}
-    m_SubmeshIndex: 0
-    m_ManualUV: 0
-    elementGroup: -1
-    m_TextureGroup: -1
-  m_SharedVertices:
-  - m_Vertices: 000000000d00000016000000
-  - m_Vertices: 010000000400000017000000
-  - m_Vertices: 020000000f00000010000000
-  - m_Vertices: 030000000600000011000000
-  - m_Vertices: 050000000800000015000000
-  - m_Vertices: 070000000a00000013000000
-  - m_Vertices: 090000000c00000014000000
-  - m_Vertices: 0b0000000e00000012000000
-  m_SharedTextures: []
-  m_Positions:
-  - {x: -20, y: -10, z: 20}
-  - {x: 20, y: -10, z: 20}
-  - {x: -20, y: 10, z: 20}
-  - {x: 20, y: 10, z: 20}
-  - {x: 20, y: -10, z: 20}
-  - {x: 20, y: -10, z: -20}
-  - {x: 20, y: 10, z: 20}
-  - {x: 20, y: 10, z: -20}
-  - {x: 20, y: -10, z: -20}
-  - {x: -20, y: -10, z: -20}
-  - {x: 20, y: 10, z: -20}
-  - {x: -20, y: 10, z: -20}
-  - {x: -20, y: -10, z: -20}
-  - {x: -20, y: -10, z: 20}
-  - {x: -20, y: 10, z: -20}
-  - {x: -20, y: 10, z: 20}
-  - {x: -20, y: 10, z: 20}
-  - {x: 20, y: 10, z: 20}
-  - {x: -20, y: 10, z: -20}
-  - {x: 20, y: 10, z: -20}
-  - {x: -20, y: -10, z: -20}
-  - {x: 20, y: -10, z: -20}
-  - {x: -20, y: -10, z: 20}
-  - {x: 20, y: -10, z: 20}
-  m_Textures0:
-  - {x: 0, y: -19}
-  - {x: 40, y: -19}
-  - {x: 0, y: 1}
-  - {x: 40, y: 1}
-  - {x: 0, y: -19}
-  - {x: 40, y: -19}
-  - {x: 0, y: 1}
-  - {x: 40, y: 1}
-  - {x: 0, y: -19}
-  - {x: 40, y: -19}
-  - {x: 0, y: 1}
-  - {x: 40, y: 1}
-  - {x: 0, y: -19}
-  - {x: 40, y: -19}
-  - {x: 0, y: 1}
-  - {x: 40, y: 1}
-  - {x: 40, y: 1}
-  - {x: 0, y: 1}
-  - {x: 40, y: -39}
-  - {x: 0, y: -39}
-  - {x: 0, y: -39}
-  - {x: 40, y: -39}
-  - {x: 0, y: 1}
-  - {x: 40, y: 1}
-  m_Textures2: []
-  m_Textures3: []
-  m_Tangents:
-  - {x: 1, y: 0, z: 0, w: -1}
-  - {x: 1, y: 0, z: 0, w: -1}
-  - {x: 1, y: 0, z: 0, w: -1}
-  - {x: 1, y: 0, z: 0, w: -1}
-  - {x: 0, y: 0, z: -1, w: -1}
-  - {x: 0, y: 0, z: -1, w: -1}
-  - {x: 0, y: 0, z: -1, w: -1}
-  - {x: 0, y: 0, z: -1, w: -1}
-  - {x: -1, y: 0, z: 0, w: -1}
-  - {x: -1, y: 0, z: 0, w: -1}
-  - {x: -1, y: 0, z: 0, w: -1}
-  - {x: -1, y: 0, z: 0, w: -1}
-  - {x: 0, y: 0, z: 1, w: -1}
-  - {x: 0, y: 0, z: 1, w: -1}
-  - {x: 0, y: 0, z: 1, w: -1}
-  - {x: 0, y: 0, z: 1, w: -1}
-  - {x: -1, y: 0, z: 0, w: -1}
-  - {x: -1, y: 0, z: 0, w: -1}
-  - {x: -1, y: 0, z: 0, w: -1}
-  - {x: -1, y: 0, z: 0, w: -1}
-  - {x: 1, y: 0, z: 0, w: -1}
-  - {x: 1, y: 0, z: 0, w: -1}
-  - {x: 1, y: 0, z: 0, w: -1}
-  - {x: 1, y: 0, z: 0, w: -1}
-  m_Colors: []
-  m_UnwrapParameters:
-    m_HardAngle: 88
-    m_PackMargin: 20
-    m_AngleError: 8
-    m_AreaError: 15
-  m_PreserveMeshAssetOnDestroy: 0
-  assetGuid: 
-  m_Mesh: {fileID: 44979912}
-  m_VersionIndex: 26
-  m_IsSelectable: 1
-  m_SelectedFaces: 
-  m_SelectedEdges: []
-  m_SelectedVertices: 
---- !u!4 &1112146611
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifierVolume
+  m_SerializedVersion: 0
+  m_Size: {x: 256, y: 150, z: 256}
+  m_Center: {x: 0, y: 1, z: 0}
+  m_Area: 1
+  m_AffectedAgents: ffffffff
+--- !u!4 &1227337780
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1112146605}
+  m_GameObject: {fileID: 1227337777}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalPosition: {x: 0, y: 88.9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1180919720
+--- !u!1 &1354629986
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1354629989}
+  - component: {fileID: 1354629988}
+  - component: {fileID: 1354629987}
+  m_Layer: 0
+  m_Name: Steam Audio Probe Batch
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1354629987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1354629986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a9558415f1321e439ba1b2bb3cdccc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Audio.SceneAcoustics
+  probeBatch: {fileID: 1354629988}
+--- !u!114 &1354629988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1354629986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 286962cac82a4fa4e9ec38ab663c9578, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioProbeBatch
+  placementStrategy: 1
+  horizontalSpacing: 5
+  heightAboveFloor: 1.5
+  asset: {fileID: 11400000, guid: 52c744665bd841a4e9ddf706e3a9a9ec, type: 2}
+  probeDataSize: 5476000
+  mProbeSpheres:
+  - center:
+      x: -92.49999
+      y: 16.897953
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -92.49999
+      y: 19.751406
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -92.49999
+      y: 17.96132
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -92.49999
+      y: 11.929716
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -92.49999
+      y: 4.715149
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -92.49999
+      y: 2.0395832
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -92.49999
+      y: 1.9540367
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -92.49999
+      y: 2.0193176
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -92.49999
+      y: 2.0637188
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -92.49999
+      y: 2.0228634
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -92.49999
+      y: 3.7330456
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 17.318403
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 5.6668987
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 1.5035057
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 1.5000019
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 1.5
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 1.5
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 3.5579662
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 1.932064
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 1.7284584
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 1.8713665
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 1.9906616
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 2.0440464
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 2.0209255
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 2.0353851
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 2.0360298
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 2.21529
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 2.332224
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 5.6910143
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 2.264368
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -87.49999
+      y: 18.815914
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 6.3377504
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 1.6497478
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 1.6276741
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 1.5747051
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 1.5363674
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 1.5145473
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 1.5
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 3.482458
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 10.763723
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 1.761425
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 1.9411354
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 2.122097
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 2.1765575
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 2.2879486
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 2.2877045
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 2.2690907
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 2.3275127
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 2.3827248
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 2.4047985
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 2.1201077
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 1.9734097
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -82.49999
+      y: 8.69935
+      z: 67.50001
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 2.2766342
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 1.6888752
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 1.6867313
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 1.7081604
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 1.7398491
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 1.6591644
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 1.591219
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 1.5491924
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 2.2348938
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 12.999586
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 3.7995358
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 1.9424572
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 2.0449677
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 2.0886402
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 2.1877937
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 2.4626846
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 2.8057709
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 3.8144436
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 2.2622147
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 2.2149506
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 8.44813
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 2.1595783
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 2.044611
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 3.8290539
+      z: 67.50001
+    radius: 5
+  - center:
+      x: -77.49999
+      y: 11.142562
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 4.008135
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 1.7833519
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 1.8161106
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 1.7766418
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 1.8142662
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 1.835371
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 1.8002567
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 1.7619419
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 1.6610603
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 1.5991173
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 12.749544
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 2.6584358
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 1.9790611
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 2.2109184
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 2.3423367
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 2.240799
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 2.0513687
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 2.0316753
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 2.867796
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 2.8177967
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 2.3507519
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 6.1710873
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 1.9877796
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 1.8756561
+      z: 67.50001
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 2.7638721
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -72.49999
+      y: 16.193842
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 10.646273
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 1.9225368
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 1.9734402
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 2.0606728
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 2.0404549
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 1.9848843
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 1.9281616
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 1.8848248
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 1.8452568
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 1.7847614
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 1.7071095
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 1.9307957
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 1.9270878
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 2.0223808
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 2.0498047
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 2.2524967
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 2.6634274
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 2.852562
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 14.247241
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 2.9235077
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 2.77635
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 2.5042171
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 13.217876
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 2.0882263
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 1.8339405
+      z: 67.50001
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 1.7342873
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -67.49999
+      y: 4.9783154
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 18.073244
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 1.9581661
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.0493526
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.0148563
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 1.931736
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 1.904644
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.1381721
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.23077
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.2886543
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.2854614
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 1.966671
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 1.7848969
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 1.7793636
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 7.2767496
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 17.495712
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.2084942
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.3033257
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.326849
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.4880238
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.5891075
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 3.414585
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.6462574
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.5116196
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 2.3270473
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 13.681814
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 1.9015789
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 1.7537498
+      z: 67.50001
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 1.6495438
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 1.5821304
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -62.499996
+      y: 12.415894
+      z: 82.50001
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 10.992963
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.1833706
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.2741318
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.254383
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.2663116
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.3246613
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.3865871
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.397274
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.2848988
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.108057
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 1.9969196
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 1.9051819
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 1.8261967
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 1.740385
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.5041542
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.2814808
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.3336182
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.3181763
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.3821964
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.4260273
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.61837
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.256445
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.137331
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.5631256
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 2.0472221
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 1.834732
+      z: 67.50001
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 1.6848335
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 1.5783691
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -57.499996
+      y: 3.7319832
+      z: 82.50001
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.0253983
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.1164894
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.2795963
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.5674877
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.8171635
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.5216713
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.2581024
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.2349548
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.1874561
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.1832638
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.052309
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 1.858696
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 1.7934437
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 1.7595901
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 1.8077946
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 15.501277
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.1512184
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.2895565
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.3864708
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.5707054
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.6425571
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.6929665
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.4554348
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 2.2110062
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 15.028704
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 1.8156242
+      z: 67.50001
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 1.6691322
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 1.5626698
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 1.5
+      z: 82.50001
+    radius: 5
+  - center:
+      x: -52.499996
+      y: 16.411327
+      z: 87.50001
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 1.9755001
+      z: -67.49999
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.2065487
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.3656616
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.1394157
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 1.98526
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.118906
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.5358772
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.8719463
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.620304
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.1840267
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.0514145
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.007782
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 1.9149666
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 1.7902908
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 1.6784496
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 1.6766415
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 8.429332
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.2636929
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.293579
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.4155655
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.4339924
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.3125095
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.4573479
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.3467655
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 2.083847
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 1.8209267
+      z: 67.50001
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 1.6297188
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 1.5292721
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 1.5
+      z: 82.50001
+    radius: 5
+  - center:
+      x: -47.499996
+      y: 15.891865
+      z: 87.50001
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 1.9497108
+      z: -67.49999
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.093235
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.0645962
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.1540947
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.5892544
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.8276062
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.919407
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.9109993
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.8108883
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.5033493
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.3314018
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.0175114
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 1.8173981
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 1.7404747
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 1.6915474
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 1.7014275
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 1.75531
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 1.835289
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 6.8105526
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.00247
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.216648
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.326973
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 18.305668
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.4001408
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.2134247
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 2.0177479
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 1.8647842
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 1.7463036
+      z: 67.50001
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 1.5904865
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 1.5085297
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -42.499996
+      y: 19.152557
+      z: 87.50001
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 5.0479546
+      z: -72.49999
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 1.9688721
+      z: -67.49999
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.0433064
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.315586
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.4144897
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.6287441
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.7358246
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.8003597
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.6986809
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.572649
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.4314384
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.180912
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 1.980299
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 1.8064346
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 1.6731491
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 1.597477
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 1.5907459
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 1.6413612
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 1.7184696
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 1.8403568
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 11.607572
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.7490425
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 1.8597584
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 5.7151155
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 11.450206
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.9995003
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.2828865
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 2.1348839
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 7.335556
+      z: 67.50001
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 13.069413
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 5.458536
+      z: 82.50001
+    radius: 5
+  - center:
+      x: -37.499996
+      y: 12.19648
+      z: 87.50001
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 3.4739742
+      z: -77.49999
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 1.6749611
+      z: -72.49999
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 1.8795319
+      z: -67.49999
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.2595863
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.2976208
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.228674
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.2130642
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.3022099
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.4083862
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.2880878
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.1448345
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.0286064
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.115265
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.013567
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 1.8375263
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 1.695324
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.8165054
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 1.9643803
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 1.5420055
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 1.6025028
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.254181
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 1.7253017
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 16.459309
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 1.7958565
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 1.8412685
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 1.7843933
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 13.147422
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 5.1434402
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 2.077383
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 1.5
+      z: 82.50001
+    radius: 5
+  - center:
+      x: -32.499996
+      y: 3.2562943
+      z: 87.50001
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 1.5878029
+      z: -77.49999
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 1.6851006
+      z: -72.49999
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 1.8145466
+      z: -67.49999
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 1.986351
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 2.152773
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 2.2891273
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 2.4828968
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 2.5445805
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 2.7397137
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 2.836752
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 2.7262402
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 2.5188828
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 2.275896
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 2.0242062
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 2.458828
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 7.8795996
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 1.5566425
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 8.564458
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 14.546646
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 10.712782
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 11.365785
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 4.186615
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 1.685175
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 1.7493534
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 1.7777233
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 1.7504444
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 1.7611275
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 13.715228
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 7.973484
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 1.5
+      z: 82.50001
+    radius: 5
+  - center:
+      x: -27.499998
+      y: 1.9717579
+      z: 87.50001
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 4.212364
+      z: -82.49999
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.6353722
+      z: -77.49999
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.7631149
+      z: -72.49999
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.8581619
+      z: -67.49999
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.949461
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 2.0861588
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 2.2693672
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 2.3308487
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 2.4449463
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 2.4263458
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 2.397173
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 2.3859444
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 2.531641
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 2.340002
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 2.081129
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 7.815118
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.6489182
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.5369816
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.5
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.5
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.5
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.5393143
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.569561
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.5971203
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.6429901
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.6705456
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.7749348
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 2.9739246
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.7157936
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 8.45109
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 2.9916954
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 4.4800816
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 1.5301666
+      z: 82.50001
+    radius: 5
+  - center:
+      x: -22.499998
+      y: 3.724638
+      z: 87.50001
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 8.876867
+      z: -87.49999
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.6616669
+      z: -82.49999
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.7140903
+      z: -77.49999
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.7965794
+      z: -72.49999
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.8828564
+      z: -67.49999
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.9289932
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.9880581
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.9867058
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 2.108694
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 2.2566185
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 2.35606
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 2.4164753
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 2.4319134
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 2.3051605
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 2.063612
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 3.6930408
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.7786198
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.6057415
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.5117569
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.5
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.502512
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.5314198
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.5747757
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.6655216
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.8066292
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.8918152
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.9447765
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 12.531775
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 2.0193768
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.9701042
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 2.1274395
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 5.414961
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 1.7265682
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 4.231756
+      z: 82.50001
+    radius: 5
+  - center:
+      x: -17.499998
+      y: 13.507368
+      z: 87.50001
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.7240887
+      z: -87.49999
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.8335743
+      z: -82.49999
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.852766
+      z: -77.49999
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.8093128
+      z: -72.49999
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.9570885
+      z: -67.49999
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 2.0363445
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 2.0827446
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 2.1484432
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 2.1247444
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 2.0273476
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.9279823
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.8111897
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.7631779
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.787508
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.7416344
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 11.576192
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.5739651
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.5119381
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.5
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.5
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.5208225
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.59021
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.7175846
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.8301468
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.9613781
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 2.100153
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 3.1481228
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 7.5014124
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.9344463
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 1.9328442
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 2.7133923
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 2.2791214
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 2.0017204
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 12.685755
+      z: 82.50001
+    radius: 5
+  - center:
+      x: -12.499999
+      y: 13.692885
+      z: 87.50001
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 1.9622936
+      z: -87.49999
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 2.0078983
+      z: -82.49999
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 2.059124
+      z: -77.49999
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 2.0373154
+      z: -72.49999
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 1.9936123
+      z: -67.49999
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 1.9876842
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 3.5091743
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 2.0636292
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 7.736706
+      z: -47.499996
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 6.679241
+      z: -42.499996
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 12.846403
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 13.611492
+      z: -32.499996
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 15.330641
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 1.9702053
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 1.8295727
+      z: -17.499998
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 6.9910364
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 1.5277386
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 1.5000019
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 1.5
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 1.506731
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 1.5759392
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 1.6903858
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 1.8508835
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 2.004465
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 6.462496
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 9.2414665
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 6.323246
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 2.2989807
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 2.3304806
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 2.39332
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 2.4136143
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 14.119116
+      z: 67.50001
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 3.4703941
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 2.0205498
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 5.279024
+      z: 82.50001
+    radius: 5
+  - center:
+      x: -7.4999995
+      y: 13.8218
+      z: 87.50001
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 2.032648
+      z: -87.49999
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 1.9748344
+      z: -82.49999
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 1.933588
+      z: -77.49999
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 2.217062
+      z: -72.49999
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 2.2897472
+      z: -67.49999
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 15.692312
+      z: -62.499996
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 15.573612
+      z: -57.499996
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 19.266613
+      z: -52.499996
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 12.174701
+      z: -37.499996
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 13.200474
+      z: -27.499998
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 12.087502
+      z: -22.499998
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 3.5493374
+      z: -12.499999
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 1.5000019
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 1.5000019
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 1.5
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 1.5347385
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 1.6725216
+      z: 12.500011
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 1.8047447
+      z: 17.500011
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 1.9385738
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 18.066322
+      z: 27.500011
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 8.723859
+      z: 32.50001
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 5.319229
+      z: 37.50001
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 2.8692188
+      z: 42.50001
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 2.5847073
+      z: 47.50001
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 2.5091171
+      z: 52.500008
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 2.4783306
+      z: 57.500008
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 2.3023052
+      z: 62.500008
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 2.2760906
+      z: 67.50001
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 2.1621094
+      z: 72.50001
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 1.9781933
+      z: 77.50001
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 1.8183174
+      z: 82.50001
+    radius: 5
+  - center:
+      x: -2.4999998
+      y: 5.1690483
+      z: 87.50001
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 17.90683
+      z: -92.49999
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.2955132
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.3184662
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.2889233
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.3422565
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 9.981013
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 14.059047
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 4.4440536
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 7.324046
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 4.6411266
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 11.715627
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.5025635
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.196907
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 1.7185707
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 1.757082
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 7.6511517
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.1509857
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 1.5666027
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 1.5207367
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 1.5000019
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 1.5368061
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 1.6357193
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 1.8192844
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 3.709488
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 5.863613
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.1950264
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 1.9592247
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.0425167
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.3531647
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 3.2110176
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 3.0214596
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.3049946
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.1612873
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.1063538
+      z: 72.50001
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 2.0281773
+      z: 77.50001
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 1.8947124
+      z: 82.50001
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 4.5096474
+      z: 87.50001
+    radius: 5
+  - center:
+      x: 2.5000124
+      y: 16.59048
+      z: 92.50001
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 14.69264
+      z: -92.49999
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.2087917
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.3992023
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.7811184
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.7640076
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.278782
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.3613129
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.2032013
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.247284
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.1746502
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.1331959
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.1080399
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 1.9141464
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 1.7804241
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 1.8533058
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 8.54678
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.3876762
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 1.7208138
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 1.615078
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 1.5321369
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 1.5414715
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 1.6518784
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 1.8313103
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 3.7812042
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.1031227
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.14917
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.1899166
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.5557594
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 5.161772
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 16.834816
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.7712498
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 2.4646244
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 3.3743248
+      z: 72.50001
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 1.9181309
+      z: 77.50001
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 6.0654783
+      z: 82.50001
+    radius: 5
+  - center:
+      x: 7.5000124
+      y: 7.791506
+      z: 87.50001
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 10.481016
+      z: -92.49999
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.393694
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.066101
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.0479126
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.4804783
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.904274
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.9064846
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.5403957
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.3445816
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.3874893
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.3753662
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.2871265
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.1670265
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.0480862
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.1959095
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 10.016423
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 1.8650627
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 1.8270874
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 1.7394829
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 1.6353645
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 1.5691166
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 1.6819458
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 1.860754
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 9.731299
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 1.9778938
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.1377468
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.5366745
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.709814
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 12.652587
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 8.799348
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.7172852
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.6453094
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 3.6525593
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 2.0709705
+      z: 77.50001
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 7.89896
+      z: 82.50001
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 7.72948
+      z: 87.50001
+    radius: 5
+  - center:
+      x: 12.500011
+      y: 18.89427
+      z: 92.50001
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 6.129651
+      z: -92.49999
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.1349106
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.5966454
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.822052
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 3.015936
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 3.097044
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.9009933
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.9119587
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.754055
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.644991
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 10.203253
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.2286835
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.0157738
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.0705433
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 3.928114
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 14.674909
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.32374
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.1459217
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 1.832489
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 1.6768284
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 1.605917
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 1.6554699
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 1.8485451
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.6746998
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.3602028
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.358862
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.2834587
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 8.591021
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.6602
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.379612
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.205927
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 2.5608253
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 1.9652939
+      z: 77.50001
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 1.969284
+      z: 82.50001
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 7.74833
+      z: 87.50001
+    radius: 5
+  - center:
+      x: 17.500011
+      y: 9.854826
+      z: 92.50001
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 8.497976
+      z: -92.49999
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.3716927
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.439333
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.6025143
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.6919003
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.820881
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.8363132
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.8199768
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.779131
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 4.6159344
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 3.5242176
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.412344
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.3864079
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.3843346
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 6.13568
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.560749
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.1910782
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.0471935
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 1.9902859
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 1.9275436
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 1.8166828
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 1.7377777
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 3.3401241
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.0517673
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.213066
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.2707806
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 5.5726576
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 18.13061
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 5.258297
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.6921234
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.7869053
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.6836262
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 8.62598
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 10.0848255
+      z: 77.50001
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.6955872
+      z: 82.50001
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 2.0148277
+      z: 87.50001
+    radius: 5
+  - center:
+      x: 22.500011
+      y: 6.15269
+      z: 92.50001
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 4.697256
+      z: -92.49999
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.4661636
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.2751637
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.2450466
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.4315338
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.5315628
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.4910831
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.6811123
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.8182201
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 19.215385
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.8045444
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.9590073
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.8497887
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.2963905
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.2174072
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.1752129
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.197836
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.1710682
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.0166702
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 1.894598
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 1.8010616
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 1.7624722
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 7.3759966
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.0226002
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.2216854
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 3.1227818
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 18.011978
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 6.4890985
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.4942226
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.480936
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.4282722
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 2.6581345
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 15.614298
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 10.456783
+      z: 72.50001
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 15.419653
+      z: 77.50001
+    radius: 5
+  - center:
+      x: 27.500011
+      y: 19.54236
+      z: 82.50001
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 6.3882446
+      z: -97.49999
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.1262093
+      z: -92.49999
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.2929878
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.3799267
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.518774
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.6555939
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.954506
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 3.1382923
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 3.1676483
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 3.1124992
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 12.841894
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.400896
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.1453266
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.4217968
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.7937794
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.841385
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.377346
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.1299477
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.1049023
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.1202545
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.172863
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.0594006
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 4.0956573
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 4.628479
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.1238308
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.101942
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 11.440826
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 7.835946
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.3905373
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.5180054
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.4922447
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.4337177
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 5.0200424
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 16.531551
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 2.3427734
+      z: 72.50001
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 1.9812622
+      z: 77.50001
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 1.7630329
+      z: 82.50001
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 3.2644653
+      z: 87.50001
+    radius: 5
+  - center:
+      x: 32.50001
+      y: 14.679268
+      z: 92.50001
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 17.95259
+      z: -97.49999
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 1.9313698
+      z: -92.49999
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.0573158
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.2920227
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.4155827
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.5159664
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.63587
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.697626
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.9472332
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.956831
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.7107239
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.8013172
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.9083805
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.9570198
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.991642
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.8941002
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.604456
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.5213223
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.4650822
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.2475395
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.314314
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 4.0212784
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 3.4936008
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.0292587
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.083826
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 3.575739
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.6980057
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.5114498
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.3545666
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 2.0838852
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 1.9242039
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 19.3236
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 6.5674305
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 1.7519169
+      z: 72.50001
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 1.6520901
+      z: 77.50001
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 1.5791912
+      z: 82.50001
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 5.1971703
+      z: 87.50001
+    radius: 5
+  - center:
+      x: 37.50001
+      y: 18.524971
+      z: 92.50001
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.6051235
+      z: -92.49999
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 1.8600216
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.027462
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.2030144
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 14.11227
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.6732693
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.8455677
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.7901669
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 11.163621
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.7394695
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.7895126
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.763359
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.8091564
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.6994324
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.6487103
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.5836315
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.4933357
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.414074
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.4004078
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 3.5574207
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 7.095006
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.2100983
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.331215
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.4170895
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 10.549783
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 14.3671465
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.4193916
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.3087826
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.2414436
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 2.0745754
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 11.07507
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 1.9212208
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 1.6093445
+      z: 72.50001
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 1.5711021
+      z: 77.50001
+    radius: 5
+  - center:
+      x: 42.50001
+      y: 1.5327625
+      z: 82.50001
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 1.8221092
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 1.8719921
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 1.8734303
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 12.210891
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 5.4215717
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.0200386
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.3357697
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 3.8193436
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.4030304
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.2577972
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.2382565
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.4676876
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.347023
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.265173
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.2942314
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.4954624
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.6320534
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.5306416
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.5094776
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.5924988
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.5063934
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.4173565
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.7518272
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 18.589804
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 8.738684
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.3884735
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.249529
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 2.162363
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 10.137855
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 4.178816
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 1.6000023
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 1.538063
+      z: 72.50001
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 1.7891998
+      z: 77.50001
+    radius: 5
+  - center:
+      x: 47.50001
+      y: 8.803612
+      z: 82.50001
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 1.6499176
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 1.6930866
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 1.8244057
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 18.865444
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 12.450762
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 4.3882046
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.0101414
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.1673222
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.292982
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.421814
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 9.111016
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 10.200344
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.8577633
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.8299656
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.7857857
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 3.0242538
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.582838
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.2800407
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.1522617
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.368721
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.66473
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.729269
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 3.7098389
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 14.67528
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 10.622599
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 9.018318
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.2369652
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 1.5769386
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 2.8218784
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 6.458972
+      z: 72.50001
+    radius: 5
+  - center:
+      x: 52.500008
+      y: 11.796502
+      z: 77.50001
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 6.223858
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 1.5686855
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 1.7293568
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 5.6466446
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 5.0260944
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 5.985281
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 1.9615097
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 2.1386204
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 2.2771893
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 3.669815
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 4.366335
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 2.7418041
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 3.286827
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 2.6336155
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 2.4416466
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 2.3530464
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 2.6227665
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 2.4661407
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 2.8135853
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 2.8464622
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 3.395237
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 4.763445
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 3.6087532
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 2.1152592
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 1.7833023
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 1.6627483
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 1.5481205
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 8.743734
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 13.8010025
+      z: 72.50001
+    radius: 5
+  - center:
+      x: 57.500008
+      y: 19.681986
+      z: 77.50001
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 19.869263
+      z: -87.49999
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 1.5
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 1.5103283
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.7113705
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 8.603155
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 1.8343506
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 1.9502792
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.1623936
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 5.482977
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 14.707033
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 18.915474
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 17.58604
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 3.4868565
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.3720493
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.4521637
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.6940155
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.818163
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.9818974
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.938717
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.7315845
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.6078758
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.390396
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.110403
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 1.9619579
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 1.7537804
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 1.631876
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 2.4395046
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 62.500008
+      y: 15.208493
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 1.8339748
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 1.5
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 1.5
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.1852188
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 16.320656
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 15.985643
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 1.8382587
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 1.9082661
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 1.9104309
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 1.9006481
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.62331
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 11.300159
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.4457073
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.4638672
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.3893604
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.3377705
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.4167118
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.5005283
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.4969578
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.3927574
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.1628876
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.0065918
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 1.8493977
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 1.7238102
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 1.717577
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 1.6413727
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 2.0205727
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 67.50001
+      y: 16.125084
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 3.4268513
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.3495045
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 1.5
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 1.5021629
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 1.5103283
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 5.6460514
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 18.971182
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 1.6619244
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 1.7014275
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 1.7396698
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 1.7719116
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 1.8071041
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 1.8516426
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 17.335106
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 18.277702
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.0171509
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.1395912
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.4209728
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.577526
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.548359
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.605444
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.620947
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.530096
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.5247822
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.348795
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.1277275
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 1.8963203
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 1.7100563
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 1.5950718
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 2.43812
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 72.50001
+      y: 15.226091
+      z: 67.50001
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 6.8730373
+      z: -82.49999
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 4.7508583
+      z: -77.49999
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 7.278058
+      z: -72.49999
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 10.36668
+      z: -67.49999
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 11.115442
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 10.678647
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 12.511181
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 4.7333603
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 1.5759544
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 1.6134815
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 1.631794
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 1.6308899
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 2.2530403
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 16.544035
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 7.474801
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 1.8784657
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 2.0706291
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 2.2403717
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 2.3539162
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 2.4177818
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 2.4881496
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 2.4948616
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 2.6947174
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 2.7126904
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 2.4378128
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 2.1046429
+      z: 42.50001
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 2.6630402
+      z: 47.50001
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 8.010015
+      z: 52.500008
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 10.009315
+      z: 57.500008
+    radius: 5
+  - center:
+      x: 77.50001
+      y: 15.505195
+      z: 62.500008
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 17.796629
+      z: -62.499996
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 18.26753
+      z: -57.499996
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 18.313028
+      z: -52.499996
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 17.487053
+      z: -47.499996
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 4.3718204
+      z: -42.499996
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 1.5099697
+      z: -37.499996
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 1.5208302
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 1.5282841
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 1.9981518
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 14.489389
+      z: -17.499998
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 5.9322767
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 1.6602478
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 1.7588234
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 2.2378178
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 2.1788845
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 2.292366
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 2.3923473
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 2.457592
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 2.6602936
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 4.8217125
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 82.50001
+      y: 11.260916
+      z: 37.50001
+    radius: 5
+  - center:
+      x: 87.50001
+      y: 6.4314585
+      z: -32.499996
+    radius: 5
+  - center:
+      x: 87.50001
+      y: 1.515789
+      z: -27.499998
+    radius: 5
+  - center:
+      x: 87.50001
+      y: 6.2345896
+      z: -22.499998
+    radius: 5
+  - center:
+      x: 87.50001
+      y: 2.6085835
+      z: -7.4999995
+    radius: 5
+  - center:
+      x: 87.50001
+      y: 4.9070835
+      z: -2.4999998
+    radius: 5
+  - center:
+      x: 87.50001
+      y: 4.2825146
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 87.50001
+      y: 2.9754467
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 87.50001
+      y: 2.3771286
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 87.50001
+      y: 2.1458817
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 87.50001
+      y: 2.4707909
+      z: 22.500011
+    radius: 5
+  - center:
+      x: 87.50001
+      y: 7.44199
+      z: 27.500011
+    radius: 5
+  - center:
+      x: 87.50001
+      y: 17.692284
+      z: 32.50001
+    radius: 5
+  - center:
+      x: 92.50001
+      y: 19.055706
+      z: -12.499999
+    radius: 5
+  - center:
+      x: 92.50001
+      y: 19.87464
+      z: 2.5000124
+    radius: 5
+  - center:
+      x: 92.50001
+      y: 13.075583
+      z: 7.5000124
+    radius: 5
+  - center:
+      x: 92.50001
+      y: 8.464671
+      z: 12.500011
+    radius: 5
+  - center:
+      x: 92.50001
+      y: 9.075727
+      z: 17.500011
+    radius: 5
+  - center:
+      x: 92.50001
+      y: 12.755234
+      z: 22.500011
+    radius: 5
+  - center:
+      x: -80.56735
+      y: 15.083333
+      z: 72.89536
+    radius: 5
+  - center:
+      x: -26.845133
+      y: 1.5833334
+      z: 9.784247
+    radius: 5
+  - center:
+      x: 91.54376
+      y: 7.472223
+      z: 22.839804
+    radius: 5
+  - center:
+      x: -7.956244
+      y: 1.9444445
+      z: -34.715755
+    radius: 5
+  - center:
+      x: -7.122911
+      y: 2.1388888
+      z: -44.049088
+    radius: 5
+  - center:
+      x: 4.8215337
+      y: 4.6944447
+      z: -17.715754
+    radius: 5
+  - center:
+      x: 89.65487
+      y: 7.861111
+      z: -6.0490875
+    radius: 5
+  - center:
+      x: 19.654867
+      y: 2.1666667
+      z: -91.826866
+    radius: 5
+  - center:
+      x: 14.654866
+      y: 2.25
+      z: -92.27131
+    radius: 5
+  - center:
+      x: 33.37709
+      y: 2
+      z: -97.38242
+    radius: 5
+  mBakedDataLayerInfo:
+  - gameObject: {fileID: 1354629986}
+    identifier:
+      type: 1
+      variation: 3
+      endpointInfluence:
+        center:
+          x: 0
+          y: 0
+          z: 0
+        radius: 0
+    dataSize: 5056432
+--- !u!4 &1354629989
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1354629986}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalScale: {x: 425, y: 20, z: 425}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1397333919
 GameObject:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -902,8 +6526,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1180919722}
-  - component: {fileID: 1180919721}
+  - component: {fileID: 1397333921}
+  - component: {fileID: 1397333920}
   m_Layer: 0
   m_Name: ProbeVolumePerSceneData
   m_TagString: Untagged
@@ -911,32 +6535,32 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1180919721
+--- !u!114 &1397333920
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1180919720}
+  m_GameObject: {fileID: 1397333919}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a83d2f7ae04ab6f4f99b0d85377be998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.ProbeVolumePerSceneData
-  serializedBakingSet: {fileID: 11400000, guid: 6e4ae936c0497a44eb9b48f7af825a91,
+  serializedBakingSet: {fileID: 11400000, guid: 94daf2779d892fd47aa6a189d35175db,
     type: 2}
-  sceneGUID: 7968a056ca504eb4f8ee6ecb862060ab
+  sceneGUID: 04c9e399a7738354ab00cb2e0d94a2e3
   obsoleteAsset: {fileID: 0}
   obsoleteCellSharedDataAsset: {fileID: 0}
   obsoleteCellSupportDataAsset: {fileID: 0}
   obsoleteSerializedScenarios: []
---- !u!4 &1180919722
+--- !u!4 &1397333921
 Transform:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1180919720}
+  m_GameObject: {fileID: 1397333919}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -945,7 +6569,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1592494193
+--- !u!1 &1924856265
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -953,131 +6577,223 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1592494195}
-  - component: {fileID: 1592494194}
+  - component: {fileID: 1924856268}
+  - component: {fileID: 1924856267}
+  - component: {fileID: 1924856266}
+  - component: {fileID: 1924856269}
   m_Layer: 0
-  m_Name: Global Volume
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1592494194
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1592494193}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
-  m_IsGlobal: 1
-  priority: 0
-  blendDistance: 0
-  weight: 1
-  sharedProfile: {fileID: 11400000, guid: 2f438f706751bd740af7a3b4a18a7dbd, type: 2}
---- !u!4 &1592494195
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1592494193}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.1050898, y: 1.3027173, z: 5.7914333}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2106644910
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2106644912}
-  - component: {fileID: 2106644911}
-  m_Layer: 0
-  m_Name: Adaptive Probe Volume
+  m_Name: Terrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
   m_IsActive: 1
---- !u!114 &2106644911
-MonoBehaviour:
+--- !u!154 &1924856266
+TerrainCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2106644910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cded085d155cde949b60f67a11dbc3bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.ProbeVolume
-  version: 2
-  globalVolume: 0
-  mode: 1
-  size: {x: 43, y: 23, z: 43}
-  overrideRendererFilters: 0
-  minRendererVolumeSize: 0.1
-  objectLayerMask:
+  m_GameObject: {fileID: 1924856265}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
-  lowestSubdivLevelOverride: 0
-  highestSubdivLevelOverride: 3
-  overridesSubdivLevels: 0
-  mightNeedRebaking: 0
-  cachedTransform:
-    e00: 1
-    e01: 0
-    e02: 0
-    e03: -0
-    e10: 0
-    e11: 1
-    e12: 0
-    e13: -10
-    e20: 0
-    e21: 0
-    e22: 1
-    e23: -0
-    e30: 0
-    e31: 0
-    e32: 0
-    e33: 1
-  cachedHashCode: 1107904620
-  fillEmptySpaces: 0
---- !u!4 &2106644912
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_TerrainData: {fileID: 15600000, guid: d74eab0dd7bc4424d81d69c3124ebc62, type: 2}
+  m_EnableTreeColliders: 1
+--- !u!218 &1924856267
+Terrain:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1924856265}
+  m_Enabled: 1
+  serializedVersion: 6
+  m_TerrainData: {fileID: 15600000, guid: d74eab0dd7bc4424d81d69c3124ebc62, type: 2}
+  m_TreeDistance: 5000
+  m_TreeBillboardDistance: 50
+  m_TreeCrossFadeLength: 5
+  m_TreeMaximumFullLODCount: 50
+  m_DetailObjectDistance: 80
+  m_DetailObjectDensity: 1
+  m_HeightmapPixelError: 5
+  m_SplatMapDistance: 1000
+  m_HeightmapMinimumLODSimplification: 0
+  m_HeightmapMaximumLOD: 0
+  m_ShadowCastingMode: 2
+  m_DrawHeightmap: 1
+  m_DrawInstanced: 0
+  m_DrawTreesAndFoliage: 1
+  m_StaticShadowCaster: 0
+  m_IgnoreQualitySettings: 0
+  m_ReflectionProbeUsage: 1
+  m_MaterialTemplate: {fileID: 2100000, guid: c5c180fc3e054e040bb3764474a6c741, type: 2}
+  m_BakeLightProbesForTrees: 1
+  m_PreserveTreePrototypeLayers: 0
+  m_DeringLightProbesForTrees: 1
+  m_ReceiveGI: 1
+  m_ScaleInLightmap: 0.0256
+  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
+  m_GroupingID: 0
+  m_RenderingLayerMask: 1
+  m_AllowAutoConnect: 1
+  m_EnableHeightmapRayTracing: 1
+  m_EnableTreesAndDetailsRayTracing: 0
+  m_TreeMotionVectorModeOverride: 3
+--- !u!4 &1924856268
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2106644910}
+  m_GameObject: {fileID: 1924856265}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -128, y: 0, z: -128}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1924856269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1924856265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e829c87dc2a2ed2419c5f67848317fe4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioGeometry
+  material: {fileID: 11400000, guid: a086f686223eed942816c70be67841b0, type: 2}
+  exportAllChildren: 0
+  terrainSimplificationLevel: 2
+--- !u!1001 &1973365886
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 400
+      objectReference: {fileID: 0}
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 400
+      objectReference: {fileID: 0}
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 400
+      objectReference: {fileID: 0}
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2007687556838274351, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5905689161742161627, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 208922715
+      objectReference: {fileID: 0}
+    - target: {fileID: 5905689161742161627, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: SceneMigrationSynchronization
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5905689161742161627, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 2024775868
+      objectReference: {fileID: 0}
+    - target: {fileID: 7603310603848955917, guid: 04d3474b6aa52b8438e6881ed13300c5,
+        type: 3}
+      propertyPath: m_Name
+      value: GrabarCage
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6772741228636626627, guid: 04d3474b6aa52b8438e6881ed13300c5, type: 3}
+    - {fileID: 8398867086918930197, guid: 04d3474b6aa52b8438e6881ed13300c5, type: 3}
+    - {fileID: 1049642219487334764, guid: 04d3474b6aa52b8438e6881ed13300c5, type: 3}
+    - {fileID: 2696128001168059280, guid: 04d3474b6aa52b8438e6881ed13300c5, type: 3}
+    - {fileID: 5905689161742161627, guid: 04d3474b6aa52b8438e6881ed13300c5, type: 3}
+    - {fileID: 1076373380013544634, guid: 04d3474b6aa52b8438e6881ed13300c5, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 04d3474b6aa52b8438e6881ed13300c5, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 493210631}
-  - {fileID: 1112146611}
-  - {fileID: 596917276}
-  - {fileID: 2106644912}
-  - {fileID: 1180919722}
-  - {fileID: 865633595}
-  - {fileID: 1592494195}
+  - {fileID: 427524377}
+  - {fileID: 1924856268}
+  - {fileID: 64987166}
+  - {fileID: 866508790}
+  - {fileID: 1397333921}
+  - {fileID: 1000557648}
+  - {fileID: 1227337780}
+  - {fileID: 315838888}
+  - {fileID: 1354629989}
+  - {fileID: 1022245072}
+  - {fileID: 1973365886}

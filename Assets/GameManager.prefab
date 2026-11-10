@@ -96,6 +96,11 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  campaignCompleted:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
   missionDuration: 0
   missionScene: {}
   missionName: 
@@ -134,6 +139,14 @@ MonoBehaviour:
     - {fileID: 5882143472327072591, guid: e6c0a4f410f490144ac8512b4d836c4a, type: 3}
   - enemies:
     - {fileID: 8182809179516268396, guid: eaed7f625dff62a439ba4a1380ed7ee2, type: 3}
+  maximumThreatBudget: 20
+  finalMissionEnemies:
+  - {fileID: 7490328760025007987, guid: 097b035102c7046429bb2ebe8efa9eaa, type: 3}
+  - {fileID: 6036963752928671945, guid: 88062001baa260540bde711249e9ce11, type: 3}
+  - {fileID: 1762973566592295038, guid: 85144f08f69669e42a836c5542f1bd7a, type: 3}
+  - {fileID: 858551871322918889, guid: 9cfc879f830574c4daa2181d094bf162, type: 3}
+  - {fileID: 7170836212076919080, guid: e6c0a4f410f490144ac8512b4d836c4a, type: 3}
+  - {fileID: 4065368204729273986, guid: eaed7f625dff62a439ba4a1380ed7ee2, type: 3}
   worldCenter: {x: 0, y: 0, z: 0}
   portalArea: 20
   spawnRadius: 100

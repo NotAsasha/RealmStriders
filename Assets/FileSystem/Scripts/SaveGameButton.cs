@@ -11,7 +11,7 @@ public class SaveGameButton : NetworkBehaviour
 
     public void SaveGame()
     {
-        if (GameManager.Instance.hasStartedMission.Value)
+        if (!IsServer || GameManager.Instance.hasStartedMission.Value || GameManager.Instance.IsResolvingMission)
         {
             PublishResult(false);
             return;

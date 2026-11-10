@@ -33,12 +33,15 @@ namespace FileSystem.Scripts
         {
             Debug.Log("---SaveFile: GetData");
 
-            if (NetworkItemsHandler.Instance != null && GameManager.Instance != null)
+            if (NetworkItemsHandler.Instance != null && GameManager.Instance != null &&
+                GameManager.Instance.IsServer && GameManager.Instance.currentSave == this &&
+                BaseManager.Instance != null)
             {
                 save = new SaveData
                 {
                     formatVersion = CurrentSaveFormatVersion,
                     teamRating = GameManager.Instance.teamRating.Value,
+                    campaignCompleted = GameManager.Instance.campaignCompleted.Value,
                     lossRating = GameManager.Instance.lossRating.Value,
                     teamMoney = GameManager.Instance.teamMoney.Value,
                     objects = NetworkItemsHandler.Instance.GetSaveablesInfo(),
@@ -55,6 +58,8 @@ namespace FileSystem.Scripts
         public void LoadGameSave()
         {
             Debug.Log("SaveFile: ---LoadGameSave");
+            if (GameManager.Instance == null || !GameManager.Instance.IsServer) return;
+            GameManager.Instance.campaignCompleted.Value = save.campaignCompleted;
             GameManager.Instance.teamRating.Value = save.teamRating;
             GameManager.Instance.lossRating.Value = save.lossRating;
             GameManager.Instance.teamMoney.Value = save.teamMoney;
@@ -71,6 +76,7 @@ namespace FileSystem.Scripts
         {
             public int formatVersion;
             public int teamRating = 3;
+            public bool campaignCompleted;
             public int lossRating;
             public int teamMoney = 300;
 

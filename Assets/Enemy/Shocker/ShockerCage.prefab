@@ -355,6 +355,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Audio.ItemAcoustics
   audioSource: {fileID: 4375694473988582987}
   acousticSource: {fileID: 8931437797241390654}
+--- !u!1 &3118426709068770753
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4389227201896870387}
+  m_Layer: 0
+  m_Name: GripPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4389227201896870387
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3118426709068770753}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.015, y: -0.025, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 747285684318294203}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8648665937768570265
 GameObject:
   m_ObjectHideFlags: 0
@@ -393,6 +424,7 @@ Transform:
   m_Children:
   - {fileID: 8065908815218018609}
   - {fileID: 3885647576192239475}
+  - {fileID: 4389227201896870387}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4645287559731344207
@@ -528,16 +560,17 @@ MonoBehaviour:
   pitchVariation: 0.08
   clickSounds: []
   icon: {fileID: 21300000, guid: 103396d01c0ba504194287b8fdc24c29, type: 3}
-  gripPoint: {fileID: 0}
+  gripPoint: {fileID: 4389227201896870387}
   gripPositionOffset: {x: 0, y: 0, z: 0}
   gripRotationOffset: {x: 0, y: 0, z: 0}
-  viewPositionOffset: {x: 0, y: 0, z: 0}
-  viewRotationOffset: {x: 0, y: 0, z: 0}
+  heldFingerCurl: {x: 25, y: 35, z: 25}
+  viewPositionOffset: {x: 0.04, y: -0.04, z: 0.08}
+  viewRotationOffset: {x: -0, y: 0, z: 90}
   heldCameraBounds:
     m_Center: {x: 0, y: -0.009738818, z: 0}
     m_Extent: {x: 0.1425, y: 0.19026119, z: 0.1425}
   remotePositionOffset: {x: 0, y: 0, z: 0}
-  remoteRotationOffset: {x: 0, y: 0, z: 0}
+  remoteRotationOffset: {x: -0, y: 0, z: 90}
   actionViewPositionOffset: {x: -0.08, y: 0.1, z: -0.08}
   actionViewRotationOffset: {x: -10, y: -15, z: 0}
   actionRemotePositionOffset: {x: -0.08, y: 0.22, z: -0.12}

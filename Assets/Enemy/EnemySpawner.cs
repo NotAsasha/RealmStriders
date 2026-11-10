@@ -9,161 +9,116 @@ namespace Enemy
     public class EnemySpawner : NetworkBehaviour
     {
         [SerializeField] private EnemyPool[] enemiesByDanger;
+        [SerializeField, Min(2)] private int maximumThreatBudget = 20;
+        [SerializeField] private Enemy[] finalMissionEnemies;
+        private readonly System.Random encounterRandom = new();
 
-        [SerializeField] Vector3 worldCenter = new(0f,0f,0f);
-        [SerializeField] float portalArea = 30f;
+        [SerializeField] private Vector3 worldCenter = new(0f, 0f, 0f);
+        [SerializeField] private float portalArea = 30f;
+        [SerializeField] private float spawnRadius = 100f;
+        [SerializeField] private Vector3 portalPos = new(3f, 0f, 0f);
 
-        [SerializeField] float spawnRadius = 100f;
-
-        [SerializeField] Vector3 portalPos = new(3f, 0f, 0f);
-
-        //void Start()
-        //{
-        //    TestDistribution();
-        //}
-
-        // Spawns enemies from a pre-rolled danger list generated at mission-selection time.
-        public void SpawnEnemies(FixedList32Bytes<int> dangerLevels)
+        public FixedList32Bytes<int> CreateMissionDangers(int teamRating, bool finalMission)
         {
-            if (!IsServer) return;
+            var dangers = new FixedList32Bytes<int>();
+            if (finalMission)
+            {
+                if (!ValidateFinalRoster(dangers.Capacity)) return dangers;
+                foreach (Enemy enemy in finalMissionEnemies)
+                    dangers.Add(Mathf.RoundToInt(enemy.dangerLevel));
+                return dangers;
+            }
 
+            int limit = Mathf.Max(2, maximumThreatBudget);
+            int budget = Mathf.Min(limit, Mathf.Clamp(teamRating, 0, limit) + 2);
+            foreach (int danger in EnemyEncounterBudget.Generate(budget, GetMaxDanger(teamRating),
+                dangers.Capacity, encounterRandom)) dangers.Add(danger);
+            return dangers;
+        }
+
+        private bool ValidateFinalRoster(int capacity)
+        {
+            if (finalMissionEnemies == null || finalMissionEnemies.Length == 0 || finalMissionEnemies.Length > capacity)
+            {
+                Debug.LogError("End requires an explicit enemy roster that fits the mission payload.", this);
+                return false;
+            }
+            var unique = new HashSet<Enemy>();
+            foreach (Enemy enemy in finalMissionEnemies)
+            {
+                if (enemy == null || !enemy.TryGetComponent<NetworkObject>(out _) || !unique.Add(enemy) ||
+                    enemy.dangerLevel < 1 || enemy.dangerLevel > 5)
+                {
+                    Debug.LogError("End roster contains a missing, duplicate or invalid enemy prefab.", this);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public bool SpawnEnemies(FixedList32Bytes<int> dangerLevels, bool finalMission = false)
+        {
+            if (!IsServer || dangerLevels.Length == 0) return false;
+            if (finalMission && (!ValidateFinalRoster(dangerLevels.Capacity) ||
+                finalMissionEnemies.Length != dangerLevels.Length)) return false;
+
+            var prefabs = new GameObject[dangerLevels.Length];
+            var positions = new Vector3[dangerLevels.Length];
             for (int i = 0; i < dangerLevels.Length; i++)
             {
                 int danger = dangerLevels[i];
-                if (danger < 1 || danger > enemiesByDanger.Length) continue;
+                if (finalMission)
+                {
+                    if (danger != Mathf.RoundToInt(finalMissionEnemies[i].dangerLevel)) return false;
+                    prefabs[i] = finalMissionEnemies[i].gameObject;
+                }
+                else
+                {
+                    if (enemiesByDanger == null || danger < 1 || danger > enemiesByDanger.Length) return false;
+                    var pool = enemiesByDanger[danger - 1].enemies;
+                    if (pool == null || pool.Length == 0) return false;
+                    prefabs[i] = pool[Random.Range(0, pool.Length)];
+                }
+                if (prefabs[i] == null || !prefabs[i].TryGetComponent<Enemy>(out _) ||
+                    !prefabs[i].TryGetComponent<NetworkObject>(out _) || !RandomMapPoint(out positions[i]))
+                {
+                    Debug.LogError("Could not prepare every mission target; no enemies were spawned.", this);
+                    return false;
+                }
+            }
 
-                var pool = enemiesByDanger[danger - 1].enemies;
-                if (pool == null || pool.Length == 0) continue;
-
-                if (!RandomMapPoint(out var position)) continue;
-                var prefab = pool[Random.Range(0, pool.Length)];
-                var enemyObj = Instantiate(prefab, position, Quaternion.identity);
+            for (int i = 0; i < prefabs.Length; i++)
+            {
+                var enemyObj = Instantiate(prefabs[i], positions[i], Quaternion.identity);
                 SceneManager.MoveGameObjectToScene(enemyObj, GameManager.Instance.missionScene);
                 var enemy = enemyObj.GetComponent<NetworkObject>();
                 enemy.Spawn(true);
-                GameManager.Instance.activeEnemies.Add(enemy.GetComponent<Enemy>());
+                GameManager.Instance.RegisterMissionEnemy(enemy.GetComponent<Enemy>());
             }
-        }
-
-        public static int RandomEnemiesNumber(int teamRating)
-        {
-            // You always start with a single enemy.
-            // With every star(3 rating) you acquire, max enemies count increases by one
-            int clampedRating = Mathf.Max(1, teamRating);
-            int maxCount = (int)Mathf.Ceil(clampedRating / 3.0f);
-            int minCount = (int)Mathf.Ceil(clampedRating / 5.0f);
-
-            return Random.Range(minCount, maxCount + 1);
+            return true;
         }
 
         public static int GetMaxDanger(int teamRating)
         {
-            // Star 1 (Rating 1-3): Danger 1-2 only (tiers 3, 4, 5 are strictly prohibited)
-            // Star 2 (Rating 4-6): up to Danger 3
-            // Star 3 (Rating 7-9): up to Danger 4
-            // Star 4-5 (Rating 10+): up to Danger 5
             if (teamRating <= 3) return 2;
             if (teamRating <= 6) return 3;
             if (teamRating <= 9) return 4;
             return 5;
         }
 
-        public static List<int> CalculateDangers(int teamRating, int enemiesNumber)
-        {
-            int maxDanger = GetMaxDanger(teamRating);
-            float[] weights = new float[maxDanger];
-
-            int clampedRating = Mathf.Clamp(teamRating, 1, 15);
-            // Continuous target danger scales smoothly from 0.5 at rating 1 to 5.0 at rating 15
-            float targetDanger = Mathf.Min(5.0f, 0.5f + (clampedRating - 1) * (4.5f / 14.0f));
-            const float sigma = 0.85f;
-            const float twoSigmaSq = 2f * sigma * sigma;
-
-            for (int i = 0; i < maxDanger; ++i)
-            {
-                float diff = (i + 1) - targetDanger;
-                weights[i] = Mathf.Exp(-(diff * diff) / twoSigmaSq);
-            }
-
-            // Randomly choose danger levels for each enemy
-            List<int> dangers = new(enemiesNumber);
-            for (int i = 0; i < enemiesNumber; ++i)
-            {
-                dangers.Add(ChooseWeight(weights) + 1);
-            }
-            return dangers;
-        }
-
-        private static int ChooseWeight(float[] weights)
-        {
-            if (weights == null || weights.Length == 0) return 0;
-
-            float sum = 0f;
-            for (int i = 0; i < weights.Length; ++i)
-            {
-                sum += weights[i];
-            }
-
-            if (sum <= 0f) return 0;
-
-            float rand = Random.value * sum;
-            float accumulated = 0f;
-
-            for (int i = 0; i < weights.Length; ++i)
-            {
-                accumulated += weights[i];
-                if (rand <= accumulated) return i;
-            }
-
-            return weights.Length - 1;
-        }
-
-        // CRITICAL: enemies can possibly choose to spawn inside player base... TODO
         public bool RandomMapPoint(out Vector3 position)
         {
-            Vector3 searchPos;
-            for (int i = 0; i < 1000; ++i)
+            for (int i = 0; i < 1000; i++)
             {
-                if (!RandomMove.RandomPoint(worldCenter, spawnRadius, out searchPos)) continue;
-                Debug.Log($"---EnemySpawner: Tried {searchPos}");
-
+                if (!RandomMove.RandomPoint(worldCenter, spawnRadius, out var searchPos)) continue;
                 if (searchPos.y < -30f) continue;
-
-                if (Vector3.Distance(searchPos, portalPos) > portalArea)
-                {
-                    position = searchPos;
-                    return true;
-                }
+                if (Vector3.Distance(searchPos, portalPos) <= portalArea) continue;
+                position = searchPos;
+                return true;
             }
             position = worldCenter;
-            Debug.LogError($"---EnemySpawner: Nooo location found...");
+            Debug.LogError("No valid enemy spawn location found.", this);
             return false;
-        }
-
-        #region Debug
-
-        private void TestDistribution()
-        {
-            for (int i = 1; i < 16; ++i)
-            {
-                int[] star = new int[5];
-
-                float avgAmount = 0;
-
-                for (int j = 0; j < 500; ++j)
-                {
-                    int enemyNum = RandomEnemiesNumber(i);
-                    avgAmount = (avgAmount * j + enemyNum) / (j + 1);
-
-                    var dangers = CalculateDangers(i, enemyNum);
-
-                    foreach (var danger in dangers)
-                    {
-                        star[danger - 1] += 1;
-                    }
-                }
-                Debug.Log($"Witin a rating: {i}, avarage enemies number was: {avgAmount}, and danger stats are: {star[0]}, {star[1]}, {star[2]}, {star[3]}, {star[4]}");
-            }
         }
 
         private void OnDrawGizmosSelected()
@@ -173,8 +128,6 @@ namespace Enemy
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(worldCenter, spawnRadius);
         }
-
-        #endregion
     }
 
     [System.Serializable]

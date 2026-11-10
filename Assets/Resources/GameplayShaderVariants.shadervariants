@@ -1,0 +1,130 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!200 &20000000
+ShaderVariantCollection:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GameplayShaderVariants
+  m_Shaders:
+  - first: {fileID: 4800000, guid: 3f966f8e05eae364298bf16ae5d0b878, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+      - keywords: _MAIN_LIGHT_SHADOWS
+        passType: 0
+      - keywords: _MAIN_LIGHT_SHADOWS_CASCADE
+        passType: 0
+      - keywords: _MAIN_LIGHT_SHADOWS_SCREEN
+        passType: 0
+  - first: {fileID: 4800000, guid: dc68794fa0abffa43912b37b09c2aeb3, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+  - first: {fileID: 4800000, guid: 6c19852bf60bc4e41a4dbd7493d9877f, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 13
+  - first: {fileID: 4800000, guid: 1f7285701d269404f9e0dd1caf6964ff, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 13
+  - first: {fileID: 4800000, guid: 8411f60eb5c743b3a6234466906a02da, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+  - first: {fileID: 4800000, guid: dcf0467f9ab844f5b724244a69675f43, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+      - keywords: INSTANCING_ON
+        passType: 0
+  - first: {fileID: 4800000, guid: 354c44f811e23894587d2954fa2e77b9, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 13
+  - first: {fileID: 4800000, guid: 1e5e5637ad7626941a035d05eab62283, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+  - first: {fileID: 4800000, guid: e30e2c74fcaab9245878bebf1461056a, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+  - first: {fileID: 4800000, guid: e574c95be0df4f14a95c9eb4dfccfebd, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 13
+      - keywords: FOG_EXP
+        passType: 13
+      - keywords: FOG_EXP INSTANCING_ON
+        passType: 13
+      - keywords: FOG_EXP2
+        passType: 13
+      - keywords: FOG_EXP2 INSTANCING_ON
+        passType: 13
+      - keywords: FOG_LINEAR
+        passType: 13
+      - keywords: FOG_LINEAR INSTANCING_ON
+        passType: 13
+      - keywords: INSTANCING_ON
+        passType: 13
+  - first: {fileID: 4800000, guid: cf45a585b008d724781a9efbb415679d, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 13
+      - keywords: FOG_EXP
+        passType: 13
+      - keywords: FOG_EXP INSTANCING_ON
+        passType: 13
+      - keywords: FOG_EXP2
+        passType: 13
+      - keywords: FOG_EXP2 INSTANCING_ON
+        passType: 13
+      - keywords: FOG_LINEAR
+        passType: 13
+      - keywords: FOG_LINEAR INSTANCING_ON
+        passType: 13
+      - keywords: INSTANCING_ON
+        passType: 13
+  - first: {fileID: 4800000, guid: 21af1cdb514573a4295814932726162e, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 13
+      - keywords: FOG_EXP
+        passType: 13
+      - keywords: FOG_EXP INSTANCING_ON
+        passType: 13
+      - keywords: FOG_EXP2
+        passType: 13
+      - keywords: FOG_EXP2 INSTANCING_ON
+        passType: 13
+      - keywords: FOG_LINEAR
+        passType: 13
+      - keywords: FOG_LINEAR INSTANCING_ON
+        passType: 13
+      - keywords: INSTANCING_ON
+        passType: 13
+  - first: {fileID: 4800000, guid: 709cf9f9dea14fe4b1e848b03a466251, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+  - first: {fileID: 4800000, guid: 34678ee666f2c4d43b40c27e7bcfb2b3, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0

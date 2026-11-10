@@ -3442,6 +3442,11 @@ MonoBehaviour:
   swayMaxOffset: {x: 0.015, y: 0.01}
   swayAmount: {x: 0.001, y: 0.0006}
   swayReturnSpeed: 6
+  enableWalkBob: 1
+  walkBobPosition: {x: 0.006, y: 0.008, z: 0.003}
+  walkBobRotation: {x: 0.35, y: 0.45, z: 0.65}
+  walkBobStrideLength: 7.5
+  walkBobBlendSpeed: 10
 --- !u!1 &3512777154750557659
 GameObject:
   m_ObjectHideFlags: 0
@@ -4600,6 +4605,9 @@ MonoBehaviour:
   spineBone: {fileID: 759629984860742249}
   remoteHandTarget: {fileID: 3228106327460071384}
   cameraTransform: {fileID: 7048491912341459997}
+  rightFingerBase: {fileID: 9131906672067982496}
+  rightFingerMiddle: {fileID: 4355529156686563853}
+  rightFingerTip: {fileID: 5270102427072887108}
   smoothSpeed: 15
   spinePitchFraction: 0
   pitchNetworkThreshold: 0.1

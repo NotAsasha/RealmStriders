@@ -17,9 +17,29 @@ the mission scene and spawns its NetworkObject.
 | 7–9 | 4 (adds CasinoMonster) |
 | 10+ | 5 (adds InvisiMan) |
 
-Within the allowed tiers, weights form a smooth bell curve around the rating's
-target danger. Placement excludes the configured portal area and low positions.
-This does not make the base safe: enemies may enter it during an active mission.
+Ordinary encounters spend a threat budget of rating + 2, capped by the spawner's
+`maximumThreatBudget` (20 by default) and the mission payload capacity. Each
+spawn-pool tier costs its index, from 1 to 5. The generator chooses a feasible
+enemy count, then spends the whole budget without exceeding the unlocked tier
+or the seven-target payload limit. Results are shuffled. A budget of 20 can
+produce four tier-5 targets or a larger mixed group; weak tiers remain eligible
+at high ratings. Three mission cards retain their rating offsets of -1, 0, +1.
+
+Threat cost is separate from capture difficulty: existing pool assignments and
+prefab stats are preserved. In particular, Grabar currently occupies pool 1
+while its prefab has dangerLevel 2. The ordinary card's danger average still
+describes the rolled pool tiers, not each prefab's capture difficulty.
+
+End bypasses budget rolls and uses `finalMissionEnemies`, explicitly configured
+on the GameManager prefab: Grabar, Runner, LureMan, Shocker, CasinoMonster and
+InvisiMan, once each. Its card derives six targets and their difficulty from
+that same roster. Positions remain random. Missing/duplicate roster entries or
+an oversized roster are configuration errors; there is no random replacement.
+All prefab references and spawn positions are prepared before spawning any
+target, so a failed placement cannot silently produce a partial final encounter.
+
+Placement excludes the configured portal area and low positions. This does not
+make the base safe: enemies may enter it during an active ordinary mission.
 
 ## Capture and counterplay
 
@@ -36,9 +56,8 @@ Current LeafBlower behaviour:
   without reacquiring that target, progress loses 20% of the required capture
   time, repeating each second until reacquired or empty.
 
-Mission success/rating follows [Game Design](GAME_DESIGN.md). The current
-`isDead`-based completion calculation has a documented
-[implementation gap](SYSTEMS.md#known-implementation-gaps).
+Mission success/rating follows [Game Design](GAME_DESIGN.md). GameManager counts
+registered targets' capture events; killing a target does not count as capture.
 
 Equipment noise is server-owned: running LeafBlower and grounded Subwoofer
 continuously lure, radio lures while voice is transmitted, and Flashbang/Taser

@@ -35,6 +35,10 @@ namespace Player.Equipment
         [Tooltip("Rotation offset (Euler angles) applied to handAnchor if gripPoint is not assigned")]
         [SerializeField] public Vector3 gripRotationOffset;
 
+        [Tooltip("Positive curl angles for the three right-hand finger joints, from base to tip.")]
+        [SerializeField] private Vector3 heldFingerCurl;
+        public Vector3 HeldFingerCurl => heldFingerCurl;
+
         
 
         [Header("Held Poses (relative to the player's grip pose)")]

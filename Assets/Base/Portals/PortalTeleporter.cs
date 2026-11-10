@@ -17,6 +17,11 @@ namespace Portals
         public Transform receiver;
         public Transform enemyReceiver;
 
+        [SerializeField] private bool returnsToBase;
+
+        public bool IsTravelBlocked => returnsToBase && GameManager.Instance != null &&
+            GameManager.Instance.endReturnLocked.Value;
+
         [Header("Audio (Optional)")]
         [Tooltip("Optional sound override to play when teleporting through this specific portal.")]
         [SerializeField] private AudioClip customTeleportSound;
@@ -77,6 +82,7 @@ namespace Portals
                 if (PortalManager.Instance == null || !PortalManager.Instance.IsServer) return;
                 if (!PortalManager.Instance.IsPortalOpen) return;
                 if (PortalManager.Instance.IsMonsterPassBlockedServer) return;
+                if (IsTravelBlocked) return;
 
                 Enemy.Enemy enemy = other.GetComponentInParent<Enemy.Enemy>();
                 if (EnemyTeleportCooldowns.TryGetValue(enemy, out float cooldownUntil))
@@ -114,6 +120,7 @@ namespace Portals
         {
             if (!objectIsOverlapping || !objectToTeleport) return;
             if (PortalManager.Instance != null && !PortalManager.Instance.IsPortalOpen) return;
+            if (IsTravelBlocked) return;
             if (Time.time < playerTeleportCooldownUntil) return;
 
             Transform portalRoot = transform.parent;

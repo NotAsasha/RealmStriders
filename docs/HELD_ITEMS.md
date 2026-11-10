@@ -8,9 +8,18 @@ item. Inventory state is server-owned; poses are evaluated locally.
 | Component | Responsibility |
 | --- | --- |
 | `Inventory` | Replicated slot snapshot and selected item |
-| `ItemHolder` | Camera/shoulder poses, action offsets and equip transition |
-| `PlayerHeadSync` | Arm IK after camera effects |
+| `ItemHolder` | Camera/shoulder poses, walking bob, action offsets and equip transition |
+| `PlayerHeadSync` | Arm IK and authored finger curl after camera effects |
 | `Item` | Aligning to the solved palm and hiding stored presentation |
+
+The owner view adds a subtle walking bob from actual grounded movement, before
+camera clearance and arm IK. Tune ItemHolder's `walkBobPosition`,
+`walkBobRotation`, `walkBobStrideLength` and `walkBobBlendSpeed`; disable it with
+`enableWalkBob`. It settles at rest, in the air, while paused/interacting or
+immobilized, and is reduced when crouching or using an action pose. It adds no
+replicated state.
+`runBobFrequencyMultiplier` speeds up the cadence while running (default 1.45),
+blending smoothly without increasing the authored amplitudes or restarting the stride.
 
 ## Authoring
 
@@ -35,6 +44,12 @@ item. Inventory state is server-owned; poses are evaluated locally.
    and child colliders. No runtime hierarchy searches supply missing references.
 7. Set `heldCameraBounds` to physical mesh bounds in item-root coordinates,
    excluding particles/effect volumes. Recompute after geometry changes.
+8. Assign PlayerHeadSync's `rightFingerBase`, `rightFingerMiddle` and
+   `rightFingerTip` to the three right-hand finger joints. Set each Item's
+   `heldFingerCurl` to positive base/middle/tip angles to wrap the fingers around
+   its handle. Zero preserves the animated pose. The current mitten rig curls
+   around each joint's local Z axis. The additive pose is
+   shared by both views and restored before animation, unequip and despawn.
 
 The wrist is solved before the item locks to the actual palm, including the
 first equip frame. Owner poses use a camera-relative grip with forward correction

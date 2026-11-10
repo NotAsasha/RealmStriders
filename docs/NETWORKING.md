@@ -16,7 +16,9 @@ not be used as proof that an authoritative action succeeded.
 
 | System | Authority and replication |
 | --- | --- |
-| Mission/spawning | Server loads/unloads NGO scenes and spawns enemies from the selected danger list |
+| Mission/spawning | Server generates budget compositions, replicates the selected danger list and loads/unloads NGO scenes; End uses the configured unique prefab roster for both its preview and actual spawn |
+| Campaign completion | Server accepts a successful End return, persists the active host slot and replicates completion; late joiners receive the saved state |
+| End portal return | Server replicates the transient return lock from mission start and registered target death/capture; player owners and server enemy movement apply it only on the configured return leg |
 | Purchases | Server resolves the configured catalog entry, price and rating requirement; client price is ignored |
 | Inventory | Server-written slot-ID `NetworkList<ulong>`, selected slot and holding flag; `ulong.MaxValue` means empty |
 | Movement/crouch | Existing owner authority; owner-written stance and `currentNoiseRadius` |

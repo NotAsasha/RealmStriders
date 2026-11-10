@@ -1,6 +1,7 @@
 ﻿using Base.Shop;
 using Enemy;
 using FileSystem.Scripts;
+using Game;
 using Player;
 using Portals;
 using Steam;
@@ -23,6 +24,9 @@ public class GameManager : NetworkBehaviour
     public NetworkVariable<int> lossRating = new(0, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<int> teamMoney = new(300, writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<bool> hasStartedMission = new(false, writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<bool> campaignCompleted = new(false, writePerm: NetworkVariableWritePermission.Server);
+    public readonly NetworkVariable<bool> endReturnLocked = new(false,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
 
     //public List<NetworkObject>
@@ -46,13 +50,18 @@ public class GameManager : NetworkBehaviour
 
     private EnemySpawner spawner;
     private Coroutine stopMissionRoutine;
+    private readonly List<Enemy.Enemy> missionTargets = new();
+    private int capturedTargetCount;
+    private bool missionEnemiesReady;
+
+    public bool IsResolvingMission => stopMissionRoutine != null;
+    public EnemySpawner MissionSpawner => spawner;
 
     #region Unity Lifecycle
 
     private void Awake()
     {
         SetupSingleton();
-        SetupInputHandlers();
         DontDestroyOnLoad(gameObject);
 
         //Decrease timer every second
@@ -61,18 +70,24 @@ public class GameManager : NetworkBehaviour
         spawner = GetComponent<EnemySpawner>();
     }
 
-    private void OnDisable()
-    {
-        CleanupInputHandlers();
-    }
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        SetupInputHandlers();
         // Initial synchronization via ReadField does not fire OnValueChanged in Netcode.
         // Explicitly trigger OnValueChanged on spawn so UI and listeners receive synced values.
         teamMoney.OnValueChanged?.Invoke(teamMoney.Value, teamMoney.Value);
         teamRating.OnValueChanged?.Invoke(teamRating.Value, teamRating.Value);
+        campaignCompleted.OnValueChanged?.Invoke(campaignCompleted.Value, campaignCompleted.Value);
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        CleanupInputHandlers();
+        ClearMissionTargets();
+        if (NetworkManager != null && NetworkManager.SceneManager != null)
+            NetworkManager.SceneManager.OnLoadComplete -= OnSceneLoaded;
+        base.OnNetworkDespawn();
     }
 
     #endregion
@@ -132,8 +147,13 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void StartMissionServerRpc()
     {
-        if (hasStartedMission.Value) return;
+        if (!IsServer || hasStartedMission.Value || IsResolvingMission) return;
         if (missionName == "") return;
+        if (CampaignProgression.RequiresFinalMission(teamRating.Value, campaignCompleted.Value) &&
+            missionName != CampaignProgression.FinalMissionName) return;
+
+        ClearMissionTargets();
+        endReturnLocked.Value = missionName == CampaignProgression.FinalMissionName;
 
         //Spawn Monsters
 
@@ -174,37 +194,23 @@ public class GameManager : NetworkBehaviour
             yield break;
         }
 
-        //Calculate rating
-        int tempRating = CalculateRating(teamRating.Value);
+        bool returnedToBase = HasLivingPlayerAtBase();
+        bool missionSuccessful = missionEnemiesReady && missionTargets.Count == dangerLevels.Length &&
+            CampaignProgression.IsMissionSuccessful(dangerLevels.Length, capturedTargetCount, returnedToBase);
+        bool completedFinalMission = missionSuccessful && missionName == CampaignProgression.FinalMissionName;
+        int tempRating = CampaignProgression.CalculateRating(teamRating.Value, missionSuccessful, !returnedToBase);
 
+        endReturnLocked.Value = false;
         KillEnemies();
 
 
         //stop the mission (turn off the portals)
-        missionName = ""; // ---- Mission stays the same, can be changed on world chooser; -- UPD: nah, changed
+        missionName = string.Empty;
         hasStartedMission.Value = false;
         yield return new WaitForSeconds(4f);
 
 
         teamRating.Value = tempRating;
-
-        // lossRating.Value += 1; // nah, it becomes too hard. TODO - idk, come up with smth
-
-        // DEPRECATED
-        if (teamRating.Value <= lossRating.Value)
-        {
-            //Loss
-            Debug.Log("---MissionManager: Game Over, you lost...");
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-
-            //TEMP - to main menu.  --- TODO
-            SteamManager.Instance.Disconnect();
-            SceneManager.LoadScene("SteamBoot", LoadSceneMode.Single);
-            stopMissionRoutine = null;
-            yield break;
-        }
-
 
         //kill players out of base
         if (alivePlayers > 0)
@@ -224,7 +230,9 @@ public class GameManager : NetworkBehaviour
 
         Shop.Instance?.EnsureFreeLeafBlowerServer();
 
-        currentSave.Save();
+        if (completedFinalMission) campaignCompleted.Value = true;
+        currentSave?.Save();
+        ClearMissionTargets();
 
         //Resume Lobby Connections
         if (SteamManager.Instance.CurrentLobby != null)
@@ -266,21 +274,60 @@ public class GameManager : NetworkBehaviour
     {
         missionDuration = serverDuration;
     }
-    private int CalculateRating(int current)
+    public void RegisterMissionEnemy(Enemy.Enemy enemy)
     {
-        bool areAllDead = activeEnemies.All(enemy => enemy.isDead.Value);
-        if (areAllDead)
-        {
-            return current + 1;
-        }
+        if (!IsServer || enemy == null || missionTargets.Contains(enemy)) return;
+        activeEnemies.Add(enemy);
+        missionTargets.Add(enemy);
+        enemy.CapturedServer += OnMissionTargetCaptured;
+        enemy.isDead.OnValueChanged += OnMissionTargetDeathChanged;
+    }
 
-        bool isAnyDead = activeEnemies.Any(enemy => enemy.isDead.Value);
-        if (!isAnyDead && current > 0)
+    private void OnMissionTargetCaptured(Entity target, NetworkObject cage)
+    {
+        if (!IsServer || !hasStartedMission.Value || IsResolvingMission) return;
+        target.CapturedServer -= OnMissionTargetCaptured;
+        capturedTargetCount++;
+    }
+
+    private void OnMissionTargetDeathChanged(bool previous, bool current)
+    {
+        if (current) TryUnlockEndReturn();
+    }
+
+    private void TryUnlockEndReturn()
+    {
+        if (!IsServer || !endReturnLocked.Value || !hasStartedMission.Value || IsResolvingMission ||
+            !missionEnemiesReady || missionTargets.Count == 0 || missionTargets.Count != dangerLevels.Length) return;
+
+        foreach (Enemy.Enemy target in missionTargets)
         {
-            return current - 1;
+            if (target != null && !target.isDead.Value) return;
         }
-        
-        return current;
+        endReturnLocked.Value = false;
+    }
+
+    private void ClearMissionTargets()
+    {
+        foreach (Enemy.Enemy target in missionTargets)
+        {
+            if (target == null) continue;
+            target.CapturedServer -= OnMissionTargetCaptured;
+            target.isDead.OnValueChanged -= OnMissionTargetDeathChanged;
+        }
+        missionTargets.Clear();
+        capturedTargetCount = 0;
+        missionEnemiesReady = false;
+    }
+
+    private bool HasLivingPlayerAtBase()
+    {
+        foreach (var client in NetworkManager.ConnectedClientsList)
+        {
+            if (client.PlayerObject != null && client.PlayerObject.TryGetComponent<Human>(out var human) &&
+                !human.isDead.Value && IsWithinBaseRange(human.transform.position)) return true;
+        }
+        return false;
     }
 
     private void StartMission()
@@ -324,8 +371,10 @@ public class GameManager : NetworkBehaviour
 
     private void OnSceneLoaded(ulong conn, string sceneName, LoadSceneMode mode)
     {
-        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded;
+        if (!IsServer || sceneName != currentSceneName || mode != LoadSceneMode.Additive) return;
         Scene loadedScene = SceneManager.GetSceneByName(sceneName);
+        if (!loadedScene.IsValid() || !loadedScene.isLoaded) return;
+        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded;
         if (loadedScene.IsValid())
         {
             missionScene = loadedScene;
@@ -337,7 +386,14 @@ public class GameManager : NetworkBehaviour
             UpdateLocalSceneRpc(sceneName);
         }
 
-        spawner.SpawnEnemies(dangerLevels);
+        missionEnemiesReady = spawner.SpawnEnemies(dangerLevels, sceneName == CampaignProgression.FinalMissionName);
+        if (!missionEnemiesReady)
+        {
+            Debug.LogError("Mission target setup failed; returning to the base without awarding progress.");
+            BeginStopMission(false);
+            return;
+        }
+        TryUnlockEndReturn();
     }
 
     [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
@@ -354,7 +410,7 @@ public class GameManager : NetworkBehaviour
     {
         foreach (var enemy in activeEnemies)
         {
-            enemy.isDead.Value = true;
+            if (enemy != null && enemy.IsSpawned) enemy.isDead.Value = true;
         }
     }
 
@@ -464,8 +520,9 @@ public class GameManager : NetworkBehaviour
 
         foreach (var enemy in activeEnemies)
         {
-            enemy.GetComponent<NetworkObject>().Despawn();
-            Destroy(enemy.gameObject);
+            if (enemy == null) continue;
+            if (enemy.IsSpawned) enemy.NetworkObject.Despawn(true);
+            else Destroy(enemy.gameObject);
         }
         activeEnemies.Clear();
 

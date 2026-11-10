@@ -203,17 +203,18 @@ MonoBehaviour:
   gripPoint: {fileID: 3081976211498296102}
   gripPositionOffset: {x: 0, y: 0, z: 0}
   gripRotationOffset: {x: 0, y: 0, z: 0}
-  viewPositionOffset: {x: 0, y: 0, z: 0}
-  viewRotationOffset: {x: 0, y: 0, z: 0}
+  heldFingerCurl: {x: 22, y: 35, z: 25}
+  viewPositionOffset: {x: 0.025, y: -0.035, z: 0.04}
+  viewRotationOffset: {x: -0, y: 0, z: 90}
   heldCameraBounds:
     m_Center: {x: -0.03952364, y: 0.053530812, z: -0.00305558}
     m_Extent: {x: 0.10745036, y: 0.20496735, z: 0.048430376}
   remotePositionOffset: {x: 0, y: 0, z: 0}
-  remoteRotationOffset: {x: 0, y: 0, z: 0}
+  remoteRotationOffset: {x: -0, y: 0, z: 90}
   actionViewPositionOffset: {x: -0.08, y: 0.1, z: -0.08}
-  actionViewRotationOffset: {x: -10, y: -15, z: 0}
+  actionViewRotationOffset: {x: 348.1185, y: 8.176334, z: 358.30557}
   actionRemotePositionOffset: {x: -0.08, y: 0.22, z: -0.12}
-  actionRemoteRotationOffset: {x: -15, y: -15, z: 0}
+  actionRemoteRotationOffset: {x: 345.33524, y: 12.41041, z: 356.81137}
   poseBlendDuration: 0.2
   holdAnimationOffset: {fileID: 0}
   inventoryRenderers:
@@ -564,8 +565,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7476820987537960328}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.045, y: -0.045, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.047, y: -0.07, z: 0.006}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

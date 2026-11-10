@@ -1,4 +1,5 @@
 using Enemy;
+using Game;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
@@ -10,7 +11,7 @@ namespace Base.WorldChooser
     public struct MissionData : INetworkSerializable, System.IEquatable<MissionData>
     {
         public FixedString64Bytes missionName;
-        // Pre-rolled danger tier for each enemy (1-5). Max 8 enemies (FixedList32Bytes<int> = 8x4 bytes).
+        // Pre-rolled danger tiers (1-5), bounded by the fixed list's payload capacity.
         public FixedList32Bytes<int> dangerLevels;
 
         public int EnemiesCount => dangerLevels.Length;
@@ -108,6 +109,7 @@ namespace Base.WorldChooser
             if (IsServer)
             {
                 GameManager.Instance.teamRating.OnValueChanged += OnRatingChanged;
+                GameManager.Instance.campaignCompleted.OnValueChanged += OnCompletionChanged;
                 GenerateMissions(missionNumber);
             }
 
@@ -125,6 +127,7 @@ namespace Base.WorldChooser
             {
                 GameManager.Instance.hasStartedMission.OnValueChanged -= ReactToMissionState;
                 GameManager.Instance.teamRating.OnValueChanged -= OnRatingChanged;
+                GameManager.Instance.campaignCompleted.OnValueChanged -= OnCompletionChanged;
             }
         }
 
@@ -134,6 +137,7 @@ namespace Base.WorldChooser
         }
 
         private void OnRatingChanged(int previous, int current) => GenerateMissions(missionNumber);
+        private void OnCompletionChanged(bool previous, bool current) => GenerateMissions(missionNumber);
 
         private void OnSelectedIndexChanged(int previous, int current)
         {
@@ -207,27 +211,33 @@ namespace Base.WorldChooser
 
         private void GenerateMissions(int capacity)
         {
-            if (availableWorlds == null || availableWorlds.Length == 0)
+            var manager = GameManager.Instance;
+            if (!IsServer || manager == null || manager.hasStartedMission.Value) return;
+            bool finalMission = CampaignProgression.RequiresFinalMission(manager.teamRating.Value,
+                manager.campaignCompleted.Value);
+            if (!finalMission && (availableWorlds == null || availableWorlds.Length == 0))
             {
                 Debug.LogError("[WorldChooser] availableWorlds is empty!");
                 return;
             }
 
             selectedMissionIndex.Value = -1;
+            selectedMissionName.Value = default;
+            manager.missionName = string.Empty;
             availableMissions.Clear();
 
-            int currentRating = GameManager.Instance != null ? GameManager.Instance.teamRating.Value : 1;
+            int currentRating = manager.teamRating.Value;
+            if (finalMission) capacity = 1;
 
             for (int i = 0; i < capacity; i++)
             {
-                var missionName = new FixedString64Bytes(availableWorlds[Random.Range(0, availableWorlds.Length)]);
+                var missionName = new FixedString64Bytes(finalMission
+                    ? CampaignProgression.FinalMissionName
+                    : availableWorlds[Random.Range(0, availableWorlds.Length)]);
 
                 int difficultyStep = Mathf.Max(1, currentRating + i - 1);
-                int enemiesCount = EnemySpawner.RandomEnemiesNumber(difficultyStep);
-                var rolledDangers = EnemySpawner.CalculateDangers(difficultyStep, enemiesCount);
-
-                var dangerLevels = new FixedList32Bytes<int>();
-                foreach (int d in rolledDangers) dangerLevels.Add(d);
+                var dangerLevels = manager.MissionSpawner.CreateMissionDangers(difficultyStep, finalMission);
+                if (dangerLevels.Length == 0) continue;
 
                 availableMissions.Add(new MissionData
                 {
@@ -243,7 +253,8 @@ namespace Base.WorldChooser
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void SetMissionServerRpc(int missionIndex)
         {
-            if (GameManager.Instance == null || GameManager.Instance.hasStartedMission.Value) return;
+            if (!IsServer || GameManager.Instance == null || GameManager.Instance.hasStartedMission.Value ||
+                GameManager.Instance.IsResolvingMission) return;
 
             if (missionIndex < 0 || missionIndex >= availableMissions.Count)
             {

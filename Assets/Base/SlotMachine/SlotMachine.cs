@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Enemy.Casino;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -19,17 +20,33 @@ namespace Base.SlotMachine
         public AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
         public List<NetworkObject> itemsToDrop;
 
+        [SerializeField] private CasinoSpinPresentation spinPresentation;
+
         private readonly NetworkVariable<bool> isSpinning = new(false);
+        private Coroutine spinRoutine;
 
         private void Start()
         {
             if (table == null) table = GetComponent<DropTable>();
         }
 
+        public void CasinoSpin()
+        {
+            if (IsSpawned && IsClient) SpinRpc();
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (spinRoutine != null) StopCoroutine(spinRoutine);
+            spinRoutine = null;
+            if (spinPresentation != null) spinPresentation.StopSpin();
+            base.OnNetworkDespawn();
+        }
+
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void SpinRpc()
         {
-            if (isSpinning.Value) return;
+            if (!IsServer || isSpinning.Value) return;
 
             if (GameManager.Instance.teamMoney.Value < spinCost)
             {
@@ -49,12 +66,14 @@ namespace Base.SlotMachine
         [Rpc(SendTo.Everyone)]
         private void SpinAnimationRpc(int dropID)
         {
-            StartCoroutine(SpinRoutine(dropID));
+            if (spinRoutine != null) StopCoroutine(spinRoutine);
+            spinRoutine = StartCoroutine(SpinRoutine(dropID));
         }
 
         private IEnumerator SpinRoutine(int dropID)
         {
             float elapsedTime = 0f;
+            if (IsClient && spinPresentation != null) spinPresentation.BeginSpin();
 
             // 1. Отримуємо поточний початковий кут Y
             float startAngleY = spinObject.localEulerAngles.y;
@@ -74,6 +93,8 @@ namespace Base.SlotMachine
             // 5. Загальний кінцевий кут = поточний кут + повні оберти + докручування до точного сектора
             float totalTargetAngleY = startAngleY + (360f * fullSpins) + forwardDelta;
 
+            float previousAngleY = startAngleY;
+
             while (elapsedTime < spinLength)
             {
                 elapsedTime += Time.deltaTime;
@@ -82,12 +103,21 @@ namespace Base.SlotMachine
 
                 float currentAngleY = Mathf.Lerp(startAngleY, totalTargetAngleY, curveValue);
 
+                if (IsClient && spinPresentation != null && Time.deltaTime > 0f)
+                {
+                    float rotationsPerSecond = (currentAngleY - previousAngleY) / (360f * Time.deltaTime);
+                    spinPresentation.SetDrumSpeed(rotationsPerSecond);
+                }
+                previousAngleY = currentAngleY;
+
                 spinObject.localRotation = Quaternion.Euler(0f, currentAngleY, 0f);
 
                 yield return null;
             }
 
             spinObject.localRotation = Quaternion.Euler(0f, totalTargetAngleY % 360f, 0f);
+            if (IsClient && spinPresentation != null) spinPresentation.CompleteSpin();
+            spinRoutine = null;
 
             if (IsServer)
             {

@@ -1066,13 +1066,14 @@ MonoBehaviour:
   gripPoint: {fileID: 5786666265718929252}
   gripPositionOffset: {x: 0, y: 0, z: 0}
   gripRotationOffset: {x: 0, y: 0, z: 0}
-  viewPositionOffset: {x: 0, y: 0, z: 0}
-  viewRotationOffset: {x: 0, y: 0, z: 0}
+  heldFingerCurl: {x: 15, y: 25, z: 20}
+  viewPositionOffset: {x: 0.04, y: -0.035, z: 0.06}
+  viewRotationOffset: {x: -0, y: 0, z: 90}
   heldCameraBounds:
     m_Center: {x: 0.000000052154064, y: -0.015894309, z: 0.11161804}
     m_Extent: {x: 0.11912508, y: 0.18445888, z: 0.41161805}
   remotePositionOffset: {x: 0, y: 0, z: 0}
-  remoteRotationOffset: {x: 0, y: 0, z: 0}
+  remoteRotationOffset: {x: -0, y: 0, z: 90}
   actionViewPositionOffset: {x: -0.08, y: 0.1, z: -0.08}
   actionViewRotationOffset: {x: -10, y: -15, z: 0}
   actionRemotePositionOffset: {x: -0.08, y: 0.22, z: -0.12}
@@ -1558,8 +1559,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7556801120079572952}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.038562227, w: 0.99925625}
-  m_LocalPosition: {x: -0.03, y: -0.03, z: -0.1766}
+  m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.028, y: -0.135, z: -0.205}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

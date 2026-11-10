@@ -56,6 +56,7 @@ namespace Player.Movement
         public bool IsCrouching => isCrouching.Value;
         public float CrouchCameraOffset => IsCrouching ? -crouchCameraDrop : 0f;
         public bool IsGrounded => player.isGrounded;
+        public Vector3 Velocity => player.velocity;
 
         private readonly NetworkVariable<bool> isCrouching = new(false,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);

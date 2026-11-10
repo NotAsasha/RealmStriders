@@ -13,6 +13,9 @@ data. Keep assets paired with their `.meta` files.
    monster's folder. Identify stackable weaknesses and server-owned state.
 3. Configure the prefab, navigation, animation, effects and separate step/vocal
    sources. Register it in NGO and the appropriate enemy danger pool.
+   If it belongs in End, add its prefab explicitly to EnemySpawner's
+   `finalMissionEnemies` on GameManager; keep that roster unique and within the
+   mission payload capacity. The End preview and spawn both use this list.
 4. Configure explicit EnemyAcoustics emitter pairs as described in
    [Steam Audio](STEAM_AUDIO.md#вороги-та-нові-джерела).
 5. Test host/client spawn, capture, player death and mission-end despawn.
@@ -75,6 +78,43 @@ output spawn and consistent host/client preview/effects.
    [Steam Audio](STEAM_AUDIO.md#геометрія-та-повторне-запікання). Review only
    structural meshes; decor/furniture stay outside the acoustic export.
 6. Casino art changes also follow [Casino art](CASINO_ART.md).
+
+## Shared Field and Menu environment
+
+Edit common buildings, pipes and background lights in
+`Assets/Enviroment/FieldEnvironment.prefab`. It retains editable ProBuilder
+components. After editing geometry, run **Tools → Worlds → Refresh Shared Field
+Meshes** to update the persistent meshes used by both scenes, then rebake Field
+lighting, navigation and acoustics as needed. Scene instances intentionally remove
+the ProBuilder components and reference the shared mesh library; keep those
+component removals on the instances when editing the source prefab.
+
+Menu-specific props stay outside the shared geometry or as instance additions.
+Keep APV generation in Field. Menu uses its existing lightmaps and direct lighting
+for its fixed camera and must not acquire a scene-wide APV baking set. Preserve
+the camera's parallax margin when editing the visible backdrop.
+
+## Shader warmup
+
+When adding a custom effect or changing its shader keywords, update the explicit
+variants in `Assets/Scripts/Editor/GameplayShaderWarmupAuthoring.cs`, then run
+**Tools → Rendering → Rebuild Gameplay Shader Variants** outside Play Mode.
+The same generator runs before builds and fails on missing shaders, shader
+errors or invalid pass/keyword combinations. Commit the generated
+`Assets/Resources/GameplayShaderVariants.shadervariants` and its metadata.
+Use `ScriptableRenderPipeline` for `UniversalForward` passes and `Normal` for
+the untagged effect/fullscreen passes. Do not use Built-in `ForwardBase` for URP.
+The collection includes the declared orbital fog/instancing combinations and
+volumetric-fog shadow modes; keep these in sync with their shader pragmas.
+
+Verify a cold start and first use of each effect in a Development Player on each
+target graphics API, with the Profiler checking `Shader.CreateGPUProgram` and
+`CreateGraphicsGraphicsPipelineImpl`. Editor caches alone do not prove coverage.
+Shader variant warmup reduces first-use compilation; on DX12, Vulkan and Metal,
+exact vertex layouts/render states can still require additional PSOs. Trace and
+warm a representative GraphicsStateCollection on target hardware if profiling
+shows remaining shader stalls. Shader warmup does not address asset loading,
+garbage collection or other sources of stutter.
 
 Content is complete when implementation, authored references, authority,
 player-facing counterplay and documentation agree. Record any remaining design

@@ -20,6 +20,11 @@ public class PlayerHeadSync : NetworkBehaviour
     [Tooltip("Local Camera (null for other players)")]
     public Transform cameraTransform;
 
+    [Header("Held Finger Pose")]
+    [SerializeField] private Transform rightFingerBase;
+    [SerializeField] private Transform rightFingerMiddle;
+    [SerializeField] private Transform rightFingerTip;
+
     [Header("Settings")]
     [Tooltip("Remote pitch interpolation speed")]
     public float smoothSpeed = 15f;
@@ -67,6 +72,10 @@ public class PlayerHeadSync : NetworkBehaviour
     private float maxSafeArmReach = 0.575f;
     private float minSafeArmReach = 0.15f;
     private Vector3 firstPersonShoulderOffset;
+    private Quaternion fingerBaseRotation;
+    private Quaternion fingerMiddleRotation;
+    private Quaternion fingerTipRotation;
+    private bool hasHeldFingerPose;
 
     public Transform ShoulderBone => ikRoot;
     public float MaxSafeArmReach => maxSafeArmReach;
@@ -136,6 +145,7 @@ public class PlayerHeadSync : NetworkBehaviour
     private void Update()
     {
         RestoreFirstPersonShoulder();
+        RestoreHeldFingerPose();
         if (!IsOwner) return;
 
         if (PlayerMovement.Instance != null && (PlayerMovement.Instance.isInInteraction || PlayerMovement.Instance.isPaused))
@@ -155,6 +165,37 @@ public class PlayerHeadSync : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         RestoreFirstPersonShoulder();
+        RestoreHeldFingerPose();
+    }
+
+    private void OnDisable()
+    {
+        RestoreHeldFingerPose();
+    }
+
+    private void RestoreHeldFingerPose()
+    {
+        if (!hasHeldFingerPose) return;
+        if (rightFingerBase != null) rightFingerBase.localRotation = fingerBaseRotation;
+        if (rightFingerMiddle != null) rightFingerMiddle.localRotation = fingerMiddleRotation;
+        if (rightFingerTip != null) rightFingerTip.localRotation = fingerTipRotation;
+        hasHeldFingerPose = false;
+    }
+
+    private void ApplyHeldFingerPose(Item item)
+    {
+        RestoreHeldFingerPose();
+        if (item == null || rightFingerBase == null || rightFingerMiddle == null || rightFingerTip == null) return;
+
+        // Restore before the next animation pass so additive curls never accumulate.
+        fingerBaseRotation = rightFingerBase.localRotation;
+        fingerMiddleRotation = rightFingerMiddle.localRotation;
+        fingerTipRotation = rightFingerTip.localRotation;
+        Vector3 curl = item.HeldFingerCurl;
+        rightFingerBase.localRotation = fingerBaseRotation * Quaternion.Euler(0f, 0f, curl.x);
+        rightFingerMiddle.localRotation = fingerMiddleRotation * Quaternion.Euler(0f, 0f, curl.y);
+        rightFingerTip.localRotation = fingerTipRotation * Quaternion.Euler(0f, 0f, curl.z);
+        hasHeldFingerPose = true;
     }
 
     private void RestoreFirstPersonShoulder()
@@ -238,6 +279,7 @@ public class PlayerHeadSync : NetworkBehaviour
             Item activeItem = inventory.GetActiveItem();
             if (activeItem != null && activeItem.gameObject.activeInHierarchy)
             {
+                ApplyHeldFingerPose(activeItem);
                 activeItem.UpdateRemoteHeldPose();
             }
         }

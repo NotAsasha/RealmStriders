@@ -109,6 +109,10 @@ implemented today and may still need work.
   A mission ending after the whole team dies decreases it by one. The rating
   unlocks shop items and influences harder enemy rolls.
 - Money is earned by selling captured `EnemyCage` items at the base.
+- Ordinary mission encounters use a rating-scaled threat budget: the same
+  budget can produce fewer strong enemies or a larger mixed group. Existing
+  enemy unlock thresholds remain in effect. Budget generation and authoring
+  settings are described in [Enemies](ENEMIES.md#spawning).
 - Shop categories correspond to five stars. Category 1 is available from
   rating 0; categories 2–5 unlock at ratings 4, 7, 10 and 13, respectively
   (the first segment of each subsequent star). Existing item grouping and
@@ -126,6 +130,38 @@ implemented today and may still need work.
   and quieter than standing walking. Holding Run while crouched moves slightly
   faster and emits the same noise radius as standing walking. Crouched players
   cannot jump or stand up beneath an obstruction.
+
+## Campaign completion
+
+**Status: Confirmed design; implemented**
+
+At exactly team rating 15, an unfinished campaign offers only the End mission
+in WorldChooser. End contains exactly one Grabar, Runner, LureMan, Shocker,
+CasinoMonster and InvisiMan, with random positions. Completing End requires
+capturing every target and ending the mission with at least one living player
+back at the base. It grants
+the usual +1 rating and permanently marks that save as completed.
+
+At ratings below 15 or above 15, ordinary missions are available even if the
+campaign has not been completed. Completed campaigns offer ordinary missions
+at every rating, including 15. Manually raising the rating does not award
+campaign completion. Each save card shows its own completion star; this is not
+an individual player achievement and does not mark a client's other saves.
+The base's OverRating display appears after completion and shows total stars
+as rating divided by three, to one decimal place (rating 16 displays 5.3 STARS).
+
+During End, the portal permits entry from the base but blocks return travel
+for players and monsters until no rolled target remains alive. Capturing or
+killing the last living target unlocks return travel; killing still does not
+count toward successful mission completion. The upper portal is completely
+hidden while return travel is locked and reappears when it unlocks.
+ReturnTeleporter bypasses this
+portal restriction and retains its ordinary charge and use rules. The mission
+timer is unchanged; unlocking the return route does not add evacuation time.
+
+A team wipe in End loses one rating point, like an ordinary mission. An
+unfinished campaign falling from 15 to 14 offers ordinary locations again,
+allowing the team to earn money and rebuild its rating before retrying End.
 
 ## Tutorial
 

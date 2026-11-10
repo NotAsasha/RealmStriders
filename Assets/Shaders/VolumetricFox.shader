@@ -77,13 +77,23 @@ Shader "Tutorial/VolumetricFog"
                 float transmittance = 1;
                 float4 fogCol = _Color;
 
+                #if defined(_MAIN_LIGHT_SHADOWS_SCREEN)
+                    // Screen shadows are constant along this pixel's ray. Sample before
+                    // the varying loop so implicit texture derivatives remain valid.
+                    Light screenShadowLight = GetMainLight(float4(IN.texcoord, 0.0, 1.0));
+                #endif
+
                 while(distTravelled < distLimit)
                 {
                     float3 rayPos = entryPoint + rayDir * distTravelled;
                     float density = get_density(rayPos);
                     if (density > 0)
                     {
-                        Light mainLight = GetMainLight(TransformWorldToShadowCoord(rayPos));
+                        #if defined(_MAIN_LIGHT_SHADOWS_SCREEN)
+                            Light mainLight = screenShadowLight;
+                        #else
+                            Light mainLight = GetMainLight(TransformWorldToShadowCoord(rayPos));
+                        #endif
                         fogCol.rgb += mainLight.color.rgb * _LightContribution.rgb * henyey_greenstein(dot(rayDir, mainLight.direction), _LightScattering) * density * mainLight.shadowAttenuation * _StepSize;
                         transmittance *= exp(-density * _StepSize);
                     }
