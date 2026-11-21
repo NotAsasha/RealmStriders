@@ -9070,6 +9070,7 @@ GameObject:
   - component: {fileID: 925898677}
   - component: {fileID: 925898676}
   - component: {fileID: 925898675}
+  - component: {fileID: 925898678}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -9152,6 +9153,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 155842459}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &925898678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925898674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff7cbe802fd34664813a6d68f124e402, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Rendering.TerrainGraphicsQuality
+  targetTerrain: {fileID: 925898676}
+  qualityLevels:
+  - densityMultiplier: 0.3
+    distanceMultiplier: 0.5
+  - densityMultiplier: 0.65
+    distanceMultiplier: 0.75
+  - densityMultiplier: 1
+    distanceMultiplier: 1
 --- !u!1 &928774966
 GameObject:
   m_ObjectHideFlags: 0

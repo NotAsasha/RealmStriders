@@ -28,12 +28,13 @@ public class VolumetricFogRenderFeature : ScriptableRendererFeature
         {
             if (fogMaterial == null) return;
 
+            UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
+            if (!cameraData.postProcessEnabled ||
+                (cameraData.cameraType != CameraType.Game && cameraData.cameraType != CameraType.SceneView)) return;
+
             var stack = VolumeManager.instance.stack;
             volumeSettings = stack.GetComponent<SciFiFogVolume>();
             if (volumeSettings == null || !volumeSettings.IsActive()) return;
-
-            UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
-            if (cameraData.cameraType != CameraType.Game && cameraData.cameraType != CameraType.SceneView) return;
 
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
             TextureHandle source = resourceData.activeColorTexture;
@@ -106,9 +107,16 @@ public class VolumetricFogRenderFeature : ScriptableRendererFeature
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        if (material != null)
-        {
-            renderer.EnqueuePass(fogPass);
-        }
+        if (material == null || fogPass == null) return;
+
+        if (!renderingData.cameraData.postProcessEnabled ||
+            (renderingData.cameraData.cameraType != CameraType.Game &&
+             renderingData.cameraData.cameraType != CameraType.SceneView)) return;
+
+        SciFiFogVolume settings = VolumeManager.instance.stack.GetComponent<SciFiFogVolume>();
+        if (settings == null || !settings.IsActive()) return;
+
+        // Reject inactive cameras before this pass can request an intermediate color target.
+        renderer.EnqueuePass(fogPass);
     }
 }

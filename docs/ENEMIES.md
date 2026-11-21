@@ -50,6 +50,9 @@ must reach the base before mission cleanup to remain available.
 
 Current LeafBlower behaviour:
 
+- Sleeping or invincible entities cannot accumulate capture progress or enter
+  the server capture sequence. Static in-base CasinoMonster and LureMan become
+  capturable only after their wake-up sequence clears those effects.
 - The holder and their child colliders are excluded from target detection;
   dropping removes that exclusion.
 - Losing sight retains the target/progress but pauses capture. After one second

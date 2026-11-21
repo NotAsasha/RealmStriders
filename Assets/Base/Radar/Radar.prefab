@@ -230,6 +230,11 @@ MonoBehaviour:
   beamLifetime: 7
   shotCost: 80
   radarCamera: {fileID: 492645591144755064}
+  screenRenderer: {fileID: 5862428144982684223}
+  radarFrameRate: 30
+  visibilityOccluders:
+    serializedVersion: 2
+    m_Bits: 4294967291
   crosshair: {fileID: 5881779908817008555}
   screen: {fileID: 375214186406419096}
   beamPrefab: {fileID: 1422715809849256587, guid: 0b5b481a31a976f4ca8df7ac5c37e491,
@@ -456,13 +461,13 @@ MonoBehaviour:
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
   m_Cameras: []
-  m_RendererIndex: -1
+  m_RendererIndex: 1
   m_VolumeLayerMask:
     serializedVersion: 2
     m_Bits: 0
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 0
-  m_RenderPostProcessing: 1
+  m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0

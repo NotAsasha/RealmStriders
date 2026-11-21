@@ -61,6 +61,9 @@ namespace Player
         private Dictionary<EffectType, Coroutine> activeCoroutines = new();
 
         public bool IsBeingCaptured => isCapturingNet.Value;
+        public bool CanBeCaptured => IsSpawned && !isDead.Value && !IsBeingCaptured &&
+                                     !IsEffectActive(EffectType.Asleep) &&
+                                     !IsEffectActive(EffectType.Invincible);
         public event System.Action<Entity, NetworkObject> CapturedServer;
 
         #region Initialization
@@ -154,7 +157,7 @@ namespace Player
         /// </summary>
         public bool TryCaptureServer()
         {
-            if (!IsServer || !IsSpawned || isDead.Value || IsBeingCaptured)
+            if (!IsServer || !CanBeCaptured)
             {
                 return false;
             }

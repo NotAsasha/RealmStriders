@@ -19,6 +19,7 @@ namespace Player
         private const string ParticleMaterialResource = "CaptureEffects/CaptureParticleMaterial";
 
         private static Material runtimeParticleMaterial;
+        private static readonly int CaptureRingId = Shader.PropertyToID("_CaptureRing");
 
         [SerializeField] private CaptureParticleEffectKind kind;
         [SerializeField] private ParticleSystem effectParticles;
@@ -29,6 +30,7 @@ namespace Player
         [SerializeField, Min(0.01f)] private float startSize = 0.08f;
         [SerializeField] private float inwardSpeed = 3f;
         [SerializeField] private float velocityStretch = 0.35f;
+        private ParticleSystem impactRing;
 
         public void SetKind(CaptureParticleEffectKind value)
         {
@@ -39,6 +41,7 @@ namespace Player
         {
             EnsureParticleSystem();
             Configure(color);
+            if (kind == CaptureParticleEffectKind.Flash) ConfigureImpactRing();
             effectParticles.Play(true);
             return effectParticles;
         }
@@ -71,55 +74,98 @@ namespace Player
         private void Configure(Color color)
         {
             ParticleSystem.MainModule main = effectParticles.main;
-            main.loop = kind == CaptureParticleEffectKind.Vortex;
+            bool isVortex = kind == CaptureParticleEffectKind.Vortex;
+            main.loop = isVortex;
+            main.useUnscaledTime = true;
             main.simulationSpace = ParticleSystemSimulationSpace.World;
-            main.startLifetime = kind == CaptureParticleEffectKind.Vortex ? lifetime : 0.35f;
-            main.startSpeed = kind == CaptureParticleEffectKind.Vortex ? 0.1f : radius * 4f;
-            main.startSize = kind == CaptureParticleEffectKind.Vortex ? startSize : radius * 0.35f;
-            main.startColor = kind == CaptureParticleEffectKind.Vortex ? color : Color.white;
-            main.maxParticles = kind == CaptureParticleEffectKind.Vortex ? maxParticles : 48;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(lifetime * 0.75f, lifetime);
+            main.startSpeed = isVortex ? new ParticleSystem.MinMaxCurve(0f)
+                : new ParticleSystem.MinMaxCurve(radius * 0.65f, radius * 1.85f);
+            main.startSize = new ParticleSystem.MinMaxCurve(startSize * 0.55f, startSize);
+            main.startColor = Color.white;
+            main.maxParticles = maxParticles;
 
             ParticleSystem.EmissionModule emission = effectParticles.emission;
-            if (kind == CaptureParticleEffectKind.Vortex)
+            if (isVortex)
             {
                 emission.rateOverTime = emissionRate;
             }
             else
             {
                 emission.rateOverTime = 0f;
-                emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 36) });
+                emission.SetBursts(new[] { new ParticleSystem.Burst(0f, (short)Mathf.Clamp(maxParticles, 1, 20)) });
             }
 
             ParticleSystem.ShapeModule shape = effectParticles.shape;
             shape.shapeType = ParticleSystemShapeType.Sphere;
-            shape.radius = kind == CaptureParticleEffectKind.Vortex ? radius : 0.03f;
+            shape.radius = isVortex ? radius : 0.045f;
+            shape.radiusThickness = isVortex ? 0.35f : 1f;
 
             ParticleSystem.VelocityOverLifetimeModule velocity = effectParticles.velocityOverLifetime;
-            velocity.enabled = kind == CaptureParticleEffectKind.Vortex;
+            velocity.enabled = isVortex;
             if (velocity.enabled)
             {
                 velocity.radial = new ParticleSystem.MinMaxCurve(-inwardSpeed);
+                velocity.orbitalY = new ParticleSystem.MinMaxCurve(0.65f);
             }
 
             ParticleSystem.ColorOverLifetimeModule colorOverLifetime = effectParticles.colorOverLifetime;
-            colorOverLifetime.enabled = kind == CaptureParticleEffectKind.Vortex;
-            if (colorOverLifetime.enabled)
-            {
-                Gradient gradient = new();
-                gradient.SetKeys(
-                    new[] { new GradientColorKey(color, 0f), new GradientColorKey(Color.white, 0.8f) },
-                    new[] { new GradientAlphaKey(0f, 0f), new GradientAlphaKey(1f, 0.15f), new GradientAlphaKey(0f, 1f) });
-                colorOverLifetime.color = new ParticleSystem.MinMaxGradient(gradient);
-            }
+            colorOverLifetime.enabled = true;
+            Color core = Color.Lerp(color, Color.white, 0.75f);
+            Gradient gradient = new();
+            gradient.SetKeys(
+                new[] { new GradientColorKey(isVortex ? color : core, 0f), new GradientColorKey(isVortex ? core : color, 0.75f) },
+                new[] { new GradientAlphaKey(isVortex ? 0f : 1f, 0f), new GradientAlphaKey(0.9f, 0.18f), new GradientAlphaKey(0f, 1f) });
+            colorOverLifetime.color = gradient;
+
+            ParticleSystem.SizeOverLifetimeModule size = effectParticles.sizeOverLifetime;
+            size.enabled = true;
+            size.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0f, 1f, 1f, 0.18f));
 
             ParticleSystemRenderer renderer = effectParticles.GetComponent<ParticleSystemRenderer>();
             if (renderer == null) return;
 
             renderer.sharedMaterial = GetParticleMaterial();
-            renderer.renderMode = kind == CaptureParticleEffectKind.Vortex
+            renderer.renderMode = isVortex
                 ? ParticleSystemRenderMode.Stretch
                 : ParticleSystemRenderMode.Billboard;
             renderer.velocityScale = velocityStretch;
+            renderer.lengthScale = 1.4f;
+        }
+
+        private void ConfigureImpactRing()
+        {
+            if (impactRing == null)
+            {
+                GameObject ring = new("Capture ring");
+                ring.transform.SetParent(effectParticles.transform, false);
+                impactRing = ring.AddComponent<ParticleSystem>();
+                var renderer = ring.GetComponent<ParticleSystemRenderer>();
+                renderer.sharedMaterial = GetParticleMaterial();
+                MaterialPropertyBlock properties = new();
+                properties.SetFloat(CaptureRingId, 1f);
+                renderer.SetPropertyBlock(properties);
+            }
+
+            impactRing.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+            var main = impactRing.main;
+            main.loop = false;
+            main.useUnscaledTime = true;
+            main.startLifetime = lifetime * 0.8f;
+            main.startSpeed = 0f;
+            main.startSize = radius;
+            main.maxParticles = 1;
+            var shape = impactRing.shape;
+            shape.enabled = false;
+            var emission = impactRing.emission;
+            emission.rateOverTime = 0f;
+            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 1) });
+            var size = impactRing.sizeOverLifetime;
+            size.enabled = true;
+            size.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0f, 0.12f, 1f, 1f));
+            var tint = impactRing.colorOverLifetime;
+            tint.enabled = true;
+            tint.color = effectParticles.colorOverLifetime.color;
         }
 
         private static Material GetParticleMaterial()

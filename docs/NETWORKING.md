@@ -109,6 +109,14 @@ All peers need the same Inspector clip list and a dedicated AudioSource with
 Play On Awake disabled. Disable/despawn cancels playback; a new event interrupts
 the previous clip. It emits no gameplay noise and stores no event history.
 
+`MissionLightFlicker` is a scene-placed NetworkBehaviour on selected Casino
+wall lamps. Only the server reads the decreasing mission timer and schedules
+each lamp's independent bursts. Transient ClientRpcs carry a future server
+timestamp, duration and random seed; clients seek to the current pulse on late
+delivery. No per-frame light values are replicated. Late joiners see future
+bursts, and mission end/disable/despawn restores normal light and emission.
+Authoring details live in [Casino art](CASINO_ART.md#lighting-and-navigation).
+
 For any new interaction, check sender/ownership, authoritative validation,
 initial state, late joining, despawn and scene transitions with a host and a
 client. UDP loopback checks do not verify Steam transport or microphone capture.

@@ -45,6 +45,10 @@ namespace Portals
         {
             if (_pass == null || material == null) return;
 
+            Camera camera = renderingData.cameraData.camera;
+            if (renderingData.cameraData.cameraType != CameraType.Game ||
+                camera == null || camera.targetTexture != null) return;
+
             // Skip when effect is invisible — saves the full blit cost
             if (Shader.GetGlobalFloat(IntensityId) <= 0.0005f) return;
 

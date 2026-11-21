@@ -19,6 +19,7 @@ namespace FileSystem.Scripts
     public class SettingsFile : GameFile
     {
         public static event Action OnSettingsChanged;
+        public static event Action OnGraphicsSettingsApplied;
 
         [Header("SettingsFile Info")]
         public SettingsSave save;
@@ -51,22 +52,26 @@ namespace FileSystem.Scripts
         {
             AudioListener.volume = Mathf.Clamp01(save.masterVolume);
 
-            if (save.qualityLevel >= 0 && save.qualityLevel < QualitySettings.names.Length)
+            if (save.qualityLevel >= 0 && save.qualityLevel < QualitySettings.names.Length &&
+                save.qualityLevel != QualitySettings.GetQualityLevel())
                 QualitySettings.SetQualityLevel(save.qualityLevel, true);
 
             QualitySettings.shadows = (ShadowQuality)Mathf.Clamp(save.shadowQuality, 0, 2);
             QualitySettings.vSyncCount = save.vSync ? 1 : 0;
             Application.targetFrameRate = save.vSync ? -1 : save.frameRate;
 
-            if (save.resolutionWidth <= 0 || save.resolutionHeight <= 0) return;
-
-            FullScreenMode mode = (FullScreenMode)Mathf.Clamp(save.fullScreenMode, 0, 3);
-            RefreshRate refreshRate = new()
+            if (save.resolutionWidth > 0 && save.resolutionHeight > 0)
             {
-                numerator = (uint)Mathf.Max(1, save.refreshRate),
-                denominator = 1
-            };
-            Screen.SetResolution(save.resolutionWidth, save.resolutionHeight, mode, refreshRate);
+                FullScreenMode mode = (FullScreenMode)Mathf.Clamp(save.fullScreenMode, 0, 3);
+                RefreshRate refreshRate = new()
+                {
+                    numerator = (uint)Mathf.Max(1, save.refreshRate),
+                    denominator = 1
+                };
+                Screen.SetResolution(save.resolutionWidth, save.resolutionHeight, mode, refreshRate);
+            }
+
+            OnGraphicsSettingsApplied?.Invoke();
         }
     }
     [Serializable]

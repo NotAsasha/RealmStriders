@@ -41,7 +41,10 @@ blending smoothly without increasing the authored amplitudes or restarting the s
    The body locomotion Animator must not drive item actions.
 6. Explicitly assign `inventoryRenderers`, `inventoryLights`, `inventoryCanvases`,
    `inventoryAudioSources` and `inventoryColliders`, including particle renderers
-   and child colliders. No runtime hierarchy searches supply missing references.
+   and child physics colliders. Keep local Volume boundary colliders (such as
+   Subwoofer's EffectArea trigger) out of `inventoryColliders` so held equipment
+   retains its post-processing area. No runtime hierarchy searches supply
+   missing references.
 7. Set `heldCameraBounds` to physical mesh bounds in item-root coordinates,
    excluding particles/effect volumes. Recompute after geometry changes.
 8. Assign PlayerHeadSync's `rightFingerBase`, `rightFingerMiddle` and

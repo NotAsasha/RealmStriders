@@ -95,6 +95,13 @@ details and [Networking](NETWORKING.md) for the trust boundary.
   on the server. `CategorySwitch`, `ShopCategoryButton` and `ShopPanelMotion`
   manage navigation and the physical terminal. `ShopItemPreview` renders
   mesh-only previews in a separate local scene and stops its camera when closed.
+- Radar's local camera updates at most 30 times per unscaled second while its
+  explicitly assigned screen Renderer is visible to the local player camera.
+  It stops outside the view, behind the screen, behind physics occluders, when
+  the screen is hidden, or on disable/despawn. Occlusion checks sample the screen
+  center/corners at 10 Hz using an authored layer mask. Skipped updates retain
+  the last render texture. This does not pause server targeting or strike timers.
+  The frame cap (1–60) and screen reference are Inspector settings on Radar.
 - `BaseManager` owns shared upgrades; `BaseUpgrader` presents their state and
   affordability without a second purchase/save state. `WorldChooser` selects
   missions and their danger rolls.
@@ -136,6 +143,15 @@ discards them, and Restore Defaults remains pending until Apply. Master volume
 previews immediately through `AudioListener.volume`. Hold is the default crouch
 mode, including for older settings files. Graphics use Unity quality, display,
 VSync, frame-rate and shadow settings; there is no post-processing toggle yet.
+
+`TerrainGraphicsQuality` scales the explicitly assigned Terrain's grass details
+in Field and Menu when enabled and on `SettingsFile.OnGraphicsSettingsApplied`.
+Performant uses 30% of authored density and 50% of detail distance; Balanced uses
+65% and 75%; High Fidelity retains the authored values. Field therefore uses
+density/distance 0.15/25 m, 0.325/37.5 m and 0.5/50 m. The component scales Terrain
+instance settings, leaves shared TerrainData untouched, avoids cumulative scaling
+and restores authored values when disabled. Assign the Terrain and tier
+multipliers in the Inspector.
 
 ## Casino slot machine
 
@@ -187,6 +203,12 @@ an assigned URP grain Volume and AudioSource, persists through the final
 bootstrap transition and then destroys itself. Campaign files are never assigned
 or written. Tape behaviour is defined in [Game Design](GAME_DESIGN.md#tutorial).
 
+`SurrealClockPresentation` animates the Tutorial ceiling clock locally. Its five
+Inspector-assigned pivots use independent sweeps, stepped ticks and periodic
+rewinds, evaluated from elapsed scaled time without accumulating rotations.
+Pause freezes the hands; disabling restores their authored poses. This is ambient
+presentation and has no connection to tape progress or mission timing.
+
 ## Presentation
 
 Menu and Field share the `FieldEnvironment` prefab and saved meshes in
@@ -213,6 +235,26 @@ color variation and canvas texture on the material. Overlay UI stays unaffected.
 Disabling the renderer feature removes its pass cost; intensity zero only
 removes the visible effect. Check every quality tier and profile on target
 hardware after changing it.
+
+Portal cameras disable their Camera component when their portal is hidden,
+outside the player's view/range, or skipped by the Performant distance throttle.
+The PortalCamera behaviour remains active to wake the camera again and retains
+the previous render texture between updates. Frustum checks reuse their plane
+buffer. PortalManager creates the render textures during camera setup, before
+the portal first opens. Validate both directions, distant Performant rendering
+and the hidden End return portal after changing this path.
+
+All quality assets reserve renderer index 1 for `URP-Radar-Renderer`. It uses
+Forward rendering with the RadarOnly marker pass, without scene fullscreen
+effects or post-processing. Keep that index consistent when adding a quality
+tier. The main Balanced/High Fidelity renderers no longer run the radar marker
+pass. WorldBending is unused; its retired High Fidelity fullscreen feature is
+disabled and its material reference is cleared so it does not pull the shader
+into the build. The graph and material remain available as authoring assets.
+Main renderers use Auto intermediate
+textures; custom fog/distortion passes request their intermediate only for
+eligible cameras and active effects. Depth/Opaque textures remain enabled for
+the equipment and scene shaders that sample them.
 
 `GameplayShaderWarmup` loads and retains `Resources/GameplayShaderVariants` before
 the first scene, warming custom Subwoofer, Shocker, capture, orbital-strike,

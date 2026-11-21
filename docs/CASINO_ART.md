@@ -39,6 +39,29 @@ chandeliers use Mixed lighting with Shadowmask in
 `VegasLighting/Casino_Vegas_Baked.lighting`. Keep lights attached to visible
 fixtures; removed strip-light components must not be recreated automatically.
 
+Passage modules `SimpleCorridor1`, `SimpleTurn1` and `SimpleThreeway` use dimmer
+wall lights (Intensity 0.44; the stronger Threeway fixture uses 0.5) to contrast
+with the warmer, brighter rooms. Flicker variants inherit these intensities.
+
+`SimpleCorridor1_Flicker`, `SimpleTurn1_Flicker` and `SimpleThreeway_Flicker`
+are room variants with one Realtime, unshadowed wall lamp each. Use these
+sparingly in the scene; the other fixtures retain baked lighting. Their
+`MissionLightFlicker` has explicit Light, Renderer and emissive material-slot
+references. Dedicated `_Flicker` materials retain the fixture color but exclude
+emission from baked GI. Rebake lighting/APV after changing variant placement.
+The server chooses independent random bursts per lamp. Quiet intervals are
+18–40 seconds initially, and their countdown accelerates smoothly toward an
+8x rate as the mission runs out. Each 0.35–1.1 second burst dims both direct
+light and visible emission, using a shared seed and server timestamp on clients.
+Mission end, disable and despawn restore the authored brightness. Late joiners
+receive future bursts; no past cosmetic events are replayed.
+Tune the component in the Inspector. `Tools > Casino > Configure Mission Light
+Flicker` reapplies the authored selection while retaining room art overrides;
+it requires Casino open outside Play Mode and must be followed by a rebake.
+`Tools > Casino > Validate Mission Light Flicker` checks scene identities,
+configured references, pulse brightness/emission and disable/despawn recovery
+using isolated prefab contents. Also test with a host and client through Steam.
+
 Static shells/decoration need valid lightmap UVs. Moving gate pieces and EyePlant
 use APV. Exclude empty imported meshes from GI. After geometry or light changes,
 rebake the affected lighting/APV and verify after save/reopen; previous bake

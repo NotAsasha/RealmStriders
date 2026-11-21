@@ -23735,7 +23735,7 @@ MonoBehaviour:
   lowestSubdivLevelOverride: 0
   highestSubdivLevelOverride: 3
   overridesSubdivLevels: 0
-  mightNeedRebaking: 0
+  mightNeedRebaking: 1
   cachedTransform:
     e00: 1
     e01: 0
@@ -23764,7 +23764,7 @@ Transform:
   m_GameObject: {fileID: 644167942}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 36.225666, z: -0.022491455}
+  m_LocalPosition: {x: 0, y: 36.225666, z: -0.022460938}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -23996,7 +23996,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 0}
+  m_NavMeshData: {fileID: 23800000, guid: d866ee998db60c048b36f59fc3c6e92d, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &712917135
 Transform:
@@ -24043,7 +24043,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.59999996
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 0}
+  m_NavMeshData: {fileID: 23800000, guid: 5063e525ab1930645bdd72463b0c7bc3, type: 2}
   m_BuildHeightMesh: 0
 --- !u!43 &790801490
 Mesh:
@@ -24286,6 +24286,7 @@ GameObject:
   - component: {fileID: 925898676}
   - component: {fileID: 925898675}
   - component: {fileID: 925898678}
+  - component: {fileID: 925898679}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -24383,6 +24384,26 @@ MonoBehaviour:
   material: {fileID: 11400000, guid: a086f686223eed942816c70be67841b0, type: 2}
   exportAllChildren: 0
   terrainSimplificationLevel: 3
+--- !u!114 &925898679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925898674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff7cbe802fd34664813a6d68f124e402, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Rendering.TerrainGraphicsQuality
+  targetTerrain: {fileID: 925898676}
+  qualityLevels:
+  - densityMultiplier: 0.3
+    distanceMultiplier: 0.5
+  - densityMultiplier: 0.65
+    distanceMultiplier: 0.75
+  - densityMultiplier: 1
+    distanceMultiplier: 1
 --- !u!43 &953014848
 Mesh:
   m_ObjectHideFlags: 0

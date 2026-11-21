@@ -20,8 +20,7 @@ namespace Portals
         private Camera portalCam;
         private Camera mainCam;
         private int originalCullingMask;
-        private bool isMaskInitialized;
-        private bool isCurrentlyRendering = true;
+        private readonly Plane[] frustumPlanes = new Plane[6];
         private float lastVisibleTime;
         private const float SleepHysteresisTime = 0.35f;
 
@@ -31,7 +30,7 @@ namespace Portals
             if (portalCam != null)
             {
                 originalCullingMask = portalCam.cullingMask;
-                isMaskInitialized = true;
+                SetCameraRendering(false);
             }
         }
 
@@ -48,7 +47,8 @@ namespace Portals
                 playerCamera = PlayerMovement.Instance.playerCamera.transform;
                 mainCam = PlayerMovement.Instance.playerCamera;
             }
-            SetCameraRendering(true);
+            lastVisibleTime = float.NegativeInfinity;
+            SetCameraRendering(false);
         }
 
         private void OnDisable()
@@ -65,10 +65,18 @@ namespace Portals
                     playerCamera = PlayerMovement.Instance.playerCamera.transform;
                     mainCam = PlayerMovement.Instance.playerCamera;
                 }
-                else return;
+                else
+                {
+                    SetCameraRendering(false);
+                    return;
+                }
             }
 
-            if (!portal || !otherPortal) return;
+            if (!portalCam || !portal || !otherPortal)
+            {
+                SetCameraRendering(false);
+                return;
+            }
 
             // Optimization: Only render when visible, facing the player, and within range
             if (!ShouldRender())
@@ -76,8 +84,6 @@ namespace Portals
                 SetCameraRendering(false);
                 return;
             }
-
-            SetCameraRendering(true);
 
             // Position and rotation logic (Mirror effect)
             Vector3 localPos = portal.InverseTransformPoint(playerCamera.position);
@@ -89,24 +95,27 @@ namespace Portals
 
             // Oblique Clipping Plane to fix clipping through walls/geometry
             UpdateNearClipPlane();
+            SetCameraRendering(true);
         }
 
         private bool ShouldRender()
         {
             if (!mainCam || !playerCamera || !portal) return false;
+            if (portalRenderer != null &&
+                (!portalRenderer.enabled || !portalRenderer.gameObject.activeInHierarchy)) return false;
 
             // 1. Distance culling
-            float dist = Vector3.Distance(playerCamera.position, portal.position);
-            if (dist > maxRenderDistance)
+            Vector3 toPlayer = playerCamera.position - portal.position;
+            float distanceSquared = toPlayer.sqrMagnitude;
+            if (maxRenderDistance <= 0f || distanceSquared > maxRenderDistance * maxRenderDistance)
             {
                 return false;
             }
 
             // 2. Facing culling: portal visual front faces -Z, so root forward (+Z) points into portal
-            Vector3 toPlayer = playerCamera.position - portal.position;
             float dot = Vector3.Dot(portal.forward, toPlayer);
             // If dot > 0.3f, player is behind the portal and cannot see the front face
-            if (dot > 0.3f && dist > 1.5f)
+            if (dot > 0.3f && distanceSquared > 2.25f)
             {
                 return false;
             }
@@ -115,8 +124,8 @@ namespace Portals
             bool inFrustum = true;
             if (portalRenderer != null)
             {
-                Plane[] planes = GeometryUtility.CalculateFrustumPlanes(mainCam);
-                inFrustum = GeometryUtility.TestPlanesAABB(planes, portalRenderer.bounds);
+                GeometryUtility.CalculateFrustumPlanes(mainCam, frustumPlanes);
+                inFrustum = GeometryUtility.TestPlanesAABB(frustumPlanes, portalRenderer.bounds);
             }
 
             if (inFrustum)
@@ -124,7 +133,7 @@ namespace Portals
                 lastVisibleTime = Time.time;
 
                 // 4. Far distance frame throttling (Performant mode)
-                if (throttleFarDistance && dist > 8f)
+                if (throttleFarDistance && distanceSquared > 64f)
                 {
                     if ((Time.frameCount % 2) != 0)
                     {
@@ -141,17 +150,11 @@ namespace Portals
         private void SetCameraRendering(bool render)
         {
             if (portalCam == null) return;
-            if (!isMaskInitialized)
-            {
-                originalCullingMask = portalCam.cullingMask;
-                isMaskInitialized = true;
-            }
+            if (portalCam.enabled == render) return;
 
-            if (isCurrentlyRendering == render) return;
-
-            isCurrentlyRendering = render;
-            // Setting cullingMask = 0 stops URP from drawing scene geometry/shadows without pipeline rebuild hitch
-            portalCam.cullingMask = render ? originalCullingMask : 0;
+            // Skip the entire URP camera and keep its last image on throttled frames.
+            if (render) portalCam.cullingMask = originalCullingMask;
+            portalCam.enabled = render;
         }
 
         private void UpdateNearClipPlane()

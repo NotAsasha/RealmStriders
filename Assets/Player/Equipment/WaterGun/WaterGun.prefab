@@ -199,7 +199,7 @@ MonoBehaviour:
   gripPositionOffset: {x: 0, y: 0, z: 0}
   gripRotationOffset: {x: 0, y: 0, z: 0}
   heldFingerCurl: {x: 15, y: 25, z: 20}
-  viewPositionOffset: {x: 0.025, y: -0.025, z: 0.035}
+  viewPositionOffset: {x: 0.1, y: -0.1, z: -0.2}
   viewRotationOffset: {x: -0, y: 0, z: 90}
   heldCameraBounds:
     m_Center: {x: -0.000000007450581, y: 0.0033552647, z: 0.03878811}
@@ -5203,6 +5203,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: -4683669308469848369, guid: 446a5492c4a33464eadd316a7cae1655,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ef8fe4396787a8f479cadddab2e6a2fc, type: 2}
     - target: {fileID: 919132149155446097, guid: 446a5492c4a33464eadd316a7cae1655,
         type: 3}
       propertyPath: m_Name

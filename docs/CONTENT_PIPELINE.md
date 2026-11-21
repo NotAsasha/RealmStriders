@@ -79,6 +79,29 @@ output spawn and consistent host/client preview/effects.
    structural meshes; decor/furniture stay outside the acoustic export.
 6. Casino art changes also follow [Casino art](CASINO_ART.md).
 
+## Tutorial ceiling clock
+
+The Tutorial's `CeilingClock` has a local `SurrealClockPresentation`. Assign each
+hand pivot and its local rotation axis explicitly in the Inspector. Sweep uses
+degrees per second; Stepped uses step angle, interval and travel duration; Rewind
+adds a periodic backward excursion. Phase offsets are seconds. Keep this ambient
+clock independent of tutorial progress and mission timing.
+
+Keep the dial free of numbers, lettering, emblems and secondary clocks. Use
+chunky geometry and matte solid colors that fit the Tutorial's existing lamps
+and painterly rendering. Floating arc fragments have separate centers and tilted
+planes; the clock uses no texture maps.
+
+`ArtSource/CeilingClockDetails.blend` contains the additive
+`CeilingClock_Details` collection. Export only its three meshes with their existing
+names and `Clock_*` material slots to `CeilingClockDetails.fbx`; keep the original
+housing FBX separate. **Tools → Tutorial → Install Ceiling Clock Details** installs
+the exported `tools/CeilingClockDetails.fbx` when present, otherwise uses the
+versioned model. It restores the shipped materials, hand poses and motion defaults
+on the open Tutorial clock. Save the scene after using it. The generation script
+in `ArtSource/` expects the original housing scene without the detail collection;
+run it with its source file path as Python's `__file__`.
+
 ## Shared Field and Menu environment
 
 Edit common buildings, pipes and background lights in
@@ -94,7 +117,74 @@ Keep APV generation in Field. Menu uses its existing lightmaps and direct lighti
 for its fixed camera and must not acquire a scene-wide APV baking set. Preserve
 the camera's parallax margin when editing the visible backdrop.
 
+Field and Menu Terrain objects have `TerrainGraphicsQuality` with an explicit
+Terrain reference. Author the High Fidelity density/distance on the Terrain and
+the lower-tier multipliers on that component. Keep grass detail prototypes'
+`Use Density Scaling` enabled so density settings can affect them. Do not reduce
+the shared TerrainData's painted detail layers to implement a quality tier.
+
+When adding a quality tier, keep `URP-Radar-Renderer` at renderer index 1 and
+the scene renderer at index 0. Radar cameras use index 1 with post-processing
+and shadows disabled. Its RenderObjects feature preserves RadarOnly markers;
+do not remove that pass with the scene-only fullscreen effects. Assign Radar's
+screenRenderer explicitly to the display Plane (front normal local +Y), and
+configure visibilityOccluders to match structural collision layers.
+
 ## Shader warmup
+
+### Shader variant reduction
+
+Keep **Strip Unused Post Processing Variants** disabled in the URP Graphics
+settings. With the current volume setup, enabling it removes a post-processing
+variant required by Lobby Bloom in the Player, despite the effect working in
+Editor Play Mode. Regular **Strip Unused Variants** remains enabled. When
+revisiting post-process stripping, compare Bloom on/off in an actual Player;
+the presence of Bloom.shader in the build alone does not prove the required
+UberPost variant survived.
+
+Graphics > Shader Build Settings overrides `_ FOG_LINEAR FOG_EXP FOG_EXP2` to
+`dynamic_branch`. Fog modes remain available without separate shader variants.
+Custom shaders using this keyword set must support dynamic branching; use URP
+fog functions or HLSL runtime conditionals rather than `#if` on fog keywords.
+
+All three quality URP assets disable light cookies and LOD cross-fading because
+the current build scenes and authored prefabs use neither feature. If adding a
+Light cookie or a cross-fading LODGroup, enable its support in the relevant URP
+assets before testing a player build. Keep APV support and its baking sets intact.
+
+Check the Editor log's **After scriptable stripping** count for each shader pass
+before judging build-time changes. The remaining variants are the actual work;
+the full theoretical variant space is not the number compiled. A first build
+after shader settings change can miss the cache; preserve the cache for later
+builds. Compare variant counts and elapsed time separately.
+
+### Desktop light limit
+
+`Packages/com.unity.render-pipelines.universal-config` is an embedded copy of
+the installed 17.0.3 config package. Desktop visible lights are capped at 64
+to reduce URP Lit shader compilation cost. Keep
+`ShaderOptions.k_MaxVisibleLightCountDesktop` in `Runtime/ShaderConfig.cs` and
+`MAX_VISIBLE_LIGHT_COUNT_DESKTOP` in `Runtime/ShaderConfig.cs.hlsl` equal.
+Mobile limits remain unchanged. Forward+ includes the main light in this cap;
+lights beyond the per-camera limit can be omitted. Check the busiest lighting
+scenes when changing it. Restart the Editor after changing this configuration.
+
+Embedded package sources are versioned and do not update automatically with
+Unity/URP. On upgrades, compare the new upstream config package, retain its
+metadata, reapply the desktop cap and verify both C# and generated HLSL values.
+The change reduces compilation cost per variant; it does not guarantee fewer
+variants or a specific build-time improvement. Compare builds in the Editor log
+without deleting the shader cache.
+
+Keep `Library` excluded from VS Code file watching (`files.watcherExclude`).
+Open directory handles can prevent Package Manager from replacing cached packages
+on Windows and leave dependencies unavailable until package resolution succeeds.
+
+When retiring a renderer effect, remove its unused material/shader references
+or remove the renderer feature. Disabling execution alone can leave shader
+dependencies in the build. Check `AssetDatabase.GetDependencies` from the enabled
+build scenes and included URP assets, plus Resources and explicit shader lists.
+Do not remove a shader still used by a material or runtime effect.
 
 When adding a custom effect or changing its shader keywords, update the explicit
 variants in `Assets/Scripts/Editor/GameplayShaderWarmupAuthoring.cs`, then run

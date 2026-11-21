@@ -78,10 +78,11 @@ namespace Player.Equipment.Subwoofer
         {
             if (!IsServer) return;
 
-            if (isOn.Value && !isCurrentlyHeld) soundProducer?.StartContinuousNoise();
+            bool auraActive = isOn.Value && (!isCurrentlyHeld || IsEquipped);
+            if (auraActive) soundProducer?.StartContinuousNoise();
             else soundProducer?.StopContinuousNoise();
 
-            if (!isOn.Value || isCurrentlyHeld) return;
+            if (!auraActive) return;
 
             checkTimer += Time.deltaTime;
             if (checkTimer >= CheckInterval)

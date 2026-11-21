@@ -18,6 +18,9 @@ namespace Base.Radar
 
         [Header("References")]
         public Camera radarCamera;
+        [SerializeField] private Renderer screenRenderer;
+        [SerializeField, Range(1, 60)] private int radarFrameRate = 30;
+        [SerializeField] private LayerMask visibilityOccluders = Physics.DefaultRaycastLayers;
         [SerializeField] private Transform crosshair;
         [SerializeField] private Transform screen;
         [SerializeField] private NetworkObject beamPrefab;
@@ -38,6 +41,11 @@ namespace Base.Radar
         private PowerGrid powerGrid;
         private bool isPowered = true;
         private float beamEndTime;
+        private Camera viewerCamera;
+        private readonly Plane[] viewPlanes = new Plane[6];
+        private double nextRadarFrame;
+        private double nextOcclusionCheck;
+        private bool screenUnoccluded;
 
         private bool IsTerminalBought => BaseManager.Instance != null &&
             (BaseManager.Instance.baseUpgrades.Value & (int)BaseUpgrades.IsTerminalBought) != 0;
@@ -48,6 +56,7 @@ namespace Base.Radar
 
         private void Awake()
         {
+            if (radarCamera != null) radarCamera.enabled = false;
             if (crosshair != null)
             {
                 var netTransform = crosshair.GetComponent<Unity.Netcode.Components.NetworkTransform>();
@@ -79,9 +88,80 @@ namespace Base.Radar
 
         public override void OnNetworkDespawn()
         {
+            if (radarCamera != null) radarCamera.enabled = false;
+            viewerCamera = null;
             syncedCrosshairPos.OnValueChanged -= OnCrosshairPosChanged;
             powerGrid?.UnregisterConsumer(this);
             base.OnNetworkDespawn();
+        }
+
+        private void OnDisable()
+        {
+            if (radarCamera != null) radarCamera.enabled = false;
+            nextRadarFrame = 0;
+            nextOcclusionCheck = 0;
+        }
+
+        private void LateUpdate()
+        {
+            if (radarCamera == null) return;
+            bool render = false;
+            double now = Time.unscaledTimeAsDouble;
+            if (IsSpawned && IsClient && IsScreenVisible(now))
+            {
+                if (now >= nextRadarFrame)
+                {
+                    render = true;
+                    nextRadarFrame = now + 1.0 / Mathf.Clamp(radarFrameRate, 1, 60);
+                }
+            }
+            else
+            {
+                nextRadarFrame = 0;
+                nextOcclusionCheck = 0;
+            }
+            if (radarCamera.enabled != render) radarCamera.enabled = render;
+        }
+
+        private bool IsScreenVisible(double now)
+        {
+            if (screenRenderer == null || !screenRenderer.enabled ||
+                !screenRenderer.gameObject.activeInHierarchy) return false;
+            if (viewerCamera == null && PlayerMovement.Instance != null)
+                viewerCamera = PlayerMovement.Instance.playerCamera;
+            if (viewerCamera == null || !viewerCamera.isActiveAndEnabled ||
+                (viewerCamera.cullingMask & (1 << screenRenderer.gameObject.layer)) == 0) return false;
+
+            Bounds bounds = screenRenderer.bounds;
+            Vector3 eye = viewerCamera.transform.position;
+            // The authored screen is a Plane: its front normal is local +Y.
+            if (Vector3.Dot(screenRenderer.transform.up, eye - bounds.center) <= 0f) return false;
+            GeometryUtility.CalculateFrustumPlanes(viewerCamera, viewPlanes);
+            if (!GeometryUtility.TestPlanesAABB(viewPlanes, bounds)) return false;
+
+            if (now >= nextOcclusionCheck)
+            {
+                nextOcclusionCheck = now + 0.1;
+                Bounds localBounds = screenRenderer.localBounds;
+                Vector3 offset = localBounds.extents * 0.8f;
+                Transform screenTransform = screenRenderer.transform;
+                screenUnoccluded = HasScreenSightline(eye, bounds.center) ||
+                    HasScreenSightline(eye, screenTransform.TransformPoint(localBounds.center + offset)) ||
+                    HasScreenSightline(eye, screenTransform.TransformPoint(localBounds.center - offset)) ||
+                    HasScreenSightline(eye, screenTransform.TransformPoint(localBounds.center + new Vector3(offset.x, -offset.y, offset.z))) ||
+                    HasScreenSightline(eye, screenTransform.TransformPoint(localBounds.center + new Vector3(-offset.x, offset.y, -offset.z)));
+            }
+            return screenUnoccluded;
+        }
+
+        private bool HasScreenSightline(Vector3 eye, Vector3 point)
+        {
+            Vector3 direction = point - eye;
+            float distance = direction.magnitude;
+            if (distance <= 0.01f) return true;
+            if (!Physics.Raycast(eye, direction / distance, out RaycastHit hit,
+                distance, visibilityOccluders, QueryTriggerInteraction.Ignore)) return true;
+            return hit.transform.IsChildOf(transform);
         }
 
         private void OnCrosshairPosChanged(Vector2 oldPos, Vector2 newPos)

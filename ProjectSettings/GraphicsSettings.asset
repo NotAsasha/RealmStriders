@@ -63,7 +63,17 @@ GraphicsSettings:
     UnityEngine.Rendering.Universal.UniversalRenderPipeline: {fileID: 11400000, guid: 18dc0cd2c080841dea60987a38ce93fa,
       type: 2}
   m_ShaderBuildSettings:
-    keywordDeclarationOverrides: []
+    keywordDeclarationOverrides:
+    - keywords:
+      - name: _
+        keepInBuild: 1
+      - name: FOG_LINEAR
+        keepInBuild: 1
+      - name: FOG_EXP
+        keepInBuild: 1
+      - name: FOG_EXP2
+        keepInBuild: 1
+      variantGenerationMode: 3
   m_LightsUseLinearIntensity: 1
   m_LightsUseColorTemperature: 1
   m_LogWhenShaderIsCompiled: 0

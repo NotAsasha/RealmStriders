@@ -248,6 +248,8 @@ namespace Portals
                     name = rtName,
                     filterMode = FilterMode.Bilinear
                 };
+                // Allocate during setup rather than on the first portal-opening frame.
+                rt.Create();
                 cam.targetTexture = rt;
                 if (mat != null) mat.mainTexture = rt;
             }

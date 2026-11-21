@@ -55,8 +55,7 @@ namespace Player.Equipment.LeafBlower
 
         EntityDetector detector;
         Entity currentTarget;
-        float currentHoldTime;
-        float currentRequiredHoldTime;
+        private float currentCaptureProgress;
         float validationTimer;
         float lostTargetTimer;
         float basePitch = 1f;
@@ -168,7 +167,11 @@ namespace Player.Equipment.LeafBlower
 
             if (!IsServer || !isOn.Value) return;
 
-            currentHoldTime += targetIsValid ? Time.deltaTime : 0f;
+            if (currentTarget != null && !currentTarget.CanBeCaptured)
+            {
+                ResetCaptureProgress();
+            }
+
             if (!targetIsValid && currentTarget != null)
             {
                 lostTargetTimer += Time.deltaTime;
@@ -186,9 +189,14 @@ namespace Player.Equipment.LeafBlower
                 ValidateTarget();
             }
 
-            if (targetIsValid && currentHoldTime >= currentRequiredHoldTime)
+            if (targetIsValid && currentTarget != null)
             {
-                if (currentTarget.TryCaptureServer())
+                float requiredHoldTime = CalculateRequiredHoldTime(currentTarget);
+                currentCaptureProgress = requiredHoldTime > 0f
+                    ? Mathf.Clamp01(currentCaptureProgress + Time.deltaTime / requiredHoldTime)
+                    : 1f;
+
+                if (currentCaptureProgress >= 1f && currentTarget.TryCaptureServer())
                 {
                     PlayCaptureSuccessSoundRpc();
                     isOn.Value = false;
@@ -196,9 +204,7 @@ namespace Player.Equipment.LeafBlower
                 }
             }
 
-            CaptureProgressNormalized.Value = currentRequiredHoldTime > 0f
-                ? Mathf.Clamp01(currentHoldTime / currentRequiredHoldTime)
-                : 0f;
+            CaptureProgressNormalized.Value = currentCaptureProgress;
         }
 
         private void DrainCharge()
@@ -274,9 +280,9 @@ namespace Player.Equipment.LeafBlower
             GameObject entityObject = detector.EntityInSight(aimOrigin.Value, aimForward.Value, true, holderRoot);
             Entity detectedTarget = entityObject != null ? entityObject.GetComponent<Entity>() : null;
 
-            if (detectedTarget == null || detectedTarget.isDead.Value)
+            if (detectedTarget == null || !detectedTarget.CanBeCaptured)
             {
-                if (currentTarget == null || currentTarget.isDead.Value)
+                if (currentTarget == null || !currentTarget.CanBeCaptured)
                 {
                     ResetCaptureProgress();
                 }
@@ -303,8 +309,6 @@ namespace Player.Equipment.LeafBlower
 
             currentTarget = detectedTarget;
             lostTargetTimer = 0f;
-            // Recalculate every tick so weakness stacks (Subwoofer/Beam/Landmine/Taser+Water) are reflected mid-capture.
-            currentRequiredHoldTime = CalculateRequiredHoldTime(detectedTarget);
             targetIsValid = true;
         }
 
@@ -321,8 +325,7 @@ namespace Player.Equipment.LeafBlower
         private void ResetCaptureProgress()
         {
             currentTarget = null;
-            currentHoldTime = 0f;
-            currentRequiredHoldTime = 0f;
+            currentCaptureProgress = 0f;
             validationTimer = 0f;
             lostTargetTimer = 0f;
             targetIsValid = false;
@@ -337,9 +340,7 @@ namespace Player.Equipment.LeafBlower
             while (lostTargetTimer >= lostTargetGracePeriod)
             {
                 lostTargetTimer -= lostTargetGracePeriod;
-                currentHoldTime = Mathf.Max(
-                    0f,
-                    currentHoldTime - currentRequiredHoldTime * lostTargetProgressPenalty);
+                currentCaptureProgress = Mathf.Max(0f, currentCaptureProgress - lostTargetProgressPenalty);
             }
         }
 
