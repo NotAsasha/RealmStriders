@@ -45,7 +45,7 @@ namespace Scenes
 
             if (ambientSounds.Length > 0)
             {
-                InvokeRepeating(nameof(PlayAmbientSounds), 5f, 1f);
+                InvokeRepeating(nameof(PlayAmbientSounds), 15f, 1f);
             }
         }
 
@@ -113,7 +113,7 @@ namespace Scenes
 
         private void PlayAmbientSounds()
         {
-            if (Random.Range(0, 50) == 1)
+            if (Random.Range(0, 100) == 1)
             {
                 sound.PlayOneShot(ambientSounds[Random.Range(0, ambientSounds.Length)]);
             }

@@ -50,7 +50,8 @@ sparingly in the scene; the other fixtures retain baked lighting. Their
 references. Dedicated `_Flicker` materials retain the fixture color but exclude
 emission from baked GI. Rebake lighting/APV after changing variant placement.
 The server chooses independent random bursts per lamp. Quiet intervals are
-18–40 seconds initially, and their countdown accelerates smoothly toward an
+4–9 seconds initially. A spatial AudioSource plays LampFlicker once per burst.
+The countdown accelerates smoothly toward an
 8x rate as the mission runs out. Each 0.35–1.1 second burst dims both direct
 light and visible emission, using a shared seed and server timestamp on clients.
 Mission end, disable and despawn restore the authored brightness. Late joiners

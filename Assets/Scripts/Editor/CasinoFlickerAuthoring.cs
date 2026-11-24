@@ -17,8 +17,10 @@ namespace Game.Editor
         private static readonly string[] SelectedInstances =
         {
             "SimpleCorridor1 (2)", "SimpleCorridor1 (8)", "SimpleCorridor1 (17)", "SimpleCorridor1 (24)",
-            "SimpleTurn1 (1)", "SimpleTurn1 (4)", "SimpleTurn1 (11)",
-            "SimpleThreeway (5)", "SimpleThreeway (15)"
+            "SimpleTurn1 (1)", "SimpleTurn1 (8)", "SimpleTurn1 (11)",
+            "SimpleThreeway (5)", "SimpleThreeway (15)", "SimpleCorridor1 (4)", "SimpleCorridor1 (10)",
+            "SimpleCorridor1 (14)", "SimpleCorridor1 (20)", "SimpleTurn1 (2)", "SimpleTurn1 (6)",
+            "SimpleThreeway (2)", "SimpleThreeway (10)", "SimpleThreeway (17)"
         };
 
         [MenuItem("Tools/Casino/Validate Mission Light Flicker")]
@@ -47,7 +49,7 @@ namespace Game.Editor
                         throw new InvalidOperationException("Missing or duplicate scene NetworkObject hash.");
                     count++;
                 }
-            if (count != SelectedInstances.Length) throw new InvalidOperationException("Expected nine scene fixtures.");
+            if (count != SelectedInstances.Length) throw new InvalidOperationException("Unexpected flickering fixture count.");
 
             foreach (string room in Rooms)
             {
@@ -95,7 +97,7 @@ namespace Game.Editor
                 }
                 finally { PrefabUtility.UnloadPrefabContents(root); }
             }
-            Debug.Log("Casino flicker validation passed: nine unique scene identities; all variants dim and restore light/emission. This does not replace a host/client transport playtest.");
+            Debug.Log($"Casino flicker validation passed for {count} scene fixtures.");
         }
 
         [MenuItem("Tools/Casino/Configure Mission Light Flicker")]
@@ -118,10 +120,14 @@ namespace Game.Editor
                         : root.GetComponentsInChildren<Light>(true)[0];
                     if (light == null) throw new InvalidOperationException("Missing light in " + path);
                     GameObject fixture = light.transform.parent.gameObject;
-                    Renderer renderer = fixture.GetComponentInChildren<Renderer>(true);
+                    SerializedObject authored = existing != null ? new SerializedObject(existing) : null;
+                    Renderer renderer = authored != null
+                        ? (Renderer)authored.FindProperty("emissionRenderer").objectReferenceValue
+                        : fixture.GetComponentInChildren<Renderer>(true);
                     if (renderer == null) throw new InvalidOperationException("Missing fixture renderer in " + path);
                     Material[] materials = renderer.sharedMaterials;
-                    int slot = Array.FindIndex(materials, m => m != null && m.IsKeywordEnabled("_EMISSION") &&
+                    int slot = authored != null ? authored.FindProperty("emissionMaterialIndex").intValue :
+                        Array.FindIndex(materials, m => m != null && m.IsKeywordEnabled("_EMISSION") &&
                         m.HasProperty("_EmissionColor") && m.GetColor("_EmissionColor").maxColorComponent > 0f);
                     if (slot < 0) throw new InvalidOperationException("Missing emissive material in " + path);
                     Material source = materials[slot];
@@ -146,6 +152,18 @@ namespace Game.Editor
                     MissionLightFlicker flicker = fixture.GetComponent<MissionLightFlicker>();
                     if (flicker == null) flicker = fixture.AddComponent<MissionLightFlicker>();
                     SerializedObject settings = new SerializedObject(flicker);
+                    AudioSource audio = fixture.GetComponent<AudioSource>();
+                    if (audio == null) audio = fixture.AddComponent<AudioSource>();
+                    audio.clip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Scenes/Casino/LampFlicker.wav");
+                    audio.playOnAwake = false;
+                    audio.loop = false;
+                    audio.spatialBlend = 1f;
+                    audio.volume = 1f;
+                    audio.rolloffMode = AudioRolloffMode.Linear;
+                    audio.minDistance = 1f;
+                    audio.maxDistance = 15f;
+                    settings.FindProperty("flickerAudio").objectReferenceValue = audio;
+                    settings.FindProperty("quietInterval").vector2Value = new Vector2(4f, 9f);
                     settings.FindProperty("targetLight").objectReferenceValue = light;
                     settings.FindProperty("emissionRenderer").objectReferenceValue = renderer;
                     settings.FindProperty("emissionMaterialIndex").intValue = slot;
@@ -163,7 +181,7 @@ namespace Game.Editor
                 foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
                     if (Array.IndexOf(SelectedInstances, child.name) >= 0) selected.Add(child.gameObject);
             if (selected.Count != SelectedInstances.Length)
-                throw new InvalidOperationException("Expected all nine authored room instances.");
+                throw new InvalidOperationException("Expected all authored room instances.");
             foreach (GameObject room in selected)
             {
                 string module = room.name.Substring(0, room.name.IndexOf(' '));

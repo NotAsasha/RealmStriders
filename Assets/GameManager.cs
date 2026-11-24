@@ -55,6 +55,7 @@ public class GameManager : NetworkBehaviour
     private bool missionEnemiesReady;
 
     public bool IsResolvingMission => stopMissionRoutine != null;
+    public static event System.Action FinalTargetsCaptured;
     public EnemySpawner MissionSpawner => spawner;
 
     #region Unity Lifecycle
@@ -288,6 +289,15 @@ public class GameManager : NetworkBehaviour
         if (!IsServer || !hasStartedMission.Value || IsResolvingMission) return;
         target.CapturedServer -= OnMissionTargetCaptured;
         capturedTargetCount++;
+        if (missionName == CampaignProgression.FinalMissionName && missionEnemiesReady &&
+            capturedTargetCount == dangerLevels.Length)
+            NotifyFinalCaptureClientRpc();
+    }
+
+    [ClientRpc]
+    private void NotifyFinalCaptureClientRpc()
+    {
+        if (IsClient) FinalTargetsCaptured?.Invoke();
     }
 
     private void OnMissionTargetDeathChanged(bool previous, bool current)

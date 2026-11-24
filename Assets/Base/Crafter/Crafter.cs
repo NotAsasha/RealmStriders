@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Base.Crafting
 {
-    public sealed class Crafter : NetworkBehaviour
+    public sealed class Crafter : ItemDeliveryTube
     {
         [Header("Recipes")]
         [SerializeField] private CraftRecipe[] recipes = System.Array.Empty<CraftRecipe>();
@@ -15,6 +15,15 @@ namespace Base.Crafting
 
         [Header("Output")]
         [SerializeField] private Transform outputSpawnPoint;
+
+        protected override Pose OutletPose
+        {
+            get
+            {
+                Transform outlet = outputSpawnPoint != null ? outputSpawnPoint : transform;
+                return new Pose(outlet.position, outlet.rotation);
+            }
+        }
 
         [Header("Presentation")]
         [SerializeField] private Renderer leftIndicator;
@@ -28,8 +37,6 @@ namespace Base.Crafting
         [SerializeField] private float doorAnimationDuration = 0.2f;
         [SerializeField] private AudioSource craftNoiseAudio;
         [SerializeField] private AudioSource itemDetectedAudio;
-        [SerializeField] private AudioSource tubeAudio;
-        [SerializeField] private ParticleSystem tubeParticle;
         [SerializeField] private TMP_Text recipePreviewText;
         [SerializeField] private TMP_Text recipeStatusText;
         [SerializeField, Min(0.05f)] private float socketValidationInterval = 0.1f;
@@ -204,10 +211,16 @@ namespace Base.Crafting
             if (recipe == null || recipe.Output == null)
                 return;
 
-            craftRoutine = StartCoroutine(CraftRoutine(recipe));
+            if (!recipe.Output.TryGetComponent(out NetworkObject output))
+            {
+                Debug.LogError($"[Crafter] Output prefab '{recipe.Output.name}' has no NetworkObject component.");
+                return;
+            }
+
+            craftRoutine = StartCoroutine(CraftRoutine(output));
         }
 
-        private IEnumerator CraftRoutine(CraftRecipe recipe)
+        private IEnumerator CraftRoutine(NetworkObject output)
         {
             isCrafting.Value = true;
             SetDoorStateRpc(true);
@@ -223,8 +236,7 @@ namespace Base.Crafting
 
             yield return new WaitForSeconds(craftDuration);
 
-            if (SpawnOutputServer(recipe.Output))
-                PlayTubeSpawnPresentationRpc();
+            DispenseServer(output);
 
             SetDoorStateRpc(false);
             isCrafting.Value = false;
@@ -250,28 +262,6 @@ namespace Base.Crafting
                 ? FindRecipe(socketItems[0], socketItems[1])
                 : null;
             previewRecipeIndex.Value = recipe == null ? -1 : System.Array.IndexOf(recipes, recipe);
-        }
-
-        private bool SpawnOutputServer(Item outputPrefab)
-        {
-            if (!IsServer || NetworkManager.Singleton == null || outputPrefab == null)
-            {
-                Debug.LogError("[Crafter] Cannot spawn craft output: server, NetworkManager, or output prefab is missing.");
-                return false;
-            }
-
-            NetworkObject networkPrefab = outputPrefab.GetComponent<NetworkObject>();
-            if (networkPrefab == null)
-            {
-                Debug.LogError($"[Crafter] Output prefab '{outputPrefab.name}' has no NetworkObject component.");
-                return false;
-            }
-
-            Transform spawnPoint = outputSpawnPoint != null ? outputSpawnPoint : transform;
-            networkPrefab.InstantiateAndSpawn(
-                NetworkManager.Singleton, 0, false, false, false,
-                spawnPoint.position, spawnPoint.rotation);
-            return true;
         }
 
         private void DespawnInput(int index)
@@ -374,15 +364,6 @@ namespace Base.Crafting
         private void SetDoorStateRpc(bool closed)
         {
             StartDoorAnimation(closed);
-        }
-
-        [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
-        private void PlayTubeSpawnPresentationRpc()
-        {
-            if (tubeAudio != null)
-                tubeAudio.Play();
-            if (tubeParticle != null)
-                tubeParticle.Play();
         }
 
         [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]

@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
-using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace Base.Shop
 {
-    public class Shop : NetworkBehaviour
+    public class Shop : ItemDeliveryTube
     {
-        [SerializeField] Vector3 spawnPosition;
-        [SerializeField] AudioSource TubeAudio;
-        [SerializeField] ParticleSystem TubeParticle;
+        [SerializeField] private Vector3 spawnPosition;
+        protected override Pose OutletPose => new(spawnPosition, Quaternion.identity);
         
         [SerializeField] List<ItemCard> cards;
 
@@ -101,18 +99,12 @@ namespace Base.Shop
                 GameManager.Instance.teamMoney.Value < card.Price) return;
             NetworkObject item = card.itemPrefab;
 
-            GameManager.Instance.teamMoney.Value -= card.Price;
-            PlaySpawnSoundRpc();
-            NetworkObject purchased = item.InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, spawnPosition);
-            if (purchased != null) PurchasedServer?.Invoke(purchased);
-            Debug.Log($"---Shop: Item bought: {item.name}");
-        }
+            NetworkObject purchased = DispenseServer(item);
+            if (purchased == null) return;
 
-        [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
-        private void PlaySpawnSoundRpc()
-        {
-            if (TubeAudio != null) TubeAudio.Play();
-            if (TubeParticle != null) TubeParticle.Play();
+            GameManager.Instance.teamMoney.Value -= card.Price;
+            PurchasedServer?.Invoke(purchased);
+            Debug.Log($"---Shop: Item bought: {item.name}");
         }
 
         /// <summary>
@@ -168,9 +160,8 @@ namespace Base.Shop
                 return;
             }
 
-            PlaySpawnSoundRpc();
-            card.itemPrefab.InstantiateAndSpawn(NetworkManager.Singleton, 0, false, false, false, spawnPosition);
-            Debug.Log($"---Shop: Emergency free item spawned: {name}");
+            if (DispenseServer(card.itemPrefab) != null)
+                Debug.Log($"---Shop: Emergency free item spawned: {name}");
         }
 
     }

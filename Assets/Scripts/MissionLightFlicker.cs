@@ -11,7 +11,8 @@ namespace Game.Casino
         [SerializeField] private Light targetLight;
         [SerializeField] private Renderer emissionRenderer;
         [SerializeField, Min(0)] private int emissionMaterialIndex = 1;
-        [SerializeField] private Vector2 quietInterval = new(18f, 40f);
+        [SerializeField] private Vector2 quietInterval = new(4f, 9f);
+        [SerializeField] private AudioSource flickerAudio;
         [SerializeField] private Vector2 burstDuration = new(0.35f, 1.1f);
         [SerializeField, Min(1f)] private float finalFrequencyMultiplier = 8f;
         [SerializeField, Min(0f)] private float synchronizationDelay = 0.2f;
@@ -29,6 +30,7 @@ namespace Game.Casino
         private float waitRemaining;
         private bool missionWasActive;
         private double burstStart;
+        private bool soundPending;
         private float currentBurstDuration;
         private uint burstSeed;
 
@@ -112,6 +114,7 @@ namespace Game.Casino
         {
             if (!IsClient || !IsSpawned || !isActiveAndEnabled) return;
             burstStart = startTime;
+            soundPending = true;
             currentBurstDuration = duration;
             burstSeed = seed;
         }
@@ -122,9 +125,17 @@ namespace Game.Casino
             if (currentBurstDuration <= 0f || elapsed < 0d) return;
             if (elapsed >= currentBurstDuration)
             {
-                currentBurstDuration = 0f;
-                ApplyBrightness(1f);
+                ResetPresentation();
                 return;
+            }
+            if (soundPending)
+            {
+                soundPending = false;
+                if (flickerAudio != null && flickerAudio.clip != null && elapsed < flickerAudio.clip.length)
+                {
+                    flickerAudio.time = (float)elapsed;
+                    flickerAudio.Play();
+                }
             }
             // A shared seed and server timestamp keep the short irregular pulses aligned.
             uint value = unchecked(burstSeed + (uint)(elapsed / 0.09d) * 747796405u);
@@ -152,6 +163,8 @@ namespace Game.Casino
 
         private void ResetPresentation()
         {
+            soundPending = false;
+            if (flickerAudio != null && flickerAudio.isPlaying) flickerAudio.Stop();
             currentBurstDuration = 0f;
             if (presentationInitialized) ApplyBrightness(1f);
         }

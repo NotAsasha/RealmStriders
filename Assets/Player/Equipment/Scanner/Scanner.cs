@@ -10,7 +10,6 @@ namespace Player.Equipment.Scanner
     [RequireComponent(typeof(EntityDetector))]
     public class Scanner : Item
     {
-        [SerializeField] TMP_Text danger;
         [SerializeField] Image freezeIcon;
         [SerializeField] Image waterIcon;
         [SerializeField] Transform arrow;
@@ -87,7 +86,6 @@ namespace Player.Equipment.Scanner
 
             if (!newV)
             {
-                danger.text = " ";
                 SetArrowRotation(0f);
             }
 
@@ -122,7 +120,6 @@ namespace Player.Equipment.Scanner
                 Entity entity = entityObj.GetComponent<Entity>();
 
                 float activeHealth = entity.GetHealth();
-                danger.text = activeHealth.ToString();
                 SetArrowRotation(activeHealth);
                 freezeIcon.color = entity.IsEffectActive(EffectType.Freeze) ? Color.white : Color.black;
                 waterIcon.color = entity.IsEffectActive(EffectType.Water) ? Color.white : Color.black;
@@ -135,7 +132,6 @@ namespace Player.Equipment.Scanner
             {
                 freezeIcon.color = Color.black;
                 waterIcon.color = Color.black;
-                danger.text = "Not Found";
                 SetArrowRotation(0f);
 
                 audioSource.pitch = basePitch;

@@ -20,6 +20,7 @@ namespace Base.SlotMachine
         public AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
         public List<NetworkObject> itemsToDrop;
 
+        [SerializeField] private bool useShopTube;
         [SerializeField] private CasinoSpinPresentation spinPresentation;
 
         private readonly NetworkVariable<bool> isSpinning = new(false);
@@ -142,10 +143,24 @@ namespace Base.SlotMachine
             int index = Random.Range(0, itemsToDrop.Count);
             NetworkObject prefab = itemsToDrop[index];
 
-            Vector3 spawnPoint = GameManager.Instance.spawnPoint;
+            NetworkObject spawnedItem;
+            if (useShopTube)
+            {
+                Shop.Shop shop = Shop.Shop.Instance;
+                if (shop == null || !shop.IsSpawned)
+                {
+                    Debug.LogError("[SlotMachine] Cannot deliver the prize because the Shop is unavailable.", this);
+                    return;
+                }
 
-            NetworkObject spawnedItem = Instantiate(prefab, spawnPoint, Quaternion.identity);
-            spawnedItem.Spawn();
+                spawnedItem = shop.DispenseServer(prefab);
+                if (spawnedItem == null) return;
+            }
+            else
+            {
+                spawnedItem = Instantiate(prefab, GameManager.Instance.spawnPoint, Quaternion.identity);
+                spawnedItem.Spawn();
+            }
 
             Debug.Log($"---SlotMachine: Won random item - {spawnedItem.name}!");
         }

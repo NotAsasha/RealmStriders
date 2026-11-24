@@ -95,6 +95,10 @@ details and [Networking](NETWORKING.md) for the trust boundary.
   on the server. `CategorySwitch`, `ShopCategoryButton` and `ShopPanelMotion`
   manage navigation and the physical terminal. `ShopItemPreview` renders
   mesh-only previews in a separate local scene and stops its camera when closed.
+- Shop purchases, emergency equipment and item wins from `InBaseCasino` use
+  the Shop's delivery tube. Crafter uses its own outlet. Both stations use
+  `ItemDeliveryTube.DispenseServer` to spawn the item and play that outlet's
+  sound and particles on connected clients.
 - Radar's local camera updates at most 30 times per unscaled second while its
   explicitly assigned screen Renderer is visible to the local player camera.
   It stops outside the view, behind the screen, behind physics occluders, when
