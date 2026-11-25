@@ -10,25 +10,28 @@ The server spawns the mission's pre-rolled danger list. `EnemySpawner` chooses
 from Inspector-configured pools, samples a map position, moves the instance to
 the mission scene and spawns its NetworkObject.
 
-| Team rating | Maximum danger |
+| Rating used for the mission card | Highest eligible spawn-pool tier |
 | --- | --- |
-| 0–3 | 2 (Grabar, Runner) |
+| 1–3 | 2 (Grabar, Runner) |
 | 4–6 | 3 (adds LureMan, Shocker) |
 | 7–9 | 4 (adds CasinoMonster) |
 | 10+ | 5 (adds InvisiMan) |
 
-Ordinary encounters spend a threat budget of rating + 2, capped by the spawner's
-`maximumThreatBudget` (20 by default) and the mission payload capacity. Each
-spawn-pool tier costs its index, from 1 to 5. The generator chooses a feasible
+WorldChooser offsets the team rating by −1, 0 and +1 for its three ordinary
+cards, with a minimum card rating of 1. Each card spends a threat budget of
+its rating + 2, capped by
+`EnemySpawner.maximumThreatBudget` (code default 20) and by what fits in the
+mission payload at the unlocked tiers. Each spawn-pool tier costs its index,
+from 1 to 5. The generator chooses a feasible
 enemy count, then spends the whole budget without exceeding the unlocked tier
 or the seven-target payload limit. Results are shuffled. A budget of 20 can
-produce four tier-5 targets or a larger mixed group; weak tiers remain eligible
-at high ratings. Three mission cards retain their rating offsets of -1, 0, +1.
+produce four tier-5 targets or a larger mixed group. Weak tiers remain eligible
+at high ratings.
 
-Threat cost is separate from capture difficulty: existing pool assignments and
-prefab stats are preserved. In particular, Grabar currently occupies pool 1
-while its prefab has dangerLevel 2. The ordinary card's danger average still
-describes the rolled pool tiers, not each prefab's capture difficulty.
+Ordinary mission cards average the rolled pool tiers. Capture difficulty comes
+from each prefab's `dangerLevel`, which can differ from its pool tier. Grabar is
+in pool 1 and has danger level 2. Hit points are a separate stat. The InvisiMan
+prefab starts with 5 HP.
 
 End bypasses budget rolls and uses `finalMissionEnemies`, explicitly configured
 on the GameManager prefab: Grabar, Runner, LureMan, Shocker, CasinoMonster and
@@ -38,17 +41,18 @@ an oversized roster are configuration errors; there is no random replacement.
 All prefab references and spawn positions are prepared before spawning any
 target, so a failed placement cannot silently produce a partial final encounter.
 
-Placement excludes the configured portal area and low positions. This does not
-make the base safe: enemies may enter it during an active ordinary mission.
+Placement excludes the configured portal area and positions below Y = −30.
 
 ## Capture and counterplay
 
-Confirmed rules: LeafBlower captures every target; higher danger takes longer.
-Other equipment weakens monsters, and stacked weaknesses shorten capture time.
-Capture produces an EnemyCage. Killing is not an alternative objective. Cages
-must reach the base before mission cleanup to remain available.
+See [Game Design](GAME_DESIGN.md#mission-success-and-failure) for success,
+rating and cage recovery. GameManager counts capture events from registered
+mission targets.
 
-Current LeafBlower behaviour:
+`LeafBlower.CalculateRequiredHoldTime` subtracts active weakness stacks from
+the target's rounded danger level. Zero and one effective star both use
+`baseCaptureTime`. Each additional star multiplies the hold time by
+`starTimeMultiplier`.
 
 - Sleeping or invincible entities cannot accumulate capture progress or enter
   the server capture sequence. Static in-base CasinoMonster and LureMan become
@@ -59,8 +63,12 @@ Current LeafBlower behaviour:
   without reacquiring that target, progress loses 20% of the required capture
   time, repeating each second until reacquired or empty.
 
-Mission success/rating follows [Game Design](GAME_DESIGN.md). GameManager counts
-registered targets' capture events; killing a target does not count as capture.
+Flashbang holds 100 charge and spends 50 per use. It remains in the inventory
+when empty and can be recharged. Its indicator is green at 100%, yellow at
+50–99% and red below 50%. `effectRadius` defaults to 30 m and controls both the
+flee effect and pulse size. `expandDuration` (0.5 s) and `fadeDuration` (0.25 s)
+set the pulse timing and together determine the reuse delay. An enemy flees if
+it has a valid escape route.
 
 Equipment noise is server-owned: running LeafBlower and grounded Subwoofer
 continuously lure, radio lures while voice is transmitted, and Flashbang/Taser
@@ -91,26 +99,23 @@ source authoring are in [Steam Audio](STEAM_AUDIO.md).
 
 ## Shocker cage
 
-`ShockerCageDischarge` selects a uniformly random living, spawned entity within
-6 m every 4–9 seconds. Players (including the carrier) and monsters qualify;
-dead, capturing and invincible entities do not. Root distance is used without
-line of sight. The cage stays active dropped, held or stored, without charge.
+`ShockerCageDischarge` selects a uniformly random living, spawned entity.
+The code defaults are a 6 m radius and a 4–9 second interval. Players
+(including the carrier) and monsters qualify while alive, vulnerable and
+outside the capture sequence. Selection uses root distance and ignores line
+of sight. The cage stays active when dropped, held or stored and needs no charge.
 
-It applies 2 seconds of Freeze and, on a wet target, refreshes weakness slot 3
-for 6 seconds; it deals no health damage. Range/timing are Inspector settings.
+It applies Freeze and, on a wet target, refreshes weakness slot 3. Code
+defaults are 2 seconds of Freeze and 6 seconds of weakness. A discharge leaves
+HP unchanged. Set the radius and timings in the Inspector.
 The server owns selection/effects, a transient RPC plays lightning/audio, and
 Entity replicates Freeze/weakness. Despawn stops timers and presentation.
 
-Shocker's wider role, counterplay and balance targets still need owner
-confirmation. Do not invent them from its current implementation. Host/client
+Shocker's role, counterplay and balance targets remain open. Host/client
 playtesting must include a stored cage and mission-end despawn.
 
 ## Adding or changing a monster
 
-Define role, detection/tracking, movement/attack states, equipment interactions,
-capture conditions and failure cases before implementation. Reuse shared enemy
-abstractions, document authority/replicated state and explicitly configure the
-prefab, animations, audio and spawn pool. See [Content Pipeline](CONTENT_PIPELINE.md).
-
-Verify host/client spawn, counterplay, player death, capture and mission-end
-cleanup. Clients must not create or resolve encounters locally.
+Follow the [monster authoring checklist](CONTENT_PIPELINE.md#monsters).
+Verify server-owned spawning and encounter resolution, counterplay, player
+death, capture and mission-end cleanup with a host and client.

@@ -1,4 +1,7 @@
 using System;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace FileSystem.Scripts
@@ -18,35 +21,78 @@ namespace FileSystem.Scripts
     [CreateAssetMenu(fileName = "SettingsFile", menuName = "Not/SettingsFile")]
     public class SettingsFile : GameFile
     {
+        private const int CurrentSettingsFormatVersion = 1;
+        private JObject loadedSettings;
+
         public static event Action OnSettingsChanged;
         public static event Action OnGraphicsSettingsApplied;
 
         [Header("SettingsFile Info")]
         public SettingsSave save;
-        public override void ProcessData(string inputData)
+        protected override Action PrepareData(string inputData)
         {
-            if (string.IsNullOrWhiteSpace(inputData) || inputData.Length < 5)
+            JObject json = ReadJsonObject(inputData);
+            bool current = ReadFormatVersion(json, CurrentSettingsFormatVersion) > 0;
+            bool hasSettings = HasNumber(json, nameof(SettingsSave.sensValue), current);
+            bool legacySensitivity = HasNumber(json, "_sensValue");
+            hasSettings |= legacySensitivity;
+            if (json[nameof(SettingsSave.rebinds)]?.Type != JTokenType.Null || current)
+                hasSettings |= HasField(json, nameof(SettingsSave.rebinds), JTokenType.String, current);
+            hasSettings |= HasNumber(json, nameof(SettingsSave.masterVolume), current);
+            hasSettings |= HasField(json, nameof(SettingsSave.qualityLevel), JTokenType.Integer, current);
+            hasSettings |= HasField(json, nameof(SettingsSave.resolutionWidth), JTokenType.Integer, current);
+            hasSettings |= HasField(json, nameof(SettingsSave.resolutionHeight), JTokenType.Integer, current);
+            hasSettings |= HasField(json, nameof(SettingsSave.refreshRate), JTokenType.Integer, current);
+            hasSettings |= HasField(json, nameof(SettingsSave.fullScreenMode), JTokenType.Integer, current);
+            hasSettings |= HasField(json, nameof(SettingsSave.vSync), JTokenType.Boolean, current);
+            hasSettings |= HasField(json, nameof(SettingsSave.frameRate), JTokenType.Integer, current);
+            hasSettings |= HasField(json, nameof(SettingsSave.shadowQuality), JTokenType.Integer, current);
+            hasSettings |= HasField(json, nameof(SettingsSave.voiceMode), JTokenType.Integer, current);
+            hasSettings |= HasField(json, nameof(SettingsSave.crouchMode), JTokenType.Integer, current);
+            if (!hasSettings) throw new InvalidDataException("The file contains no settings.");
+
+            SettingsSave loaded = json.ToObject<SettingsSave>(SaveSerializer);
+            if (legacySensitivity && json[nameof(SettingsSave.sensValue)] == null)
+                loaded.sensValue = json["_sensValue"].Value<float>();
+
+            loaded.rebinds ??= "";
+            if (!string.IsNullOrWhiteSpace(loaded.rebinds))
+                HasField(ReadJsonObject(loaded.rebinds), "bindings", JTokenType.Array, true);
+
+            if (loaded.sensValue < 0 || loaded.masterVolume < 0 || loaded.masterVolume > 1 ||
+                loaded.qualityLevel < -1 || loaded.resolutionWidth < 0 || loaded.resolutionHeight < 0 ||
+                (loaded.resolutionWidth == 0) != (loaded.resolutionHeight == 0) || loaded.refreshRate < 0 ||
+                loaded.frameRate < -1 || loaded.frameRate == 0 ||
+                !Enum.IsDefined(typeof(FullScreenMode), loaded.fullScreenMode) ||
+                !Enum.IsDefined(typeof(ShadowQuality), loaded.shadowQuality) ||
+                !Enum.IsDefined(typeof(VoiceMode), loaded.voiceMode) ||
+                !Enum.IsDefined(typeof(CrouchMode), loaded.crouchMode))
             {
-                Debug.LogWarning("InputData is empty, resetting to default save");
-                save = new();
-                ApplyRuntimeSettings();
-                Save();
-                return;
+                throw new InvalidDataException("A settings value is outside its supported range.");
             }
 
-            Debug.Log("InputData:" + inputData + GetFullPath());
-            SettingsSave loadedSave = new();
-            JsonUtility.FromJsonOverwrite(inputData, loadedSave);
-            save = loadedSave;
+            return () => ApplyLoadedSettings(loaded, json);
+        }
+
+        protected override void ResetData() => ApplyLoadedSettings(new SettingsSave(), null);
+
+        private void ApplyLoadedSettings(SettingsSave loaded, JObject source)
+        {
+            save = loaded;
+            loadedSettings = source;
             ApplyRuntimeSettings();
             OnSettingsChanged?.Invoke();
         }
+
         public override string GetData()
         {
-            OnSettingsChanged?.Invoke();
-            string jsonSave = JsonUtility.ToJson(save);
-            return jsonSave;
+            JObject json = loadedSettings != null ? (JObject)loadedSettings.DeepClone() : new JObject();
+            json.Merge(JObject.FromObject(save, SaveSerializer));
+            json["formatVersion"] = CurrentSettingsFormatVersion;
+            return json.ToString(Formatting.None);
         }
+
+        protected override void OnSaved(Action applyData) => OnSettingsChanged?.Invoke();
 
         public void ApplyRuntimeSettings()
         {

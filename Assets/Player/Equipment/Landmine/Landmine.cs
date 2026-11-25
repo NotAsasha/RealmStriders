@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Enemy;
 using Unity.Netcode;
 using UnityEngine;
@@ -6,75 +7,96 @@ namespace Player.Equipment.Landmine
 {
     public class Landmine : Item, ICollidable
     {
-        [SerializeField] float explosionRadius = 5;
-        [SerializeField] float weakDuration = 8f;
-        [SerializeField] ParticleSystem emit;
-        [SerializeField] LayerMask entityLayer;
-        [SerializeField] LayerMask wallLayer;
+        [SerializeField] private float explosionRadius = 5;
+        [SerializeField] private float weakDuration = 8f;
+        [SerializeField] private ParticleSystem emit;
+        [SerializeField] private LayerMask entityLayer;
+        [SerializeField] private LayerMask wallLayer;
 
-        [SerializeField] Renderer indicator;
+        [SerializeField] private Renderer indicator;
 
-        SoundProducer soundProducer;
+        private SoundProducer soundProducer;
+        private readonly HashSet<Entity> affectedEntities = new();
+        private readonly NetworkVariable<bool> isTriggered = new(false);
 
-        private void Start()
+        public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             soundProducer = GetComponent<SoundProducer>();
+            isTriggered.OnValueChanged += UpdateIndicator;
+            UpdateIndicator(false, isTriggered.Value);
         }
 
-        bool isTriggered = false;
+        public override void OnNetworkDespawn()
+        {
+            isTriggered.OnValueChanged -= UpdateIndicator;
+            base.OnNetworkDespawn();
+        }
+
         protected override void ExecuteItemAction(GameObject player)
         {
-            Debug.Log("---Landmine: Used!");
-            ExplodeServerRpc();
+            if (IsClient && IsSpawned) ExplodeServerRpc();
         }
 
-        public bool IsTaken() { return isCurrentlyHeld || isTriggered; }
+        public bool IsTaken() => isCurrentlyHeld || isTriggered.Value;
+
+        private void UpdateIndicator(bool _, bool triggered)
+        {
+            if (triggered && indicator != null) indicator.material.color = Color.green;
+        }
 
         public void OnColliderEnter(GameObject collider)
         {
-            if (isCurrentlyHeld) return;
-            indicator.material.color = Color.green;
-            Debug.Log($"---Landmine: Collided with {collider.name}!");
-            isTriggered = true;
-            soundProducer.EmitSoundServerRpc(0);
+            if (!IsServer || !IsSpawned || isCurrentlyHeld || isTriggered.Value) return;
+            isTriggered.Value = true;
+            soundProducer?.EmitSoundServer(0);
         }
 
         public void OnColliderExit(GameObject collider)
         {
-            if (!IsServer || isCurrentlyHeld || !isTriggered) return;
-            isTriggered = false;
-            ExplodeServerRpc();
+            if (!IsServer || !IsSpawned || isCurrentlyHeld || !isTriggered.Value) return;
+            ExplodeServer();
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void ExplodeServerRpc()
+        private void ExplodeServerRpc(RpcParams rpc = default)
         {
-            soundProducer.EmitSoundServerRpc(1);
+            if (TryGetUsableHolderServer(rpc.Receive.SenderClientId, out _))
+            {
+                UpdateRemoteHeldPose();
+                ExplodeServer();
+            }
+        }
+
+        private void ExplodeServer()
+        {
+            soundProducer?.EmitSoundServer(1);
+            affectedEntities.Clear();
             Collider[] hits = Physics.OverlapSphere(transform.position, explosionRadius, entityLayer, QueryTriggerInteraction.Collide);
             foreach (Collider collider in hits)
             {
                 ApplyDamage(collider);
             }
+            affectedEntities.Clear();
 
             ExplodeClientRpc();
             NetworkObject.Despawn(true);
         }
 
-        void ApplyDamage(Collider collider)
+        private void ApplyDamage(Collider collider)
         {
             Vector3 toTarget = collider.transform.position - transform.position;
             float distanceToTarget = toTarget.magnitude;
 
             // Check for walls between mine and target
-            if (Physics.Raycast(transform.position, toTarget.normalized, out RaycastHit hit, distanceToTarget, wallLayer)) return;
+            if (Physics.Raycast(transform.position, toTarget.normalized, distanceToTarget, wallLayer)) return;
 
             Entity entity = collider.GetComponentInParent<Entity>();
-            if (entity == null || entity.isDead.Value) return;
+            if (entity == null || !entity.IsSpawned || entity.IsDead() || !affectedEntities.Add(entity)) return;
 
             // Slot 2: Landmine owns this weakness layer.
             entity.AddHealth(-1);
             entity.ApplyWeakStack(1, weakDuration, slot: 2);
-            Debug.Log($"---Landmine: Applied weakness to {entity.name}.");
         }
 
 

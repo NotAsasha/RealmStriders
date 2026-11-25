@@ -1,24 +1,18 @@
-# Base Development Guidance
+# Base systems
 
-Read the root `AGENTS.md`, `docs/GAME_DESIGN.md`, and `docs/SYSTEMS.md` before
-changing base systems.
+[WorldChooser](WorldChooser/WorldChooser.cs) selects the mission and its danger
+rolls. The [lever](Interactables/Lever/Lever.cs) submits start and return requests
+to [GameManager](../GameManager.cs). Check both entry points when changing
+mission flow, including a request from a remote terminal operator.
 
-## Important entry points
+- [Shop](Shop/Shop.cs), [SellPoint](SellPoint/SellPoint.cs) and
+  [BaseManager](BaseUpgrader/BaseManager.cs) own purchases, cage sales and
+  upgrades. Resolve prices, shared funds and rewards on the server.
+- [PortalManager](Portals/PortalManager.cs) controls the portal. Enemies can
+  enter the base during an active mission.
+- [Terminal](Terminal.cs) and [PackedFurnitureItem](PackedFurnitureItem.cs)
+  handle packing and placement. For changes to furniture identity or
+  persistence, check the [save instructions](../FileSystem/AGENTS.md).
 
-- `WorldChooser/WorldChooser.cs` — mission list and danger roll selection.
-- `Shop/Shop.cs` — server-side purchases and item spawning.
-- `SellPoint/SellPoint.cs` — selling items for team money.
-- `Portals/PortalManager.cs` — portal state and mission access.
-- `BaseUpgrader/BaseManager.cs` — base progression and upgrades.
-- `../GameManager.cs` — mission transitions and team rating.
-
-- The base is the preparation, selling, shopping, upgrade, and mission
-  transition area.
-- Captured `EnemyCage` items are sold for money after a successful return.
-- Team rating increases by a fixed amount for a successful mission and
-  unlocks shop content and harder enemies.
-- A mission may be ended from the base at any time, but it only grants the
-  rating increase when all targets were captured.
-- The base is not guaranteed to be safe after a portal is opened.
-- Shared money, rating, purchases, and upgrades must be authoritative.
-- Preserve both local and networked scene-flow behaviour.
+See [Game Design](../../docs/GAME_DESIGN.md) for mission outcomes and
+[Systems](../../docs/SYSTEMS.md#player-and-base-services) for station responsibilities.

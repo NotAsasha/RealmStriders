@@ -29,13 +29,10 @@ public class GameManager : NetworkBehaviour
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
 
-    //public List<NetworkObject>
-
-    private int alivePlayers;
-
-    public float missionDuration;
-
-    public int AlivePlayersCount { get => alivePlayers; }
+    private readonly NetworkVariable<double> missionDeadline = new(0d);
+    public int MissionSecondsRemaining => IsSpawned && hasStartedMission.Value
+        ? (int)System.Math.Max(0d, System.Math.Ceiling(missionDeadline.Value - NetworkManager.ServerTime.Time))
+        : 0;
 
     public Scene missionScene;
     public string missionName = "World1";
@@ -65,9 +62,6 @@ public class GameManager : NetworkBehaviour
         SetupSingleton();
         DontDestroyOnLoad(gameObject);
 
-        //Decrease timer every second
-        InvokeRepeating(nameof(Radiation), 0f, 1f);
-
         spawner = GetComponent<EnemySpawner>();
     }
 
@@ -75,6 +69,15 @@ public class GameManager : NetworkBehaviour
     {
         base.OnNetworkSpawn();
         SetupInputHandlers();
+        if (IsServer)
+        {
+            NetworkManager.OnClientDisconnectCallback += OnClientDisconnected;
+            if (NetworkManager.SceneManager != null)
+            {
+                NetworkManager.SceneManager.OnLoadEventCompleted += OnMissionTransitionCompleted;
+                NetworkManager.SceneManager.OnUnloadEventCompleted += OnMissionTransitionCompleted;
+            }
+        }
         // Initial synchronization via ReadField does not fire OnValueChanged in Netcode.
         // Explicitly trigger OnValueChanged on spawn so UI and listeners receive synced values.
         teamMoney.OnValueChanged?.Invoke(teamMoney.Value, teamMoney.Value);
@@ -85,9 +88,18 @@ public class GameManager : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         CleanupInputHandlers();
+        if (NetworkManager != null) NetworkManager.OnClientDisconnectCallback -= OnClientDisconnected;
+        if (stopMissionRoutine != null) StopCoroutine(stopMissionRoutine);
+        stopMissionRoutine = null;
         ClearMissionTargets();
         if (NetworkManager != null && NetworkManager.SceneManager != null)
+        {
             NetworkManager.SceneManager.OnLoadComplete -= OnSceneLoaded;
+            NetworkManager.SceneManager.OnLoadEventCompleted -= OnMissionTransitionCompleted;
+            NetworkManager.SceneManager.OnUnloadEventCompleted -= OnMissionTransitionCompleted;
+        }
+        missionSceneTransitionInProgress = false;
+        currentSceneName = null;
         base.OnNetworkDespawn();
     }
 
@@ -131,27 +143,31 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    public void OnPlayerDeathServerRpc()
+    private void OnClientDisconnected(ulong clientId)
     {
-        alivePlayers -= 1;
-        Debug.Log($"---MissionManager: Allive players: {alivePlayers}.");
-        if (alivePlayers <= 0)
+        if (hasStartedMission.Value) CheckForTeamWipeServer(clientId);
+    }
+
+    public void CheckForTeamWipeServer(ulong? departingClientId = null)
+    {
+        if (!IsSpawned || !IsServer || NetworkManager.ShutdownInProgress || IsResolvingMission) return;
+        foreach (var client in NetworkManager.ConnectedClientsList)
         {
-            Debug.Log("---MissionManager: Everyone died, stopping mission.");
-            StopMissionServerRpc();
+            if (client.ClientId != departingClientId && client.PlayerObject != null &&
+                client.PlayerObject.TryGetComponent<Human>(out var human) && !human.isDead.Value) return;
         }
+        BeginStopMission(false, true);
     }
 
     #region MissionRpc
 
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    public void StartMissionServerRpc()
+    public void StartMissionServer()
     {
         if (!IsServer || hasStartedMission.Value || IsResolvingMission) return;
         if (missionName == "") return;
         if (CampaignProgression.RequiresFinalMission(teamRating.Value, campaignCompleted.Value) &&
             missionName != CampaignProgression.FinalMissionName) return;
+        if (!TryLoadWorld(missionName)) return;
 
         ClearMissionTargets();
         endReturnLocked.Value = missionName == CampaignProgression.FinalMissionName;
@@ -159,32 +175,30 @@ public class GameManager : NetworkBehaviour
         //Spawn Monsters
 
         RevivePlayers();
-        alivePlayers = NetworkManager.Singleton.ConnectedClients.Count;
 
         //Stop Lobby Connections
         if (SteamManager.Instance.CurrentLobby != null)
             SteamManager.Instance.CurrentLobby.Value.SetJoinable(false);
 
-        LoadWorld(missionName);
-        StartTimer();
+        missionDeadline.Value = NetworkManager.ServerTime.Time +
+            Random.Range(defaultMissionTime - maxTimeSpread, defaultMissionTime + maxTimeSpread);
 
         hasStartedMission.Value = true;
     }
 
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    public void StopMissionServerRpc()
+    public void StopMissionServer()
     {
-        BeginStopMission(false);
+        if (hasStartedMission.Value) BeginStopMission(false);
     }
 
-    private void BeginStopMission(bool timeExpired)
+    private void BeginStopMission(bool timeExpired, bool teamWiped = false)
     {
         if (!IsServer) return;
         if (stopMissionRoutine != null) return;
-        stopMissionRoutine = StartCoroutine(StopMissionClock(timeExpired));
+        stopMissionRoutine = StartCoroutine(StopMissionClock(timeExpired, teamWiped));
     }
 
-    private IEnumerator StopMissionClock(bool timeExpired)
+    private IEnumerator StopMissionClock(bool timeExpired, bool teamWiped)
     {
         //revive if died in lobby
         if (!hasStartedMission.Value)
@@ -195,7 +209,7 @@ public class GameManager : NetworkBehaviour
             yield break;
         }
 
-        bool returnedToBase = HasLivingPlayerAtBase();
+        bool returnedToBase = !teamWiped && HasLivingPlayerAtBase();
         bool missionSuccessful = missionEnemiesReady && missionTargets.Count == dangerLevels.Length &&
             CampaignProgression.IsMissionSuccessful(dangerLevels.Length, capturedTargetCount, returnedToBase);
         bool completedFinalMission = missionSuccessful && missionName == CampaignProgression.FinalMissionName;
@@ -214,16 +228,13 @@ public class GameManager : NetworkBehaviour
         teamRating.Value = tempRating;
 
         //kill players out of base
-        if (alivePlayers > 0)
-        {
-            KillOutOfRangePlayers(timeExpired);
-        }
+        KillOutOfRangePlayers(timeExpired);
 
         DestroyOutOfRangeItems();
         PreserveItemsBroughtToBase();
 
         //unload world
-        UnloadWorld();
+        yield return UnloadWorld();
 
 
         //revive
@@ -232,7 +243,7 @@ public class GameManager : NetworkBehaviour
         Shop.Instance?.EnsureFreeLeafBlowerServer();
 
         if (completedFinalMission) campaignCompleted.Value = true;
-        currentSave?.Save();
+        if (currentSave != null) BroadcastAutosaveResultRpc(currentSave.Save());
         ClearMissionTargets();
 
         //Resume Lobby Connections
@@ -263,17 +274,10 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    private void StartTimer()
+    [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+    private void BroadcastAutosaveResultRpc(bool succeeded)
     {
-        missionDuration = Random.Range(defaultMissionTime - maxTimeSpread, defaultMissionTime + maxTimeSpread);
-
-        StartTimerClientRpc(missionDuration);
-    }
-
-    [ClientRpc]
-    private void StartTimerClientRpc(float serverDuration)
-    {
-        missionDuration = serverDuration;
+        SaveGameButton.NotifySaveCompleted(succeeded);
     }
     public void RegisterMissionEnemy(Enemy.Enemy enemy)
     {
@@ -356,35 +360,39 @@ public class GameManager : NetworkBehaviour
     #region World Manager
 
     private string currentSceneName;
-    public void LoadWorld(string sceneToLoad)
+    private bool missionSceneTransitionInProgress;
+
+    private bool TryLoadWorld(string sceneToLoad)
     {
-        if (currentSceneName != null)
+        if (currentSceneName != null || NetworkManager.SceneManager == null) return false;
+        var status = NetworkManager.SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
+        if (status != SceneEventProgressStatus.Started)
         {
-            Debug.LogError("---MissionManager: Trying to load mission without ending the previous one.");
+            Debug.LogWarning($"Could not start mission scene {sceneToLoad}: {status}.");
+            return false;
         }
 
-        if (!IsServer)
-        {
-            Debug.Log("Waiting for server to load scene...");
-            return;
-        }
-
-        //Scene
-        NetworkManager.Singleton.SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
-        Scene sceneToUnload = SceneManager.GetSceneByName(sceneToLoad);
         currentSceneName = sceneToLoad;
-        missionScene = sceneToUnload;
+        missionSceneTransitionInProgress = true;
+        NetworkManager.SceneManager.OnLoadComplete += OnSceneLoaded;
+        return true;
+    }
 
-        //Enemies
-        NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
+    private void OnMissionTransitionCompleted(string sceneName, LoadSceneMode mode,
+        List<ulong> completed, List<ulong> timedOut)
+    {
+        if (sceneName == currentSceneName)
+            missionSceneTransitionInProgress = false;
     }
 
     private void OnSceneLoaded(ulong conn, string sceneName, LoadSceneMode mode)
     {
-        if (!IsServer || sceneName != currentSceneName || mode != LoadSceneMode.Additive) return;
+        if (!IsServer || conn != NetworkManager.ServerClientId || sceneName != currentSceneName ||
+            mode != LoadSceneMode.Additive) return;
         Scene loadedScene = SceneManager.GetSceneByName(sceneName);
         if (!loadedScene.IsValid() || !loadedScene.isLoaded) return;
         NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded;
+        if (!hasStartedMission.Value || IsResolvingMission) return;
         if (loadedScene.IsValid())
         {
             missionScene = loadedScene;
@@ -428,8 +436,8 @@ public class GameManager : NetworkBehaviour
     {
         foreach (var player in NetworkManager.Singleton.ConnectedClientsList)
         {
-            var human = player.PlayerObject.gameObject.GetComponent<Human>();
-            if (human.isDead.Value) continue;
+            if (player.PlayerObject == null || !player.PlayerObject.TryGetComponent<Human>(out var human) ||
+                human.isDead.Value) continue;
 
             float distanceToSpawn = Vector3.Distance(human.transform.position, spawnPoint);
             if (distanceToSpawn > baseRadius) human.KillForMissionEnd(timeExpired);
@@ -514,18 +522,18 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    private bool IsWithinBaseRange(Vector3 position)
+    public bool IsWithinBaseRange(Vector3 position)
     {
         Vector3 offset = position - spawnPoint;
         return offset.sqrMagnitude <= baseRadius * baseRadius;
     }
 
-    public void UnloadWorld()
+    private IEnumerator UnloadWorld()
     {
         if (currentSceneName == null)
         {
             Debug.LogError("---MissionManager: Trying to stop non-existing mission.");
-            return;
+            yield break;
         }
 
         foreach (var enemy in activeEnemies)
@@ -536,20 +544,29 @@ public class GameManager : NetworkBehaviour
         }
         activeEnemies.Clear();
 
+        // A wipe can arrive while another peer is still synchronizing the additive load.
+        while (missionSceneTransitionInProgress) yield return null;
         Scene sceneToUnload = SceneManager.GetSceneByName(currentSceneName);
-        NetworkManager.Singleton.SceneManager.UnloadScene(sceneToUnload);
+        if (sceneToUnload.IsValid() && sceneToUnload.isLoaded)
+        {
+            var status = NetworkManager.SceneManager.UnloadScene(sceneToUnload);
+            if (status == SceneEventProgressStatus.Started)
+            {
+                missionSceneTransitionInProgress = true;
+                while (missionSceneTransitionInProgress) yield return null;
+            }
+            else
+                Debug.LogError($"Could not unload mission scene {currentSceneName}: {status}.");
+        }
         currentSceneName = null;
         missionScene = default;
     }
 
     #endregion
 
-    private void Radiation()
+    private void Update()
     {
-        if (!hasStartedMission.Value || !IsServer) return;
-
-        missionDuration -= 1;
-        if (missionDuration <= 0)
+        if (IsServer && hasStartedMission.Value && NetworkManager.ServerTime.Time >= missionDeadline.Value)
         {
             BeginStopMission(true);
         }

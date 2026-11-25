@@ -220,7 +220,7 @@ namespace Base.Alarm
             // End the mission if one is active
             if (GameManager.Instance != null && GameManager.Instance.hasStartedMission.Value)
             {
-                GameManager.Instance.StopMissionServerRpc();
+                GameManager.Instance.StopMissionServer();
             }
         }
 

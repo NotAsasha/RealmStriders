@@ -21,9 +21,12 @@ namespace Enemy
         }
 
         private Collider[] nearbyEntities = new Collider[20];
+        public Vector3 EyePosition => transform.position + eyeLocalPosition;
+        public LayerMask WallLayer => wallLayer;
+
         public GameObject EntityInSight(bool chaseEnemies = false)
         {
-            return EntityInSight(transform.position + eyeLocalPosition, transform.forward, chaseEnemies);
+            return EntityInSight(EyePosition, transform.forward, chaseEnemies);
         }
 
         public GameObject EntityInSight(Vector3 eyePosition, Vector3 viewDirection, bool chaseEnemies = false,

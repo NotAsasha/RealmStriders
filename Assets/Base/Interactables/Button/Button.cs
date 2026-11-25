@@ -1,4 +1,5 @@
 using System.Collections;
+using Player;
 using Player.Equipment;
 using Unity.Netcode;
 using UnityEngine;
@@ -10,6 +11,7 @@ namespace Base.Interactables
     {
         [SerializeField] private float cooldown = 0f;
         [SerializeField] private UnityEvent onInteract;
+        [SerializeField, Min(0f)] private float serverInteractionReach = 3f;
 
         [SerializeField] private Transform slider;
 
@@ -20,10 +22,12 @@ namespace Base.Interactables
         );
 
         private Coroutine sliderAnimationCoroutine;
+        private Collider interactionCollider;
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            interactionCollider = GetComponent<Collider>();
             isReady.OnValueChanged += AnimateCooldown;
 
             // Синхронізуємо візуальний стан повзунка при підключенні
@@ -46,9 +50,9 @@ namespace Base.Interactables
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        private void InteractServerRpc()
+        private void InteractServerRpc(RpcParams rpc = default)
         {
-            if (!isReady.Value) return;
+            if (!CanPressServer(rpc.Receive.SenderClientId)) return;
 
             if (cooldown > 0f)
             {
@@ -62,16 +66,28 @@ namespace Base.Interactables
         {
         }
 
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Server)]
         public void StartCooldownServerRpc()
         {
-            if (!isReady.Value) return;
             StartCooldown();
+        }
+
+        private bool CanPressServer(ulong clientId)
+        {
+            if (!IsServer || !IsSpawned || !isActiveAndEnabled || !isReady.Value ||
+                interactionCollider == null || !interactionCollider.enabled ||
+                !NetworkManager.ConnectedClients.TryGetValue(clientId, out var client) ||
+                client.PlayerObject == null || !client.PlayerObject.TryGetComponent<Human>(out var human) ||
+                human.IsDead() || human.IsBeingCaptured || human.IsEffectActive(EffectType.Freeze)) return false;
+
+            Vector3 origin = human.transform.position + Vector3.up;
+            Vector3 nearest = interactionCollider.ClosestPoint(origin);
+            return (nearest - origin).sqrMagnitude <= serverInteractionReach * serverInteractionReach;
         }
 
         private void StartCooldown()
         {
-            if (!IsServer || !isReady.Value) return;
+            if (!IsServer || !IsSpawned || !isReady.Value) return;
             StartCoroutine(Cooldown());
         }
 

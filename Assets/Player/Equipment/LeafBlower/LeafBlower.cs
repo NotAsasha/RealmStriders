@@ -120,7 +120,6 @@ namespace Player.Equipment.LeafBlower
         [Rpc(SendTo.Server)]
         private void SwitchStateServerRpc(Vector3 origin, Vector3 forward, RpcParams rpcParams = default)
         {
-            if (!IsHeldByClient(rpcParams.Receive.SenderClientId)) return;
             if (!TrySetAim(rpcParams.Receive.SenderClientId, origin, forward)) return;
             if (!isOn.Value && Charge.Value <= 0) return;
 
@@ -257,20 +256,14 @@ namespace Player.Equipment.LeafBlower
 
         private bool TrySetAim(ulong clientId, Vector3 origin, Vector3 forward)
         {
-            if (!IsHeldByClient(clientId) || forward.sqrMagnitude <= Mathf.Epsilon)
-            {
-                return false;
-            }
-
-            if (!NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client) ||
-                client.PlayerObject == null ||
-                (origin - client.PlayerObject.transform.position).sqrMagnitude > 9f)
+            if (detector == null || !TryGetUsableHolderServer(clientId, out var holder) ||
+                !IsValidAim(holder, origin, forward, detector.WallLayer))
             {
                 return false;
             }
 
             aimOrigin.Value = origin;
-            aimForward.Value = forward.normalized;
+            aimForward.Value = forward;
             return true;
         }
 
@@ -411,7 +404,7 @@ namespace Player.Equipment.LeafBlower
             suppressStopSound = false;
         }
 
-        [Rpc(SendTo.Everyone)]
+        [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
         private void PlayCaptureSuccessSoundRpc()
         {
             suppressStopSound = true;
@@ -421,7 +414,7 @@ namespace Player.Equipment.LeafBlower
             audioSource.PlayOneShot(captureSuccessSound);
         }
 
-        [Rpc(SendTo.Everyone)]
+        [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
         private void PlayLostTargetSoundRpc()
         {
             PlayLostTargetAudio();

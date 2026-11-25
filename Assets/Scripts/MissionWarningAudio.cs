@@ -29,11 +29,10 @@ namespace Game.Casino
         {
             if (!IsSpawned || !IsServer) return;
 
-            // Only the server decrements GameManager's missionDuration.
             GameManager mission = GameManager.Instance;
             bool shouldWarn = mission != null && mission.IsSpawned &&
-                mission.hasStartedMission.Value && mission.missionDuration > 0f &&
-                mission.missionDuration <= warningSeconds;
+                mission.hasStartedMission.Value && mission.MissionSecondsRemaining > 0 &&
+                mission.MissionSecondsRemaining <= warningSeconds;
             if (warningActive.Value != shouldWarn) warningActive.Value = shouldWarn;
         }
 

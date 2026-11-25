@@ -17,7 +17,7 @@ namespace Base.Radar
             {
                 Debug.Log($"---Beam: Shot entity: {entity.name}");
 
-                entity.ApplyEffectServerRpc(EffectType.Freeze, weakDuration);
+                entity.ApplyEffect(EffectType.Freeze, weakDuration);
                 // Slot 1: Radar Beam owns this weakness layer.
                 entity.ApplyWeakStack(1, weakDuration, slot: 1);
             }

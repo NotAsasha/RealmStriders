@@ -99,12 +99,14 @@ namespace Player.Equipment
             return new Pose(position, orientation);
         }
 
-        [Header("Inventory Presentation (assign in the prefab)")]
-        [SerializeField] private Renderer[] inventoryRenderers = System.Array.Empty<Renderer>();
-        [SerializeField] private Light[] inventoryLights = System.Array.Empty<Light>();
-        [SerializeField] private Canvas[] inventoryCanvases = System.Array.Empty<Canvas>();
-        [SerializeField] private AudioSource[] inventoryAudioSources = System.Array.Empty<AudioSource>();
+        [Header("Inventory")]
+        [Tooltip("Effects that render independently of this item, such as detached teleport particles.")]
+        [SerializeField] private Renderer[] independentRenderers = System.Array.Empty<Renderer>();
         [SerializeField] private Collider[] inventoryColliders = System.Array.Empty<Collider>();
+        private Renderer[] inventoryRenderers;
+        private Light[] inventoryLights;
+        private Canvas[] inventoryCanvases;
+        private AudioSource[] inventoryAudioSources;
         private bool[] lightStates;
         private bool[] canvasStates;
         private bool[] audioMuteStates;
@@ -173,7 +175,7 @@ namespace Player.Equipment
         }
 
         [Header("Save System")]
-        [SerializeField, HideInInspector] private int prefabId;
+        [SerializeField, Min(-1)] private int prefabId = -1;
         public int PrefabId => prefabId;
         public void SetPrefabId(int id) => prefabId = id;
 
@@ -225,6 +227,31 @@ namespace Player.Equipment
             return TryGetHolderInventory(out var inventory) && inventory.OwnerClientId == clientId && inventory.IsActiveItem(this);
         }
 
+        protected bool TryGetUsableHolderServer(ulong clientId, out Inventory inventory)
+        {
+            inventory = null;
+            return IsServer && IsSpawned && isActiveAndEnabled && TryGetHolderInventory(out inventory) &&
+                inventory.IsSpawned && inventory.OwnerClientId == clientId &&
+                NetworkManager.ConnectedClients.TryGetValue(clientId, out var client) &&
+                client.PlayerObject == inventory.NetworkObject &&
+                inventory.IsActiveItem(this) && inventory.CanUseHeldEquipment;
+        }
+
+        protected static bool IsValidAim(Inventory holder, Vector3 origin, Vector3 forward, LayerMask wallLayer)
+        {
+            if (!IsFinite(origin) || !IsFinite(forward)) return false;
+            float directionLengthSquared = forward.sqrMagnitude;
+            if (directionLengthSquared < 0.99f || directionLengthSquared > 1.01f) return false;
+
+            Vector3 holderOrigin = holder.transform.position + Vector3.up;
+            // Allow for muzzle/camera offsets and delayed owner movement, while keeping the ray on the player's side of a wall.
+            return (origin - holderOrigin).sqrMagnitude <= 9f &&
+                !Physics.Linecast(holderOrigin, origin, wallLayer, QueryTriggerInteraction.Ignore);
+        }
+
+        private static bool IsFinite(Vector3 value) =>
+            float.IsFinite(value.x) && float.IsFinite(value.y) && float.IsFinite(value.z);
+
         public virtual Quaternion GetRemoteGripRotation(Inventory inventory)
         {
             return inventory != null ? inventory.GetRemoteAimRotation() : transform.rotation;
@@ -248,7 +275,7 @@ namespace Player.Equipment
 
         #region Unity Lifecycle
 
-        private void Awake()
+        public virtual void Awake()
         {
             CacheComponents();
         }
@@ -349,6 +376,13 @@ namespace Player.Equipment
             itemParentConstraint = GetComponent<ParentConstraint>();
             audioSource = GetComponent<AudioSource>();
             TryGetComponent(out droppedItemHighlight);
+            inventoryRenderers = GetComponentsInChildren<Renderer>(true);
+            if (independentRenderers.Length > 0)
+                inventoryRenderers = System.Array.FindAll(inventoryRenderers,
+                    renderer => System.Array.IndexOf(independentRenderers, renderer) < 0);
+            inventoryLights = GetComponentsInChildren<Light>(true);
+            inventoryCanvases = GetComponentsInChildren<Canvas>(true);
+            inventoryAudioSources = GetComponentsInChildren<AudioSource>(true);
             lightStates = new bool[inventoryLights.Length];
             canvasStates = new bool[inventoryCanvases.Length];
             audioMuteStates = new bool[inventoryAudioSources.Length];

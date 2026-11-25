@@ -46,7 +46,8 @@ namespace Player.Movement
             if (!IsOwner) return;
 
             camTransform = cameraTransform;
-            camTransform.parent = null; // Відв'язуємо від регдолу!
+            // Keep the camera with its persistent player when an additive mission unloads.
+            camTransform.SetParent(NetworkObject.transform, true);
             isSpectating = true;
             this.enabled = true;
             SetCursorForTarget(true);
@@ -72,21 +73,17 @@ namespace Player.Movement
             targets.Clear();
 
             // 1. Збираємо живих гравців через чистий список Netcode
-            foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+            foreach (var player in NetworkManager.SpawnManager.SpawnedObjectsList)
             {
-                if (client.ClientId == NetworkManager.Singleton.LocalClientId) continue; // Себе пропускаємо
-
-                if (client.PlayerObject != null)
+                if (!player.IsPlayerObject || player.IsLocalPlayer) continue;
+                if (player.TryGetComponent<Human>(out var human) && !human.isDead.Value)
                 {
-                    if (client.PlayerObject.TryGetComponent<Human>(out var human) && !human.isDead.Value)
+                    targets.Add(new SpectatorTarget
                     {
-                        targets.Add(new SpectatorTarget
-                        {
-                            Transform = client.PlayerObject.transform,
-                            Type = SpectatorTargetType.Player,
-                            DisplayName = $"Гравець: {client.ClientId}"
-                        });
-                    }
+                        Transform = player.transform,
+                        Type = SpectatorTargetType.Player,
+                        DisplayName = $"Гравець: {player.OwnerClientId}"
+                    });
                 }
             }
 

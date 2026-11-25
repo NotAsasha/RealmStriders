@@ -90,10 +90,10 @@ namespace Game.Casino
             {
                 if (!missionWasActive)
                 {
-                    initialRemaining = Mathf.Max(1f, mission.missionDuration);
+                    initialRemaining = Mathf.Max(1f, mission.MissionSecondsRemaining);
                     waitRemaining = Sample(quietInterval);
                 }
-                float progress = 1f - Mathf.Clamp01(mission.missionDuration / initialRemaining);
+                float progress = 1f - Mathf.Clamp01(mission.MissionSecondsRemaining / initialRemaining);
                 float rate = Mathf.Lerp(1f, finalFrequencyMultiplier, progress * progress);
                 waitRemaining -= Time.deltaTime * rate;
                 if (waitRemaining <= 0f)

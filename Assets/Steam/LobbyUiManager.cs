@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using FileSystem.Scripts;
-using Unity.Netcode;
+using System.Collections.Generic;
+using Steamworks;
+using Lobby = Steamworks.Data.Lobby;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
@@ -25,6 +26,7 @@ namespace Steam
         [Header("Save selection")]
         [SerializeField] private SaveSlot[] saveSlots = Array.Empty<SaveSlot>();
         [SerializeField] private Button createLobbyButton;
+        [SerializeField] private TMP_Text createLobbyLabel;
         [SerializeField] private TMP_Text hostStatus;
         [SerializeField] private UnityEvent onHostStarted = new();
         [SerializeField] private Color selectedSaveColor = new(0.40f, 0.30f, 0.20f);
@@ -37,6 +39,20 @@ namespace Steam
         private int selectedSave = -1;
         private int pendingDelete = -1;
         [SerializeField] private TMP_Text deleteConfirmationTitle;
+
+        [Header("Lobby browser")]
+        [SerializeField] private Button refreshLobbiesButton;
+        [SerializeField] private ScrollRect lobbyList;
+        [SerializeField] private TMP_Text lobbyListTitle;
+        [SerializeField] private TMP_Text joinStatus;
+
+        private const float LobbyRowHeight = 60f;
+        private const float LobbyRowPitch = 68f;
+        private readonly List<Button> lobbyButtons = new();
+        private bool hostStarting;
+        private bool hostSingleplayer;
+        private bool lobbiesRefreshing;
+        private bool lobbyConnecting;
 
         [Serializable]
         private sealed class SaveSlot
@@ -53,20 +69,30 @@ namespace Steam
             RefreshSaveSelection();
         }
 
+        private SaveFile SelectedSave => selectedSave >= 0 && selectedSave < saveSlots.Length
+            ? saveSlots[selectedSave].source.gameSave
+            : null;
+
         private void RefreshSaveSelection()
         {
-            bool valid = selectedSave >= 0 && selectedSave < saveSlots.Length &&
-                         saveSlots[selectedSave].source.gameSave != null;
+            SaveFile save = SelectedSave;
             for (int i = 0; i < saveSlots.Length; i++)
             {
-                bool selected = valid && i == selectedSave;
+                bool selected = save != null && i == selectedSave;
                 saveSlots[i].background.color = selected ? selectedSaveColor : normalSaveColor;
                 saveSlots[i].selectionLabel.text = selected ? "SELECTED" : "SELECT";
             }
-            if (createLobbyButton != null) createLobbyButton.interactable = valid;
-            if (hostStatus != null) hostStatus.text = valid
-                ? "Save " + (selectedSave + 1).ToString("00") + " selected."
-                : "Select a save to create a lobby.";
+
+            hostSingleplayer = steamManager != null && !steamManager.IsSteamActive;
+            friendsOnly.gameObject.SetActive(!hostSingleplayer);
+            createLobbyLabel.text = hostSingleplayer ? "PLAY SOLO" : "CREATE LOBBY";
+            createLobbyButton.interactable = save != null && !save.IsLoadBlocked && !hostStarting;
+            if (save == null)
+                hostStatus.text = hostSingleplayer ? "Steam is offline. Select a save to play solo." : "Select a save to create a lobby.";
+            else if (save.IsLoadBlocked)
+                hostStatus.text = "This save is unavailable. Choose another slot or delete this save.";
+            else
+                hostStatus.text = hostSingleplayer ? "Steam is offline. This session will be solo." : "";
         }
 
         public void OpenFileManagement()
@@ -138,14 +164,24 @@ namespace Steam
         }
 
         public void ShowMainMenu() => ShowPage(mainPage);
-        public void ShowHostLobby() => ShowPage(hostPage);
-        public void ShowJoinLobby() => ShowPage(joinPage);
+        public void ShowHostLobby()
+        {
+            RefreshSaveSelection();
+            ShowPage(hostPage);
+        }
+
+        public void ShowJoinLobby()
+        {
+            ShowPage(joinPage);
+            if (joinPage.activeInHierarchy) RefreshJoinLobbies();
+        }
+
         public void ShowSettings() => ShowPage(settingsPage);
         public void StartTutorial() => Game.Tutorial.TutorialSession.Open();
 
         private void ShowPage(GameObject page)
         {
-            if (page == null || transition != null) return;
+            if (page == null || transition != null || hostStarting || lobbyConnecting) return;
             CloseFileManagement();
             InitializePresentation();
             if (Application.isPlaying && isActiveAndEnabled && pagePresentations.Length > 0)
@@ -254,6 +290,7 @@ namespace Steam
         {
             UnlockCursor();
             steamManager = SteamManager.Instance;
+            refreshLobbiesButton.onClick.AddListener(RefreshJoinLobbies);
             RefreshSaveSelection();
         }
 
@@ -263,41 +300,184 @@ namespace Steam
             Cursor.visible = true;
         }
 
-        public void CreateLobbyButton()
+        public async void CreateLobbyButton()
         {
-            if (selectedSave < 0 || selectedSave >= saveSlots.Length ||
-                saveSlots[selectedSave].source.gameSave == null)
+            if (hostStarting) return;
+            SaveFile save = SelectedSave;
+            if (save == null || save.IsLoadBlocked)
             {
                 RefreshSaveSelection();
                 return;
             }
-            if (GameManager.Instance == null || NetworkManager.Singleton == null)
+
+            var game = GameManager.Instance;
+            if (game == null || steamManager == null)
             {
-                if (hostStatus != null) hostStatus.text = "Game services are not ready.";
-                return;
-            }
-            if (NetworkManager.Singleton.IsListening) return;
-            if (steamManager == null)
-            {
-                steamManager = SteamManager.Instance;
-            }
-            if (steamManager == null)
-            {
-                Debug.LogError("[LobbyUiManager] SteamManager instance is not available.");
+                hostStatus.text = "Game services are not ready. Please try again.";
                 return;
             }
 
-            try
+            hostStarting = true;
+            SetHostInteraction(false);
+            createLobbyButton.interactable = false;
+            hostStatus.text = hostSingleplayer ? "Starting solo play..." : "Creating Steam lobby...";
+            SaveFile previousSave = game.currentSave;
+            game.currentSave = save;
+            string error = await steamManager.StartHostAsync(friendsOnly.isOn, hostSingleplayer);
+            if (error != null && game != null && game.currentSave == save)
+                game.currentSave = previousSave;
+            if (this == null) return;
+
+            hostStarting = false;
+            SetHostInteraction(true);
+            if (error == null)
             {
-                GameManager.Instance.currentSave = saveSlots[selectedSave].source.gameSave;
-                bool isFriendsOnly = friendsOnly != null && friendsOnly.isOn;
-                steamManager.StartHost(6, isFriendsOnly);
-                if (NetworkManager.Singleton.IsHost) onHostStarted.Invoke();
+                onHostStarted.Invoke();
+                return;
             }
-            catch (Exception ex)
+
+            RefreshSaveSelection();
+            hostStatus.text = error;
+            createLobbyButton.Select();
+        }
+
+        public async void RefreshJoinLobbies()
+        {
+            if (lobbiesRefreshing || lobbyConnecting) return;
+            ClearLobbyButtons();
+            if (steamManager == null)
             {
-                Debug.LogError($"[LobbyUiManager] Error starting host: {ex}");
-                throw;
+                SetJoinFeedback("Lobby browser unavailable.", "Game services are not ready. Try Refresh again.");
+                return;
+            }
+            if (!steamManager.IsSteamActive)
+            {
+                SetJoinFeedback("Steam is offline.", "Connect to Steam to refresh, or return to Host to play solo.");
+                return;
+            }
+
+            lobbiesRefreshing = true;
+            refreshLobbiesButton.interactable = false;
+            SetJoinFeedback("Searching for lobbies...", "");
+            var (lobbies, error) = await steamManager.RefreshLobbies();
+            if (this == null) return;
+
+            lobbiesRefreshing = false;
+            refreshLobbiesButton.interactable = true;
+            if (error != null)
+            {
+                SetJoinFeedback("Refresh failed.", error);
+                return;
+            }
+            if (lobbies.Length == 0)
+            {
+                SetJoinFeedback("No public lobbies found.",
+                    "Refresh to check again. Accept a Steam invite to join a friends-only lobby.");
+                return;
+            }
+
+            foreach (Lobby lobby in lobbies) AddLobbyButton(lobby);
+            lobbyList.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, lobbies.Length * LobbyRowPitch);
+            Canvas.ForceUpdateCanvases();
+            lobbyList.verticalNormalizedPosition = 1f;
+            SetJoinFeedback(null, lobbies.Length > 5 ? "Scroll to see more public lobbies." : "");
+        }
+
+        private void ClearLobbyButtons()
+        {
+            foreach (Button button in lobbyButtons)
+            {
+                button.gameObject.SetActive(false);
+                Destroy(button.gameObject);
+            }
+            lobbyButtons.Clear();
+            lobbyList.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0f);
+        }
+
+        private void AddLobbyButton(Lobby lobby)
+        {
+            var row = new GameObject("Lobby Result", typeof(RectTransform), typeof(Image), typeof(Button));
+            var rect = (RectTransform)row.transform;
+            rect.SetParent(lobbyList.content, worldPositionStays: false);
+            rect.anchorMin = new Vector2(0f, 1f);
+            rect.anchorMax = Vector2.one;
+            rect.pivot = new Vector2(0f, 1f);
+            rect.anchoredPosition = new Vector2(0f, -lobbyButtons.Count * LobbyRowPitch);
+            rect.sizeDelta = new Vector2(0f, LobbyRowHeight);
+
+            var background = row.GetComponent<Image>();
+            background.color = new Color(0.30f, 0.31f, 0.34f, 0.74f);
+            var button = row.GetComponent<Button>();
+            button.targetGraphic = background;
+            ColorBlock colors = button.colors;
+            colors.normalColor = new Color(0.77f, 0.77f, 0.77f);
+            colors.highlightedColor = Color.white;
+            colors.selectedColor = Color.white;
+            colors.pressedColor = new Color(0.65f, 0.65f, 0.65f);
+            button.colors = colors;
+            button.onClick.AddListener(() => JoinLobby(lobby.Id, button));
+            lobbyButtons.Add(button);
+
+            AddLobbyColumn(rect, SteamManager.GetLobbyName(lobby), 24f, 1150f);
+            AddLobbyColumn(rect, $"{lobby.MemberCount}/{lobby.MaxMembers}", 1194f, 180f);
+            AddLobbyColumn(rect, "JOIN", 1414f, 180f);
+        }
+
+        private void AddLobbyColumn(RectTransform row, string value, float offset, float width)
+        {
+            var column = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
+            var rect = (RectTransform)column.transform;
+            rect.SetParent(row, worldPositionStays: false);
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.up;
+            rect.pivot = new Vector2(0f, 0.5f);
+            rect.anchoredPosition = new Vector2(offset, 0f);
+            rect.sizeDelta = new Vector2(width, 0f);
+
+            var label = column.GetComponent<TextMeshProUGUI>();
+            label.font = joinStatus.font;
+            label.fontSize = joinStatus.fontSize;
+            label.color = lobbyListTitle.color;
+            label.alignment = TextAlignmentOptions.Left;
+            label.textWrappingMode = TextWrappingModes.NoWrap;
+            label.overflowMode = TextOverflowModes.Ellipsis;
+            label.richText = false;
+            label.raycastTarget = false;
+            label.text = value;
+        }
+
+        private void SetJoinFeedback(string title, string detail)
+        {
+            lobbyListTitle.gameObject.SetActive(title != null);
+            lobbyListTitle.text = title ?? "";
+            joinStatus.text = detail;
+        }
+
+        private async void JoinLobby(SteamId id, Button source)
+        {
+            if (lobbyConnecting || lobbiesRefreshing) return;
+            SetJoinInteraction(false);
+            SetJoinFeedback(null, "Joining Steam lobby...");
+            string error = await steamManager.TryConnectLobby(id);
+            if (this == null) return;
+
+            if (error == null)
+            {
+                SetJoinFeedback(null, "Connected. Waiting for the host...");
+                return;
+            }
+
+            SetJoinFeedback(null, error);
+            SetJoinInteraction(true);
+            source.Select();
+        }
+
+        private void SetJoinInteraction(bool enabled)
+        {
+            lobbyConnecting = !enabled;
+            foreach (PagePresentation page in pagePresentations)
+            {
+                if (page.page == joinPage) page.group.interactable = enabled;
             }
         }
 
@@ -326,4 +506,4 @@ namespace Steam
             CloseFileManagement();
         }
     }
-} 
+}

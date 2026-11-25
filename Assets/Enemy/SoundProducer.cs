@@ -21,9 +21,9 @@ namespace Enemy
         float lastNoiseRefreshTime = float.NegativeInfinity;
         float nextContinuousNoiseTime;
 
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void EmitSoundServerRpc(int soundIndex = 0, bool singleLure = false)
+        public void EmitSoundServer(int soundIndex = 0, bool singleLure = false)
         {
+            if (!IsServer) return;
             if (!soundEmitor) soundEmitor = transform;
 
             if (source != null && clip != null && soundIndex >= 0 && soundIndex < clip.Count)
@@ -94,7 +94,7 @@ namespace Enemy
             }
         }
 
-        [Rpc(SendTo.Everyone)]
+        [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
         private void EmitSoundClientRpc(int soundIndex)
         {
             if (IsServer || source == null || clip == null || soundIndex < 0 || soundIndex >= clip.Count) return;

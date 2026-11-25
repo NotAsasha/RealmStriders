@@ -242,6 +242,10 @@ namespace Player
 
         public bool IsActiveItem(Item item) => item != null && GetActiveItem() == item;
 
+        internal bool CanUseHeldEquipment => human != null && human.IsSpawned && !human.IsDead() &&
+            !human.IsBeingCaptured && !human.IsEffectActive(EffectType.Freeze) &&
+            !human.IsEffectActive(EffectType.Asleep);
+
         public void ForgetItemServer(Item item)
         {
             if (!IsServer || item == null || slotIds == null) return;

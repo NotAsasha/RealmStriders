@@ -13,6 +13,7 @@ namespace Player
         public CharacterController characterController;
         public AudioSource source;
         private PlayerMovement playerMovement;
+        private Rigidbody[] ragdollBodies;
         [SerializeField] private UI.PortalClosedNotice portalClosedNotice;
 
         public void KillForMissionEnd(bool timeExpired)
@@ -42,6 +43,7 @@ namespace Player
             animator = GetComponent<Animator>();
             characterController = GetComponent<CharacterController>();
             playerMovement = GetComponent<PlayerMovement>();
+            ragdollBodies = animator.GetBoneTransform(HumanBodyBones.Hips).GetComponentsInChildren<Rigidbody>();
             ToggleRagdoll(false);
 
             ToSpawnPoint();
@@ -115,6 +117,7 @@ namespace Player
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
         public void TakeDamageRpc(float damage)
         {
+            if (isDead.Value || !(damage > 0f) || float.IsInfinity(damage)) return;
             AddHealth(-damage);
         }
 
@@ -123,19 +126,16 @@ namespace Player
             StatusVisuals?.OnDeath();
             ToggleRagdoll(true);
             PlayDeathSound();
-            if (IsOwner)
-            {
-                GameManager.Instance.OnPlayerDeathServerRpc();
-            }
+            if (IsServer && GameManager.Instance != null) GameManager.Instance.CheckForTeamWipeServer();
         }
         override protected void ReviveEntity()
         {
             Debug.Log($"---Human: Reviving myself");
+            ToggleRagdoll(false);
             if (IsOwner)
             {
                 ToSpawnPoint();
             }
-            ToggleRagdoll(false);
             StatusVisuals?.SetDead(false);
         }
 
@@ -148,15 +148,23 @@ namespace Player
         {
             if (IsOwner)
             {
-                PlayerMovement.Instance.enabled = !isActive;
+                playerMovement.enabled = !isActive;
                 if (isActive)
-                    PlayerMovement.Instance.SwitchToInteractionControls();
+                    playerMovement.SwitchToInteractionControls();
                 else
-                    PlayerMovement.Instance.SwitchToGameplayControls();
+                    playerMovement.SwitchToGameplayControls();
             }
             animator.enabled = !isActive;
             characterController.enabled = !isActive;
-            Debug.Log($"---Human: Toggled ragdoll: {isActive}");
+
+            // The animated bones overlap the live character capsule.
+            foreach (var body in ragdollBodies)
+            {
+                body.isKinematic = !isActive;
+                body.detectCollisions = isActive;
+                if (isActive)
+                    body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            }
         }
 
         private void PlayDeathSound()

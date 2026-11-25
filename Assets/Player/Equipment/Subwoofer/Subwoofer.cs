@@ -61,14 +61,15 @@ namespace Player.Equipment.Subwoofer
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        private void SwitchStateServerRpc()
+        private void SwitchStateServerRpc(RpcParams rpc = default)
         {
+            if (!TryGetUsableHolderServer(rpc.Receive.SenderClientId, out _)) return;
             isOn.Value = !isOn.Value;
         }
 
         public override void TurnOffServer()
         {
-            if (isOn.Value)
+            if (IsServer && isOn.Value)
             {
                 isOn.Value = false;
             }
@@ -76,7 +77,7 @@ namespace Player.Equipment.Subwoofer
 
         private void Update()
         {
-            if (!IsServer) return;
+            if (!IsServer || !IsSpawned) return;
 
             bool auraActive = isOn.Value && (!isCurrentlyHeld || IsEquipped);
             if (auraActive) soundProducer?.StartContinuousNoise();
@@ -111,7 +112,7 @@ namespace Player.Equipment.Subwoofer
                 if (col == null) continue;
 
                 var enemy = col.GetComponentInParent<Entity>();
-                if (enemy == null || enemy.isDead.Value || !affectedEntitiesInTick.Add(enemy)) continue;
+                if (enemy == null || !enemy.IsSpawned || enemy.isDead.Value || !affectedEntitiesInTick.Add(enemy)) continue;
 
                 // Slot 0: Subwoofer owns this weakness layer.
                 enemy.ApplyWeakStack(1, 2f, slot: 0);

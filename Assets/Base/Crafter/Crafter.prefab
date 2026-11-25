@@ -684,7 +684,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1358605849
+  GlobalObjectIdHash: 858331478
   InScenePlacedSourceGlobalObjectIdHash: 858331478
   DeferredDespawnTick: 0
   Ownership: 1
@@ -710,6 +710,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Base.Crafting.Crafter
   ShowTopMostFoldoutHeaderGroup: 1
+  TubeAudio: {fileID: 4044576340502797429}
+  TubeParticle: {fileID: 6260940746871885971}
   recipes:
   - firstInput: {fileID: 464452778466763374, guid: 252081321d2dabb448471f25b38bbe31,
       type: 3}
@@ -746,6 +748,13 @@ MonoBehaviour:
     output: {fileID: 9192015305699896306, guid: 3c83141112ed7334994c7c56d1eb8deb,
       type: 3}
     craftText: Calibrates teleporter to the base location
+  - firstInput: {fileID: 266472199676907412, guid: 76b91dba47771244d9bb6688dc58ba7e,
+      type: 3}
+    secondInput: {fileID: 5512341275959933783, guid: fc52f54fcc9527943b93bb0c425bda33,
+      type: 3}
+    output: {fileID: 1895620215723440900, guid: 4019e301b037bce4ebac17f4829abe12,
+      type: 3}
+    craftText: Increases battery capacity to 400%
   craftDuration: 3
   outputSpawnPoint: {fileID: 2409705442975202365}
   leftIndicator: {fileID: 2633866658836807957}
@@ -759,8 +768,6 @@ MonoBehaviour:
   doorAnimationDuration: 0.2
   craftNoiseAudio: {fileID: 5755058181628671351}
   itemDetectedAudio: {fileID: 3274961134189715561}
-  tubeAudio: {fileID: 4044576340502797429}
-  tubeParticle: {fileID: 6260940746871885971}
   recipePreviewText: {fileID: 8658004316570450446}
   recipeStatusText: {fileID: 6595295012354799910}
   socketValidationInterval: 0.1

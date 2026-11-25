@@ -18,6 +18,7 @@ namespace Player.Equipment.Taser
 
         [Header("References & Layers")]
         [SerializeField] private LayerMask entityLayer;
+        [SerializeField] private LayerMask wallLayer = 1;
         [SerializeField] private TMP_Text danger;
         [SerializeField] private AudioSource sound;
         [SerializeField] private ParticleSystem particle;
@@ -29,11 +30,14 @@ namespace Player.Equipment.Taser
             NetworkVariableWritePermission.Server
         );
 
-        private float nextFireTime;
+        private float nextLocalFireTime;
+        private float nextServerFireTime;
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            nextLocalFireTime = 0f;
+            nextServerFireTime = 0f;
             chargePercent.OnValueChanged += ScreenUpdate;
             UpdateScreen(chargePercent.Value);
         }
@@ -74,70 +78,53 @@ namespace Player.Equipment.Taser
 
         #region Item Actions
 
-        override protected void ExecuteItemAction(GameObject player)
+        protected override void ExecuteItemAction(GameObject player)
         {
-            if (Time.time < nextFireTime || chargePercent.Value < shotCost) return;
-            nextFireTime = Time.time + cooldown;
+            if (!IsClient || !IsSpawned || Time.time < nextLocalFireTime || CurrentCharge < shotCost) return;
 
-            // 1. МОМЕНТАЛЬНИЙ ВІДГУК: локальний гравець бачить і чує постріл без затримки пінгу
+            var camera = CameraMovement.Instance;
+            if (camera == null) return;
+
+            nextLocalFireTime = Time.time + cooldown;
             PlayShootEffects();
-
-            Transform cam = CameraMovement.Instance.transform;
-
-            if (Physics.Raycast(cam.position, cam.forward, out RaycastHit hit, maxDistance, entityLayer))
-            {
-                if (hit.transform.TryGetComponent<NetworkObject>(out var netObj))
-                {
-                    HitEntityServerRpc(netObj);
-                    return;
-                }
-            }
-
-            MissServerRpc();
+            FireServerRpc(camera.transform.position, camera.transform.forward);
         }
 
         [Rpc(SendTo.Server)]
-        private void HitEntityServerRpc(NetworkObjectReference targetRef, RpcParams rpcParams = default)
+        private void FireServerRpc(Vector3 origin, Vector3 forward, RpcParams rpc = default)
         {
-            if (chargePercent.Value < shotCost) return;
-            soundProducer?.EmitSoundServerRpc();
+            ulong sender = rpc.Receive.SenderClientId;
+            if (!TryGetUsableHolderServer(sender, out var holder) ||
+                Time.time < nextServerFireTime || CurrentCharge < shotCost ||
+                !IsValidAim(holder, origin, forward, wallLayer)) return;
 
-            if (targetRef.TryGet(out NetworkObject targetNetObj) &&
-                targetNetObj.TryGetComponent<Entity>(out var entity))
+            nextServerFireTime = Time.time + cooldown;
+            ((IChargeable)this).ModifyCharge(-shotCost);
+            UpdateRemoteHeldPose();
+            soundProducer?.EmitSoundServer();
+
+            if (Physics.Raycast(origin, forward, out RaycastHit hit, maxDistance, entityLayer) &&
+                !hit.transform.IsChildOf(holder.transform) &&
+                !Physics.Linecast(origin, hit.point, wallLayer, QueryTriggerInteraction.Ignore))
             {
-                float distSqr = (transform.position - entity.transform.position).sqrMagnitude;
-                if (distSqr <= (maxDistance * 1.5f) * (maxDistance * 1.5f))
+                var entity = hit.collider.GetComponentInParent<Entity>();
+                if (entity != null && entity.IsSpawned)
                 {
-                    ((IChargeable)this).ModifyCharge(-shotCost);
-                    entity.ApplyEffectServerRpc(EffectType.Freeze, freezeTime);
-
-                    // Combo: Taser + Water = weakness stack (slot 3).
+                    entity.ApplyEffect(EffectType.Freeze, freezeTime);
                     if (entity.IsEffectActive(EffectType.Water))
                     {
                         entity.ApplyWeakStack(1, comboWeakDuration, slot: 3);
                     }
-
-                    // Транслюємо ефекти іншим клієнтам, виключаючи відправника
-                    BroadcastShootFxClientRpc(rpcParams.Receive.SenderClientId);
                 }
             }
+
+            BroadcastShootFxClientRpc(sender);
         }
 
-        [Rpc(SendTo.Server)]
-        private void MissServerRpc(RpcParams rpcParams = default)
-        {
-            if (chargePercent.Value < shotCost) return;
-            soundProducer?.EmitSoundServerRpc();
-
-            ((IChargeable)this).ModifyCharge(-shotCost);
-
-            BroadcastShootFxClientRpc(rpcParams.Receive.SenderClientId);
-        }
-
-        [Rpc(SendTo.ClientsAndHost)]
+        [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
         private void BroadcastShootFxClientRpc(ulong senderClientId)
         {
-            if (NetworkManager.Singleton.LocalClientId == senderClientId) return;
+            if (NetworkManager.LocalClientId == senderClientId) return;
 
             PlayShootEffects();
         }

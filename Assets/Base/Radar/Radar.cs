@@ -180,10 +180,15 @@ namespace Base.Radar
                    currentInteractingClientId.Value == NetworkManager.Singleton.LocalClientId;
         }
 
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Server)]
         public void SpawnBeamServerRpc()
         {
-            if (!isPowered || powerGrid == null || powerGrid.IsGridOverloaded.Value) return;
+            // Called by the physical radar button after its server-side interaction check.
+            if (!IsServer || !IsSpawned || !IsTerminalBought ||
+                (BaseManager.Instance.baseUpgrades.Value & (int)BaseUpgrades.IsBeamBought) == 0 ||
+                !isPowered || powerGrid == null || powerGrid.IsGridOverloaded.Value || beamPrefab == null) return;
+
+            if (beam != null && beam.IsSpawned) beam.Despawn();
 
             powerGrid.ConsumeInstantChargeServer(shotCost);
 
@@ -197,7 +202,7 @@ namespace Base.Radar
             OnBeamFiredClientRpc();
         }
 
-        [Rpc(SendTo.ClientsAndHost)]
+        [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
         private void OnBeamFiredClientRpc()
         {
             if (beamAlarmSource != null && strikeAlarmClip != null)
@@ -280,8 +285,12 @@ namespace Base.Radar
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        private void UpdateCrosshairServerRpc(Vector2 pos)
+        private void UpdateCrosshairServerRpc(Vector2 pos, RpcParams rpc = default)
         {
+            if (!IsOperatedByServer(rpc.Receive.SenderClientId) || !IsTerminalBought || !isPowered ||
+                !float.IsFinite(pos.x) || !float.IsFinite(pos.y) ||
+                Mathf.Abs(pos.x) > border.x || Mathf.Abs(pos.y) > border.y) return;
+
             syncedCrosshairPos.Value = pos;
             if (crosshair != null)
             {

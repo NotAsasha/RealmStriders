@@ -62,12 +62,7 @@ namespace Base.Crafting
                 NetworkSaveables database = NetworkItemsHandler.Instance != null
                     ? NetworkItemsHandler.Instance.database
                     : null;
-                if (database == null || database.prefabs == null ||
-                    item.PrefabId < 0 || item.PrefabId >= database.prefabs.Count)
-                    return false;
-
-                networkObject = database.prefabs[item.PrefabId];
-                if (networkObject == null)
+                if (database == null || !database.TryGetPrefab(item.PrefabId, out networkObject))
                     return false;
             }
 

@@ -30,11 +30,11 @@ namespace Scenes
         {
             if (!TryGetComponent<AudioSource>(out sound)) throw new Exception("There is no AudioSource to play.");
 
-            timeEffects.weight = 0;
-            defaultEffects.weight = 0;
+            if (timeEffects != null) timeEffects.weight = 0;
+            if (defaultEffects != null) defaultEffects.weight = 0;
             foreach (AudioSource source in sceneAudios)
             {
-                source.volume = 0;
+                if (source != null) source.volume = 0;
             }
 
             defaultTime = GameManager.Instance.defaultMissionTime + GameManager.Instance.maxTimeSpread;
@@ -54,7 +54,7 @@ namespace Scenes
 
         private void UpdateEffects()
         {
-            float timeStrength = GetEffectStrength(GameManager.Instance.missionDuration, defaultTime);
+            float timeStrength = GetEffectStrength(GameManager.Instance.MissionSecondsRemaining, defaultTime);
 
 
             if (timeEffects != null)
@@ -93,11 +93,11 @@ namespace Scenes
                 //Debug.Log(playerPresenceWeight);
 
 
-                defaultEffects.weight = playerPresenceWeight;
+                if (defaultEffects != null) defaultEffects.weight = playerPresenceWeight;
 
                 foreach (AudioSource source in sceneAudios)
                 {
-                    source.volume = playerPresenceWeight;
+                    if (source != null) source.volume = playerPresenceWeight;
                 }
 
                 yield return null;

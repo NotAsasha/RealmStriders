@@ -78,14 +78,14 @@ namespace Player.Equipment.Flashbang
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void ExplodeServerRpc(RpcParams rpcParams = default)
         {
-            if (!IsServer || !IsHeldByClient(rpcParams.Receive.SenderClientId) || !isActiveAndEnabled ||
+            if (!TryGetUsableHolderServer(rpcParams.Receive.SenderClientId, out _) ||
                 CurrentCharge < UseCost || Time.time < nextUseTime) return;
 
             nextUseTime = Time.time + expandDuration + fadeDuration;
             ((IChargeable)this).ModifyCharge(-UseCost);
             UpdateRemoteHeldPose();
             Vector3 origin = transform.position;
-            soundProducer?.EmitSoundServerRpc();
+            soundProducer?.EmitSoundServer();
 
             affectedEnemies.Clear();
             Collider[] hits = Physics.OverlapSphere(origin, effectRadius, entityLayer, QueryTriggerInteraction.Collide);

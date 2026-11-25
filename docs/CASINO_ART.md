@@ -2,15 +2,14 @@
 
 ## Visual direction
 
-Preserve the owner's revised BigRoom1/roulette salon as the reference: ivory
-walls, dark ceilings, petrol wainscot tiles, restrained brass, burgundy drapes,
-framed paintings and metric diamond carpets. Lighting follows warm 1990s Las
-Vegas: golden chandeliers/amber sconces, with turquoise on the western lower
-branch and rose on the eastern branch. Visible emission follows fixture color.
+Use the BigRoom1 roulette salon as the visual reference. It pairs ivory walls
+and dark ceilings with petrol wainscot tiles, brass, burgundy drapes, framed
+paintings and metric diamond carpets. Golden chandeliers and amber sconces
+give it a warm 1990s Las Vegas palette. The western lower branch uses turquoise
+and the eastern branch uses rose. Match visible emission to each fixture.
 
-Preserve the authored furniture, curtains, paintings and gameplay-object
-placements. Do not restore removed cashier/signage/floating-light layouts from
-old setup scripts or snapshots.
+Preserve the authored placements of furniture, curtains, paintings and gameplay
+objects.
 
 ## Assets and pivots
 
@@ -24,7 +23,7 @@ Reusable models, materials, textures and prefabs live under
 | Cornice tiles | Centered pivot; 1.5 m along local X; keep sections independently editable |
 | Diamond carpets | Centered, unit scale; metric UVs repeat the motif every 1.2 m |
 | `VegasLighting/Casino_OrnateWallLamp.prefab` | Wall-mount-center pivot, identity root, geometry toward local +Z |
-| `VegasLighting/Models/CasinoWallLamp_Restored.fbx` | Preserve the owner's silhouette, UVs and three material slots |
+| [Restored wall lamp](../Assets/Scenes/Casino/LastWager/Models/CasinoWallLamp_Restored.fbx) | Preserve its silhouette, UVs and three material slots |
 
 Carpet borders use non-overlapping mesh strips. Create a mesh of the required
 size instead of nonuniform Transform scale, which stretches motif density.
@@ -37,7 +36,7 @@ slot order. Preserve asset GUIDs when revising exports.
 Static fixtures use Baked lighting. The original salon and two main gallery
 chandeliers use Mixed lighting with Shadowmask in
 `VegasLighting/Casino_Vegas_Baked.lighting`. Keep lights attached to visible
-fixtures; removed strip-light components must not be recreated automatically.
+fixtures.
 
 Passage modules `SimpleCorridor1`, `SimpleTurn1` and `SimpleThreeway` use dimmer
 wall lights (Intensity 0.44; the stronger Threeway fixture uses 0.5) to contrast
@@ -49,37 +48,23 @@ sparingly in the scene; the other fixtures retain baked lighting. Their
 `MissionLightFlicker` has explicit Light, Renderer and emissive material-slot
 references. Dedicated `_Flicker` materials retain the fixture color but exclude
 emission from baked GI. Rebake lighting/APV after changing variant placement.
-The server chooses independent random bursts per lamp. Quiet intervals are
-4–9 seconds initially. A spatial AudioSource plays LampFlicker once per burst.
-The countdown accelerates smoothly toward an
-8x rate as the mission runs out. Each 0.35–1.1 second burst dims both direct
-light and visible emission, using a shared seed and server timestamp on clients.
-Mission end, disable and despawn restore the authored brightness. Late joiners
-receive future bursts; no past cosmetic events are replayed.
-Tune the component in the Inspector. `Tools > Casino > Configure Mission Light
-Flicker` reapplies the authored selection while retaining room art overrides;
-it requires Casino open outside Play Mode and must be followed by a rebake.
+Tune burst timing, intensity and the spatial LampFlicker source in the Inspector.
+With Casino open outside Play Mode, `Tools > Casino > Configure Mission Light
+Flicker` reapplies the authored selection while retaining room art overrides.
+Rebake after running it.
 `Tools > Casino > Validate Mission Light Flicker` checks scene identities,
 configured references, pulse brightness/emission and disable/despawn recovery
 using isolated prefab contents. Also test with a host and client through Steam.
 
 Static shells/decoration need valid lightmap UVs. Moving gate pieces and EyePlant
 use APV. Exclude empty imported meshes from GI. After geometry or light changes,
-rebake the affected lighting/APV and verify after save/reopen; previous bake
-counts and reports are not acceptance criteria for a new layout.
+rebake the affected lighting/APV and verify after saving and reopening the scene.
 
-Decoration has no active colliders and is excluded from NavMesh builds. Preserve
-existing collision and navigation; adding a real obstacle requires reviewing
-navigation separately. Acoustic geometry follows [Steam Audio](STEAM_AUDIO.md#геометрія-та-повторне-запікання),
-which excludes decorative meshes and furniture.
+Keep decoration outside collision and NavMesh builds. Review navigation when
+adding an obstacle. Follow the [acoustic export workflow](STEAM_AUDIO.md#геометрія-та-повторне-запікання).
 
 ## Validation
 
 Check material assignments, pivots, carpet density/overlap, fixture alignment,
 lightmap/APV validity, door/stair clearance and existing gameplay references.
 Inspect both floor levels in Game View and profile on target hardware.
-
-Tune the authored scene/prefabs in the Inspector. Local historical Casino art
-construction scripts are not runtime generators: rerunning creation stages on
-an authored scene can duplicate content or overwrite owner edits. Old fixed
-object-count and placement checks do not describe the current room.

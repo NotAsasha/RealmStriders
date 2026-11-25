@@ -9,12 +9,14 @@ namespace FileSystem.Scripts
         [Header("TestGameFile Info")]
         
         public int buttonPresses = 0;
-        public override void ProcessData(string inputData)
+        protected override Action PrepareData(string inputData)
         {
-            if (inputData == null || inputData.Length == 0) { buttonPresses = 0; return; }
-            Debug.Log($"---{nameof(TestGameFile)}: {inputData} {GetFullPath()}");
-            buttonPresses = Convert.ToInt32(inputData);
+            if (!int.TryParse(inputData, out int loaded))
+                throw new System.IO.InvalidDataException("Expected an integer.");
+            return () => buttonPresses = loaded;
         }
+
+        protected override void ResetData() => buttonPresses = 0;
         public override string GetData()
         {
             Debug.Log($"GetData -- buttonPresses:" + buttonPresses + GetFullPath());

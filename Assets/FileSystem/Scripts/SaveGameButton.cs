@@ -6,6 +6,7 @@ using UnityEngine.Events;
 public class SaveGameButton : NetworkBehaviour
 {
     public static event Action<bool> SaveCompleted;
+    public static void NotifySaveCompleted(bool succeeded) => SaveCompleted?.Invoke(succeeded);
 
     [SerializeField] private UnityEvent<bool> onSaveResult;
 
@@ -42,6 +43,6 @@ public class SaveGameButton : NetworkBehaviour
     private void NotifyResult(bool succeeded)
     {
         onSaveResult?.Invoke(succeeded);
-        SaveCompleted?.Invoke(succeeded);
+        NotifySaveCompleted(succeeded);
     }
 }

@@ -200,7 +200,7 @@ namespace Player
             NetworkObject.Despawn(true);
         }
 
-        [Rpc(SendTo.Everyone)]
+        [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
         private void PlayCaptureSequenceRpc(Vector3 collapsePoint, double serverStartTime)
         {
             StopShockSound(force: true);
@@ -210,12 +210,6 @@ namespace Player
 
 
         #region Effects
-
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void ApplyEffectServerRpc(EffectType type, float seconds)
-        {
-            ApplyEffect(type, seconds);
-        }
 
         public void ApplyEffect(EffectType type, float seconds)
         {
@@ -263,12 +257,6 @@ namespace Player
         /// Adds <paramref name="stacks"/> weakness levels for <paramref name="duration"/> seconds.
         /// Each slot is identified by a key so the same source refreshes rather than double-stacks.
         /// </summary>
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void ApplyWeakStackServerRpc(int stacks, float duration, int slot)
-        {
-            ApplyWeakStack(stacks, duration, slot);
-        }
-
         public void ApplyWeakStack(int stacks, float duration, int slot)
         {
             if (!IsServer || isDead.Value || IsBeingCaptured) return;
@@ -421,17 +409,11 @@ namespace Player
             ApplyEffect(EffectType.Freeze, seconds);
         }
 
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void ApplyShockServerRpc(float seconds)
-        {
-            ApplyEffect(EffectType.Freeze, seconds);
-        }
-
         /// <summary>
         /// Plays the electric shock sound on this entity across all clients.
         /// </summary>
-        [Rpc(SendTo.Everyone)]
-        public void PlayShockSoundRpc()
+        [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
+        private void PlayShockSoundRpc()
         {
             PlayShockSound();
         }

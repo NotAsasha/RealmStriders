@@ -94,8 +94,6 @@ namespace Base.SlotMachine
             // 5. Загальний кінцевий кут = поточний кут + повні оберти + докручування до точного сектора
             float totalTargetAngleY = startAngleY + (360f * fullSpins) + forwardDelta;
 
-            float previousAngleY = startAngleY;
-
             while (elapsedTime < spinLength)
             {
                 elapsedTime += Time.deltaTime;
@@ -104,14 +102,8 @@ namespace Base.SlotMachine
 
                 float currentAngleY = Mathf.Lerp(startAngleY, totalTargetAngleY, curveValue);
 
-                if (IsClient && spinPresentation != null && Time.deltaTime > 0f)
-                {
-                    float rotationsPerSecond = (currentAngleY - previousAngleY) / (360f * Time.deltaTime);
-                    spinPresentation.SetDrumSpeed(rotationsPerSecond);
-                }
-                previousAngleY = currentAngleY;
-
                 spinObject.localRotation = Quaternion.Euler(0f, currentAngleY, 0f);
+                if (IsClient && spinPresentation != null) spinPresentation.UpdateDrumClicks(elapsedTime, progress);
 
                 yield return null;
             }
@@ -165,10 +157,10 @@ namespace Base.SlotMachine
             Debug.Log($"---SlotMachine: Won random item - {spawnedItem.name}!");
         }
 
-        [Rpc(SendTo.Everyone)]
+        [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
         public void TurnIntoMonsterRpc()
         {
-            DeactivateRpc();
+            if (IsServer) DeactivateServer();
             Debug.Log("---SlotMachine: Main prize - MIMIC!");
         }
     }

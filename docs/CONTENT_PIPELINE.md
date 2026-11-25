@@ -1,14 +1,11 @@
 # Content Pipeline
 
-Read the relevant [design](GAME_DESIGN.md), [systems](SYSTEMS.md) and local
-`AGENTS.md` before authoring. Use Unity MCP for scenes, prefabs and serialized
-data. Keep assets paired with their `.meta` files.
+Follow the [design](GAME_DESIGN.md) and [development conventions](CONVENTIONS.md).
 
 ## Monsters
 
 1. Define role, danger, detection, attacks, equipment counterplay and failure
-   cases in [Enemies](ENEMIES.md). Every target must be capturable by LeafBlower;
-   killing is not a mission objective.
+   cases in [Enemies](ENEMIES.md).
 2. Reuse shared enemy abstractions and implement specialized behaviour in the
    monster's folder. Identify stackable weaknesses and server-owned state.
 3. Configure the prefab, navigation, animation, effects and separate step/vocal
@@ -24,20 +21,19 @@ data. Keep assets paired with their `.meta` files.
 
 1. Define whether it captures, weakens, detects or supports, and which enemies
    it affects. Reuse existing item/equipment interfaces.
-2. Validate requests on the server before applying gameplay effects. Configure
-   the network prefab and saveable registration where applicable.
+2. Register the network prefab and follow the [network authority rules](NETWORKING.md).
 3. Assign visuals, effects and the `Item.icon` inventory sprite. If `clickSounds`
    is populated, assign an enabled AudioSource on the Item root with Play On
    Awake disabled; a child source does not supply Item's default use click.
-4. Set GripPoint at the physical handle, then author held poses and root-space
-   `heldCameraBounds` from physical meshes, excluding effect volumes. Assign
-   all inventory presentation arrays, including children. Never hide a network
-   root with `SetActive(false)`. See [Held items](HELD_ITEMS.md).
-5. Test stacking/capture timing, charge if applicable, pickup/selection/drop,
-   stored presentation, death, late joining and mission return/cleanup.
+4. Follow [Held items](HELD_ITEMS.md#authoring) for grip, poses, camera bounds
+   and inventory presentation. For spatial sources, see [Steam Audio](STEAM_AUDIO.md#предмети-та-переносні-ефекти).
+5. Test stacking, capture timing and charge as applicable, then run the
+   [held-item checks](HELD_ITEMS.md#verification).
 
-Preserve existing `NetworkSaveables` registry indices: save files use them as
-prefab IDs. New variants need distinct registered identities.
+Assign every registered saveable prefab, including each variant, a unique
+`Prefab Id` on its Item or Terminal component. Keep existing IDs when reordering
+the `NetworkSaveables` list and reserve retired IDs so old slots can never load a
+different prefab for the same ID.
 
 ## Shop previews
 
@@ -75,8 +71,7 @@ output spawn and consistent host/client preview/effects.
 4. Test capture/return, early closure, timer expiry, team death and disconnects,
    including both returned and unreturned held/stored items.
 5. For acoustic geometry, probes and rebaking follow
-   [Steam Audio](STEAM_AUDIO.md#геометрія-та-повторне-запікання). Review only
-   structural meshes; decor/furniture stay outside the acoustic export.
+   [Steam Audio](STEAM_AUDIO.md#геометрія-та-повторне-запікання).
 6. Casino art changes also follow [Casino art](CASINO_ART.md).
 
 ## Tutorial ceiling clock
@@ -92,15 +87,12 @@ chunky geometry and matte solid colors that fit the Tutorial's existing lamps
 and painterly rendering. Floating arc fragments have separate centers and tilted
 planes; the clock uses no texture maps.
 
-`ArtSource/CeilingClockDetails.blend` contains the additive
-`CeilingClock_Details` collection. Export only its three meshes with their existing
-names and `Clock_*` material slots to `CeilingClockDetails.fbx`; keep the original
-housing FBX separate. **Tools → Tutorial → Install Ceiling Clock Details** installs
-the exported `tools/CeilingClockDetails.fbx` when present, otherwise uses the
-versioned model. It restores the shipped materials, hand poses and motion defaults
-on the open Tutorial clock. Save the scene after using it. The generation script
-in `ArtSource/` expects the original housing scene without the detail collection;
-run it with its source file path as Python's `__file__`.
+Keep `Assets/Scenes/Tutorial/CeilingClockDetails.fbx` separate from the original
+housing FBX and preserve its mesh names and `Clock_*` material slots on export.
+With Tutorial open outside Play Mode, **Tools → Tutorial → Install Ceiling Clock
+Details** restores the shipped materials, poses and motion defaults. It uses the
+versioned model or imports a replacement from `tools/CeilingClockDetails.fbx` if
+present. Save the scene after running it.
 
 ## Shared Field and Menu environment
 
@@ -152,12 +144,6 @@ the current build scenes and authored prefabs use neither feature. If adding a
 Light cookie or a cross-fading LODGroup, enable its support in the relevant URP
 assets before testing a player build. Keep APV support and its baking sets intact.
 
-Check the Editor log's **After scriptable stripping** count for each shader pass
-before judging build-time changes. The remaining variants are the actual work;
-the full theoretical variant space is not the number compiled. A first build
-after shader settings change can miss the cache; preserve the cache for later
-builds. Compare variant counts and elapsed time separately.
-
 ### Desktop light limit
 
 `Packages/com.unity.render-pipelines.universal-config` is an embedded copy of
@@ -172,13 +158,8 @@ scenes when changing it. Restart the Editor after changing this configuration.
 Embedded package sources are versioned and do not update automatically with
 Unity/URP. On upgrades, compare the new upstream config package, retain its
 metadata, reapply the desktop cap and verify both C# and generated HLSL values.
-The change reduces compilation cost per variant; it does not guarantee fewer
-variants or a specific build-time improvement. Compare builds in the Editor log
-without deleting the shader cache.
 
-Keep `Library` excluded from VS Code file watching (`files.watcherExclude`).
-Open directory handles can prevent Package Manager from replacing cached packages
-on Windows and leave dependencies unavailable until package resolution succeeds.
+### Variant collection and validation
 
 When retiring a renderer effect, remove its unused material/shader references
 or remove the renderer feature. Disabling execution alone can leave shader
@@ -203,9 +184,4 @@ target graphics API, with the Profiler checking `Shader.CreateGPUProgram` and
 Shader variant warmup reduces first-use compilation; on DX12, Vulkan and Metal,
 exact vertex layouts/render states can still require additional PSOs. Trace and
 warm a representative GraphicsStateCollection on target hardware if profiling
-shows remaining shader stalls. Shader warmup does not address asset loading,
-garbage collection or other sources of stutter.
-
-Content is complete when implementation, authored references, authority,
-player-facing counterplay and documentation agree. Record any remaining design
-or implementation gap explicitly.
+shows remaining shader stalls.

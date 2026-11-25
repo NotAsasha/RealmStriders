@@ -4,7 +4,7 @@ using TMPro;
 public class GameSavedText : MonoBehaviour
 {
     [SerializeField] private TMP_Text text;
-    [SerializeField] Animator animator;
+    [SerializeField] private Animator animator;
 
     private void Awake()
     {
@@ -14,14 +14,19 @@ public class GameSavedText : MonoBehaviour
         }
     }
 
-    void Start()
+    private void OnEnable()
     {
         SaveGameButton.SaveCompleted += GameSavedAnimation;
     }
 
+    private void OnDisable()
+    {
+        SaveGameButton.SaveCompleted -= GameSavedAnimation;
+    }
+
     private void GameSavedAnimation(bool isSaved)
     {
-        text.text = isSaved ? "saved" : "Cannot save, mission in progress.";
+        text.text = isSaved ? "Game saved." : "Game could not be saved.";
         animator.SetTrigger("SaveTriggered");
     }
 }

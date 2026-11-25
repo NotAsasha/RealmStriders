@@ -1,25 +1,22 @@
-# Persistence Development Guidance
+# Persistence
 
-Read the root `AGENTS.md` and `docs/SYSTEMS.md` before changing save/load
-code.
+- [GameFile](Scripts/GameFile.cs) reads and writes files, validates candidate
+  data and recovers backups. [GameFileHandler](Scripts/GameFileHandler.cs)
+  loads the configured files at startup.
+- [SaveFile](Scripts/SaveFile.cs) owns the versioned campaign snapshot.
+  [SettingsFile](Scripts/SettingsFile.cs) owns local preferences.
+- [NetworkSaveables](Scripts/NetworkSaveables.cs) maps stable prefab IDs.
+  [NetworkItemsHandler](Scripts/NetworkItemsHandler.cs) restores live objects
+  and remembers which authored furniture was packed. Keep IDs stable when
+  reordering the registry. Restoring a moved station must create exactly one
+  replacement.
+- [SaveGameButton](Scripts/SaveGameButton.cs) allows manual saves at the base
+  after cleanup. [LoadSaveButton](Scripts/LoadSaveButton.cs) displays the state
+  of its assigned slot. The host writes campaign progress after mission resolution.
 
-## Important entry points
-
-- `Scripts/GameFile.cs` — file abstraction and serialization contract.
-- `Scripts/GameFileHandler.cs` — file discovery and load/delete orchestration.
-- `Scripts/SaveFile.cs` — game progression save data.
-- `Scripts/SaveGameButton.cs` and `Scripts/LoadSaveButton.cs` — manual
-  save/load UI entry points.
-- `Scripts/NetworkSaveables.cs` — networked saveable objects.
-
-- Keep persistent progression separate from transient mission state unless the
-  design explicitly says otherwise.
-- Do not persist an `EnemyCage` until the team has successfully returned to
-  the base and the result has been accepted.
-- Items left in the mission zone are destroyed when the mission ends; items
-  brought into the base remain available.
-- Save automatically after mission completion; allow manual saves only when
-  no mission is active.
-- Preserve existing file discovery, load, and delete behaviour.
-- Handle missing or invalid files explicitly and keep user-visible failures
-  diagnosable.
+Exercise format changes with a new slot, an older supported file, and a damaged
+primary with a valid backup. Use temporary slots. Verify recovery and that a
+newer-format slot survives an attempted write. For item changes, reload a
+base once with a packed station, then again after placing it. Check the cube
+or replacement and its original spot on each reload.
+See [Systems](../../docs/SYSTEMS.md#persistence-and-settings).

@@ -1,18 +1,16 @@
 # Game Design
 
-This is the current design reference, after explicit owner decisions.
-Implementation details are documented in [Systems](SYSTEMS.md); code that
-disagrees with these confirmed rules is an implementation gap.
+Game Design records owner-confirmed gameplay intent. The gameplay reference
+also lists current controls and content. See [Systems](SYSTEMS.md) for
+implementation details and gaps.
 
 ## High concept
 
-Realm Striders is a cooperative monster-hunting game. A team prepares on a
-shared base, enters a mission world, finds and handles monsters with
-specialized equipment, and returns to the base to spend the rewards.
+Realm Striders is a tactical survival horror game for 1–4 players. The team
+chooses its equipment at a shared base and enters pocket dimensions to hunt
+monsters. Captures fund the next expedition.
 
 ## Narrative premise
-
-**Status: Confirmed design**
 
 In the 2050s, humanity developed devices that create personal pocket
 dimensions. These dimensions can contain dangerous radiation and aggressive
@@ -21,49 +19,39 @@ prevent them from escaping into the surrounding world.
 
 ## World model
 
-**Status: Confirmed design; partially implemented**
-
 Each mission takes place in a bounded pocket dimension with its own visual
-identity and environmental hazards. A mission world is temporary: its scene
-and everything left inside it are removed when the mission ends. The portal
-has a limited safe operating time, which can vary by mission.
+identity and environmental hazards. The portal has a limited safe operating
+time, which can vary by mission. Players can check the remaining time with the
+Dosimeter.
 
 ## Core loop
 
-**Status: Confirmed design; partially implemented**
-
-1. Prepare the team and equipment on the base.
+1. Prepare the team and equipment at the base.
 2. Choose a mission world.
 3. Enter the mission scene.
 4. Locate and identify monsters.
 5. Use equipment and teamwork to capture the monsters.
-6. End the mission from the base, then return to the base state with any cages
-   that were brought there.
+6. Bring the cages back to the base and end the mission there.
 7. Sell the captured `EnemyCage` items, buy equipment, and unlock harder
    content.
 
 ## Mission success and failure
 
-**Status: Confirmed design; known implementation gaps in [Systems](SYSTEMS.md#known-implementation-gaps)**
+A mission may be ended from the base at any time. Success requires capturing
+every target and ending the mission with a living player at the base. A kill
+does not count as a capture. See the [mission lifecycle](SYSTEMS.md#scene-and-mission-lifecycle).
 
-A mission may be ended from the base at any time. It is successful only when
-all target monsters have been captured. Killing monsters is not a gameplay
-objective or an alternative completion outcome.
+A player who dies becomes a spectator until the mission ends. The rest of the
+team can continue. If every player dies, the mission ends automatically and
+the team rating decreases by one.
 
-A player who dies becomes a spectator until the mission ends; the rest of the
-team can continue the mission. If every player dies, the mission ends
-automatically and the team rating decreases by one.
+Each capture produces an `EnemyCage`. If the team does not return to the
+base, the cages and the mission result are lost. Ending the mission removes
+enemies, players and items left in the mission zone. Items and cages brought
+into the base survive cleanup.
 
-Captured enemies produce `EnemyCage` items. If the team does not return to the
-base, the cages and the mission result are lost.
-
-Progress is saved automatically after a mission completes and may also be
-saved manually while no mission is active. Manual saving during an active
-mission is not allowed.
-
-Everything in the mission zone is transient. When the mission ends, enemies,
-players, and items left in the mission zone are destroyed. Items and cages
-that were brought into the base remain safe.
+Progress saves automatically after a mission completes. Manual saving is
+available between missions.
 
 ## Design pillars
 
@@ -78,49 +66,27 @@ that were brought into the base remain safe.
 
 ## Current gameplay concepts
 
-**Status: Mixed**
-
-The entries below combine confirmed design rules with implementation facts.
-Confirmed rules describe intended behaviour; code references describe what is
-implemented today and may still need work.
+This section includes design rules and current content and control details.
 
 - The base contains shared progression and services such as the shop,
   upgrades, power, portals, and mission selection.
-- Missions are loaded as scenes and can spawn a pre-rolled list of enemy
-  danger levels. Mission duration is limited and is exposed by the
-  `Dosimeter`.
-- Players carry equipment from the `Assets/Player/Equipment/` area.
-- `Flashbang` is rechargeable like `Taser`: each activation consumes 50 of
-  its 100 charge, and the item remains when empty. Its indicator is green at
-  100%, yellow at 50–99%, and red below 50%. Each activation repels enemies
-  within 30 m and displays a brief expanding pulse matching that radius.
-- The current inventory implementation has four configurable slots.
-- Held equipment uses the existing full-body character and a single right-hand
-  grip. Separate first-person arms and two-handed poses are outside the current
-  scope. A powered, equipped radio is raised while transmitting voice, then
-  lowered after transmission ends.
-- Enemy behaviour is specialized per monster and built on shared enemy
-  functionality.
+- Held equipment uses a full-body character and a single right-hand grip.
+  See [Held items](HELD_ITEMS.md) for inventory and pose rules.
 - `LeafBlower` is the capture tool. Higher-danger monsters take longer to
-  capture. Other equipment weakens monsters and can be combined; weaknesses
-  stack and reduce the time needed by the `LeafBlower`.
-- There is one shared team rating, not an individual player rating. A
-  successful mission with every target captured gives a fixed increase of one.
-  A mission ending after the whole team dies decreases it by one. The rating
-  unlocks shop items and influences harder enemy rolls.
+  capture. Equipment weaknesses stack and reduce the capture time.
+  See [Enemies](ENEMIES.md#capture-and-counterplay) for equipment interactions.
+- A successful mission increases the shared team rating by one. The rating
+  unlocks shop items and harder enemy rolls.
 - Money is earned by selling captured `EnemyCage` items at the base.
 - Ordinary mission encounters use a rating-scaled threat budget: the same
-  budget can produce fewer strong enemies or a larger mixed group. Existing
-  enemy unlock thresholds remain in effect. Budget generation and authoring
-  settings are described in [Enemies](ENEMIES.md#spawning).
+  budget can produce fewer strong enemies or a larger mixed group.
+  See [Enemies](ENEMIES.md#spawning) for unlock thresholds and budget settings.
 - Shop categories correspond to five stars. Category 1 is available from
-  rating 0; categories 2–5 unlock at ratings 4, 7, 10 and 13, respectively
-  (the first segment of each subsequent star). Existing item grouping and
-  prices are unchanged; the last two categories currently have no stock.
-- After the portal opens, enemies may enter the base. The base is not
-  guaranteed to be safe, and players may intentionally lure enemies there.
-- The game supports networked play through Netcode for GameObjects and a
-  Facepunch Steam transport.
+  rating 0. Categories 2–5 unlock at ratings 4, 7, 10 and 13 respectively,
+  at the first segment of each subsequent star. Category 4 stocks the
+  Portable Charger for 200 credits and the Sprinkler for 125 credits.
+  The Portable Charger holds 200 charge. Category 5 stocks the BaseMover.
+- Once the portal opens, enemies may enter the base. Players can lure them there.
 - In the Casino scene, interacting with the pedestal while holding CasinoCage
   installs it permanently and opens the gate. The cage leaves the inventory
   and cannot be retrieved or sold. Other items do not activate the pedestal.
@@ -133,20 +99,17 @@ implemented today and may still need work.
 
 ## Campaign completion
 
-**Status: Confirmed design; implemented**
-
 At exactly team rating 15, an unfinished campaign offers only the End mission
 in WorldChooser. End contains exactly one Grabar, Runner, LureMan, Shocker,
 CasinoMonster and InvisiMan, with random positions. Completing End requires
 capturing every target and ending the mission with at least one living player
-back at the base. It grants
-the usual +1 rating and permanently marks that save as completed.
+back at the base. It grants the usual +1 rating and permanently marks that
+save as completed.
 
 At ratings below 15 or above 15, ordinary missions are available even if the
 campaign has not been completed. Completed campaigns offer ordinary missions
 at every rating, including 15. Manually raising the rating does not award
-campaign completion. Each save card shows its own completion star; this is not
-an individual player achievement and does not mark a client's other saves.
+campaign completion. Each save card shows the completion star for its own save.
 The base's OverRating display appears after completion and shows total stars
 as rating divided by three, to one decimal place (rating 16 displays 5.3 STARS).
 
@@ -155,9 +118,8 @@ for players and monsters until no rolled target remains alive. Capturing or
 killing the last living target unlocks return travel; killing still does not
 count toward successful mission completion. The upper portal is completely
 hidden while return travel is locked and reappears when it unlocks.
-ReturnTeleporter bypasses this
-portal restriction and retains its ordinary charge and use rules. The mission
-timer is unchanged; unlocking the return route does not add evacuation time.
+ReturnTeleporter bypasses the portal restriction with its ordinary charge and
+use rules. The existing mission timer continues through the unlock.
 
 A team wipe in End loses one rating point, like an ordinary mission. An
 unfinished campaign falling from 15 to 14 offers ordinary locations again,
@@ -165,17 +127,15 @@ allowing the team to earn money and rebuild its rating before retrying End.
 
 ## Tutorial
 
-**Status: Confirmed design; implemented**
-
 The main menu's Tutorial button opens an isolated singleplayer simulation in
 the Tutorial scene. It uses one room whose contents change between five tapes:
 capture a one-star mannequin with LeafBlower, sell its EnemyCage, buy Taser and
 WaterGun, capture an unweakened three-star mannequin, then capture another
 three-star mannequin using WaterGun followed by Taser and LeafBlower.
 
-The difficult-target comparison teaches weakening through equipment combinations,
-not crafting or upgrading LeafBlower. A physical RatingScreen above the mannequin
-shows its effective difficulty in whole stars using the production equipment rules.
+The difficult-target comparison teaches weakening through equipment combinations.
+A physical RatingScreen above the mannequin shows its effective difficulty in
+whole stars using the production equipment rules.
 Taser on a wet target removes one effective star temporarily; the base danger
 rating does not change. The final tape requires both the combo and a capture.
 
@@ -187,11 +147,5 @@ and props beneath the cassette/grain overlay. The first captured cage is retaine
 for the selling tape. F5 repeats the current tape with fresh equipment.
 The last tape returns automatically to Menu with `tutorial completed`, using the
 same notification presentation as `host left the game`. Training credits,
-rating and items never enter campaign saves.
-Mannequins do not attack, and the training selling booth's kill zone is disabled.
-
-## Design decision rule
-
-When gameplay intent is unclear, preserve existing behaviour and record the
-open question in documentation or a task. Do not silently turn an
-implementation detail into a design requirement.
+rating and items stay in the simulation. Mannequins do not attack, and the
+training selling booth's kill zone is disabled.

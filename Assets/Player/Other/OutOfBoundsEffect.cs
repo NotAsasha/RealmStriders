@@ -6,6 +6,7 @@ using System.Collections;
 public class OutOfBoundsEffect : MonoBehaviour
 {
     private Volume volume;
+    private GameManager mission;
 
     private void Awake()
     {
@@ -16,11 +17,13 @@ public class OutOfBoundsEffect : MonoBehaviour
     }
     private void OnEnable()
     {
-        GameManager.Instance.hasStartedMission.OnValueChanged += StartEffect;
+        mission = GameManager.Instance;
+        if (mission != null) mission.hasStartedMission.OnValueChanged += StartEffect;
     }
     private void OnDisable()
     {
-        GameManager.Instance.hasStartedMission.OnValueChanged -= StartEffect;
+        if (mission != null) mission.hasStartedMission.OnValueChanged -= StartEffect;
+        mission = null;
     }
 
     private void StartEffect(bool _, bool val)

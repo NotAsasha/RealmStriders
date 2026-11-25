@@ -12,7 +12,7 @@ namespace Player.Equipment.Dosimeter
         [SerializeField, Min(0f)] private float spinAcceleration = 720f;
         [SerializeField, Min(0f)] private float spinDeceleration = 900f;
 
-        private readonly GameManager gameManager = GameManager.Instance;
+        private int displayedSeconds = -1;
         private float currentSpinSpeed;
 
         NetworkVariable<bool> isOn = new(false, 0, 0);
@@ -44,9 +44,12 @@ namespace Player.Equipment.Dosimeter
         {
             UpdateSpinAnimation();
 
-            if (isOn.Value)
+            if (isOn.Value && GameManager.Instance != null)
             {
-                danger.text = gameManager.missionDuration.ToString();
+                int remaining = GameManager.Instance.MissionSecondsRemaining;
+                if (remaining == displayedSeconds) return;
+                displayedSeconds = remaining;
+                danger.SetText("{0}", remaining);
             }
         }
 

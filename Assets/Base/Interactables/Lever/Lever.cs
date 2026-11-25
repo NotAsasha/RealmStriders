@@ -25,6 +25,7 @@ namespace Base.Interactables
 
         private Coroutine cooldownRoutine;
         private Coroutine fallbackResetRoutine;
+        private double nextServerSwitchTime;
 
         private void Awake()
         {
@@ -116,10 +117,6 @@ namespace Base.Interactables
             if (!isReady || GameManager.Instance == null) return;
 
             bool isMissionActive = GameManager.Instance.hasStartedMission.Value;
-            if (!isMissionActive && string.IsNullOrEmpty(GameManager.Instance.missionName))
-            {
-                return;
-            }
 
             isTargetingStartMission = !isMissionActive;
             isHolding = true;
@@ -171,20 +168,28 @@ namespace Base.Interactables
         {
             if (!isReady || GameManager.Instance == null) return;
 
-            if (!GameManager.Instance.hasStartedMission.Value)
-            {
-                GameManager.Instance.StartMissionServerRpc();
-            }
-            else
-            {
-                GameManager.Instance.StopMissionServerRpc();
-            }
+            RequestMissionSwitchRpc(!GameManager.Instance.hasStartedMission.Value);
 
             if (cooldownRoutine != null)
             {
                 StopCoroutine(cooldownRoutine);
             }
             cooldownRoutine = StartCoroutine(Cooldown());
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        private void RequestMissionSwitchRpc(bool start, RpcParams rpcParams = default)
+        {
+            GameManager manager = GameManager.Instance;
+            ulong sender = rpcParams.Receive.SenderClientId;
+            if (manager == null || manager.IsResolvingMission || manager.hasStartedMission.Value == start ||
+                terminal == null || !terminal.IsOperatedByServer(sender) ||
+                !manager.IsWithinBaseRange(NetworkManager.ConnectedClients[sender].PlayerObject.transform.position) ||
+                NetworkManager.ServerTime.Time < nextServerSwitchTime) return;
+            if (start && string.IsNullOrEmpty(manager.missionName)) return;
+            nextServerSwitchTime = NetworkManager.ServerTime.Time + cooldown;
+            if (start) manager.StartMissionServer();
+            else manager.StopMissionServer();
         }
 
         private IEnumerator Cooldown()

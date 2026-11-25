@@ -16,16 +16,18 @@ public class LoadSaveButton : MonoBehaviour
 
     public void RefreshText()
     {
+        bool available = gameSave != null && !gameSave.IsLoadBlocked && gameSave.save != null;
         if (completedStar != null)
-            completedStar.SetActive(gameSave != null && gameSave.save != null && gameSave.save.campaignCompleted);
+            completedStar.SetActive(available && gameSave.save.campaignCompleted);
         if (saveText == null) return;
-        saveText.text = gameSave != null && gameSave.save != null
+        saveText.text = gameSave != null && gameSave.IsLoadBlocked ? "Save unavailable" : available
             ? $"Rating: {gameSave.save.teamRating}\nMoney: {gameSave.save.teamMoney}"
             : "Empty save";
     }
 
     public void LoadSave()
     {
+        if (gameSave == null || gameSave.IsLoadBlocked) return;
         GameManager.Instance.currentSave = gameSave;
     }
 }

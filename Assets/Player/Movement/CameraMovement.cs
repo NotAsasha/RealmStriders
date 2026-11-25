@@ -117,14 +117,17 @@ namespace Player.Movement
             UnityEngine.Cursor.visible = true;
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
+            CleanupInputHandlers();
+            SettingsFile.OnSettingsChanged -= UpdateSensitivity;
             if (Instance == this)
             {
                 Instance = null;
                 UnityEngine.Cursor.lockState = CursorLockMode.None;
                 UnityEngine.Cursor.visible = true;
             }
+            base.OnDestroy();
         }
 
 

@@ -217,15 +217,9 @@ MonoBehaviour:
   actionRemoteRotationOffset: {x: -15, y: -15, z: 0}
   poseBlendDuration: 0.2
   holdAnimationOffset: {fileID: 0}
-  inventoryRenderers:
-  - {fileID: 5456380174134468142}
-  - {fileID: 5082641762796492387}
-  - {fileID: 1908105603011327603}
-  - {fileID: 2727181719101561310}
-  inventoryLights: []
-  inventoryCanvases: []
-  inventoryAudioSources:
-  - {fileID: 6039384330410812876}
+  independentRenderers:
+  - {fileID: 7792699169915705560}
+  - {fileID: 7626526755193744139}
   inventoryColliders:
   - {fileID: 7737286886557379534}
   prefabId: 26
@@ -10387,27 +10381,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d62e35853d4d8e746a0dffbc00c78588, type: 3}
---- !u!23 &1908105603011327603 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7202271454713460447, guid: d62e35853d4d8e746a0dffbc00c78588,
-    type: 3}
-  m_PrefabInstance: {fileID: 8757645665339539628}
-  m_PrefabAsset: {fileID: 0}
 --- !u!23 &2727181719101561310 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -2571118854743697038, guid: d62e35853d4d8e746a0dffbc00c78588,
-    type: 3}
-  m_PrefabInstance: {fileID: 8757645665339539628}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &5082641762796492387 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -4683669308469848369, guid: d62e35853d4d8e746a0dffbc00c78588,
-    type: 3}
-  m_PrefabInstance: {fileID: 8757645665339539628}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &5456380174134468142 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 3616844112969948802, guid: d62e35853d4d8e746a0dffbc00c78588,
     type: 3}
   m_PrefabInstance: {fileID: 8757645665339539628}
   m_PrefabAsset: {fileID: 0}

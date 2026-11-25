@@ -1,109 +1,107 @@
+using System.Collections.Generic;
 using Player.Equipment;
-using System.Drawing;
+using Player.Movement;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 namespace Base
 {
     public class PackedFurnitureItem : Item, INetworkSaveable
     {
+        private const float PlacementReach = 5f;
         [SerializeField] private LayerMask layersToPlaceOn;
+        public NetworkVariable<int> storedPrefabID = new(-1, writePerm: NetworkVariableWritePermission.Server);
 
-        public NetworkVariable<int> storedPrefabID = new(writePerm: NetworkVariableWritePermission.Server);
-
-        [SerializeField] private GameObject previewPrefab;
-        private GameObject currentPreview;
-
-        #region Unity Lifecycle
-
-        public void Start()
+        private struct PreviewPart
         {
-            if (IsOwner)
-            {
-                previewPrefab = NetworkItemsHandler.Instance.database.GetPrefab(storedPrefabID.Value).gameObject;
-                currentPreview = Instantiate(previewPrefab, transform);
-                currentPreview.SetActive(false);
-            }
+            public Mesh mesh;
+            public Matrix4x4 relativeTransform;
+            public RenderParams[] materials;
         }
 
-        public override void OnNetworkDespawn()
-        {
-            if (currentPreview != null) Destroy(currentPreview);
-            base.OnNetworkDespawn();
-        }
+        private readonly List<PreviewPart> previewParts = new();
+        private int previewId = -1;
 
-        private void Update()
-        {
-            if (!IsOwner || !IsSpawned || !IsEquipped)
-            {
-                if (currentPreview != null) currentPreview.SetActive(false);
-                return;
-            }
-
-            //only local
-            HandlePreview();
-        }
-
-        #endregion
-
-        #region Saving
-
-        public override string GetInfo()
-        {
-            return storedPrefabID.Value.ToString();
-        }
+        public override string GetInfo() => storedPrefabID.Value.ToString();
 
         public override void ApplyInfo(string info)
         {
-            if (!int.TryParse(info, out var id)) Debug.LogError("---PackedFurnitureItem: Tried to load non-int value.");
-            storedPrefabID.Value = id;
+            if (IsServer && int.TryParse(info, out int id) &&
+                NetworkItemsHandler.Instance.database.TryGetTerminalPrefab(id, out _))
+                storedPrefabID.Value = id;
         }
 
-        #endregion
-
-        #region Item Specific
-
-        override protected void ExecuteItemAction(GameObject player)
+        private bool TryGetPlacement(Vector3 origin, Vector3 forward, out RaycastHit hit)
         {
-            // if (currentPreview.GetComponent<Collider>()) --- somehow check if out-of-bounds
-            PlaceServerRpc(currentPreview.transform.position, currentPreview.transform.rotation);
+            return Physics.Raycast(origin, forward, out hit, PlacementReach, layersToPlaceOn,
+                QueryTriggerInteraction.Ignore);
         }
 
-        [Rpc(SendTo.Server)]
-        private void PlaceServerRpc(Vector3 position, Quaternion rotation)
+        protected override void LateUpdate()
         {
-            NetworkObject furniturePrefab = NetworkItemsHandler.Instance.database.GetPrefab(storedPrefabID.Value);
+            base.LateUpdate();
+            if (!IsSpawned || !IsClient || !IsHeldByClient(NetworkManager.LocalClientId) ||
+                CameraMovement.Instance == null) return;
+            Transform aim = CameraMovement.Instance.transform;
+            if (!TryGetPlacement(aim.position, aim.forward, out RaycastHit hit)) return;
+            if (previewId != storedPrefabID.Value) CachePreview();
+            var pose = Matrix4x4.TRS(hit.point, Quaternion.Euler(0f, transform.eulerAngles.y - 90f, 0f), Vector3.one);
+            foreach (var part in previewParts)
+            {
+                var matrix = pose * part.relativeTransform;
+                for (int i = 0; i < part.materials.Length; i++)
+                    if (part.materials[i].material != null)
+                        Graphics.RenderMesh(part.materials[i], part.mesh, i, matrix);
+            }
+        }
 
-            NetworkObject spawnedFurniture = Instantiate(furniturePrefab, position, rotation);
-            spawnedFurniture.Spawn();
-            spawnedFurniture.Register();
+        // Drawing the prefab's meshes avoids spawning a second set of terminals, colliders and audio sources.
+        private void CachePreview()
+        {
+            previewParts.Clear();
+            previewId = storedPrefabID.Value;
+            if (!NetworkItemsHandler.Instance.database.TryGetTerminalPrefab(previewId, out var prefab)) return;
+            Matrix4x4 relativeToRoot = Matrix4x4.Scale(prefab.transform.localScale) * prefab.transform.worldToLocalMatrix;
+            foreach (var filter in prefab.GetComponentsInChildren<MeshFilter>())
+            {
+                if (filter.sharedMesh == null || !filter.TryGetComponent<MeshRenderer>(out var renderer) ||
+                    !renderer.enabled) continue;
+                var materials = renderer.sharedMaterials;
+                int count = Mathf.Min(filter.sharedMesh.subMeshCount, materials.Length);
+                var parameters = new RenderParams[count];
+                for (int i = 0; i < count; i++)
+                    parameters[i] = new RenderParams(materials[i]) { layer = renderer.gameObject.layer };
+                previewParts.Add(new PreviewPart
+                {
+                    mesh = filter.sharedMesh,
+                    relativeTransform = relativeToRoot * filter.transform.localToWorldMatrix,
+                    materials = parameters
+                });
+            }
+        }
 
+        protected override void ExecuteItemAction(GameObject player)
+        {
+            if (CameraMovement.Instance == null) return;
+            Transform aim = CameraMovement.Instance.transform;
+            if (TryGetPlacement(aim.position, aim.forward, out _))
+                PlaceServerRpc(aim.position, aim.forward, transform.eulerAngles.y - 90f);
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        private void PlaceServerRpc(Vector3 origin, Vector3 forward, float yaw, RpcParams rpcParams = default)
+        {
+            if (!TryGetUsableHolderServer(rpcParams.Receive.SenderClientId, out var holder) ||
+                !IsValidAim(holder, origin, forward, layersToPlaceOn) || !float.IsFinite(yaw) ||
+                !TryGetPlacement(origin, forward, out RaycastHit hit) ||
+                !NetworkItemsHandler.Instance.database.TryGetTerminalPrefab(storedPrefabID.Value, out var prefab)) return;
+            var furniture = Instantiate(prefab, hit.point, Quaternion.Euler(0f, yaw, 0f));
+            Scene surfaceScene = hit.collider.gameObject.scene;
+            if (surfaceScene.IsValid() && surfaceScene.isLoaded)
+                SceneManager.MoveGameObjectToScene(furniture.gameObject, surfaceScene);
+            furniture.Spawn();
             NetworkObject.Despawn(true);
-        }
-
-        override public void Drop()
-        {
-            if (currentPreview != null) currentPreview.SetActive(false);
-            base.Drop();
-        }
-
-        #endregion
-
-        private void HandlePreview()
-        {
-            Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));
-            if (Physics.Raycast(ray, out RaycastHit hit, 5f, layersToPlaceOn))
-            {
-                currentPreview.SetActive(true);
-                currentPreview.transform.position = hit.point; // Тут можна додати логіку прив'язки до сітки (Grid Snapping)
-                currentPreview.transform.rotation = hit.transform.rotation;
-
-                // Обертання: можна додати поворот на коліщатко миші
-                currentPreview.transform.eulerAngles = new Vector3(0f, transform.eulerAngles.y - 90f, 0f);
-            }
-            else
-            {
-                currentPreview.SetActive(false);
-            }
         }
     }
 }

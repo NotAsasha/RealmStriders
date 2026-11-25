@@ -1,7 +1,6 @@
-using System.Collections;
+using Player;
 using Player.Equipment;
 using Player.Movement;
-using Unity.Multiplayer.PlayMode;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -15,8 +14,9 @@ namespace Base
         [SerializeField] protected Canvas terminalCanvas;
         [SerializeField] private Transform cameraPoint;
         [SerializeField] protected AudioSource interactSound;
+        [SerializeField, Min(0.1f)] private float serverInteractionReach = 4f;
 
-        [SerializeField, HideInInspector] private int prefabId;
+        [SerializeField, Min(-1)] private int prefabId = -1;
         public int PrefabId => prefabId;
         public virtual string GetInfo() => "";
         public virtual void ApplyInfo(string _) { }
@@ -29,11 +29,13 @@ namespace Base
         {
             if (NetworkObject == null) return;
             NetworkObject.Register();
+            if (IsServer) NetworkManager.OnClientDisconnectCallback += ReleaseDepartingOperator;
         }
 
         public override void OnNetworkDespawn()
         {
-            ReleaseCurrentPlayer();
+            if (NetworkManager != null) NetworkManager.OnClientDisconnectCallback -= ReleaseDepartingOperator;
+            ReleaseCurrentPlayer(false);
             if (NetworkObject != null) NetworkObject.UnRegister();
         }
 
@@ -94,7 +96,7 @@ namespace Base
             if (isDead) ReleaseCurrentPlayer();
         }
 
-        private void ReleaseCurrentPlayer()
+        private void ReleaseCurrentPlayer(bool notifyServer = true)
         {
             var playerMovement = currentPlayer != null ? currentPlayer.GetComponentInParent<PlayerMovement>() : null;
             if (playerMovement != null && playerMovement.human != null)
@@ -102,12 +104,7 @@ namespace Base
                 playerMovement.human.isDead.OnValueChanged -= OnPlayerDeathStateChanged;
             }
 
-            if (IsSpawned && IsServer)
-            {
-                isTaken.Value = false;
-                currentInteractingClientId.Value = ulong.MaxValue;
-            }
-            else if (IsSpawned && IsClient)
+            if (notifyServer && currentPlayer != null && IsSpawned && IsClient)
             {
                 SetTakenServerRpc(false);
             }
@@ -121,8 +118,47 @@ namespace Base
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void SetTakenServerRpc(bool whatToSet, RpcParams rpcParams = default)
         {
-            isTaken.Value = whatToSet;
-            currentInteractingClientId.Value = whatToSet ? rpcParams.Receive.SenderClientId : ulong.MaxValue;
+            ulong sender = rpcParams.Receive.SenderClientId;
+            if (!whatToSet)
+            {
+                ReleaseDepartingOperator(sender);
+                return;
+            }
+            if ((isTaken.Value && currentInteractingClientId.Value != sender) || !IsPlayerInReach(sender))
+            {
+                RejectInteractionRpc(RpcTarget.Single(sender, RpcTargetUse.Temp));
+                return;
+            }
+            currentInteractingClientId.Value = sender;
+            isTaken.Value = true;
+        }
+
+        [Rpc(SendTo.SpecifiedInParams, InvokePermission = RpcInvokePermission.Server, DeferLocal = true)]
+        private void RejectInteractionRpc(RpcParams rpcParams = default)
+        {
+            if (currentPlayer != null) currentPlayer.GetComponent<CameraMovement>()?.StopInteraction();
+        }
+
+        private void ReleaseDepartingOperator(ulong clientId)
+        {
+            if (!IsServer || currentInteractingClientId.Value != clientId) return;
+            currentInteractingClientId.Value = ulong.MaxValue;
+            isTaken.Value = false;
+        }
+
+        public bool IsOperatedByServer(ulong clientId)
+        {
+            return IsServer && isTaken.Value && currentInteractingClientId.Value == clientId && IsPlayerInReach(clientId);
+        }
+
+        private bool IsPlayerInReach(ulong clientId)
+        {
+            if (!NetworkManager.ConnectedClients.TryGetValue(clientId, out var client) ||
+                client.PlayerObject == null || !client.PlayerObject.TryGetComponent<Human>(out var human) ||
+                human.isDead.Value || human.IsBeingCaptured) return false;
+            Vector3 origin = human.transform.position + Vector3.up;
+            return isActiveAndEnabled && TryGetComponent<Collider>(out var surface) && surface.enabled &&
+                   (surface.bounds.ClosestPoint(origin) - origin).sqrMagnitude <= serverInteractionReach * serverInteractionReach;
         }
 
         public bool IsTaken() => isTaken.Value;
@@ -134,30 +170,28 @@ namespace Base
 
         public void Pack()
         {
-            PackServerRpc();
-        }
-
-        [Rpc(SendTo.Server)]
-        private void PackServerRpc()
-        {
-            DeactivateRpc();
+            if (!IsServer || !IsSpawned || NetworkItemsHandler.Instance == null ||
+                !NetworkItemsHandler.Instance.database.TryGetTerminalPrefab(PrefabId, out _)) return;
+            DeactivateServer();
 
             GameObject cubePrefab = NetworkItemsHandler.Instance.database.cubeItemPrefab;
 
             GameObject cubeInstance = Instantiate(cubePrefab, GetComponent<Collider>().bounds.center + Vector3.up * 0.5f, Quaternion.identity);
             cubeInstance.GetComponent<PackedFurnitureItem>().storedPrefabID.Value = this.PrefabId;
             cubeInstance.GetComponent<NetworkObject>().Spawn();
+            NetworkItemsHandler.Instance.RecordPackedSceneFurniture(NetworkObject);
 
 
             NetworkObject.Despawn(true);
         }
 
 
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void DeactivateRpc()
+        protected void DeactivateServer()
         {
+            if (!IsServer) return;
+            currentInteractingClientId.Value = ulong.MaxValue;
             DeactivateClientRpc();
-            isTaken.Value = false; 
+            isTaken.Value = false;
         }
 
         [ClientRpc]

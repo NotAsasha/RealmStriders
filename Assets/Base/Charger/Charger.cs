@@ -29,7 +29,7 @@ public class Charger : NetworkBehaviour, IPowerConsumer
         NetworkVariableWritePermission.Server
     );
 
-    private readonly Collider[] nearbyItems = new Collider[20];
+    private Collider[] nearbyItems = new Collider[20];
     private float tickTimer = 0f;
 
     // Кеш для локального візуалу
@@ -124,13 +124,25 @@ public class Charger : NetworkBehaviour, IPowerConsumer
         }
     }
 
-    private IChargeable GetBestChargeableTarget(out NetworkObject bestNetObj)
+    private IChargeable GetBestChargeableTarget(out NetworkObject bestNetObj) =>
+        FindChargeableTarget(beamOrigin.position, chargeDistance, itemLayer, wallLayer, ref nearbyItems,
+            NetworkManager, out bestNetObj);
+
+    internal static IChargeable FindChargeableTarget(Vector3 originPos, float chargeDistance, LayerMask itemLayer,
+        LayerMask wallLayer, ref Collider[] nearbyItems, NetworkManager manager, out NetworkObject bestNetObj,
+        System.Predicate<IChargeable> acceptsTarget = null)
     {
         bestNetObj = null;
-        Vector3 originPos = beamOrigin.position;
         int numColliders = Physics.OverlapSphereNonAlloc(originPos, chargeDistance, nearbyItems, itemLayer);
+        // A full non-allocating query may have omitted the nearest eligible item.
+        while (numColliders == nearbyItems.Length)
+        {
+            System.Array.Resize(ref nearbyItems, nearbyItems.Length * 2);
+            numColliders = Physics.OverlapSphereNonAlloc(originPos, chargeDistance, nearbyItems, itemLayer);
+        }
 
         IChargeable bestItem = null;
+        float radiusSqr = chargeDistance * chargeDistance;
         float closestDistanceSqr = float.MaxValue;
 
         for (int i = 0; i < numColliders; i++)
@@ -139,29 +151,23 @@ public class Charger : NetworkBehaviour, IPowerConsumer
             if (col == null) continue;
 
             var item = col.GetComponentInParent<IChargeable>();
-            if (item == null || item.IsFullyCharged) continue;
+            if (item == null || item.IsFullyCharged || (acceptsTarget != null && !acceptsTarget(item))) continue;
 
             if (!col.TryGetComponent<NetworkObject>(out var netObj))
             {
                 netObj = col.GetComponentInParent<NetworkObject>();
             }
 
-            if (netObj == null || !netObj.IsSpawned) continue;
+            if (netObj == null || !netObj.IsSpawned || netObj.NetworkManager != manager) continue;
 
-            Vector3 targetPos = col.bounds.center;
-            Vector3 direction = targetPos - originPos;
-            float distance = direction.magnitude;
+            Vector3 direction = col.bounds.center - originPos;
+            float distanceSqr = direction.sqrMagnitude;
+            if (distanceSqr > radiusSqr || distanceSqr >= closestDistanceSqr) continue;
+            if (Physics.Raycast(originPos, direction.normalized, Mathf.Sqrt(distanceSqr), wallLayer)) continue;
 
-            if (Physics.Raycast(originPos, direction.normalized, distance, wallLayer))
-                continue;
-
-            float distSqr = direction.sqrMagnitude;
-            if (distSqr < closestDistanceSqr)
-            {
-                closestDistanceSqr = distSqr;
-                bestItem = item;
-                bestNetObj = netObj;
-            }
+            closestDistanceSqr = distanceSqr;
+            bestItem = item;
+            bestNetObj = netObj;
         }
 
         // Inventory disables held colliders, so physics queries cannot find equipped items.
@@ -170,16 +176,17 @@ public class Charger : NetworkBehaviour, IPowerConsumer
         {
             Inventory inventory = inventories[i];
             if (inventory == null || !inventory.IsSpawned || !inventory.isActiveAndEnabled ||
-                inventory.NetworkManager != NetworkManager) continue;
+                inventory.NetworkManager != manager) continue;
 
             Item heldItem = inventory.GetActiveItem();
             if (heldItem == null || !heldItem.IsSpawned || !heldItem.isActiveAndEnabled ||
-                heldItem is not IChargeable chargeable || chargeable.IsFullyCharged) continue;
+                heldItem is not IChargeable chargeable || chargeable.IsFullyCharged ||
+                (acceptsTarget != null && !acceptsTarget(chargeable))) continue;
             if ((itemLayer.value & (1 << heldItem.gameObject.layer)) == 0) continue;
 
             Vector3 direction = heldItem.transform.position - originPos;
             float distanceSqr = direction.sqrMagnitude;
-            if (distanceSqr > chargeDistance * chargeDistance || distanceSqr >= closestDistanceSqr) continue;
+            if (distanceSqr > radiusSqr || distanceSqr >= closestDistanceSqr) continue;
             if (Physics.Raycast(originPos, direction.normalized, Mathf.Sqrt(distanceSqr), wallLayer)) continue;
 
             closestDistanceSqr = distanceSqr;

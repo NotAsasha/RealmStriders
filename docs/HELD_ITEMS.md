@@ -1,31 +1,30 @@
 # Held items
 
 The system uses one full-body rig, the right hand and one NetworkObject per
-item. Inventory state is server-owned; poses are evaluated locally.
+item. Separate first-person arms and two-handed poses are outside scope.
+The server owns inventory state. Each client evaluates poses locally.
 
 ## Ownership
 
 | Component | Responsibility |
 | --- | --- |
-| `Inventory` | Replicated slot snapshot and selected item |
+| `Inventory` | Replicated slot snapshot and selected item. Configure `capacity` (code default 4) to match the inventory UI. |
 | `ItemHolder` | Camera/shoulder poses, walking bob, action offsets and equip transition |
 | `PlayerHeadSync` | Arm IK and authored finger curl after camera effects |
 | `Item` | Aligning to the solved palm and hiding stored presentation |
 
 The owner view adds a subtle walking bob from actual grounded movement, before
 camera clearance and arm IK. Tune ItemHolder's `walkBobPosition`,
-`walkBobRotation`, `walkBobStrideLength` and `walkBobBlendSpeed`; disable it with
-`enableWalkBob`. It settles at rest, in the air, while paused/interacting or
-immobilized, and is reduced when crouching or using an action pose. It adds no
-replicated state.
-`runBobFrequencyMultiplier` speeds up the cadence while running (default 1.45),
-blending smoothly without increasing the authored amplitudes or restarting the stride.
+`walkBobRotation`, `walkBobStrideLength` and `walkBobBlendSpeed`, or disable
+the effect with `enableWalkBob`. Bob settles at rest, in the air, when paused,
+while interacting or when immobilized. Crouching and action poses reduce it.
+`runBobFrequencyMultiplier` (code default 1.45) blends to a faster cadence
+while preserving the authored amplitudes and current stride phase.
 
 ## Authoring
 
 1. Set `Item.gripPoint` at the physical handle contact, with axes describing the
-   grip coordinate system. Use pose offsets to adjust framing rather than moving
-   the handle.
+   grip coordinate system. Adjust framing with the pose offsets in step 3.
 2. Calibrate `ItemHolder.palmPositionLocal` in hand-bone coordinates and
    `handGripRotationOffset` for grip-to-wrist orientation. Both views share this
    calibration, including skeleton scale compensation.
@@ -33,62 +32,63 @@ blending smoothly without increasing the authored amplitudes or restarting the s
    `remotePositionOffset` / `remoteRotationOffset` for the world pose. These move
    the whole hand/item assembly.
 4. Use `actionView*`, `actionRemote*` and `poseBlendDuration` for an alternate
-   pose, with `IsHoldActionActive` supplying the action state. WalkieTalkie uses
-   voice transmission with a 0.35-second release grace period between packets.
+   pose, with `IsHoldActionActive` supplying the action state.
 5. For clips, create an identity child `HoldAnimationOffset`, assign
    `holdAnimationOffset` and animate that child's local transform with a dedicated
    Animator. Do not animate the network root, GripPoint or player IK target.
    The body locomotion Animator must not drive item actions.
-6. Explicitly assign `inventoryRenderers`, `inventoryLights`, `inventoryCanvases`,
-   `inventoryAudioSources` and `inventoryColliders`, including particle renderers
-   and child physics colliders. Keep local Volume boundary colliders (such as
+6. Item automatically collects renderers, lights, canvases and audio sources
+   from its hierarchy at initialization, including inactive children. List
+   detached effects that should stay visible in `independentRenderers`.
+   Assign the pickup and child physics colliders in `inventoryColliders`.
+   Keep local Volume boundary colliders (such as
    Subwoofer's EffectArea trigger) out of `inventoryColliders` so held equipment
-   retains its post-processing area. No runtime hierarchy searches supply
-   missing references.
+   retains its post-processing area.
 7. Set `heldCameraBounds` to physical mesh bounds in item-root coordinates,
    excluding particles/effect volumes. Recompute after geometry changes.
 8. Assign PlayerHeadSync's `rightFingerBase`, `rightFingerMiddle` and
    `rightFingerTip` to the three right-hand finger joints. Set each Item's
    `heldFingerCurl` to positive base/middle/tip angles to wrap the fingers around
    its handle. Zero preserves the animated pose. The current mitten rig curls
-   around each joint's local Z axis. The additive pose is
-   shared by both views and restored before animation, unequip and despawn.
+   around each joint's local Z axis. The additive pose is shared by both
+   views and restored before animation, unequip and despawn.
 
-The wrist is solved before the item locks to the actual palm, including the
-first equip frame. Owner poses use a camera-relative grip with forward correction
-when bounds enter `ItemHolder.cameraClearance` (0.12 m). Local shoulder extension
-preserves arm lengths and palm contact and is restored before the next animation
-pass/on despawn. Remote reach remains separate. Terminal interaction retains its
-frozen world-space pose. Extreme angles/large items still need visual review.
+The wrist is solved before the item locks to the palm, including the first
+equip frame. Owner poses use a camera-relative grip with forward correction
+when bounds enter `ItemHolder.cameraClearance` (code default 0.12 m). Local
+shoulder extension preserves arm lengths and palm contact. The shoulder resets
+before the next animation pass and on despawn. Remote reach is handled
+separately. Terminal interaction retains its frozen world-space pose.
 
 ## Lifecycle
 
-- Selection starts ItemHolder's procedural raise/wrist turn. Tune `equipDuration`
-  (0.32 s), `equipPositionOffset` and `equipRotationOffset` in the Inspector.
-  Rapid switching restarts for the latest item; selecting the same slot does not.
-  Empty slots release the arm. Animation does not delay use or add RPCs.
-- `AddItem` returns request submission, not server acceptance. Display follows
-  acknowledged inventory state; see [Networking](NETWORKING.md).
+- Selection starts ItemHolder's procedural raise and wrist turn. In the
+  Inspector, tune `equipDuration` (code default 0.32 s), `equipPositionOffset`
+  and `equipRotationOffset`. Switching restarts the transition for the latest
+  item. Selecting the same slot preserves the current transition. Empty slots
+  release the arm. Items can be used during the animation.
+- `AddItem` indicates whether it submitted a request. Display follows the
+  server-acknowledged inventory state. See [Networking](NETWORKING.md).
 - Stored roots remain active and parented to the player. Presentation hides
   graphics/audio and disables colliders/physics. Hidden items follow the holder
   for mission cleanup.
 - Slot and parent messages may arrive in either order; reference resolution
   retries. Mission promotion can remove/reapply parents without losing slot IDs.
 - Despawn removes its slot. Death drops all items on the server and turns them
-  off. Normal drops preserve powered devices; changing slots turns them off.
+  off. Normal drops preserve power. Changing slots turns the previous item off.
 - An equipped powered radio raises while transmitting and lowers after the
-  packet grace period. Unequip, drop or power-off ends that pose. Voice activation
-  uses the existing RMS threshold; push-to-talk sends while recording.
+  0.35-second packet grace period. Unequip, drop or power-off ends that pose.
+  Voice activation uses the RMS threshold. Push-to-talk sends while recording.
 
 ## Verification
 
 Check the real Player rig and item prefab in standing/crouch idle/crouch walk,
-several animation phases, look pitches and equip weights. Confirm camera
-clearance, palm contact, unchanged arm lengths and restored shoulder pose.
+several animation phases, look pitches and equip weights. Include large items
+and extreme angles. Confirm camera clearance, palm contact, preserved arm
+lengths and restored shoulder pose.
 Inspect first-person and remote views, including terminal entry/exit.
 
 With a host and client, verify pickup, rapid/empty-slot selection, late-join slot
 and radio state, parent/visibility order, rejection of foreign-player requests,
 powered drops, death drops, despawn and mission return with stored/equipped items.
-Test Steam voice in both input modes separately; local loopback does not verify
-microphone capture or Steam transport.
+Test microphone capture and Steam transport with both voice input modes.

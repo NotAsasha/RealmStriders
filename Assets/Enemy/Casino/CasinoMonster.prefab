@@ -37395,6 +37395,7 @@ MonoBehaviour:
   terminalCanvas: {fileID: 4248858489144881491}
   cameraPoint: {fileID: 7992786183299789942}
   interactSound: {fileID: 0}
+  serverInteractionReach: 4
   prefabId: 0
   isTaken:
     UpdateTraits:
@@ -37444,6 +37445,7 @@ MonoBehaviour:
   - {fileID: 742197212546932466, guid: afb107c634d22c74bb33899eb38ecb92, type: 3}
   - {fileID: 895901380240031348, guid: bcfbe0d2a5902e74b824f7004c2bcc11, type: 3}
   - {fileID: 895901380240031348, guid: 23fed63beb2a54e47aecd03aa2e99fa4, type: 3}
+  useShopTube: 0
   spinPresentation: {fileID: 5528548501945236823}
 --- !u!114 &2405124022911735812
 MonoBehaviour:
@@ -37555,12 +37557,9 @@ MonoBehaviour:
   handleClip: {fileID: 7400000, guid: 3317a2f6404f2074998f2c31203d4abe, type: 2}
   effectsAudio: {fileID: 6227397918265990601}
   drumAudio: {fileID: 4215302032344880114}
-  handleSound: {fileID: 8300000, guid: 8284e3c2748d83e4cbd026f3847a3a20, type: 3}
-  drumLoop: {fileID: 8300000, guid: 1e2514edb04a4e641bc521938caaf16f, type: 3}
-  stopSound: {fileID: 8300000, guid: f4b214375f0770a4eb5ca26d078bfbab, type: 3}
-  referenceRotationsPerSecond: 5
-  minimumDrumPitch: 0.3
-  maximumDrumPitch: 1.2
+  handleSound: {fileID: 8300000, guid: c8ed68e0b13c9d14ba4f0d246829227d, type: 3}
+  drumClick: {fileID: 8300000, guid: 18d627398d99d014b89e584754b21058, type: 3}
+  stopSound: {fileID: 8300000, guid: 6d5b1c0c65904d94d8215d625b9de703, type: 3}
 --- !u!1 &3975968862184668150
 GameObject:
   m_ObjectHideFlags: 0
