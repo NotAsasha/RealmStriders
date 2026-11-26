@@ -36097,6 +36097,246 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2321904917416796257
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3798461714124600986}
+  - component: {fileID: 2522305068855833713}
+  - component: {fileID: 3360636976947930990}
+  m_Layer: 0
+  m_Name: ShockAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3798461714124600986
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2321904917416796257}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.11481176, y: 0.008733903, z: 0.051009793, w: 0.99203837}
+  m_LocalPosition: {x: -0.021938432, y: 0.5798311, z: -0.3213463}
+  m_LocalScale: {x: 1.1999999, y: 1.1999999, z: 1.1999998}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8494507264682673876}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &2522305068855833713
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2321904917416796257}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 17f59cf469750bf4590518a6e5ea73aa, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 1
+  SpatializePostEffects: 1
+  Priority: 128
+  DopplerLevel: 0
+  MinDistance: 1
+  MaxDistance: 10
+  Pan2D: 0
+  rolloffMode: 2
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.1
+      value: 1
+      inSlope: -10.0039835
+      outSlope: -10.0039835
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.2
+      value: 0.5
+      inSlope: -2.5009959
+      outSlope: -2.5009959
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.4
+      value: 0.25
+      inSlope: -0.62524897
+      outSlope: -0.62524897
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.8
+      value: 0.125
+      inSlope: -0.15631224
+      outSlope: -0.15631224
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -0.10003988
+      outSlope: -0.10003988
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &3360636976947930990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2321904917416796257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c3684b22f00604a97bb68037fcf4cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamAudioUnity::SteamAudio.SteamAudioSource
+  directBinaural: 1
+  interpolation: 1
+  perspectiveCorrection: 0
+  distanceAttenuation: 1
+  distanceAttenuationInput: 0
+  distanceAttenuationValue: 1
+  airAbsorption: 0
+  airAbsorptionInput: 0
+  airAbsorptionLow: 1
+  airAbsorptionMid: 1
+  airAbsorptionHigh: 1
+  directivity: 0
+  directivityInput: 0
+  dipoleWeight: 0
+  dipolePower: 0
+  directivityValue: 1
+  occlusion: 1
+  occlusionInput: 0
+  occlusionType: 0
+  occlusionRadius: 1
+  occlusionSamples: 16
+  occlusionValue: 1
+  transmission: 1
+  transmissionType: 1
+  transmissionInput: 0
+  transmissionLow: 1
+  transmissionMid: 1
+  transmissionHigh: 1
+  maxTransmissionSurfaces: 1
+  directMixLevel: 1
+  reflections: 0
+  reflectionsType: 0
+  useDistanceCurveForReflections: 0
+  currentBakedSource: {fileID: 0}
+  reverbTimeLow: 0
+  reverbTimeMid: 0
+  reverbTimeHigh: 0
+  hybridReverbEQLow: 1
+  hybridReverbEQMid: 1
+  hybridReverbEQHigh: 1
+  hybridReverbDelay: 0
+  applyHRTFToReflections: 0
+  reflectionsMixLevel: 1
+  pathing: 0
+  pathingProbeBatch: {fileID: 0}
+  pathValidation: 1
+  findAlternatePaths: 1
+  pathingEQ:
+  - 1
+  - 1
+  - 1
+  pathingSH:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  applyHRTFToPathing: 1
+  pathingMixLevel: 0.8
+  normalizePathingEQ: 0
 --- !u!1 &2482545264378017402
 GameObject:
   m_ObjectHideFlags: 0
@@ -39425,6 +39665,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 3798461714124600986}
   - {fileID: 1578652059846415978}
   - {fileID: 4316962516686859450}
   - {fileID: 1815107322064509221}
@@ -39443,7 +39684,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 4077620890
+  GlobalObjectIdHash: 1215243224
   InScenePlacedSourceGlobalObjectIdHash: 4077620890
   DeferredDespawnTick: 0
   Ownership: 1
@@ -39610,8 +39851,8 @@ MonoBehaviour:
   captureLift: 1.1
   captureTransformation: {fileID: 5394576420641348537}
   statusVisuals: {fileID: 0}
-  shockAudioSource: {fileID: 0}
-  shockAudioClip: {fileID: 0}
+  shockAudioSource: {fileID: 2522305068855833713}
+  shockAudioClip: {fileID: 8300000, guid: 17f59cf469750bf4590518a6e5ea73aa, type: 3}
   isDead:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -39803,7 +40044,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3695b90fba94e1246b3076bed15d9913, type: 3}
   angrySounds:
   - {fileID: 8300000, guid: 03f1e99b15c4b914fb3ec7a8dd5a61ed, type: 3}
-  deathSound: {fileID: 8300000, guid: 03f1e99b15c4b914fb3ec7a8dd5a61ed, type: 3}
+  deathSound: {fileID: 8300000, guid: 550d298239f06fd47ac3ae612af3a2b2, type: 3}
   jumpscareSound: {fileID: 8300000, guid: 03f1e99b15c4b914fb3ec7a8dd5a61ed, type: 3}
   idleRadius: 30
   angryRadius: 35
@@ -39841,7 +40082,7 @@ MonoBehaviour:
   implosionMaterialTemplate: {fileID: 2100000, guid: 698883ec95c8dcc48984f516a86de42c,
     type: 2}
   vacuumLoop: {fileID: 8300000, guid: accc014927a8edb42b182f2167ec0736, type: 3}
-  implosionPop: {fileID: 8300000, guid: 7f4dc8c1301992642b1a31ac4f235213, type: 3}
+  implosionPop: {fileID: 8300000, guid: 550d298239f06fd47ac3ae612af3a2b2, type: 3}
   effectRadius: 3
   vacuumVolume: 2
   energyColor: {r: 1, g: 0.19999999, b: 0.23132361, a: 1}
@@ -39867,6 +40108,8 @@ MonoBehaviour:
     acousticSource: {fileID: 5605283130477859905}
   - audioSource: {fileID: 4215302032344880114}
     acousticSource: {fileID: 4028618217175857383}
+  - audioSource: {fileID: 2522305068855833713}
+    acousticSource: {fileID: 3360636976947930990}
   refreshInterval: 0.1
 --- !u!114 &7905665947840641109
 MonoBehaviour:

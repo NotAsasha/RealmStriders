@@ -11706,6 +11706,84 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!1001 &1885292878
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 141431450553219019, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: m_Name
+      value: Speaker
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958927241620849, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -84.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958927241620849, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.2682493
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958927241620849, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 12.082
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958927241620849, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.37355486
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958927241620849, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.048019126
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958927241620849, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.9188042
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958927241620849, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.118108965
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958927241620849, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -14.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958927241620849, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 135.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 773958927241620849, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1868007484562812251, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: m_Resource
+      value: 
+      objectReference: {fileID: 8300000, guid: 87549c34a29d96540852905b731d1897, type: 3}
+    - target: {fileID: 5125919518633098387, guid: 43aa87f3785077c45981593388646375,
+        type: 3}
+      propertyPath: pathingProbeBatch
+      value: 
+      objectReference: {fileID: 1354629988}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 43aa87f3785077c45981593388646375, type: 3}
 --- !u!1 &1899173910
 GameObject:
   m_ObjectHideFlags: 0
@@ -12093,3 +12171,4 @@ SceneRoots:
   - {fileID: 943157618}
   - {fileID: 352164122}
   - {fileID: 1899173911}
+  - {fileID: 1885292878}
